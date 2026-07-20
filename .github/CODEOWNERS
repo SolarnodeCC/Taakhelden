@@ -1,0 +1,4 @@
+# Extra review verplicht op gevoelige onderdelen
+/apps/api/migrations/          @remco
+/apps/api/src/middleware/      @remco
+/apps/api/src/routes/auth.ts   @remco

@@ -1,0 +1,31 @@
+import { z } from "zod";
+
+export const RegisterBody = z.object({
+  email: z.string().email(),
+  password: z.string().min(10),
+  familyName: z.string().min(1).max(50),
+  displayName: z.string().min(1).max(30),
+  turnstileToken: z.string(),
+});
+
+export const LoginBody = z.object({
+  email: z.string().email(),
+  password: z.string(),
+});
+
+export const FamilyCodeBody = z.object({
+  familyCode: z.string().length(6),
+});
+
+export const ChildSessionBody = z.object({
+  familyCode: z.string().length(6),
+  childId: z.string(),
+  pincode: z.string().regex(/^\d{4}$/),
+});
+
+export const TokenPair = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string().optional(), // kind-sessies hebben geen refresh token
+  expiresIn: z.number(),
+});
+export type TokenPair = z.infer<typeof TokenPair>;

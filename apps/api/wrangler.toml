@@ -1,0 +1,42 @@
+name = "taakhelden-api"
+main = "src/index.ts"
+compatibility_date = "2026-07-01"
+
+# --- staging is de default omgeving ---
+[[d1_databases]]
+binding = "DB"
+database_name = "taakhelden-db"
+database_id = "REPLACE_AFTER_wrangler_d1_create"   # wrangler d1 create taakhelden-db --location=weur
+
+[[r2_buckets]]
+binding = "PHOTOS"
+bucket_name = "taakhelden-photos"                  # aanmaken met jurisdiction=eu
+
+[[kv_namespaces]]
+binding = "KV"
+id = "REPLACE_AFTER_wrangler_kv_create"
+
+[[durable_objects.bindings]]
+name = "FAMILY_DO"
+class_name = "FamilyRoom"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["FamilyRoom"]
+
+[[queues.producers]]
+binding = "PHOTO_QUEUE"
+queue = "photo-processing"
+
+[[queues.consumers]]
+queue = "photo-processing"
+
+[triggers]
+crons = ["5 0 * * *", "*/15 * * * *"]  # 00:05 instance-generatie · elke 15 min notificaties
+
+# Secrets (via `wrangler secret put`): JWT_SECRET, APNS_KEY, APNS_KEY_ID,
+# APNS_TEAM_ID, APPLE_CLIENT_ID, TURNSTILE_SECRET
+
+[env.production]
+name = "taakhelden-api-prod"
+# production heeft eigen D1/R2/KV — id's invullen na aanmaken

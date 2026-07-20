@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.next/
+.wrangler/
+.dev.vars
+*.local
+.DS_Store
+coverage/
+apps/ios/build/
+apps/ios/DerivedData/

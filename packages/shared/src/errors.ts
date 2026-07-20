@@ -1,0 +1,19 @@
+/** Stabiele, machine-leesbare foutcodes — zie docs/taakhelden-api-specificatie.md §1 */
+export const ErrorCodes = {
+  VALIDATION_FAILED: "VALIDATION_FAILED",
+  UNAUTHORIZED: "UNAUTHORIZED",
+  FORBIDDEN: "FORBIDDEN",
+  NOT_FOUND: "NOT_FOUND",
+  TASK_ALREADY_COMPLETED: "TASK_ALREADY_COMPLETED",
+  INSUFFICIENT_POINTS: "INSUFFICIENT_POINTS",
+  REWARD_LIMIT_REACHED: "REWARD_LIMIT_REACHED",
+  PIN_LOCKED: "PIN_LOCKED",
+  INVALID_FAMILY_CODE: "INVALID_FAMILY_CODE",
+  IDEMPOTENCY_REPLAY: "IDEMPOTENCY_REPLAY",
+  RATE_LIMITED: "RATE_LIMITED",
+} as const;
+export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
+
+export interface ApiError {
+  error: { code: ErrorCode; message: string; details?: Record<string, unknown> };
+}
