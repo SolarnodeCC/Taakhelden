@@ -7,7 +7,7 @@ compatibility_flags = ["nodejs_compat"]
 [[d1_databases]]
 binding = "DB"
 database_name = "taakhelden-db"
-database_id = "REPLACE_AFTER_wrangler_d1_create"   # wrangler d1 create taakhelden-db --location=weur
+database_id = "031e773c-bad4-40fa-ad65-984f40c1992c"   # wrangler d1 create taakhelden-db --location=weur
 
 [[r2_buckets]]
 binding = "PHOTOS"
@@ -15,7 +15,7 @@ bucket_name = "taakhelden-photos"                  # aanmaken met jurisdiction=e
 
 [[kv_namespaces]]
 binding = "KV"
-id = "REPLACE_AFTER_wrangler_kv_create"
+id = "5f1fabd9e81f4fd7843a7cbe8ba5f2ac"
 
 [[durable_objects.bindings]]
 name = "FAMILY_DO"
