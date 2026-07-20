@@ -4,7 +4,7 @@
  * cron mag gerust vaker draaien. Roulatie wisselt per ISO-week.
  */
 import { newId } from "./ids";
-import { weekdayCode, isoWeekNumber } from "./time";
+import { weekdayCode, isoWeekNumber, weekDates } from "./time";
 import { listActiveTasksForDate } from "../repo/tasks";
 import { insertInstance } from "../repo/instances";
 
@@ -55,6 +55,25 @@ export async function generateInstancesForFamily(
       });
       created++;
     }
+  }
+  return created;
+}
+
+/**
+ * Genereert vanaf `fromDate` t/m het einde van diens ISO-week. Zo staat het
+ * weektotaal er vroeg, waardoor de weekbonus elke dag kan vallen (niet meer
+ * alleen op zondag). INSERT OR IGNORE houdt het idempotent bij herhaalde runs.
+ */
+export async function generateWeekAheadForFamily(
+  db: D1Database,
+  familyId: string,
+  family: { vacation_mode?: unknown },
+  fromDate: string,
+): Promise<number> {
+  let created = 0;
+  for (const date of weekDates(fromDate)) {
+    if (date < fromDate) continue; // alleen vandaag + de resterende week
+    created += await generateInstancesForFamily(db, familyId, family, date);
   }
   return created;
 }

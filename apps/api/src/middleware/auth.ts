@@ -10,7 +10,8 @@ export const authMiddleware: MiddlewareHandler<AppBindings> = async (c, next) =>
     throw new ApiException(401, ErrorCodes.UNAUTHORIZED, "Inloggen vereist.");
   }
   const payload = await verifyJwt(header.slice(7), c.env.JWT_SECRET);
-  if (!payload) {
+  if (!payload || payload.typ === "ws") {
+    // Een kortlevend ws-token mag nooit een gewone API-call authenticeren.
     throw new ApiException(401, ErrorCodes.UNAUTHORIZED, "Sessie verlopen, log opnieuw in.");
   }
   const auth: AuthContext = {

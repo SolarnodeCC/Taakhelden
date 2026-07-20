@@ -16,6 +16,19 @@ export async function getParentByEmail(db: D1Database, email: string) {
     .first();
 }
 
+/**
+ * Is dit e-mailadres al in gebruik? Bewust ZONDER deleted_at-filter: de
+ * users.email UNIQUE-constraint negeert soft-deletes ook, dus een soft-deleted
+ * rij zou anders alsnog een INSERT-conflict (500) geven i.p.v. een nette 409.
+ */
+export async function emailInUse(db: D1Database, email: string): Promise<boolean> {
+  const row = await db
+    .prepare("SELECT 1 FROM users WHERE email = ? LIMIT 1")
+    .bind(email.toLowerCase())
+    .first();
+  return row !== null;
+}
+
 export async function getParentByAppleSub(db: D1Database, appleSub: string) {
   return db
     .prepare(

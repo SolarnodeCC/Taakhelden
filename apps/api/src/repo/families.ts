@@ -104,6 +104,26 @@ export async function createChild(
     .run();
 }
 
+/**
+ * Tweede verzorger: parent-rij zonder inloggegevens (pending). De ouder zet
+ * later een wachtwoord via de uitnodigingslink. display_name is voorlopig het
+ * lokale deel van het e-mailadres tot de uitnodiging geaccepteerd wordt.
+ */
+export async function createPendingParent(
+  db: D1Database,
+  familyId: string,
+  input: { id: string; email: string; permissions: "full" | "approve_only" },
+) {
+  const placeholderName = input.email.split("@")[0] ?? "Ouder";
+  await db
+    .prepare(
+      `INSERT INTO users (id, family_id, role, permissions, display_name, email)
+       VALUES (?, ?, 'parent', ?, ?, ?)`,
+    )
+    .bind(input.id, familyId, input.permissions, placeholderName, input.email.toLowerCase())
+    .run();
+}
+
 export async function updateMember(
   db: D1Database,
   familyId: string,

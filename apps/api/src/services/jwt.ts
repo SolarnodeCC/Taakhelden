@@ -5,6 +5,8 @@ export interface JwtPayload {
   fam: string;
   role: "parent" | "child";
   perm?: "full" | "approve_only";
+  /** Tokensoort. Ontbreekt = normale access-JWT; "ws" = kortlevend WebSocket-token. */
+  typ?: "ws";
 }
 
 const enc = (secret: string) => new TextEncoder().encode(secret);

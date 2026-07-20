@@ -13,8 +13,10 @@ import * as instances from "../repo/instances";
 import * as ledger from "../repo/ledger";
 import * as rewards from "../repo/rewards";
 import * as photos from "../repo/photos";
+import * as badges from "../repo/badges";
+import { qualifyingBadgeIds } from "./badges";
 import { newId } from "./ids";
-import { localDate, weekDates, weekKey, weekdayCode, yesterdayOf } from "./time";
+import { localDate, weekDates, weekKey, yesterdayOf } from "./time";
 
 const UNDO_WINDOW_MS = 5 * 60 * 1000;
 
@@ -98,36 +100,70 @@ async function bookPoints(
     dayBonusEarned = true;
   }
 
-  // Weekbonus: geëvalueerd op de laatste dag van de week (zo), omdat instances
-  // per dag worden gegenereerd en het weektotaal pas dan compleet is.
-  // TODO(iteratie 2): hele week vooruit genereren zodat dit elke dag kan.
+  // Weekbonus: de cron genereert de hele week vooruit, dus het weektotaal is
+  // compleet en de bonus kan elke dag vallen zodra de drempel gehaald is
+  // (niet meer alleen op zondag). Weeksleutel als ref_id → max één per week.
   let weekBonusEarned = false;
-  if (weekdayCode(inst.date) === "SU") {
-    const week = await instances.weekStats(db, familyId, inst.child_id, weekDates(inst.date));
-    const ref = weekKey(inst.date);
-    if (
-      week.total > 0 &&
-      week.approved / week.total >= family.week_bonus_threshold &&
-      !(await ledger.bonusExists(db, familyId, inst.child_id, "week_bonus", ref))
-    ) {
-      await ledger.insertEntry(db, familyId, {
-        childId: inst.child_id,
-        type: "week_bonus",
-        amount: family.week_bonus_points,
-        refId: ref,
-      });
-      weekBonusEarned = true;
-    }
+  const week = await instances.weekStats(db, familyId, inst.child_id, weekDates(inst.date));
+  const ref = weekKey(inst.date);
+  if (
+    week.total > 0 &&
+    week.approved / week.total >= family.week_bonus_threshold &&
+    !(await ledger.bonusExists(db, familyId, inst.child_id, "week_bonus", ref))
+  ) {
+    await ledger.insertEntry(db, familyId, {
+      childId: inst.child_id,
+      type: "week_bonus",
+      amount: family.week_bonus_points,
+      refId: ref,
+    });
+    weekBonusEarned = true;
   }
+
+  const newBalance = await ledger.balance(db, familyId, inst.child_id);
+  const newBadges = await awardBadges(db, familyId, family, inst.child_id, newBalance);
 
   return {
     pointsEarned: taskPoints,
     photoBonusPoints,
     dayBonusEarned,
     weekBonusEarned,
-    newBadges: [], // TODO(iteratie 2): badge-catalogus + toekenning in deze transactie
-    newBalance: await ledger.balance(db, familyId, inst.child_id),
+    newBadges,
+    newBalance,
   };
+}
+
+/**
+ * Kent, in dezelfde transactie als de boeking, de badges toe waarvoor het kind
+ * nu (nieuw) kwalificeert en geeft ze terug voor de confetti-response.
+ */
+async function awardBadges(
+  db: D1Database,
+  familyId: string,
+  family: FamilyRow,
+  childId: string,
+  balance: number,
+): Promise<CompleteResult["newBadges"]> {
+  const today = localDate(family.timezone);
+  const bonusDates = await ledger.dayBonusDates(db, familyId, childId);
+  const streakDays = computeStreak(bonusDates, today);
+
+  const stats = await badges.collectStats(db, familyId, childId, streakDays, balance);
+  const earned = await badges.listEarnedIds(db, familyId, childId);
+  const candidates = qualifyingBadgeIds(stats).filter((id) => !earned.has(id));
+
+  const awarded: string[] = [];
+  for (const id of candidates) {
+    if (await badges.award(db, familyId, childId, id)) awarded.push(id);
+  }
+  if (awarded.length === 0) return [];
+
+  const rows = await badges.getBadges(db, awarded);
+  const byId = new Map(rows.map((r) => [r.id, r]));
+  return awarded
+    .map((id) => byId.get(id))
+    .filter((b): b is badges.BadgeRow => b !== undefined)
+    .map((b) => ({ id: b.id, title: b.title, icon: b.icon }));
 }
 
 /** Afvinken (kind: eigen taak, ouder: elke taak in het gezin). */
@@ -462,7 +498,22 @@ export async function computeBalance(
     ledger.dayBonusDates(db, familyId, childId),
   ]);
 
-  // Streak: aaneengesloten dagen met dagbonus, eindigend vandaag of gisteren.
+  return {
+    childId,
+    balance: bal,
+    todayCompleted: day.approved,
+    todayTotal: day.total,
+    weekProgress: week.total === 0 ? 0 : week.approved / week.total,
+    streakDays: computeStreak(bonusDates, today),
+  };
+}
+
+/**
+ * Aaneengesloten dagen met dagbonus, eindigend vandaag of gisteren
+ * (`bonusDates` aflopend gesorteerd). Eén open dag vandaag breekt de streak
+ * niet — die loopt dan t/m gisteren.
+ */
+export function computeStreak(bonusDates: string[], today: string): number {
   let streak = 0;
   let expected = today;
   for (const date of bonusDates) {
@@ -476,13 +527,5 @@ export async function computeBalance(
     streak++;
     expected = yesterdayOf(expected);
   }
-
-  return {
-    childId,
-    balance: bal,
-    todayCompleted: day.approved,
-    todayTotal: day.total,
-    weekProgress: week.total === 0 ? 0 : week.approved / week.total,
-    streakDays: streak,
-  };
+  return streak;
 }
