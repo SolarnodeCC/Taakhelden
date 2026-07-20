@@ -17,6 +17,7 @@ import {
   applyRedeem,
   applyFulfillRedemption,
   applyCancelRedemption,
+  applyAttachPhoto,
   type Actor,
 } from "../services/pointsEngine";
 
@@ -29,6 +30,7 @@ interface MutationBody {
   amount?: number;
   rewardId?: string;
   redemptionId?: string;
+  photoId?: string;
 }
 
 export class FamilyRoom implements DurableObject {
@@ -97,6 +99,18 @@ export class FamilyRoom implements DurableObject {
         const { status, childId } = await applyUndo(db, familyId, body.instanceId!, actor);
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
         return { status };
+      }
+      case "/attach-photo": {
+        const result = await applyAttachPhoto(db, familyId, body.instanceId!, body.photoId!, body.actor);
+        this.broadcast("instance.updated", {
+          instanceId: body.instanceId,
+          childId: result.childId,
+          photoStatus: result.photoStatus,
+        });
+        if (result.photoBonusPoints > 0) {
+          this.broadcast("points.changed", { childId: result.childId, newBalance: result.newBalance });
+        }
+        return result;
       }
       case "/redeem": {
         const { result, childId, rewardTitle } = await applyRedeem(db, familyId, body.rewardId!, body.actor);

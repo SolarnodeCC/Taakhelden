@@ -114,6 +114,19 @@ export async function setStatus(
     .run();
 }
 
+/** Foto koppelen aan een instance (foto-bonusflow §3.6). */
+export async function setPhoto(
+  db: D1Database,
+  familyId: string,
+  instanceId: string,
+  fields: { photoKey: string; photoStatus: "processing" | "ready" },
+) {
+  await db
+    .prepare("UPDATE task_instances SET photo_key = ?, photo_status = ? WHERE family_id = ? AND id = ?")
+    .bind(fields.photoKey, fields.photoStatus, familyId, instanceId)
+    .run();
+}
+
 /** Terug naar open (oeps-knop): wist afvink-metadata expliciet. */
 export async function reopenInstance(db: D1Database, familyId: string, instanceId: string) {
   await db

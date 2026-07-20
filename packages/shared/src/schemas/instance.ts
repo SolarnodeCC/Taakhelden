@@ -15,6 +15,7 @@ export const AttachPhotoBody = z.object({
 /** Response van POST /instances/{id}/complete — alles voor confetti in één roundtrip */
 export const CompleteResult = z.object({
   pointsEarned: z.number().int(),
+  photoBonusPoints: z.number().int(),
   dayBonusEarned: z.boolean(),
   weekBonusEarned: z.boolean(),
   newBadges: z.array(z.object({ id: z.string(), title: z.string(), icon: z.string() })),

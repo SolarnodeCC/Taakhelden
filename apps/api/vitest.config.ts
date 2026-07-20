@@ -8,6 +8,11 @@ export default defineWorkersConfig(async () => {
       setupFiles: ["./test/apply-migrations.ts"],
       poolOptions: {
         workers: {
+          // R2-writes + queue-delivery verdragen de isolated-storage-stack niet
+          // (WAL-bestanden bij het poppen); tests gebruiken unieke seeds per test,
+          // dus gedeelde storage per run is veilig.
+          isolatedStorage: false,
+          singleWorker: true,
           wrangler: { configPath: "./wrangler.toml" },
           miniflare: {
             bindings: {

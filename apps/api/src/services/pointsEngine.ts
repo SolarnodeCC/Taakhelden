@@ -12,6 +12,7 @@ import { getTask } from "../repo/tasks";
 import * as instances from "../repo/instances";
 import * as ledger from "../repo/ledger";
 import * as rewards from "../repo/rewards";
+import * as photos from "../repo/photos";
 import { newId } from "./ids";
 import { localDate, weekDates, weekKey, weekdayCode, yesterdayOf } from "./time";
 
@@ -53,14 +54,32 @@ async function bookPoints(
   familyId: string,
   family: FamilyRow,
   inst: instances.InstanceRow,
-  taskPoints: number,
+  task: { points: number; photo_bonus_points: number },
 ): Promise<CompleteResult> {
+  const taskPoints = task.points;
   await ledger.insertEntry(db, familyId, {
     childId: inst.child_id,
     type: "task",
     amount: taskPoints,
     refId: inst.id,
   });
+
+  // Foto-bonus: als er (al) een foto aan deze instance hangt. Hangt de foto er
+  // nog niet, dan boekt applyAttachPhoto de bonus zodra het kind 'm koppelt.
+  let photoBonusPoints = 0;
+  if (
+    task.photo_bonus_points > 0 &&
+    inst.photo_key &&
+    !(await ledger.bonusExists(db, familyId, inst.child_id, "photo_bonus", inst.id))
+  ) {
+    await ledger.insertEntry(db, familyId, {
+      childId: inst.child_id,
+      type: "photo_bonus",
+      amount: task.photo_bonus_points,
+      refId: inst.id,
+    });
+    photoBonusPoints = task.photo_bonus_points;
+  }
 
   // Dagbonus: alle taken van deze dag afgerond én nog niet eerder geboekt.
   let dayBonusEarned = false;
@@ -103,6 +122,7 @@ async function bookPoints(
 
   return {
     pointsEarned: taskPoints,
+    photoBonusPoints,
     dayBonusEarned,
     weekBonusEarned,
     newBadges: [], // TODO(iteratie 2): badge-catalogus + toekenning in deze transactie
@@ -144,6 +164,7 @@ export async function applyComplete(
       childId: inst.child_id,
       result: {
         pointsEarned: 0,
+        photoBonusPoints: 0,
         dayBonusEarned: false,
         weekBonusEarned: false,
         newBadges: [],
@@ -160,7 +181,10 @@ export async function applyComplete(
     approvedAt: now,
     approvedBy: actor.role === "parent" ? actor.userId : null,
   });
-  const result = await bookPoints(db, familyId, family, { ...inst, date: inst.date }, points);
+  const result = await bookPoints(
+    db, familyId, family, { ...inst, date: inst.date },
+    task as { points: number; photo_bonus_points: number },
+  );
   return { status: "approved", childId: inst.child_id, result };
 }
 
@@ -192,8 +216,10 @@ export async function applyApprove(
     approvedAt: new Date().toISOString(),
     approvedBy: actor.userId,
   });
-  // TODO(iteratie 2): push naar kind ("goedgekeurd!") via notifier.
-  const result = await bookPoints(db, familyId, family, inst, points);
+  const result = await bookPoints(
+    db, familyId, family, inst,
+    task as { points: number; photo_bonus_points: number },
+  );
   return { status: "approved", childId: inst.child_id, result };
 }
 
@@ -252,6 +278,60 @@ export async function applyAdjust(
     note: input.note,
   });
   return { newBalance: await ledger.balance(db, familyId, input.childId) };
+}
+
+/**
+ * Foto-bonus koppelen (kind, eigen taak) na de presigned-flow uit §3.6.
+ * Is de instance al approved (taken zonder approvalRequired), dan boeken we de
+ * bonus direct; anders volgt hij transactioneel bij approve (via bookPoints).
+ */
+export async function applyAttachPhoto(
+  db: D1Database,
+  familyId: string,
+  instanceId: string,
+  photoId: string,
+  actor: Actor,
+): Promise<{ childId: string; photoStatus: string; photoBonusPoints: number; newBalance: number }> {
+  const inst = await loadInstanceOr404(db, familyId, instanceId);
+  requireOwnInstance(actor, inst.child_id);
+  if (inst.status === "open") {
+    throw new ApiException(409, ErrorCodes.INVALID_STATUS, "Vink de taak eerst af, dan de foto erbij!");
+  }
+
+  const photo = await photos.getPhoto(db, familyId, photoId);
+  if (!photo || photo.owner_id !== actor.userId || photo.purpose !== "task" || photo.ref_id !== instanceId) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Foto niet gevonden.");
+  }
+  if (photo.status === "intent" || photo.status === "failed") {
+    throw new ApiException(409, ErrorCodes.INVALID_STATUS, "Upload de foto eerst.");
+  }
+
+  const photoStatus = photo.status === "ready" ? "ready" : "processing";
+  await instances.setPhoto(db, familyId, instanceId, { photoKey: photo.r2_key, photoStatus });
+
+  let photoBonusPoints = 0;
+  const task = await getTask(db, familyId, inst.task_id);
+  const bonus = (task?.photo_bonus_points as number) ?? 0;
+  if (
+    inst.status === "approved" &&
+    bonus > 0 &&
+    !(await ledger.bonusExists(db, familyId, inst.child_id, "photo_bonus", inst.id))
+  ) {
+    await ledger.insertEntry(db, familyId, {
+      childId: inst.child_id,
+      type: "photo_bonus",
+      amount: bonus,
+      refId: inst.id,
+    });
+    photoBonusPoints = bonus;
+  }
+
+  return {
+    childId: inst.child_id,
+    photoStatus,
+    photoBonusPoints,
+    newBalance: await ledger.balance(db, familyId, inst.child_id),
+  };
 }
 
 /**

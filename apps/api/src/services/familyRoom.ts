@@ -16,7 +16,8 @@ export async function callFamilyRoom(
     | "/adjust"
     | "/redeem"
     | "/redemption-fulfill"
-    | "/redemption-cancel",
+    | "/redemption-cancel"
+    | "/attach-photo",
   payload: {
     instanceId?: string;
     note?: string;
@@ -24,6 +25,7 @@ export async function callFamilyRoom(
     amount?: number;
     rewardId?: string;
     redemptionId?: string;
+    photoId?: string;
   },
 ): Promise<Response> {
   const { familyId, userId, role } = c.get("auth");

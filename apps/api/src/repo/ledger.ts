@@ -32,12 +32,12 @@ export async function balance(db: D1Database, familyId: string, childId: string)
   return row?.balance ?? 0;
 }
 
-/** Is deze bonus (day_bonus/week_bonus met deze ref) al geboekt? */
+/** Is deze bonus (dag/week/foto met deze ref) al geboekt? */
 export async function bonusExists(
   db: D1Database,
   familyId: string,
   childId: string,
-  type: "day_bonus" | "week_bonus",
+  type: "day_bonus" | "week_bonus" | "photo_bonus",
   refId: string,
 ): Promise<boolean> {
   const row = await db
