@@ -139,6 +139,20 @@ export async function reopenInstance(db: D1Database, familyId: string, instanceI
     .run();
 }
 
+/** Open taken van een dag (voor de herinnerings-scheduler), oudste taak eerst. */
+export async function listOpenForDate(db: D1Database, familyId: string, date: string) {
+  const { results } = await db
+    .prepare(
+      `SELECT i.child_id, t.title, t.points
+       FROM task_instances i JOIN tasks t ON t.id = i.task_id
+       WHERE i.family_id = ? AND i.date = ? AND i.status IN ('open', 'open_redo')
+       ORDER BY i.child_id, t.created_at`,
+    )
+    .bind(familyId, date)
+    .all<{ child_id: string; title: string; points: number }>();
+  return results;
+}
+
 export async function dayStats(db: D1Database, familyId: string, childId: string, date: string) {
   const row = await db
     .prepare(

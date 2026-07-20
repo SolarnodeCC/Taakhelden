@@ -19,6 +19,7 @@ import { signJwt, type JwtPayload } from "../services/jwt";
 import { hashSecret, verifySecret } from "../services/passwords";
 import { verifyTurnstile } from "../services/turnstile";
 import { verifyAppleIdentityToken } from "../services/apple";
+import { notifyParents, parentCopy } from "../services/notifier";
 import * as repo from "../repo/auth";
 
 const ACCESS_TTL_PARENT = 60 * 60; //  1 u  (spec §1)
@@ -212,7 +213,14 @@ auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
     if (attempts >= PIN_MAX_ATTEMPTS) {
       const until = new Date(Date.now() + PIN_LOCK_MINUTES * 60 * 1000).toISOString();
       await repo.setPinLock(c.env.DB, family.id as string, child.id as string, until);
-      // TODO(iteratie 2): pushmelding naar ouders bij pincode-lock (notifier).
+      // Ouders informeren — buiten de response om, en een APNs-fout blokkeert niets.
+      c.executionCtx.waitUntil(
+        notifyParents(
+          c.env,
+          family.id as string,
+          parentCopy.pinLock(child.display_name as string),
+        ).catch(() => {}),
+      );
       throw new ApiException(403, ErrorCodes.PIN_LOCKED, "Even pauze! Probeer het over een kwartiertje nog eens.");
     }
     throw new ApiException(

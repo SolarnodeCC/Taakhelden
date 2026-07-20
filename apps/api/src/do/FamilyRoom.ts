@@ -20,6 +20,7 @@ import {
   applyAttachPhoto,
   type Actor,
 } from "../services/pointsEngine";
+import { notifyChild, notifyParents, memberName, childCopy, parentCopy } from "../services/notifier";
 
 interface MutationBody {
   familyId: string;
@@ -88,11 +89,19 @@ export class FamilyRoom implements DurableObject {
         const { result, status, childId } = await applyApprove(db, familyId, body.instanceId!, actor);
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
         this.broadcast("points.changed", { childId, newBalance: result.newBalance });
+        await this.tryNotify(() =>
+          notifyChild(this.env, familyId, childId,
+            childCopy.approved(result.pointsEarned + result.photoBonusPoints)),
+        );
         return result;
       }
       case "/redo": {
         const { status, childId } = await applyRedo(db, familyId, body.instanceId!, body.note ?? "");
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
+        await this.tryNotify(async () =>
+          notifyChild(this.env, familyId, childId,
+            childCopy.redo(await memberName(this.env, familyId, actor.userId))),
+        );
         return { status };
       }
       case "/undo": {
@@ -121,6 +130,10 @@ export class FamilyRoom implements DurableObject {
           childId,
         });
         this.broadcast("points.changed", { childId, newBalance: result.newBalance });
+        await this.tryNotify(async () =>
+          notifyParents(this.env, familyId,
+            parentCopy.redemption(await memberName(this.env, familyId, childId), rewardTitle)),
+        );
         return result;
       }
       case "/redemption-fulfill": {
@@ -145,6 +158,15 @@ export class FamilyRoom implements DurableObject {
       }
       default:
         throw new ApiException(404, "NOT_FOUND", "Onbekende mutatie.");
+    }
+  }
+
+  /** Pushmeldingen zijn best-effort: een APNs-fout mag nooit een mutatie breken. */
+  private async tryNotify(fn: () => Promise<void>) {
+    try {
+      await fn();
+    } catch {
+      /* bewust stil — nooit tokens of namen loggen */
     }
   }
 

@@ -13,6 +13,16 @@ export function localDate(timezone: string, at: Date = new Date()): string {
   }).format(at);
 }
 
+/** HH:MM (24-uurs) van `at` in de opgegeven tijdzone — voor quiet hours. */
+export function localTime(timezone: string, at: Date = new Date()): string {
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: timezone,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(at);
+}
+
 const DAY_CODES = ["SU", "MO", "TU", "WE", "TH", "FR", "SA"] as const;
 
 /** Weekdagcode (MO..SU) van een YYYY-MM-DD-datum. */
