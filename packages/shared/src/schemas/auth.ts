@@ -23,6 +23,22 @@ export const ChildSessionBody = z.object({
   pincode: z.string().regex(/^\d{4}$/),
 });
 
+export const RefreshBody = z.object({
+  refreshToken: z.string().min(1),
+});
+
+export const LogoutBody = z.object({
+  refreshToken: z.string().min(1),
+});
+
+/** Kindprofiel zoals getoond in de kind-loginflow (geen PII). */
+export const ChildProfile = z.object({
+  id: z.string(),
+  displayName: z.string(),
+  avatarId: z.string().nullable(),
+});
+export type ChildProfile = z.infer<typeof ChildProfile>;
+
 export const TokenPair = z.object({
   accessToken: z.string(),
   refreshToken: z.string().optional(), // kind-sessies hebben geen refresh token

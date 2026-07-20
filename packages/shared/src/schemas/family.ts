@@ -13,10 +13,28 @@ export const FamilySettings = z.object({
   weekBonusThreshold: z.number().min(0.5).max(1).default(0.8),
   vacationMode: z.boolean().default(false),
 });
+export type FamilySettings = z.infer<typeof FamilySettings>;
+
+/** PATCH /families/me — alle instellingen optioneel. */
+export const FamilyPatchBody = FamilySettings.partial();
+export type FamilyPatchBody = z.infer<typeof FamilyPatchBody>;
 
 export const CreateChildBody = z.object({
   displayName: z.string().min(1).max(30),
   birthYear: z.number().int().min(2005).max(new Date().getFullYear() - 3),
   avatarId: z.string().optional(),
+  pincode: z.string().regex(/^\d{4}$/),
+});
+export type CreateChildBody = z.infer<typeof CreateChildBody>;
+
+/** PATCH /members/{id} — kind mag alleen eigen avatarId wijzigen. */
+export const UpdateMemberBody = z.object({
+  displayName: z.string().min(1).max(30).optional(),
+  avatarId: z.string().optional(),
+  birthYear: z.number().int().min(2005).optional(),
+});
+export type UpdateMemberBody = z.infer<typeof UpdateMemberBody>;
+
+export const PincodeBody = z.object({
   pincode: z.string().regex(/^\d{4}$/),
 });
