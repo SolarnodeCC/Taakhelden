@@ -1,4 +1,7 @@
+# Standaard reviewer voor het hele project
+*                              @jankurai
+
 # Extra review verplicht op gevoelige onderdelen
-/apps/api/migrations/          @remco
-/apps/api/src/middleware/      @remco
-/apps/api/src/routes/auth.ts   @remco
+/apps/api/migrations/          @remco @jankurai
+/apps/api/src/middleware/      @remco @jankurai
+/apps/api/src/routes/auth.ts   @remco @jankurai
