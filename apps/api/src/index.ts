@@ -12,6 +12,7 @@ import rewardRoutes from "./routes/rewards";
 import redemptionRoutes from "./routes/redemptions";
 import photoRoutes, { photoTransfer } from "./routes/photos";
 import deviceRoutes from "./routes/devices";
+import syncRoutes from "./routes/sync";
 
 const app = new Hono<AppBindings>().basePath("/v1");
 
@@ -34,7 +35,8 @@ app.route("/rewards", rewardRoutes);
 app.route("/redemptions", redemptionRoutes);
 app.route("/photos", photoRoutes);
 app.route("/devices", deviceRoutes);
-// TODO volgende iteraties: /sync /account /ws
+app.route("/sync", syncRoutes);
+// TODO volgende iteraties: /account /ws
 
 export default {
   fetch: app.fetch,

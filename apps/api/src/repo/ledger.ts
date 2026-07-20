@@ -72,6 +72,26 @@ export async function listEntries(
   return results;
 }
 
+/** Ledger-entries van na `since` (sync-delta). childId = null → alle kinderen (ouder). */
+export async function entriesSince(
+  db: D1Database,
+  familyId: string,
+  since: string,
+  childId?: string,
+) {
+  const conditions = ["family_id = ?", "created_at > ?"];
+  const values: unknown[] = [familyId, since];
+  if (childId) { conditions.push("child_id = ?"); values.push(childId); }
+  const { results } = await db
+    .prepare(
+      `SELECT id, child_id, type, amount, ref_id, note, created_at FROM points_ledger
+       WHERE ${conditions.join(" AND ")} ORDER BY created_at LIMIT 500`,
+    )
+    .bind(...values)
+    .all();
+  return results;
+}
+
 /** Opeenvolgende dagen (t/m vandaag of gisteren) met dagbonus — de streak. */
 export async function dayBonusDates(db: D1Database, familyId: string, childId: string, limit = 60) {
   const { results } = await db

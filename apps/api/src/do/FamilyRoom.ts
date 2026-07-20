@@ -21,6 +21,8 @@ import {
   type Actor,
 } from "../services/pointsEngine";
 import { notifyChild, notifyParents, memberName, childCopy, parentCopy } from "../services/notifier";
+import { processSyncBatch } from "../services/syncService";
+import type { SyncMutation } from "@taakhelden/shared";
 
 interface MutationBody {
   familyId: string;
@@ -32,6 +34,8 @@ interface MutationBody {
   rewardId?: string;
   redemptionId?: string;
   photoId?: string;
+  mutations?: SyncMutation[];
+  since?: string;
 }
 
 export class FamilyRoom implements DurableObject {
@@ -146,6 +150,17 @@ export class FamilyRoom implements DurableObject {
         this.broadcast("redemption.updated", { redemptionId: body.redemptionId, status, childId });
         this.broadcast("points.changed", { childId, newBalance });
         return { status, newBalance };
+      }
+      case "/sync": {
+        // Hele batch in één DO-turn: strikt op volgorde, per gezin geserialiseerd.
+        return await processSyncBatch(
+          this.env,
+          familyId,
+          actor,
+          body.mutations ?? [],
+          body.since,
+          (event, data) => this.broadcast(event, data),
+        );
       }
       case "/adjust": {
         const { newBalance } = await applyAdjust(db, familyId, {

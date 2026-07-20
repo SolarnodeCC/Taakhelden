@@ -7,3 +7,4 @@ export * from "./schemas/reward";
 export * from "./schemas/points";
 export * from "./schemas/photo";
 export * from "./schemas/device";
+export * from "./schemas/sync";
