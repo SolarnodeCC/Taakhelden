@@ -14,13 +14,13 @@ jobs:
         with: { node-version: 20, cache: npm }
       - run: npm ci
       - name: D1-migraties (production)
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: apps/api
           command: d1 migrations apply taakhelden-db --remote --env production
       - name: Deploy API
-        uses: cloudflare/wrangler-action@v3
+        uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: apps/api
