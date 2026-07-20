@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { RedoBody, ErrorCodes } from "@taakhelden/shared";
+import { RedoBody, AttachPhotoBody, ErrorCodes } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
@@ -121,7 +121,17 @@ instances.post("/:id/undo", async (c) =>
   callFamilyRoom(c, "/undo", { instanceId: c.req.param("id") }),
 );
 
-// TODO(iteratie 2): POST /:id/photo — foto-bonus na presigned upload (§3.6).
-instances.post("/:id/photo", async (c) => c.json({ todo: "foto-bonus koppelen" }, 501));
+/** Foto-bonus koppelen (kind, eigen taak) — na de presigned-flow uit §3.6. */
+instances.post("/:id/photo", idempotency, validate("json", AttachPhotoBody), async (c) => {
+  const { role } = c.get("auth");
+  if (role !== "child") {
+    // Rollenmatrix §5: alleen het kind zelf koppelt taakfoto's.
+    throw new ApiException(403, ErrorCodes.FORBIDDEN, "Alleen kinderen koppelen taakfoto's.");
+  }
+  return callFamilyRoom(c, "/attach-photo", {
+    instanceId: c.req.param("id"),
+    photoId: c.req.valid("json").photoId,
+  });
+});
 
 export default instances;

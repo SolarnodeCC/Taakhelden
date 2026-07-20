@@ -5,12 +5,15 @@
  *  - dag/weekbonus transactioneel bij de laatste kwalificerende complete
  *  - nooit negatief behalve redemption
  */
-import { ErrorCodes, type CompleteResult } from "@taakhelden/shared";
+import { ErrorCodes, type CompleteResult, type RedeemResult } from "@taakhelden/shared";
 import { ApiException } from "../middleware/error";
 import { getFamily } from "../repo/families";
 import { getTask } from "../repo/tasks";
 import * as instances from "../repo/instances";
 import * as ledger from "../repo/ledger";
+import * as rewards from "../repo/rewards";
+import * as photos from "../repo/photos";
+import { newId } from "./ids";
 import { localDate, weekDates, weekKey, weekdayCode, yesterdayOf } from "./time";
 
 const UNDO_WINDOW_MS = 5 * 60 * 1000;
@@ -51,14 +54,32 @@ async function bookPoints(
   familyId: string,
   family: FamilyRow,
   inst: instances.InstanceRow,
-  taskPoints: number,
+  task: { points: number; photo_bonus_points: number },
 ): Promise<CompleteResult> {
+  const taskPoints = task.points;
   await ledger.insertEntry(db, familyId, {
     childId: inst.child_id,
     type: "task",
     amount: taskPoints,
     refId: inst.id,
   });
+
+  // Foto-bonus: als er (al) een foto aan deze instance hangt. Hangt de foto er
+  // nog niet, dan boekt applyAttachPhoto de bonus zodra het kind 'm koppelt.
+  let photoBonusPoints = 0;
+  if (
+    task.photo_bonus_points > 0 &&
+    inst.photo_key &&
+    !(await ledger.bonusExists(db, familyId, inst.child_id, "photo_bonus", inst.id))
+  ) {
+    await ledger.insertEntry(db, familyId, {
+      childId: inst.child_id,
+      type: "photo_bonus",
+      amount: task.photo_bonus_points,
+      refId: inst.id,
+    });
+    photoBonusPoints = task.photo_bonus_points;
+  }
 
   // Dagbonus: alle taken van deze dag afgerond én nog niet eerder geboekt.
   let dayBonusEarned = false;
@@ -101,6 +122,7 @@ async function bookPoints(
 
   return {
     pointsEarned: taskPoints,
+    photoBonusPoints,
     dayBonusEarned,
     weekBonusEarned,
     newBadges: [], // TODO(iteratie 2): badge-catalogus + toekenning in deze transactie
@@ -142,6 +164,7 @@ export async function applyComplete(
       childId: inst.child_id,
       result: {
         pointsEarned: 0,
+        photoBonusPoints: 0,
         dayBonusEarned: false,
         weekBonusEarned: false,
         newBadges: [],
@@ -158,7 +181,10 @@ export async function applyComplete(
     approvedAt: now,
     approvedBy: actor.role === "parent" ? actor.userId : null,
   });
-  const result = await bookPoints(db, familyId, family, { ...inst, date: inst.date }, points);
+  const result = await bookPoints(
+    db, familyId, family, { ...inst, date: inst.date },
+    task as { points: number; photo_bonus_points: number },
+  );
   return { status: "approved", childId: inst.child_id, result };
 }
 
@@ -190,8 +216,10 @@ export async function applyApprove(
     approvedAt: new Date().toISOString(),
     approvedBy: actor.userId,
   });
-  // TODO(iteratie 2): push naar kind ("goedgekeurd!") via notifier.
-  const result = await bookPoints(db, familyId, family, inst, points);
+  const result = await bookPoints(
+    db, familyId, family, inst,
+    task as { points: number; photo_bonus_points: number },
+  );
   return { status: "approved", childId: inst.child_id, result };
 }
 
@@ -250,6 +278,173 @@ export async function applyAdjust(
     note: input.note,
   });
   return { newBalance: await ledger.balance(db, familyId, input.childId) };
+}
+
+/**
+ * Foto-bonus koppelen (kind, eigen taak) na de presigned-flow uit §3.6.
+ * Is de instance al approved (taken zonder approvalRequired), dan boeken we de
+ * bonus direct; anders volgt hij transactioneel bij approve (via bookPoints).
+ */
+export async function applyAttachPhoto(
+  db: D1Database,
+  familyId: string,
+  instanceId: string,
+  photoId: string,
+  actor: Actor,
+): Promise<{ childId: string; photoStatus: string; photoBonusPoints: number; newBalance: number }> {
+  const inst = await loadInstanceOr404(db, familyId, instanceId);
+  requireOwnInstance(actor, inst.child_id);
+  if (inst.status === "open") {
+    throw new ApiException(409, ErrorCodes.INVALID_STATUS, "Vink de taak eerst af, dan de foto erbij!");
+  }
+
+  const photo = await photos.getPhoto(db, familyId, photoId);
+  if (!photo || photo.owner_id !== actor.userId || photo.purpose !== "task" || photo.ref_id !== instanceId) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Foto niet gevonden.");
+  }
+  if (photo.status === "intent" || photo.status === "failed") {
+    throw new ApiException(409, ErrorCodes.INVALID_STATUS, "Upload de foto eerst.");
+  }
+
+  const photoStatus = photo.status === "ready" ? "ready" : "processing";
+  await instances.setPhoto(db, familyId, instanceId, { photoKey: photo.r2_key, photoStatus });
+
+  let photoBonusPoints = 0;
+  const task = await getTask(db, familyId, inst.task_id);
+  const bonus = (task?.photo_bonus_points as number) ?? 0;
+  if (
+    inst.status === "approved" &&
+    bonus > 0 &&
+    !(await ledger.bonusExists(db, familyId, inst.child_id, "photo_bonus", inst.id))
+  ) {
+    await ledger.insertEntry(db, familyId, {
+      childId: inst.child_id,
+      type: "photo_bonus",
+      amount: bonus,
+      refId: inst.id,
+    });
+    photoBonusPoints = bonus;
+  }
+
+  return {
+    childId: inst.child_id,
+    photoStatus,
+    photoBonusPoints,
+    newBalance: await ledger.balance(db, familyId, inst.child_id),
+  };
+}
+
+/**
+ * Beloning kopen (kind). De enige plek — naast annulering hieronder — waar een
+ * negatief ledger-bedrag is toegestaan (architectuurregel 4).
+ */
+export async function applyRedeem(
+  db: D1Database,
+  familyId: string,
+  rewardId: string,
+  actor: Actor,
+): Promise<{ result: RedeemResult; childId: string; rewardTitle: string }> {
+  const reward = await rewards.getReward(db, familyId, rewardId);
+  if (!reward || reward.archived_at) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Deze beloning bestaat niet (meer).");
+  }
+  const childId = actor.userId; // route staat alleen kinderen toe
+
+  const balance = await ledger.balance(db, familyId, childId);
+  if (balance < reward.price) {
+    throw new ApiException(
+      409,
+      ErrorCodes.INSUFFICIENT_POINTS,
+      "Nog even doorsparen — je bent er bijna!",
+      { balance, price: reward.price },
+    );
+  }
+
+  if (reward.limit_per_week !== null) {
+    const family = (await getFamily(db, familyId)) as unknown as { timezone: string };
+    const monday = weekDates(localDate(family.timezone))[0]!;
+    const used = await rewards.countRedemptionsSince(db, familyId, childId, rewardId, monday);
+    if (used >= reward.limit_per_week) {
+      throw new ApiException(
+        409,
+        ErrorCodes.REWARD_LIMIT_REACHED,
+        "Deze beloning is op voor deze week — volgende week weer een kans!",
+      );
+    }
+  }
+
+  const redemptionId = newId("rd");
+  await rewards.insertRedemption(db, familyId, { id: redemptionId, rewardId, childId });
+  await ledger.insertEntry(db, familyId, {
+    childId,
+    type: "redemption",
+    amount: -reward.price,
+    refId: redemptionId,
+  });
+
+  return {
+    childId,
+    rewardTitle: reward.title,
+    result: {
+      redemptionId,
+      rewardId,
+      price: reward.price,
+      status: "pending",
+      newBalance: await ledger.balance(db, familyId, childId),
+    },
+  };
+}
+
+/** Inlossing afhandelen (ouder): pending → fulfilled. Geen ledger-mutatie. */
+export async function applyFulfillRedemption(
+  db: D1Database,
+  familyId: string,
+  redemptionId: string,
+  actor: Actor,
+): Promise<{ status: string; childId: string }> {
+  const redemption = await rewards.getRedemption(db, familyId, redemptionId);
+  if (!redemption) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Inlossing niet gevonden.");
+  }
+  if (redemption.status !== "pending") {
+    throw new ApiException(409, ErrorCodes.INVALID_STATUS, "Deze inlossing is al afgehandeld.");
+  }
+  await rewards.setRedemptionStatus(db, familyId, redemptionId, {
+    status: "fulfilled",
+    handledBy: actor.userId,
+  });
+  return { status: "fulfilled", childId: redemption.child_id };
+}
+
+/** Annuleren (ouder): punten terug via tegenboeking — de enige toegestane 'correctie'. */
+export async function applyCancelRedemption(
+  db: D1Database,
+  familyId: string,
+  redemptionId: string,
+  actor: Actor,
+): Promise<{ status: string; childId: string; newBalance: number }> {
+  const redemption = await rewards.getRedemption(db, familyId, redemptionId);
+  if (!redemption) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Inlossing niet gevonden.");
+  }
+  if (redemption.status === "cancelled") {
+    throw new ApiException(409, ErrorCodes.INVALID_STATUS, "Deze inlossing is al geannuleerd.");
+  }
+  await rewards.setRedemptionStatus(db, familyId, redemptionId, {
+    status: "cancelled",
+    handledBy: actor.userId,
+  });
+  await ledger.insertEntry(db, familyId, {
+    childId: redemption.child_id,
+    type: "redemption_cancel",
+    amount: redemption.price,
+    refId: redemptionId,
+  });
+  return {
+    status: "cancelled",
+    childId: redemption.child_id,
+    newBalance: await ledger.balance(db, familyId, redemption.child_id),
+  };
 }
 
 /** Balance-object voor GET /points/balance en /instances/today. */

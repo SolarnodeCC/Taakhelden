@@ -1,4 +1,4 @@
-import { SignJWT, jwtVerify } from "jose"; // TODO: toevoegen aan deps of vervangen door hono/jwt
+import { SignJWT, jwtVerify } from "jose";
 
 export interface JwtPayload {
   sub: string;

@@ -114,6 +114,19 @@ export async function setStatus(
     .run();
 }
 
+/** Foto koppelen aan een instance (foto-bonusflow §3.6). */
+export async function setPhoto(
+  db: D1Database,
+  familyId: string,
+  instanceId: string,
+  fields: { photoKey: string; photoStatus: "processing" | "ready" },
+) {
+  await db
+    .prepare("UPDATE task_instances SET photo_key = ?, photo_status = ? WHERE family_id = ? AND id = ?")
+    .bind(fields.photoKey, fields.photoStatus, familyId, instanceId)
+    .run();
+}
+
 /** Terug naar open (oeps-knop): wist afvink-metadata expliciet. */
 export async function reopenInstance(db: D1Database, familyId: string, instanceId: string) {
   await db
@@ -124,6 +137,20 @@ export async function reopenInstance(db: D1Database, familyId: string, instanceI
     )
     .bind(familyId, instanceId)
     .run();
+}
+
+/** Open taken van een dag (voor de herinnerings-scheduler), oudste taak eerst. */
+export async function listOpenForDate(db: D1Database, familyId: string, date: string) {
+  const { results } = await db
+    .prepare(
+      `SELECT i.child_id, t.title, t.points
+       FROM task_instances i JOIN tasks t ON t.id = i.task_id
+       WHERE i.family_id = ? AND i.date = ? AND i.status IN ('open', 'open_redo')
+       ORDER BY i.child_id, t.created_at`,
+    )
+    .bind(familyId, date)
+    .all<{ child_id: string; title: string; points: number }>();
+  return results;
 }
 
 export async function dayStats(db: D1Database, familyId: string, childId: string, date: string) {

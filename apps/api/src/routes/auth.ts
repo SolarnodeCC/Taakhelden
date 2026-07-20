@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import {
   RegisterBody,
   LoginBody,
+  AppleAuthBody,
   FamilyCodeBody,
   ChildSessionBody,
   RefreshBody,
@@ -17,6 +18,8 @@ import { newId, newFamilyCode } from "../services/ids";
 import { signJwt, type JwtPayload } from "../services/jwt";
 import { hashSecret, verifySecret } from "../services/passwords";
 import { verifyTurnstile } from "../services/turnstile";
+import { verifyAppleIdentityToken } from "../services/apple";
+import { notifyParents, parentCopy } from "../services/notifier";
 import * as repo from "../repo/auth";
 
 const ACCESS_TTL_PARENT = 60 * 60; //  1 u  (spec §1)
@@ -104,8 +107,53 @@ auth.post("/login", validate("json", LoginBody), async (c) => {
   return c.json({ familyId: user.family_id, userId: user.id, ...tokens });
 });
 
-// TODO(iteratie 2): Sign in with Apple — identityToken verifiëren tegen Apples JWKS.
-auth.post("/apple", async (c) => c.json({ todo: "sign in with apple" }, 501));
+/** Sign in with Apple: bestaand account (apple_sub of e-mail) of nieuw gezin. */
+auth.post("/apple", validate("json", AppleAuthBody), async (c) => {
+  await rateLimit(c, "apple", 5);
+  const body = c.req.valid("json");
+
+  const claims = await verifyAppleIdentityToken(body.identityToken, c.env.APPLE_CLIENT_ID);
+  if (!claims) {
+    throw new ApiException(
+      401,
+      ErrorCodes.INVALID_CREDENTIALS,
+      "Inloggen met Apple is niet gelukt. Probeer het opnieuw.",
+    );
+  }
+
+  let user = await repo.getParentByAppleSub(c.env.DB, claims.sub);
+  if (!user && claims.email) {
+    // Zelfde e-mailadres als een bestaand wachtwoord-account → koppelen.
+    const byEmail = await repo.getParentByEmail(c.env.DB, claims.email);
+    if (byEmail) {
+      await repo.linkAppleSub(c.env.DB, byEmail.id as string, claims.sub);
+      user = byEmail;
+    }
+  }
+  let isNew = false;
+  if (!user) {
+    const familyId = newId("fam");
+    const parentId = newId("usr");
+    await repo.createFamilyWithParent(c.env.DB, {
+      familyId,
+      inviteCode: newFamilyCode(),
+      familyName: body.familyName ?? "Ons gezin",
+      parentId,
+      email: claims.email,
+      passwordHash: null,
+      appleSub: claims.sub,
+      displayName: body.displayName ?? "Ouder",
+    });
+    user = await repo.getUserById(c.env.DB, parentId);
+    isNew = true;
+  }
+
+  const tokens = await issueParentTokens(c.env.DB, c.env.JWT_SECRET, user as unknown as ParentRow);
+  return c.json(
+    { familyId: (user as ParentRow).family_id, userId: (user as ParentRow).id, ...tokens },
+    isNew ? 201 : 200,
+  );
+});
 
 auth.post("/refresh", validate("json", RefreshBody), async (c) => {
   const consumed = await repo.consumeRefreshToken(c.env.DB, c.req.valid("json").refreshToken);
@@ -165,7 +213,14 @@ auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
     if (attempts >= PIN_MAX_ATTEMPTS) {
       const until = new Date(Date.now() + PIN_LOCK_MINUTES * 60 * 1000).toISOString();
       await repo.setPinLock(c.env.DB, family.id as string, child.id as string, until);
-      // TODO(iteratie 2): pushmelding naar ouders bij pincode-lock (notifier).
+      // Ouders informeren — buiten de response om, en een APNs-fout blokkeert niets.
+      c.executionCtx.waitUntil(
+        notifyParents(
+          c.env,
+          family.id as string,
+          parentCopy.pinLock(child.display_name as string),
+        ).catch(() => {}),
+      );
       throw new ApiException(403, ErrorCodes.PIN_LOCKED, "Even pauze! Probeer het over een kwartiertje nog eens.");
     }
     throw new ApiException(

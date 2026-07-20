@@ -14,8 +14,15 @@ import {
   applyRedo,
   applyUndo,
   applyAdjust,
+  applyRedeem,
+  applyFulfillRedemption,
+  applyCancelRedemption,
+  applyAttachPhoto,
   type Actor,
 } from "../services/pointsEngine";
+import { notifyChild, notifyParents, memberName, childCopy, parentCopy } from "../services/notifier";
+import { processSyncBatch } from "../services/syncService";
+import type { SyncMutation } from "@taakhelden/shared";
 
 interface MutationBody {
   familyId: string;
@@ -24,6 +31,11 @@ interface MutationBody {
   note?: string;
   childId?: string;
   amount?: number;
+  rewardId?: string;
+  redemptionId?: string;
+  photoId?: string;
+  mutations?: SyncMutation[];
+  since?: string;
 }
 
 export class FamilyRoom implements DurableObject {
@@ -81,17 +93,74 @@ export class FamilyRoom implements DurableObject {
         const { result, status, childId } = await applyApprove(db, familyId, body.instanceId!, actor);
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
         this.broadcast("points.changed", { childId, newBalance: result.newBalance });
+        await this.tryNotify(() =>
+          notifyChild(this.env, familyId, childId,
+            childCopy.approved(result.pointsEarned + result.photoBonusPoints)),
+        );
         return result;
       }
       case "/redo": {
         const { status, childId } = await applyRedo(db, familyId, body.instanceId!, body.note ?? "");
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
+        await this.tryNotify(async () =>
+          notifyChild(this.env, familyId, childId,
+            childCopy.redo(await memberName(this.env, familyId, actor.userId))),
+        );
         return { status };
       }
       case "/undo": {
         const { status, childId } = await applyUndo(db, familyId, body.instanceId!, actor);
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
         return { status };
+      }
+      case "/attach-photo": {
+        const result = await applyAttachPhoto(db, familyId, body.instanceId!, body.photoId!, body.actor);
+        this.broadcast("instance.updated", {
+          instanceId: body.instanceId,
+          childId: result.childId,
+          photoStatus: result.photoStatus,
+        });
+        if (result.photoBonusPoints > 0) {
+          this.broadcast("points.changed", { childId: result.childId, newBalance: result.newBalance });
+        }
+        return result;
+      }
+      case "/redeem": {
+        const { result, childId, rewardTitle } = await applyRedeem(db, familyId, body.rewardId!, body.actor);
+        this.broadcast("redemption.created", {
+          redemptionId: result.redemptionId,
+          rewardId: body.rewardId,
+          rewardTitle,
+          childId,
+        });
+        this.broadcast("points.changed", { childId, newBalance: result.newBalance });
+        await this.tryNotify(async () =>
+          notifyParents(this.env, familyId,
+            parentCopy.redemption(await memberName(this.env, familyId, childId), rewardTitle)),
+        );
+        return result;
+      }
+      case "/redemption-fulfill": {
+        const { status, childId } = await applyFulfillRedemption(db, familyId, body.redemptionId!, body.actor);
+        this.broadcast("redemption.updated", { redemptionId: body.redemptionId, status, childId });
+        return { status };
+      }
+      case "/redemption-cancel": {
+        const { status, childId, newBalance } = await applyCancelRedemption(db, familyId, body.redemptionId!, body.actor);
+        this.broadcast("redemption.updated", { redemptionId: body.redemptionId, status, childId });
+        this.broadcast("points.changed", { childId, newBalance });
+        return { status, newBalance };
+      }
+      case "/sync": {
+        // Hele batch in één DO-turn: strikt op volgorde, per gezin geserialiseerd.
+        return await processSyncBatch(
+          this.env,
+          familyId,
+          actor,
+          body.mutations ?? [],
+          body.since,
+          (event, data) => this.broadcast(event, data),
+        );
       }
       case "/adjust": {
         const { newBalance } = await applyAdjust(db, familyId, {
@@ -104,6 +173,15 @@ export class FamilyRoom implements DurableObject {
       }
       default:
         throw new ApiException(404, "NOT_FOUND", "Onbekende mutatie.");
+    }
+  }
+
+  /** Pushmeldingen zijn best-effort: een APNs-fout mag nooit een mutatie breken. */
+  private async tryNotify(fn: () => Promise<void>) {
+    try {
+      await fn();
+    } catch {
+      /* bewust stil — nooit tokens of namen loggen */
     }
   }
 

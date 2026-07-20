@@ -32,12 +32,12 @@ export async function balance(db: D1Database, familyId: string, childId: string)
   return row?.balance ?? 0;
 }
 
-/** Is deze bonus (day_bonus/week_bonus met deze ref) al geboekt? */
+/** Is deze bonus (dag/week/foto met deze ref) al geboekt? */
 export async function bonusExists(
   db: D1Database,
   familyId: string,
   childId: string,
-  type: "day_bonus" | "week_bonus",
+  type: "day_bonus" | "week_bonus" | "photo_bonus",
   refId: string,
 ): Promise<boolean> {
   const row = await db
@@ -68,6 +68,26 @@ export async function listEntries(
        WHERE ${conditions.join(" AND ")} ORDER BY created_at DESC, id DESC LIMIT ?`,
     )
     .bind(...values, opts.limit + 1)
+    .all();
+  return results;
+}
+
+/** Ledger-entries van na `since` (sync-delta). childId = null → alle kinderen (ouder). */
+export async function entriesSince(
+  db: D1Database,
+  familyId: string,
+  since: string,
+  childId?: string,
+) {
+  const conditions = ["family_id = ?", "created_at > ?"];
+  const values: unknown[] = [familyId, since];
+  if (childId) { conditions.push("child_id = ?"); values.push(childId); }
+  const { results } = await db
+    .prepare(
+      `SELECT id, child_id, type, amount, ref_id, note, created_at FROM points_ledger
+       WHERE ${conditions.join(" AND ")} ORDER BY created_at LIMIT 500`,
+    )
+    .bind(...values)
     .all();
   return results;
 }

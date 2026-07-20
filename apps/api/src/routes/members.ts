@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { CreateChildBody, UpdateMemberBody, PincodeBody, ErrorCodes } from "@taakhelden/shared";
+import { CreateChildBody, UpdateMemberBody, PincodeBody, AttachPhotoBody, ErrorCodes } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
@@ -7,6 +7,7 @@ import { validate } from "../middleware/validate";
 import { newId } from "../services/ids";
 import { hashSecret } from "../services/passwords";
 import * as repo from "../repo/families";
+import { getPhoto, setMemberPhotoKey } from "../repo/photos";
 
 const members = new Hono<AppBindings>();
 
@@ -95,10 +96,23 @@ members.post("/:id/pincode", validate("json", PincodeBody), async (c) => {
   return c.json({ ok: true });
 });
 
-// TODO(iteratie 2): POST /:id/photo — profielfoto via presigned-flow (§3.6).
-members.post("/:id/photo", async (c) => {
-  requireParent(c, { full: true });
-  return c.json({ todo: "profielfoto presigned-flow" }, 501);
+/** Profielfoto koppelen na de presigned-flow (§3.6). Zichtbaar zodra 'ready'. */
+members.post("/:id/photo", validate("json", AttachPhotoBody), async (c) => {
+  const { familyId } = requireParent(c, { full: true });
+  const memberId = c.req.param("id");
+  const member = await repo.getMember(c.env.DB, familyId, memberId);
+  if (!member) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Gezinslid niet gevonden.");
+  }
+  const photo = await getPhoto(c.env.DB, familyId, c.req.valid("json").photoId);
+  if (!photo || photo.purpose !== "profile" || photo.ref_id !== memberId) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Foto niet gevonden.");
+  }
+  if (photo.status === "intent" || photo.status === "failed") {
+    throw new ApiException(409, ErrorCodes.INVALID_STATUS, "Upload de foto eerst.");
+  }
+  await setMemberPhotoKey(c.env.DB, familyId, memberId, photo.r2_key);
+  return c.json({ ok: true, photoId: photo.id, status: photo.status });
 });
 
 members.delete("/:id", async (c) => {

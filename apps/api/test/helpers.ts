@@ -39,16 +39,23 @@ export async function seedFamily(prefix: string) {
 export async function seedTask(
   familyId: string,
   childId: string,
-  opts: { points?: number; approvalRequired?: boolean } = {},
+  opts: { points?: number; approvalRequired?: boolean; photoBonusPoints?: number } = {},
 ) {
   counter++;
   const taskId = `tsk_test${counter}`;
   await env.DB
     .prepare(
-      `INSERT INTO tasks (id, family_id, title, points, approval_required, assignees)
-       VALUES (?, ?, 'Testtaak', ?, ?, ?)`,
+      `INSERT INTO tasks (id, family_id, title, points, approval_required, photo_bonus_points, assignees)
+       VALUES (?, ?, 'Testtaak', ?, ?, ?, ?)`,
     )
-    .bind(taskId, familyId, opts.points ?? 15, opts.approvalRequired ? 1 : 0, JSON.stringify([childId]))
+    .bind(
+      taskId,
+      familyId,
+      opts.points ?? 15,
+      opts.approvalRequired ? 1 : 0,
+      opts.photoBonusPoints ?? 0,
+      JSON.stringify([childId]),
+    )
     .run();
   return taskId;
 }

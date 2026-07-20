@@ -16,6 +16,23 @@ export async function getParentByEmail(db: D1Database, email: string) {
     .first();
 }
 
+export async function getParentByAppleSub(db: D1Database, appleSub: string) {
+  return db
+    .prepare(
+      "SELECT * FROM users WHERE apple_sub = ? AND role = 'parent' AND deleted_at IS NULL",
+    )
+    .bind(appleSub)
+    .first();
+}
+
+/** Apple-account koppelen aan een bestaand (e-mail)account met hetzelfde adres. */
+export async function linkAppleSub(db: D1Database, userId: string, appleSub: string) {
+  await db
+    .prepare("UPDATE users SET apple_sub = ? WHERE id = ? AND deleted_at IS NULL")
+    .bind(appleSub, userId)
+    .run();
+}
+
 export async function getFamilyByInviteCode(db: D1Database, code: string) {
   return db
     .prepare("SELECT * FROM families WHERE invite_code = ? AND deleted_at IS NULL")
@@ -99,8 +116,9 @@ export async function createFamilyWithParent(
     inviteCode: string;
     familyName: string;
     parentId: string;
-    email: string;
-    passwordHash: string;
+    email: string | null; // Apple-only accounts kunnen zonder e-mail bestaan
+    passwordHash: string | null; // NULL bij Sign in with Apple
+    appleSub?: string | null;
     displayName: string;
   },
 ) {
@@ -110,9 +128,16 @@ export async function createFamilyWithParent(
       .bind(input.familyId, input.familyName, input.inviteCode),
     db
       .prepare(
-        `INSERT INTO users (id, family_id, role, permissions, display_name, email, password_hash)
-         VALUES (?, ?, 'parent', 'full', ?, ?, ?)`,
+        `INSERT INTO users (id, family_id, role, permissions, display_name, email, password_hash, apple_sub)
+         VALUES (?, ?, 'parent', 'full', ?, ?, ?, ?)`,
       )
-      .bind(input.parentId, input.familyId, input.displayName, input.email.toLowerCase(), input.passwordHash),
+      .bind(
+        input.parentId,
+        input.familyId,
+        input.displayName,
+        input.email?.toLowerCase() ?? null,
+        input.passwordHash,
+        input.appleSub ?? null,
+      ),
   ]);
 }

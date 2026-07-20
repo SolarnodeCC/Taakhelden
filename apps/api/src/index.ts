@@ -8,6 +8,11 @@ import memberRoutes from "./routes/members";
 import taskRoutes from "./routes/tasks";
 import instanceRoutes from "./routes/instances";
 import pointsRoutes from "./routes/points";
+import rewardRoutes from "./routes/rewards";
+import redemptionRoutes from "./routes/redemptions";
+import photoRoutes, { photoTransfer } from "./routes/photos";
+import deviceRoutes from "./routes/devices";
+import syncRoutes from "./routes/sync";
 
 const app = new Hono<AppBindings>().basePath("/v1");
 
@@ -16,6 +21,8 @@ app.get("/health", (c) => c.json({ ok: true }));
 
 // Publiek (eigen rate limits + Turnstile in de handlers)
 app.route("/auth", authRoutes);
+// Foto-transfer: HMAC-signed URLs i.p.v. JWT (à la presigned, zie routes/photos.ts)
+app.route("/photos", photoTransfer);
 
 // Alles hieronder vereist een geldige JWT
 app.use("*", authMiddleware);
@@ -24,7 +31,12 @@ app.route("/members", memberRoutes);
 app.route("/tasks", taskRoutes);
 app.route("/instances", instanceRoutes);
 app.route("/points", pointsRoutes);
-// TODO volgende iteraties: /photos /rewards /devices /sync /account /ws
+app.route("/rewards", rewardRoutes);
+app.route("/redemptions", redemptionRoutes);
+app.route("/photos", photoRoutes);
+app.route("/devices", deviceRoutes);
+app.route("/sync", syncRoutes);
+// TODO volgende iteraties: /account /ws
 
 export default {
   fetch: app.fetch,
