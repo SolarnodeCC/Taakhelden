@@ -1,11 +1,13 @@
 import { Hono } from "hono";
-import type { AppBindings } from "./types";
+import type { AppBindings, Env } from "./types";
 import { errorHandler } from "./middleware/error";
 import { authMiddleware } from "./middleware/auth";
 import authRoutes from "./routes/auth";
 import familyRoutes from "./routes/families";
+import memberRoutes from "./routes/members";
 import taskRoutes from "./routes/tasks";
 import instanceRoutes from "./routes/instances";
+import pointsRoutes from "./routes/points";
 
 const app = new Hono<AppBindings>().basePath("/v1");
 
@@ -18,17 +20,19 @@ app.route("/auth", authRoutes);
 // Alles hieronder vereist een geldige JWT
 app.use("*", authMiddleware);
 app.route("/families", familyRoutes);
+app.route("/members", memberRoutes);
 app.route("/tasks", taskRoutes);
 app.route("/instances", instanceRoutes);
-// TODO volgende iteraties: /photos /points /rewards /devices /sync /account
+app.route("/points", pointsRoutes);
+// TODO volgende iteraties: /photos /rewards /devices /sync /account /ws
 
 export default {
   fetch: app.fetch,
-  scheduled: async (event: ScheduledEvent, env: any, ctx: ExecutionContext) => {
+  scheduled: async (event: ScheduledEvent, env: Env, ctx: ExecutionContext) => {
     const { runCron } = await import("./jobs/cron");
     ctx.waitUntil(runCron(event.cron, env));
   },
-  queue: async (batch: MessageBatch, env: any) => {
+  queue: async (batch: MessageBatch, env: Env) => {
     const { processPhotos } = await import("./jobs/photoConsumer");
     await processPhotos(batch, env);
   },

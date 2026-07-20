@@ -23,3 +23,7 @@ export const TaskBody = z.object({
   activeUntil: z.string().date().nullable().default(null),
 });
 export type TaskBody = z.infer<typeof TaskBody>;
+
+/** PATCH /tasks/{id} — werkt alleen door op toekomstige instances. */
+export const TaskPatchBody = TaskBody.partial();
+export type TaskPatchBody = z.infer<typeof TaskPatchBody>;
