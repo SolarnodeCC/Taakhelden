@@ -23,6 +23,13 @@ export const ChildSessionBody = z.object({
   pincode: z.string().regex(/^\d{4}$/),
 });
 
+export const AppleAuthBody = z.object({
+  identityToken: z.string().min(1),
+  // Alleen gebruikt bij een eerste login (accountcreatie):
+  familyName: z.string().min(1).max(50).optional(),
+  displayName: z.string().min(1).max(30).optional(),
+});
+
 export const RefreshBody = z.object({
   refreshToken: z.string().min(1),
 });
