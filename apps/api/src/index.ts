@@ -8,6 +8,8 @@ import memberRoutes from "./routes/members";
 import taskRoutes from "./routes/tasks";
 import instanceRoutes from "./routes/instances";
 import pointsRoutes from "./routes/points";
+import rewardRoutes from "./routes/rewards";
+import redemptionRoutes from "./routes/redemptions";
 
 const app = new Hono<AppBindings>().basePath("/v1");
 
@@ -24,7 +26,9 @@ app.route("/members", memberRoutes);
 app.route("/tasks", taskRoutes);
 app.route("/instances", instanceRoutes);
 app.route("/points", pointsRoutes);
-// TODO volgende iteraties: /photos /rewards /devices /sync /account /ws
+app.route("/rewards", rewardRoutes);
+app.route("/redemptions", redemptionRoutes);
+// TODO volgende iteraties: /photos /devices /sync /account /ws
 
 export default {
   fetch: app.fetch,

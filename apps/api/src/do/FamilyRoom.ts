@@ -14,6 +14,9 @@ import {
   applyRedo,
   applyUndo,
   applyAdjust,
+  applyRedeem,
+  applyFulfillRedemption,
+  applyCancelRedemption,
   type Actor,
 } from "../services/pointsEngine";
 
@@ -24,6 +27,8 @@ interface MutationBody {
   note?: string;
   childId?: string;
   amount?: number;
+  rewardId?: string;
+  redemptionId?: string;
 }
 
 export class FamilyRoom implements DurableObject {
@@ -92,6 +97,28 @@ export class FamilyRoom implements DurableObject {
         const { status, childId } = await applyUndo(db, familyId, body.instanceId!, actor);
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
         return { status };
+      }
+      case "/redeem": {
+        const { result, childId, rewardTitle } = await applyRedeem(db, familyId, body.rewardId!, body.actor);
+        this.broadcast("redemption.created", {
+          redemptionId: result.redemptionId,
+          rewardId: body.rewardId,
+          rewardTitle,
+          childId,
+        });
+        this.broadcast("points.changed", { childId, newBalance: result.newBalance });
+        return result;
+      }
+      case "/redemption-fulfill": {
+        const { status, childId } = await applyFulfillRedemption(db, familyId, body.redemptionId!, body.actor);
+        this.broadcast("redemption.updated", { redemptionId: body.redemptionId, status, childId });
+        return { status };
+      }
+      case "/redemption-cancel": {
+        const { status, childId, newBalance } = await applyCancelRedemption(db, familyId, body.redemptionId!, body.actor);
+        this.broadcast("redemption.updated", { redemptionId: body.redemptionId, status, childId });
+        this.broadcast("points.changed", { childId, newBalance });
+        return { status, newBalance };
       }
       case "/adjust": {
         const { newBalance } = await applyAdjust(db, familyId, {

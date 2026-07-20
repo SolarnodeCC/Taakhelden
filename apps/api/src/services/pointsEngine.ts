@@ -5,12 +5,14 @@
  *  - dag/weekbonus transactioneel bij de laatste kwalificerende complete
  *  - nooit negatief behalve redemption
  */
-import { ErrorCodes, type CompleteResult } from "@taakhelden/shared";
+import { ErrorCodes, type CompleteResult, type RedeemResult } from "@taakhelden/shared";
 import { ApiException } from "../middleware/error";
 import { getFamily } from "../repo/families";
 import { getTask } from "../repo/tasks";
 import * as instances from "../repo/instances";
 import * as ledger from "../repo/ledger";
+import * as rewards from "../repo/rewards";
+import { newId } from "./ids";
 import { localDate, weekDates, weekKey, weekdayCode, yesterdayOf } from "./time";
 
 const UNDO_WINDOW_MS = 5 * 60 * 1000;
@@ -250,6 +252,119 @@ export async function applyAdjust(
     note: input.note,
   });
   return { newBalance: await ledger.balance(db, familyId, input.childId) };
+}
+
+/**
+ * Beloning kopen (kind). De enige plek — naast annulering hieronder — waar een
+ * negatief ledger-bedrag is toegestaan (architectuurregel 4).
+ */
+export async function applyRedeem(
+  db: D1Database,
+  familyId: string,
+  rewardId: string,
+  actor: Actor,
+): Promise<{ result: RedeemResult; childId: string; rewardTitle: string }> {
+  const reward = await rewards.getReward(db, familyId, rewardId);
+  if (!reward || reward.archived_at) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Deze beloning bestaat niet (meer).");
+  }
+  const childId = actor.userId; // route staat alleen kinderen toe
+
+  const balance = await ledger.balance(db, familyId, childId);
+  if (balance < reward.price) {
+    throw new ApiException(
+      409,
+      ErrorCodes.INSUFFICIENT_POINTS,
+      "Nog even doorsparen — je bent er bijna!",
+      { balance, price: reward.price },
+    );
+  }
+
+  if (reward.limit_per_week !== null) {
+    const family = (await getFamily(db, familyId)) as unknown as { timezone: string };
+    const monday = weekDates(localDate(family.timezone))[0]!;
+    const used = await rewards.countRedemptionsSince(db, familyId, childId, rewardId, monday);
+    if (used >= reward.limit_per_week) {
+      throw new ApiException(
+        409,
+        ErrorCodes.REWARD_LIMIT_REACHED,
+        "Deze beloning is op voor deze week — volgende week weer een kans!",
+      );
+    }
+  }
+
+  const redemptionId = newId("rd");
+  await rewards.insertRedemption(db, familyId, { id: redemptionId, rewardId, childId });
+  await ledger.insertEntry(db, familyId, {
+    childId,
+    type: "redemption",
+    amount: -reward.price,
+    refId: redemptionId,
+  });
+
+  return {
+    childId,
+    rewardTitle: reward.title,
+    result: {
+      redemptionId,
+      rewardId,
+      price: reward.price,
+      status: "pending",
+      newBalance: await ledger.balance(db, familyId, childId),
+    },
+  };
+}
+
+/** Inlossing afhandelen (ouder): pending → fulfilled. Geen ledger-mutatie. */
+export async function applyFulfillRedemption(
+  db: D1Database,
+  familyId: string,
+  redemptionId: string,
+  actor: Actor,
+): Promise<{ status: string; childId: string }> {
+  const redemption = await rewards.getRedemption(db, familyId, redemptionId);
+  if (!redemption) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Inlossing niet gevonden.");
+  }
+  if (redemption.status !== "pending") {
+    throw new ApiException(409, ErrorCodes.INVALID_STATUS, "Deze inlossing is al afgehandeld.");
+  }
+  await rewards.setRedemptionStatus(db, familyId, redemptionId, {
+    status: "fulfilled",
+    handledBy: actor.userId,
+  });
+  return { status: "fulfilled", childId: redemption.child_id };
+}
+
+/** Annuleren (ouder): punten terug via tegenboeking — de enige toegestane 'correctie'. */
+export async function applyCancelRedemption(
+  db: D1Database,
+  familyId: string,
+  redemptionId: string,
+  actor: Actor,
+): Promise<{ status: string; childId: string; newBalance: number }> {
+  const redemption = await rewards.getRedemption(db, familyId, redemptionId);
+  if (!redemption) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Inlossing niet gevonden.");
+  }
+  if (redemption.status === "cancelled") {
+    throw new ApiException(409, ErrorCodes.INVALID_STATUS, "Deze inlossing is al geannuleerd.");
+  }
+  await rewards.setRedemptionStatus(db, familyId, redemptionId, {
+    status: "cancelled",
+    handledBy: actor.userId,
+  });
+  await ledger.insertEntry(db, familyId, {
+    childId: redemption.child_id,
+    type: "redemption_cancel",
+    amount: redemption.price,
+    refId: redemptionId,
+  });
+  return {
+    status: "cancelled",
+    childId: redemption.child_id,
+    newBalance: await ledger.balance(db, familyId, redemption.child_id),
+  };
 }
 
 /** Balance-object voor GET /points/balance en /instances/today. */

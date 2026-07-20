@@ -8,8 +8,23 @@ import type { Actor } from "./pointsEngine";
  */
 export async function callFamilyRoom(
   c: Context<AppBindings>,
-  path: "/complete" | "/approve" | "/redo" | "/undo" | "/adjust",
-  payload: { instanceId?: string; note?: string; childId?: string; amount?: number },
+  path:
+    | "/complete"
+    | "/approve"
+    | "/redo"
+    | "/undo"
+    | "/adjust"
+    | "/redeem"
+    | "/redemption-fulfill"
+    | "/redemption-cancel",
+  payload: {
+    instanceId?: string;
+    note?: string;
+    childId?: string;
+    amount?: number;
+    rewardId?: string;
+    redemptionId?: string;
+  },
 ): Promise<Response> {
   const { familyId, userId, role } = c.get("auth");
   const actor: Actor = { userId, role };
