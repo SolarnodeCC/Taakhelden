@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
-import { seedFamily, seedTask, seedInstance, childToken, api, todayAmsterdam } from "./helpers";
+import { seedFamily, seedTask, seedInstance, seedWeekFiller, childToken, api, todayAmsterdam } from "./helpers";
 
 async function seedPoints(familyId: string, childId: string, amount: number) {
   await env.DB
@@ -46,6 +46,8 @@ describe("POST /sync", () => {
     const fam = await seedFamily("syni");
     const taskId = await seedTask(fam.familyId, fam.childA, { points: 15 });
     const instanceId = await seedInstance(fam.familyId, taskId, fam.childA, todayAmsterdam());
+    // Nog open taken elders in de week → geen weekbonus door deze ene complete.
+    await seedWeekFiller(fam.familyId, taskId, fam.childA, todayAmsterdam(), 4);
     const token = await childToken(fam.childA, fam.familyId);
     const key = crypto.randomUUID();
     const mutations = [{ key, op: "complete", instanceId }];

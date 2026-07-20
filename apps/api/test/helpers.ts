@@ -1,5 +1,6 @@
 import { env, SELF } from "cloudflare:test";
 import { signJwt } from "../src/services/jwt";
+import { weekDates } from "../src/services/time";
 
 let counter = 0;
 
@@ -100,6 +101,23 @@ export function api(
 }
 
 /** Datum van vandaag in Europe/Amsterdam — consistent met de API-defaults. */
+/**
+ * Seed `count` nog-open instances op andere dagen van dezelfde ISO-week als
+ * `date`, zodat het weektotaal realistisch is (niet 1 taak = meteen weekbonus).
+ */
+export async function seedWeekFiller(
+  familyId: string,
+  taskId: string,
+  childId: string,
+  date: string,
+  count: number,
+) {
+  const others = weekDates(date).filter((d) => d !== date).slice(0, count);
+  for (const d of others) {
+    await seedInstance(familyId, taskId, childId, d);
+  }
+}
+
 export function todayAmsterdam(): string {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Amsterdam",

@@ -8,3 +8,7 @@ export * from "./schemas/points";
 export * from "./schemas/photo";
 export * from "./schemas/device";
 export * from "./schemas/sync";
+export * from "./schemas/badge";
+export * from "./schemas/account";
+export * from "./schemas/notification";
+export * from "./schemas/ws";

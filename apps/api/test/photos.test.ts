@@ -5,7 +5,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { env, SELF } from "cloudflare:test";
-import { seedFamily, seedTask, seedInstance, childToken, parentToken, api, todayAmsterdam } from "./helpers";
+import { seedFamily, seedTask, seedInstance, seedWeekFiller, childToken, parentToken, api, todayAmsterdam } from "./helpers";
 import { processPhotos } from "../src/jobs/photoConsumer";
 
 /** Mini-JPEG: SOI · APP1(Exif+nep-GPS) · APP0(JFIF) · SOS · data · EOI. */
@@ -64,6 +64,7 @@ describe("fotoflow: upload → strip → ready", () => {
     const fam = await seedFamily("pho");
     const taskId = await seedTask(fam.familyId, fam.childA, { photoBonusPoints: 5 });
     const instanceId = await seedInstance(fam.familyId, taskId, fam.childA, todayAmsterdam());
+    await seedWeekFiller(fam.familyId, taskId, fam.childA, todayAmsterdam(), 4);
     const token = await childToken(fam.childA, fam.familyId);
 
     // Afvinken vóór de foto (approvalRequired=false → direct approved)
@@ -114,6 +115,7 @@ describe("fotoflow: upload → strip → ready", () => {
       photoBonusPoints: 5,
     });
     const instanceId = await seedInstance(fam.familyId, taskId, fam.childA, todayAmsterdam());
+    await seedWeekFiller(fam.familyId, taskId, fam.childA, todayAmsterdam(), 4);
     const token = await childToken(fam.childA, fam.familyId);
 
     await api(`/instances/${instanceId}/complete`, {

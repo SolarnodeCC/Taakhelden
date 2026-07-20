@@ -22,7 +22,7 @@ import {
 } from "../services/pointsEngine";
 import { notifyChild, notifyParents, memberName, childCopy, parentCopy } from "../services/notifier";
 import { processSyncBatch } from "../services/syncService";
-import type { SyncMutation } from "@taakhelden/shared";
+import type { SyncMutation, CompleteResult } from "@taakhelden/shared";
 
 interface MutationBody {
   familyId: string;
@@ -87,12 +87,14 @@ export class FamilyRoom implements DurableObject {
         if (result.pointsEarned > 0) {
           this.broadcast("points.changed", { childId, newBalance: result.newBalance });
         }
+        this.broadcastBadges(childId, result.newBadges);
         return result;
       }
       case "/approve": {
         const { result, status, childId } = await applyApprove(db, familyId, body.instanceId!, actor);
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
         this.broadcast("points.changed", { childId, newBalance: result.newBalance });
+        this.broadcastBadges(childId, result.newBadges);
         await this.tryNotify(() =>
           notifyChild(this.env, familyId, childId,
             childCopy.approved(result.pointsEarned + result.photoBonusPoints)),
@@ -173,6 +175,13 @@ export class FamilyRoom implements DurableObject {
       }
       default:
         throw new ApiException(404, "NOT_FOUND", "Onbekende mutatie.");
+    }
+  }
+
+  /** Eén badge.earned-event per zojuist verdiende badge. */
+  private broadcastBadges(childId: string, newBadges: CompleteResult["newBadges"]) {
+    for (const badge of newBadges) {
+      this.broadcast("badge.earned", { childId, badge });
     }
   }
 

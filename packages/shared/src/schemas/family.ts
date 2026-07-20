@@ -38,3 +38,10 @@ export type UpdateMemberBody = z.infer<typeof UpdateMemberBody>;
 export const PincodeBody = z.object({
   pincode: z.string().regex(/^\d{4}$/),
 });
+
+/** POST /families/me/parents — tweede verzorger uitnodigen per e-mail. */
+export const InviteParentBody = z.object({
+  email: z.string().email(),
+  permissions: z.enum(["full", "approve_only"]).default("approve_only"),
+});
+export type InviteParentBody = z.infer<typeof InviteParentBody>;

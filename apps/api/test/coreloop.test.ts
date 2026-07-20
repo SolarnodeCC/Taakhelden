@@ -4,7 +4,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
-import { seedFamily, seedTask, seedInstance, parentToken, childToken, api, todayAmsterdam } from "./helpers";
+import { seedFamily, seedTask, seedInstance, seedWeekFiller, parentToken, childToken, api, todayAmsterdam } from "./helpers";
 
 describe("auth-flow", () => {
   it("registreren → inloggen → gezinscode → kind-sessie", async () => {
@@ -64,6 +64,9 @@ describe("kernlus: afvinken → punten → idempotent", () => {
     const fam = await seedFamily("loop");
     const taskId = await seedTask(fam.familyId, fam.childA, { points: 15 });
     const instanceId = await seedInstance(fam.familyId, taskId, fam.childA, todayAmsterdam());
+    // Nog open taken elders in de week: weektotaal realistisch, dus deze ene
+    // complete triggert (terecht) nog geen weekbonus.
+    await seedWeekFiller(fam.familyId, taskId, fam.childA, todayAmsterdam(), 4);
     const token = await childToken(fam.childA, fam.familyId);
     const key = crypto.randomUUID();
 
@@ -115,6 +118,7 @@ describe("kernlus: afvinken → punten → idempotent", () => {
     const fam = await seedFamily("appr");
     const taskId = await seedTask(fam.familyId, fam.childA, { points: 10, approvalRequired: true });
     const instanceId = await seedInstance(fam.familyId, taskId, fam.childA, todayAmsterdam());
+    await seedWeekFiller(fam.familyId, taskId, fam.childA, todayAmsterdam(), 4);
 
     const complete = await api(`/instances/${instanceId}/complete`, {
       method: "POST",

@@ -13,6 +13,10 @@ import redemptionRoutes from "./routes/redemptions";
 import photoRoutes, { photoTransfer } from "./routes/photos";
 import deviceRoutes from "./routes/devices";
 import syncRoutes from "./routes/sync";
+import badgeRoutes from "./routes/badges";
+import accountRoutes from "./routes/account";
+import notificationRoutes from "./routes/notifications";
+import wsRoutes, { handleWsUpgrade } from "./routes/ws";
 
 const app = new Hono<AppBindings>().basePath("/v1");
 
@@ -23,6 +27,9 @@ app.get("/health", (c) => c.json({ ok: true }));
 app.route("/auth", authRoutes);
 // Foto-transfer: HMAC-signed URLs i.p.v. JWT (à la presigned, zie routes/photos.ts)
 app.route("/photos", photoTransfer);
+// Publiek: de ws-upgrade authenticeert via ?token= (browser-WebSocket kan geen
+// Authorization-header sturen), dus vóór de auth-middleware.
+app.get("/ws", (c) => handleWsUpgrade(c));
 
 // Alles hieronder vereist een geldige JWT
 app.use("*", authMiddleware);
@@ -36,7 +43,10 @@ app.route("/redemptions", redemptionRoutes);
 app.route("/photos", photoRoutes);
 app.route("/devices", deviceRoutes);
 app.route("/sync", syncRoutes);
-// TODO volgende iteraties: /account /ws
+app.route("/badges", badgeRoutes);
+app.route("/account", accountRoutes);
+app.route("/notification-settings", notificationRoutes);
+app.route("/ws", wsRoutes);
 
 export default {
   fetch: app.fetch,
