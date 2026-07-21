@@ -124,6 +124,35 @@ export async function createPendingParent(
     .run();
 }
 
+/**
+ * Co-ouder accepteert de uitnodiging: zet wachtwoord (en optioneel roepnaam) op
+ * het pending parent-profiel. Alleen als er nog geen wachtwoord staat — anders is
+ * de uitnodiging al gebruikt. Geeft terug of er daadwerkelijk een rij is bijgewerkt
+ * (atomair: voorkomt dubbel-accepteren).
+ */
+export async function activatePendingParent(
+  db: D1Database,
+  familyId: string,
+  userId: string,
+  input: { passwordHash: string; displayName?: string },
+): Promise<boolean> {
+  const sets = ["password_hash = ?"];
+  const values: unknown[] = [input.passwordHash];
+  if (input.displayName !== undefined) {
+    sets.push("display_name = ?");
+    values.push(input.displayName);
+  }
+  const res = await db
+    .prepare(
+      `UPDATE users SET ${sets.join(", ")}
+       WHERE family_id = ? AND id = ? AND role = 'parent'
+         AND password_hash IS NULL AND deleted_at IS NULL`,
+    )
+    .bind(...values, familyId, userId)
+    .run();
+  return (res.meta.changes ?? 0) > 0;
+}
+
 export async function updateMember(
   db: D1Database,
   familyId: string,

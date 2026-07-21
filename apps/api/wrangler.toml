@@ -32,11 +32,19 @@ queue = "photo-processing"
 [[queues.consumers]]
 queue = "photo-processing"
 
+[[queues.producers]]
+binding = "EXPORT_QUEUE"
+queue = "export-processing"
+
+[[queues.consumers]]
+queue = "export-processing"
+
 [triggers]
 crons = ["5 0 * * *", "*/15 * * * *"]  # 00:05 instance-generatie · elke 15 min notificaties
 
 # Secrets (via `wrangler secret put`): JWT_SECRET, APNS_KEY, APNS_KEY_ID,
-# APNS_TEAM_ID, APPLE_CLIENT_ID, TURNSTILE_SECRET
+# APNS_TEAM_ID, APPLE_CLIENT_ID, TURNSTILE_SECRET, EMAIL_API_KEY, EMAIL_FROM
+# Vars (optioneel): APP_BASE_URL (voor uitnodigings-links in e-mail)
 
 [env.production]
 name = "taakhelden-api-prod"
