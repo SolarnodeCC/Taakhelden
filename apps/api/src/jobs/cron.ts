@@ -1,5 +1,5 @@
 import type { Env } from "../types";
-import { listActiveFamilies } from "../repo/system";
+import { listActiveFamilies, purgeOldIdempotencyKeys } from "../repo/system";
 import { generateWeekAheadForFamily } from "../services/taskEngine";
 import { purgeExpiredAccounts } from "../services/accountPurge";
 import { listOpenForDate } from "../repo/instances";
@@ -24,6 +24,8 @@ export async function runCron(cron: string, env: Env) {
     }
     // AVG art. 17: gezinnen voorbij het 7-daagse soft-delete-venster opschonen.
     await purgeExpiredAccounts(env);
+    // Idempotentie-rijen (DO-side dedup) ouder dan 48u opruimen.
+    await purgeOldIdempotencyKeys(env.DB);
   }
   if (cron === "*/15 * * * *") {
     // Vriendelijke taakherinnering rond 16:00 lokale tijd (één cron-tick per dag

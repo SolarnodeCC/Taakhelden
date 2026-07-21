@@ -146,15 +146,16 @@ export async function listRedemptions(
 
 /**
  * Aantal niet-geannuleerde inlossingen van dit kind voor deze beloning sinds
- * maandag (gezins-lokale weekgrens als YYYY-MM-DD; created_at is UTC — de
- * marge van enkele uren rond middernacht accepteren we voor een weeklimiet).
+ * `sinceUtc`. `created_at` staat in UTC, dus de aanroeper geeft de gezins-lokale
+ * weekgrens al omgerekend naar UTC mee (zie `localMidnightUtc`) — anders zou het
+ * venster met de tijdzone-offset verschuiven.
  */
 export async function countRedemptionsSince(
   db: D1Database,
   familyId: string,
   childId: string,
   rewardId: string,
-  sinceDate: string,
+  sinceUtc: string,
 ) {
   const row = await db
     .prepare(
@@ -162,7 +163,7 @@ export async function countRedemptionsSince(
        WHERE family_id = ? AND child_id = ? AND reward_id = ? AND status != 'cancelled'
          AND created_at >= ?`,
     )
-    .bind(familyId, childId, rewardId, `${sinceDate} 00:00:00`)
+    .bind(familyId, childId, rewardId, sinceUtc)
     .first<{ n: number }>();
   return row?.n ?? 0;
 }
