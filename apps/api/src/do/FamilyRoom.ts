@@ -36,6 +36,7 @@ interface MutationBody {
   photoId?: string;
   mutations?: SyncMutation[];
   since?: string;
+  idempotencyKey?: string;
 }
 
 export class FamilyRoom implements DurableObject {
@@ -57,7 +58,7 @@ export class FamilyRoom implements DurableObject {
     const path = new URL(req.url).pathname;
     const body = (await req.json()) as MutationBody;
     try {
-      const result = await this.serialize(() => this.handleMutation(path, body));
+      const result = await this.serialize(() => this.runIdempotent(path, body));
       return Response.json(result);
     } catch (err) {
       if (err instanceof ApiException) {
@@ -74,6 +75,30 @@ export class FamilyRoom implements DurableObject {
     const next = this.chain.then(fn, fn);
     this.chain = next.catch(() => {}); // fout in de ene mutatie blokkeert de volgende niet
     return next;
+  }
+
+  /**
+   * DO-side idempotentie: draait binnen de geserialiseerde mutatie-turn, dus de
+   * check-en-schrijf kan niet racen met een gelijktijdig request. Voorkomt dubbel
+   * afboeken/afvinken als twee requests met dezelfde Idempotency-Key de KV-cache
+   * allebei missen. Alleen succesvolle resultaten worden gecachet (een fout mag
+   * opnieuw geprobeerd worden). Zonder key: gewoon doorlaten.
+   */
+  private async runIdempotent(path: string, body: MutationBody): Promise<unknown> {
+    const rawKey = body.idempotencyKey;
+    if (!rawKey) return this.handleMutation(path, body);
+    const storeKey = `${body.actor.userId}:${rawKey}`;
+    const cached = await this.env.DB
+      .prepare("SELECT response FROM idempotency_keys WHERE key = ?")
+      .bind(storeKey)
+      .first<{ response: string }>();
+    if (cached) return JSON.parse(cached.response);
+    const result = await this.handleMutation(path, body);
+    await this.env.DB
+      .prepare("INSERT OR IGNORE INTO idempotency_keys (key, user_id, response) VALUES (?, ?, ?)")
+      .bind(storeKey, body.actor.userId, JSON.stringify(result))
+      .run();
+    return result;
   }
 
   private async handleMutation(path: string, body: MutationBody): Promise<unknown> {

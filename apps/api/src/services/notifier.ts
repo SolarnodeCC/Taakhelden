@@ -7,7 +7,7 @@
 import { SignJWT, importPKCS8 } from "jose";
 import type { Env } from "../types";
 import { getFamily, getMembers, getMember } from "../repo/families";
-import { listDeviceTokensForUsers } from "../repo/devices";
+import { listDeviceTokensForUsers, deleteDeadDeviceToken } from "../repo/devices";
 import { localDate, localTime } from "./time";
 
 export const childCopy = {
@@ -74,7 +74,7 @@ async function apnsSend(
         body: JSON.stringify({ aps: { alert: message, sound: "default" } }),
       });
       if (res.ok) sent++;
-      // TODO(iteratie 3): bij 410 (Unregistered) het token opruimen.
+      else if (res.status === 410) await deleteDeadDeviceToken(env.DB, token); // Unregistered → opruimen
     } catch {
       // netwerk-hik: push is best-effort, nooit een mutatie laten falen
     }

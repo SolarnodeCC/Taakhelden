@@ -30,11 +30,15 @@ export async function callFamilyRoom(
 ): Promise<Response> {
   const { familyId, userId, role } = c.get("auth");
   const actor: Actor = { userId, role };
+  // De Idempotency-Key gaat mee de DO in, zodat dedup binnen de geserialiseerde
+  // mutatie-turn gebeurt — de KV-cache alleen dekt de race van twee gelijktijdige
+  // requests niet af (die schrijven pas ná afloop, dus missen allebei de cache).
+  const idempotencyKey = c.req.header("Idempotency-Key") ?? undefined;
   const stub = c.env.FAMILY_DO.get(c.env.FAMILY_DO.idFromName(familyId));
   const res = await stub.fetch(`https://family-room.internal${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ familyId, actor, ...payload }),
+    body: JSON.stringify({ familyId, actor, idempotencyKey, ...payload }),
   });
   return c.newResponse(await res.text(), res.status as 200, {
     "Content-Type": "application/json",
