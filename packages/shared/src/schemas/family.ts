@@ -45,3 +45,15 @@ export const InviteParentBody = z.object({
   permissions: z.enum(["full", "approve_only"]).default("approve_only"),
 });
 export type InviteParentBody = z.infer<typeof InviteParentBody>;
+
+/**
+ * POST /families/parents/accept — de uitgenodigde verzorger accepteert: het
+ * uitnodigingstoken uit de e-mail plus een eigen wachtwoord (en optioneel een
+ * roepnaam). Publiek endpoint: de tweede ouder is nog niet ingelogd.
+ */
+export const ParentAcceptBody = z.object({
+  token: z.string().min(1),
+  password: z.string().min(8, "Kies een wachtwoord van minstens 8 tekens."),
+  displayName: z.string().min(1).max(30).optional(),
+});
+export type ParentAcceptBody = z.infer<typeof ParentAcceptBody>;

@@ -3,9 +3,19 @@
  * wachtwoordbevestiging, en de purge-cascade over D1 + R2 + KV (art. 17).
  */
 import { describe, it, expect } from "vitest";
-import { env } from "cloudflare:test";
+import { env, SELF } from "cloudflare:test";
+import { unzipSync, strFromU8 } from "fflate";
 import { seedFamily, seedTask, seedInstance, parentToken, childToken, api, todayAmsterdam } from "./helpers";
 import { purgeExpiredAccounts, purgeFamily } from "../src/services/accountPurge";
+import { processExports } from "../src/jobs/exportConsumer";
+
+/** Handmatige queue-batch voor de export-consumer (deterministisch). */
+function fakeExportBatch(exportId: string, familyId: string): MessageBatch {
+  return {
+    queue: "export-processing",
+    messages: [{ body: { exportId, familyId }, ack() {}, retry() {} }],
+  } as unknown as MessageBatch;
+}
 
 let regCounter = 0;
 async function registerFamily(password = "superveilig123") {
@@ -22,29 +32,84 @@ async function registerFamily(password = "superveilig123") {
   return res.json() as Promise<{ accessToken: string; familyId: string; userId: string }>;
 }
 
-describe("GET /account/export", () => {
-  it("ouder krijgt een machineleesbare export van gezinsdata", async () => {
+describe("account-export (async ZIP, AVG art. 20)", () => {
+  it("ouder start een export; de queue bouwt een ZIP met JSON + foto; downloadlink werkt", async () => {
     const fam = await seedFamily("exp");
     const taskId = await seedTask(fam.familyId, fam.childA, { points: 15 });
     await seedInstance(fam.familyId, taskId, fam.childA, todayAmsterdam());
+    const parentTok = await parentToken(fam.parentId, fam.familyId);
 
-    const res = await api("/account/export", { token: await parentToken(fam.parentId, fam.familyId) });
-    expect(res.status).toBe(200);
-    expect(res.headers.get("Content-Disposition")).toContain("attachment");
+    // Een 'ready' foto: rij in D1 + bytes in R2, zodat de export ze meepakt.
+    const photoId = "ph_exp1";
+    const r2key = `task/${fam.familyId}/${photoId}`;
+    await env.PHOTOS.put(r2key, "fake-jpeg-bytes");
+    await env.DB
+      .prepare(
+        `INSERT INTO photos (id, family_id, owner_id, purpose, r2_key, content_type, bytes, status)
+         VALUES (?, ?, ?, 'task', ?, 'image/jpeg', 15, 'ready')`,
+      )
+      .bind(photoId, fam.familyId, fam.childA, r2key)
+      .run();
 
-    const body = (await res.json()) as {
+    // Start → 202 pending
+    const start = await api("/account/export", { method: "POST", token: parentTok });
+    expect(start.status).toBe(202);
+    const { exportId, status } = (await start.json()) as { exportId: string; status: string };
+    expect(status).toBe("pending");
+
+    // Vóór verwerking: nog pending, geen downloadlink
+    const pending = (await (await api(`/account/export/${exportId}`, { token: parentTok })).json()) as {
+      status: string;
+      downloadUrl?: string;
+    };
+    expect(pending.status).toBe("pending");
+    expect(pending.downloadUrl).toBeUndefined();
+
+    // Queue verwerkt de job
+    await processExports(fakeExportBatch(exportId, fam.familyId), env);
+
+    // Klaar + kortlevende downloadlink
+    const ready = (await (await api(`/account/export/${exportId}`, { token: parentTok })).json()) as {
+      status: string;
+      downloadUrl: string;
+    };
+    expect(ready.status).toBe("ready");
+    expect(ready.downloadUrl).toContain(`/v1/account/export/${exportId}/file`);
+
+    // Download is publiek maar HMAC-gesigneerd
+    const dl = await SELF.fetch(ready.downloadUrl);
+    expect(dl.status).toBe(200);
+    expect(dl.headers.get("Content-Disposition")).toContain("attachment");
+
+    const entries = unzipSync(new Uint8Array(await dl.arrayBuffer()));
+    expect(Object.keys(entries)).toContain("export.json");
+    expect(Object.keys(entries).some((k) => k.startsWith("photos/"))).toBe(true);
+    const manifest = JSON.parse(strFromU8(entries["export.json"]!)) as {
       family: { id: string };
-      members: unknown[];
       tasks: Array<{ id: string }>;
     };
-    expect(body.family.id).toBe(fam.familyId);
-    expect(body.members.length).toBe(3); // 1 ouder + 2 kinderen
-    expect(body.tasks.some((t) => t.id === taskId)).toBe(true);
+    expect(manifest.family.id).toBe(fam.familyId);
+    expect(manifest.tasks.some((t) => t.id === taskId)).toBe(true);
   });
 
-  it("kind mag geen export opvragen (403)", async () => {
+  it("kind mag geen export starten (403)", async () => {
     const fam = await seedFamily("expx");
-    const res = await api("/account/export", { token: await childToken(fam.childA, fam.familyId) });
+    const res = await api("/account/export", {
+      method: "POST",
+      token: await childToken(fam.childA, fam.familyId),
+    });
+    expect(res.status).toBe(403);
+  });
+
+  it("download met een geknoeide handtekening → 403", async () => {
+    const fam = await seedFamily("expsig");
+    const parentTok = await parentToken(fam.parentId, fam.familyId);
+    const { exportId } = (await (await api("/account/export", { method: "POST", token: parentTok })).json()) as {
+      exportId: string;
+    };
+    await processExports(fakeExportBatch(exportId, fam.familyId), env);
+    const forged = `https://api.test/v1/account/export/${exportId}/file?fam=${fam.familyId}&exp=9999999999&sig=deadbeef`;
+    const res = await SELF.fetch(forged);
     expect(res.status).toBe(403);
   });
 });

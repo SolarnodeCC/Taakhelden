@@ -22,9 +22,11 @@ export async function purgeFamily(env: Env, familyId: string): Promise<void> {
   // User-id's eerst ophalen: na de D1-cascade zijn ze weg.
   const userIds = await account.familyUserIds(env.DB, familyId);
 
-  // R2-foto's staan onder task/<familyId>/ en profile/<familyId>/ (zie photoService).
+  // R2-foto's staan onder task/<familyId>/ en profile/<familyId>/ (zie photoService),
+  // export-ZIP's onder export/<familyId>/ (zie exportService).
   await deleteR2Prefix(env.PHOTOS, `task/${familyId}/`);
   await deleteR2Prefix(env.PHOTOS, `profile/${familyId}/`);
+  await deleteR2Prefix(env.PHOTOS, `export/${familyId}/`);
 
   for (const userId of userIds) {
     await deleteKvPrefix(env.KV, `idem:${userId}:`);
