@@ -154,7 +154,10 @@ describe("fotoflow: upload → strip → ready", () => {
     });
     const { uploadUrl } = (await intent.json()) as { uploadUrl: string };
 
-    const tampered = uploadUrl.replace(/sig=./, "sig=0");
+    // Flip the first signature character to a guaranteed-different value so the
+    // tamper is deterministic — replacing with a fixed char was a no-op (→ 200)
+    // whenever the signature already started with that char, making this flaky.
+    const tampered = uploadUrl.replace(/sig=(.)/, (_m, c: string) => `sig=${c === "0" ? "1" : "0"}`);
     const res = await SELF.fetch(tampered, { method: "PUT", body: jpegWithExif() });
     expect(res.status).toBe(403);
   });
