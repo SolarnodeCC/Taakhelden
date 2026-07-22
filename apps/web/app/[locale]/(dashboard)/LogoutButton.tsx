@@ -22,7 +22,12 @@ export default function LogoutButton() {
   }
 
   return (
-    <button type="button" onClick={onLogout} disabled={busy} style={{ padding: "0.4rem 0.8rem" }}>
+    <button
+      type="button"
+      onClick={onLogout}
+      disabled={busy}
+      className="rounded border border-border px-3 py-1.5 text-sm font-medium text-text transition-colors hover:bg-surface disabled:opacity-60"
+    >
       {t("logout")}
     </button>
   );

@@ -2,6 +2,7 @@ import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "../../i18n/routing";
+import "../globals.css";
 
 export const metadata = { title: "TaakHelden — Ouderdashboard" };
 
@@ -26,7 +27,7 @@ export default function LocaleLayout({
 
   return (
     <html lang={locale}>
-      <body>
+      <body className="min-h-screen bg-bg font-sans text-text antialiased">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>
     </html>

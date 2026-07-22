@@ -28,6 +28,7 @@
     "i18n",
     "lib",
     "middleware.ts",
+    "tailwind.config.ts",
     "next-env.d.ts",
     ".next/types/**/*.ts"
   ],

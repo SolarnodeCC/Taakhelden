@@ -14,9 +14,9 @@ export default function LoginPage({ params }: { params: { locale: string } }) {
   const t = useTranslations("auth");
 
   return (
-    <main style={{ fontFamily: "system-ui", padding: "4rem", maxWidth: 420 }}>
-      <h1>TaakHelden</h1>
-      <p style={{ color: "#555" }}>{t("loginIntro")}</p>
+    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-16">
+      <h1 className="text-2xl font-semibold text-accent">TaakHelden</h1>
+      <p className="mt-1 text-sm text-muted">{t("loginIntro")}</p>
       <LoginForm />
     </main>
   );

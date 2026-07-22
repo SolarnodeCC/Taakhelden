@@ -45,9 +45,12 @@ export default function LoginForm() {
     }
   }
 
+  const fieldClass =
+    "rounded border border-border bg-bg px-3 py-2 text-sm outline-none focus:border-accent";
+
   return (
-    <form onSubmit={onSubmit} style={{ display: "flex", flexDirection: "column", gap: "0.75rem", marginTop: "1.5rem" }}>
-      <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+    <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
+      <label className="flex flex-col gap-1 text-sm font-medium text-text">
         {t("email")}
         <input
           type="email"
@@ -56,10 +59,10 @@ export default function LoginForm() {
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          style={{ padding: "0.5rem" }}
+          className={fieldClass}
         />
       </label>
-      <label style={{ display: "flex", flexDirection: "column", gap: "0.25rem" }}>
+      <label className="flex flex-col gap-1 text-sm font-medium text-text">
         {t("password")}
         <input
           type="password"
@@ -68,17 +71,21 @@ export default function LoginForm() {
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          style={{ padding: "0.5rem" }}
+          className={fieldClass}
         />
       </label>
 
       {error && (
-        <p role="alert" style={{ color: "#b00020", margin: 0 }}>
+        <p role="alert" className="text-sm text-danger">
           {error}
         </p>
       )}
 
-      <button type="submit" disabled={busy} style={{ padding: "0.6rem", marginTop: "0.5rem" }}>
+      <button
+        type="submit"
+        disabled={busy}
+        className="mt-1 rounded bg-accent px-4 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover disabled:opacity-60"
+      >
         {busy ? t("submitting") : t("submit")}
       </button>
     </form>
