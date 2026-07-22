@@ -142,14 +142,15 @@ Naast de bestaande `ci.yml` (typecheck/test/migratie-dry-run) voegt deze kit de
 **Claude Code GitHub Action** toe (`anthropics/claude-code-action@v1`):
 
 - `@claude`-mentions in issues/PR-comments laten Claude fixes voorstellen of vragen
-  beantwoorden.
-- Draait ook bij een nieuw geopende PR (review). De agents/skills uit `.claude/` — o.a.
-  `architecture-reviewer` — zijn dan gewoon beschikbaar.
+  beantwoorden. De agents/skills uit `.claude/` — o.a. `architecture-reviewer` — zijn dan
+  beschikbaar.
+- Draait **alleen** op een expliciete `@claude`-mention (geen auto-run bij PR-open), zodat
+  er geen rode CI ontstaat zolang het secret nog niet is gezet.
 
 **Actie vereist:** zet `ANTHROPIC_API_KEY` als **repo-secret** (Settings → Secrets and
 variables → Actions). Er staat bewust geen secret in de repo. De scope is klein gehouden
-(`issue_comment`, `pull_request_review_comment`, `issues`, `pull_request: opened`), en de
-bestaande `ci.yml` blijft de bron van waarheid voor groen/rood.
+(`issue_comment`, `pull_request_review_comment`, `issues`), en de bestaande `ci.yml` blijft
+de bron van waarheid voor groen/rood.
 
 ---
 

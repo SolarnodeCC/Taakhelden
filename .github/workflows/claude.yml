@@ -1,6 +1,8 @@
 name: Claude Code
 
 # @claude-mentions in issues en PR's laten Claude Code meedenken/reviewen.
+# Bewust alleen op expliciete @claude-mention (geen auto-run op PR-open), zodat er
+# geen rode CI ontstaat zolang ANTHROPIC_API_KEY nog niet is gezet.
 # De bestaande ci.yml blijft de bron van waarheid voor groen/rood.
 on:
   issue_comment:
@@ -9,14 +11,11 @@ on:
     types: [created]
   issues:
     types: [opened, assigned]
-  pull_request:
-    types: [opened]
 
 jobs:
   claude:
-    # Alleen draaien als iemand @claude noemt (of bij een nieuwe PR/issue).
+    # Alleen draaien als iemand @claude noemt.
     if: |
-      github.event_name == 'pull_request' ||
       (github.event_name == 'issues' && contains(github.event.issue.body, '@claude')) ||
       (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
       (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
