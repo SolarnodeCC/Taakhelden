@@ -154,7 +154,10 @@ describe("fotoflow: upload → strip → ready", () => {
     });
     const { uploadUrl } = (await intent.json()) as { uploadUrl: string };
 
-    const tampered = uploadUrl.replace(/sig=./, "sig=0");
+    // Vervang de hele signature-waarde door een onmogelijke waarde, zodat de tamper
+    // nooit per toeval samenvalt met een geldige signature (voorheen flaky bij sig die
+    // met "0" begon).
+    const tampered = uploadUrl.replace(/sig=[^&]+/, "sig=tampered");
     const res = await SELF.fetch(tampered, { method: "PUT", body: jpegWithExif() });
     expect(res.status).toBe(403);
   });
