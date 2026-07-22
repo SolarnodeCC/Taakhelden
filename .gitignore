@@ -5,6 +5,7 @@ dist/
 .wrangler/
 .dev.vars
 *.local
+.claude/settings.local.json
 .DS_Store
 coverage/
 apps/ios/build/
