@@ -27,7 +27,7 @@ export interface ApiError {
 /** Runtime-validatie van het standaard fout-envelope, zodat clients falen kunnen parsen. */
 export const ApiErrorSchema = z.object({
   error: z.object({
-    code: z.enum(Object.values(ErrorCodes) as [ErrorCode, ...ErrorCode[]]),
+    code: z.nativeEnum(ErrorCodes),
     message: z.string(),
     details: z.record(z.unknown()).optional(),
   }),

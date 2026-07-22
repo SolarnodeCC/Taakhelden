@@ -57,10 +57,14 @@ async function proxy(req: Request, path: string[]): Promise<Response> {
     );
   }
 
-  // Stream the Worker's response back unchanged (status + body + content-type).
+  // Stream the Worker's response back (status + body + content-type). Mark it
+  // no-store so per-family authenticated data is never cached by intermediaries.
   return new NextResponse(res.body, {
     status: res.status,
-    headers: { "Content-Type": res.headers.get("Content-Type") ?? "application/json" },
+    headers: {
+      "Content-Type": res.headers.get("Content-Type") ?? "application/json",
+      "Cache-Control": "no-store",
+    },
   });
 }
 

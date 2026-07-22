@@ -6,11 +6,12 @@ import { LoginBody, ErrorCodes, type ErrorCode } from "@taakhelden/shared";
 import { apiClient, ApiClientError } from "../../../lib/api/client";
 import { useRouter } from "../../../i18n/navigation";
 
-// Error codes we surface with a tailored message; anything else uses the fallback.
+// Server-round-trip errors we surface with tailored copy; anything else (incl.
+// 5xx/network with no code) falls back to the generic message. Bad input is
+// caught client-side below before we ever call the server.
 const KNOWN_ERRORS: ErrorCode[] = [
   ErrorCodes.INVALID_CREDENTIALS,
   ErrorCodes.RATE_LIMITED,
-  ErrorCodes.VALIDATION_FAILED,
 ];
 
 export default function LoginForm() {
