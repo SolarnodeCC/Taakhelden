@@ -11,13 +11,19 @@ export default function LanguageSwitcher() {
   const router = useRouter();
 
   return (
-    <nav style={{ display: "flex", gap: "0.5rem", marginTop: "1.5rem" }}>
+    <nav className="flex gap-1">
       {routing.locales.map((locale) => (
         <button
           key={locale}
           type="button"
           disabled={locale === active}
           onClick={() => router.replace(pathname, { locale })}
+          className={
+            "rounded px-2 py-1 text-xs font-medium transition-colors " +
+            (locale === active
+              ? "bg-accent text-accent-fg"
+              : "text-muted hover:bg-border/50")
+          }
         >
           {locale.toUpperCase()}
         </button>

@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/*
+ * Design tokens — single source of truth, framework-agnostic CSS variables so
+ * iOS can adopt the same values later (productvoorstel §4.2). Palette is a
+ * placeholder pending design: white/neutral base + one calm accent, per the
+ * "zakelijker en rustiger" brief. Swap the hex values here to rebrand.
+ */
+:root {
+  --color-bg: #ffffff;
+  --color-surface: #f6f7f9;
+  --color-border: #e5e8ec;
+  --color-text: #1b1f24;
+  --color-text-muted: #5a6470;
+  --color-accent: #0e9f8e;
+  --color-accent-hover: #0c8c7d;
+  --color-on-accent: #ffffff;
+  --color-danger: #b00020;
+  --color-success: #1f9254;
+  --radius: 0.625rem;
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}

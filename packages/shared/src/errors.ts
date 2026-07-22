@@ -1,3 +1,5 @@
+import { z } from "zod";
+
 /** Stabiele, machine-leesbare foutcodes — zie docs/taakhelden-api-specificatie.md §1 */
 export const ErrorCodes = {
   VALIDATION_FAILED: "VALIDATION_FAILED",
@@ -21,3 +23,12 @@ export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
 export interface ApiError {
   error: { code: ErrorCode; message: string; details?: Record<string, unknown> };
 }
+
+/** Runtime-validatie van het standaard fout-envelope, zodat clients falen kunnen parsen. */
+export const ApiErrorSchema = z.object({
+  error: z.object({
+    code: z.nativeEnum(ErrorCodes),
+    message: z.string(),
+    details: z.record(z.unknown()).optional(),
+  }),
+});

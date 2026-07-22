@@ -1,5 +1,50 @@
 {
-  "home": {
-    "subtitle": "Ouderdashboard — in aanbouw."
+  "auth": {
+    "loginIntro": "Log in om het dashboard van je gezin te bekijken.",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "submit": "Inloggen",
+    "submitting": "Bezig met inloggen…",
+    "logout": "Uitloggen",
+    "errors": {
+      "INVALID_CREDENTIALS": "Dat e-mailadres en wachtwoord passen nog niet bij elkaar. Probeer het gerust opnieuw.",
+      "RATE_LIMITED": "Even een momentje — probeer het over een minuutje nog eens.",
+      "VALIDATION_FAILED": "Vul een geldig e-mailadres en wachtwoord in.",
+      "generic": "Er ging iets mis bij het inloggen. Probeer het straks nog eens."
+    }
+  },
+  "nav": {
+    "vandaag": "Vandaag",
+    "goedkeuren": "Goedkeuren",
+    "taken": "Taken",
+    "winkel": "Winkel",
+    "inzichten": "Inzichten"
+  },
+  "shell": {
+    "loading": "Laden…",
+    "loadError": "Kon gezinsgegevens niet laden.",
+    "greeting": "Hoi {name}"
+  },
+  "sections": {
+    "vandaag": {
+      "title": "Vandaag",
+      "body": "Binnenkort: per kind wat openstaat, wat af is en wat op goedkeuring wacht."
+    },
+    "goedkeuren": {
+      "title": "Goedkeuren",
+      "body": "Binnenkort: de goedkeuringswachtrij met foto's — in één tik goedkeuren of opnieuw laten doen."
+    },
+    "taken": {
+      "title": "Taken",
+      "body": "Binnenkort: taken en beloningen beheren en de weekplanner."
+    },
+    "winkel": {
+      "title": "Winkel",
+      "body": "Binnenkort: beloningen instellen en inwisselverzoeken bekijken."
+    },
+    "inzichten": {
+      "title": "Inzichten",
+      "body": "Binnenkort: trends per week als hulp voor het gesprek — nooit als controlemiddel."
+    }
   }
 }

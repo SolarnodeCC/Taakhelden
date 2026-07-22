@@ -1,5 +1,50 @@
 {
-  "home": {
-    "subtitle": "Parent dashboard — under construction."
+  "auth": {
+    "loginIntro": "Sign in to view your family's dashboard.",
+    "email": "Email address",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "logout": "Sign out",
+    "errors": {
+      "INVALID_CREDENTIALS": "That email and password don't match just yet. Feel free to try again.",
+      "RATE_LIMITED": "Just a moment — please try again in a minute.",
+      "VALIDATION_FAILED": "Please enter a valid email address and password.",
+      "generic": "Something went wrong while signing in. Please try again in a bit."
+    }
+  },
+  "nav": {
+    "vandaag": "Today",
+    "goedkeuren": "Approvals",
+    "taken": "Tasks",
+    "winkel": "Shop",
+    "inzichten": "Insights"
+  },
+  "shell": {
+    "loading": "Loading…",
+    "loadError": "Couldn't load family details.",
+    "greeting": "Hi {name}"
+  },
+  "sections": {
+    "vandaag": {
+      "title": "Today",
+      "body": "Coming soon: per child, what's open, what's done, and what's waiting for approval."
+    },
+    "goedkeuren": {
+      "title": "Approvals",
+      "body": "Coming soon: the approval queue with photos — approve or ask for a redo in one tap."
+    },
+    "taken": {
+      "title": "Tasks",
+      "body": "Coming soon: manage tasks and rewards, plus the weekly planner."
+    },
+    "winkel": {
+      "title": "Shop",
+      "body": "Coming soon: set up rewards and review redemption requests."
+    },
+    "inzichten": {
+      "title": "Insights",
+      "body": "Coming soon: weekly trends to support the conversation — never as a monitoring tool."
+    }
   }
 }
