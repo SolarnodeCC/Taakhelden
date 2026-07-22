@@ -1,5 +1,19 @@
 {
   "home": {
     "subtitle": "Parent dashboard — under construction."
+  },
+  "auth": {
+    "loginIntro": "Sign in to view your family's dashboard.",
+    "email": "Email address",
+    "password": "Password",
+    "submit": "Sign in",
+    "submitting": "Signing in…",
+    "logout": "Sign out",
+    "errors": {
+      "INVALID_CREDENTIALS": "That email and password don't match just yet. Feel free to try again.",
+      "RATE_LIMITED": "Just a moment — please try again in a minute.",
+      "VALIDATION_FAILED": "Please enter a valid email address and password.",
+      "generic": "Something went wrong while signing in. Please try again in a bit."
+    }
   }
 }

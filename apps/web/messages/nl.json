@@ -1,5 +1,19 @@
 {
   "home": {
     "subtitle": "Ouderdashboard — in aanbouw."
+  },
+  "auth": {
+    "loginIntro": "Log in om het dashboard van je gezin te bekijken.",
+    "email": "E-mailadres",
+    "password": "Wachtwoord",
+    "submit": "Inloggen",
+    "submitting": "Bezig met inloggen…",
+    "logout": "Uitloggen",
+    "errors": {
+      "INVALID_CREDENTIALS": "Dat e-mailadres en wachtwoord passen nog niet bij elkaar. Probeer het gerust opnieuw.",
+      "RATE_LIMITED": "Even een momentje — probeer het over een minuutje nog eens.",
+      "VALIDATION_FAILED": "Vul een geldig e-mailadres en wachtwoord in.",
+      "generic": "Er ging iets mis bij het inloggen. Probeer het straks nog eens."
+    }
   }
 }

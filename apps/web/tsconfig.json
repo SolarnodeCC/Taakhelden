@@ -26,6 +26,7 @@
   "include": [
     "app",
     "i18n",
+    "lib",
     "middleware.ts",
     "next-env.d.ts",
     ".next/types/**/*.ts"
