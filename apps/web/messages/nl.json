@@ -25,23 +25,128 @@
     "loadError": "Kon gezinsgegevens niet laden.",
     "greeting": "Hoi {name}"
   },
+  "vandaag": {
+    "title": "Vandaag",
+    "loading": "Laden…",
+    "loadError": "Kon het overzicht niet laden.",
+    "noChildren": "Er zijn nog geen kinderen in dit gezin.",
+    "childEmpty": "Nog niets voor vandaag.",
+    "balance": "{points} punten",
+    "bucket": {
+      "open": "Te doen",
+      "awaiting": "Wacht op goedkeuring",
+      "done": "Af"
+    }
+  },
+  "goedkeuren": {
+    "title": "Goedkeuren",
+    "loading": "Laden…",
+    "loadError": "Kon de wachtrij niet laden.",
+    "empty": "Alles is bijgewerkt 🎉",
+    "submittedBy": "Ingediend door {name}",
+    "points": "{points} punten",
+    "approve": "Goedkeuren",
+    "redo": "Opnieuw",
+    "redoLabel": "Wat kan er nog beter?",
+    "redoPlaceholder": "Bijna! Nog even dit…",
+    "redoSubmit": "Stuur terug",
+    "cancel": "Annuleren",
+    "actionError": "Er ging iets mis. Probeer het nog eens.",
+    "photoAlt": "Foto van de afgeronde taak",
+    "photoUnavailable": "Foto is nog niet beschikbaar."
+  },
+  "taken": {
+    "title": "Taken",
+    "loading": "Laden…",
+    "loadError": "Kon de taken niet laden.",
+    "newTask": "Nieuwe taak",
+    "empty": "Nog geen taken. Maak er een aan om te beginnen.",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "deleteConfirm": "Deze taak verwijderen? De historie blijft bewaard.",
+    "points": "{points} punten",
+    "category": {
+      "household": "Huishouden",
+      "homework": "Huiswerk",
+      "selfcare": "Verzorging",
+      "custom": "Overig"
+    },
+    "daypart": {
+      "any": "Hele dag",
+      "morning": "Ochtend",
+      "afternoon": "Middag",
+      "evening": "Avond"
+    },
+    "recurrence": {
+      "once": "Eenmalig",
+      "daily": "Dagelijks",
+      "weekly": "Wekelijks"
+    },
+    "weekday": {
+      "MO": "ma",
+      "TU": "di",
+      "WE": "wo",
+      "TH": "do",
+      "FR": "vr",
+      "SA": "za",
+      "SU": "zo"
+    },
+    "badge": {
+      "approval": "Goedkeuring",
+      "photoBonus": "+{points} foto"
+    },
+    "form": {
+      "createTitle": "Nieuwe taak",
+      "editTitle": "Taak bewerken",
+      "fldTitle": "Titel",
+      "fldCategory": "Categorie",
+      "fldIcon": "Icoon",
+      "fldPoints": "Punten",
+      "fldPhotoBonus": "Fotobonus",
+      "fldApproval": "Goedkeuring door ouder nodig",
+      "fldAssignees": "Voor wie",
+      "fldDaypart": "Dagdeel",
+      "fldRecurrence": "Herhaling",
+      "fldDays": "Dagen",
+      "assigneesRequired": "Kies minstens één kind.",
+      "errorSave": "Kon de taak niet opslaan.",
+      "save": "Opslaan",
+      "saving": "Bezig met opslaan…",
+      "cancel": "Annuleren"
+    }
+  },
+  "winkel": {
+    "title": "Winkel",
+    "loading": "Laden…",
+    "loadError": "Kon de winkel niet laden.",
+    "requestsHeading": "Inwisselverzoeken",
+    "noRequests": "Geen openstaande verzoeken.",
+    "requestedBy": "Gevraagd door {name}",
+    "price": "{points} punten",
+    "fulfill": "Ingelost",
+    "cancelRequest": "Annuleren",
+    "rewardsHeading": "Beloningen",
+    "newReward": "Nieuwe beloning",
+    "noRewards": "Nog geen beloningen. Voeg er een toe.",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "deleteConfirm": "Deze beloning verwijderen? De historie blijft bewaard.",
+    "limitPerWeek": "max {count}x per week",
+    "form": {
+      "createTitle": "Nieuwe beloning",
+      "editTitle": "Beloning bewerken",
+      "fldTitle": "Naam",
+      "fldIcon": "Icoon",
+      "fldPrice": "Puntenprijs",
+      "fldLimited": "Beperk hoe vaak per week",
+      "fldLimitPerWeek": "Max per week",
+      "errorSave": "Kon de beloning niet opslaan.",
+      "save": "Opslaan",
+      "saving": "Bezig met opslaan…",
+      "cancel": "Annuleren"
+    }
+  },
   "sections": {
-    "vandaag": {
-      "title": "Vandaag",
-      "body": "Binnenkort: per kind wat openstaat, wat af is en wat op goedkeuring wacht."
-    },
-    "goedkeuren": {
-      "title": "Goedkeuren",
-      "body": "Binnenkort: de goedkeuringswachtrij met foto's — in één tik goedkeuren of opnieuw laten doen."
-    },
-    "taken": {
-      "title": "Taken",
-      "body": "Binnenkort: taken en beloningen beheren en de weekplanner."
-    },
-    "winkel": {
-      "title": "Winkel",
-      "body": "Binnenkort: beloningen instellen en inwisselverzoeken bekijken."
-    },
     "inzichten": {
       "title": "Inzichten",
       "body": "Binnenkort: trends per week als hulp voor het gesprek — nooit als controlemiddel."

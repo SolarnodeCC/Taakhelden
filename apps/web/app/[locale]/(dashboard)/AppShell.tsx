@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Link, usePathname } from "../../../i18n/navigation";
-import { apiClient } from "../../../lib/api/client";
+import { Link, usePathname, useRouter } from "../../../i18n/navigation";
+import { apiClient, ApiClientError } from "../../../lib/api/client";
 import {
   FamilyView,
   MemberList,
@@ -25,6 +25,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const t = useTranslations("shell");
   const tNav = useTranslations("nav");
   const pathname = usePathname();
+  const router = useRouter();
 
   const [data, setData] = useState<ShellData | null>(null);
   const [failed, setFailed] = useState(false);
@@ -49,14 +50,21 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           permissions: session.permissions,
           children: members.filter((m) => m.role === "child"),
         });
-      } catch {
-        if (active) setFailed(true);
+      } catch (err) {
+        if (!active) return;
+        // An expired/revoked session can't be recovered here — send the parent to
+        // login rather than leaving them on a shell that only shows an error.
+        if (err instanceof ApiClientError && err.status === 401) {
+          router.push("/login");
+          return;
+        }
+        setFailed(true);
       }
     })();
     return () => {
       active = false;
     };
-  }, []);
+  }, [router]);
 
   // Until permissions are known, show only the ungated items so we never flash
   // management sections to an approve_only parent.

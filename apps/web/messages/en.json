@@ -25,23 +25,128 @@
     "loadError": "Couldn't load family details.",
     "greeting": "Hi {name}"
   },
+  "vandaag": {
+    "title": "Today",
+    "loading": "Loading…",
+    "loadError": "Couldn't load the overview.",
+    "noChildren": "There are no children in this family yet.",
+    "childEmpty": "Nothing for today yet.",
+    "balance": "{points} points",
+    "bucket": {
+      "open": "To do",
+      "awaiting": "Waiting for approval",
+      "done": "Done"
+    }
+  },
+  "goedkeuren": {
+    "title": "Approvals",
+    "loading": "Loading…",
+    "loadError": "Couldn't load the queue.",
+    "empty": "You're all caught up 🎉",
+    "submittedBy": "Submitted by {name}",
+    "points": "{points} points",
+    "approve": "Approve",
+    "redo": "Try again",
+    "redoLabel": "What could be better?",
+    "redoPlaceholder": "Almost there! Just this…",
+    "redoSubmit": "Send back",
+    "cancel": "Cancel",
+    "actionError": "Something went wrong. Please try again.",
+    "photoAlt": "Photo of the finished task",
+    "photoUnavailable": "Photo isn't available yet."
+  },
+  "taken": {
+    "title": "Tasks",
+    "loading": "Loading…",
+    "loadError": "Couldn't load tasks.",
+    "newTask": "New task",
+    "empty": "No tasks yet. Create one to get started.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this task? Its history is kept.",
+    "points": "{points} points",
+    "category": {
+      "household": "Household",
+      "homework": "Homework",
+      "selfcare": "Self-care",
+      "custom": "Other"
+    },
+    "daypart": {
+      "any": "All day",
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "recurrence": {
+      "once": "One-off",
+      "daily": "Daily",
+      "weekly": "Weekly"
+    },
+    "weekday": {
+      "MO": "Mon",
+      "TU": "Tue",
+      "WE": "Wed",
+      "TH": "Thu",
+      "FR": "Fri",
+      "SA": "Sat",
+      "SU": "Sun"
+    },
+    "badge": {
+      "approval": "Approval",
+      "photoBonus": "+{points} photo"
+    },
+    "form": {
+      "createTitle": "New task",
+      "editTitle": "Edit task",
+      "fldTitle": "Title",
+      "fldCategory": "Category",
+      "fldIcon": "Icon",
+      "fldPoints": "Points",
+      "fldPhotoBonus": "Photo bonus",
+      "fldApproval": "Requires parent approval",
+      "fldAssignees": "For whom",
+      "fldDaypart": "Time of day",
+      "fldRecurrence": "Repeat",
+      "fldDays": "Days",
+      "assigneesRequired": "Pick at least one child.",
+      "errorSave": "Couldn't save the task.",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    }
+  },
+  "winkel": {
+    "title": "Shop",
+    "loading": "Loading…",
+    "loadError": "Couldn't load the shop.",
+    "requestsHeading": "Redemption requests",
+    "noRequests": "No open requests.",
+    "requestedBy": "Requested by {name}",
+    "price": "{points} points",
+    "fulfill": "Fulfilled",
+    "cancelRequest": "Cancel",
+    "rewardsHeading": "Rewards",
+    "newReward": "New reward",
+    "noRewards": "No rewards yet. Add one.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this reward? Its history is kept.",
+    "limitPerWeek": "max {count}x per week",
+    "form": {
+      "createTitle": "New reward",
+      "editTitle": "Edit reward",
+      "fldTitle": "Name",
+      "fldIcon": "Icon",
+      "fldPrice": "Point price",
+      "fldLimited": "Limit how often per week",
+      "fldLimitPerWeek": "Max per week",
+      "errorSave": "Couldn't save the reward.",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    }
+  },
   "sections": {
-    "vandaag": {
-      "title": "Today",
-      "body": "Coming soon: per child, what's open, what's done, and what's waiting for approval."
-    },
-    "goedkeuren": {
-      "title": "Approvals",
-      "body": "Coming soon: the approval queue with photos — approve or ask for a redo in one tap."
-    },
-    "taken": {
-      "title": "Tasks",
-      "body": "Coming soon: manage tasks and rewards, plus the weekly planner."
-    },
-    "winkel": {
-      "title": "Shop",
-      "body": "Coming soon: set up rewards and review redemption requests."
-    },
     "inzichten": {
       "title": "Insights",
       "body": "Coming soon: weekly trends to support the conversation — never as a monitoring tool."

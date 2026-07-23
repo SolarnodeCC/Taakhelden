@@ -31,10 +31,20 @@ async function request<T>(
   method: string,
   path: string,
   body?: unknown,
+  opts?: { idempotencyKey?: string },
 ): Promise<T> {
+  const headers: Record<string, string> = {};
+  if (body !== undefined) headers["Content-Type"] = "application/json";
+  // Every mutation carries an Idempotency-Key so a retried request can never be
+  // applied twice (architectuurregel 2 — dubbel afvinken mag nooit dubbele
+  // punten opleveren). The BFF forwards this header to the Worker.
+  if (method !== "GET" && method !== "HEAD") {
+    headers["Idempotency-Key"] = opts?.idempotencyKey ?? crypto.randomUUID();
+  }
+
   const res = await fetch(path, {
     method,
-    headers: body === undefined ? undefined : { "Content-Type": "application/json" },
+    headers,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
 
@@ -54,5 +64,10 @@ async function request<T>(
 
 export const apiClient = {
   get: <T>(path: string) => request<T>("GET", path),
-  post: <T>(path: string, body?: unknown) => request<T>("POST", path, body),
+  post: <T>(path: string, body?: unknown, opts?: { idempotencyKey?: string }) =>
+    request<T>("POST", path, body, opts),
+  patch: <T>(path: string, body?: unknown, opts?: { idempotencyKey?: string }) =>
+    request<T>("PATCH", path, body, opts),
+  delete: <T>(path: string, opts?: { idempotencyKey?: string }) =>
+    request<T>("DELETE", path, undefined, opts),
 };

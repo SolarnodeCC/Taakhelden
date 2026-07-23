@@ -95,18 +95,18 @@ export async function storeRefreshToken(db: D1Database, userId: string, token: s
 
 export async function consumeRefreshToken(db: D1Database, token: string) {
   const hash = await sha256Hex(token);
-  const row = await db
+  // Atomic single-use: flip revoked_at from NULL in one statement and only treat
+  // the token as consumed when this call is the one that changed the row. This
+  // closes the read-then-write race where two concurrent refreshes could both
+  // pass a `revoked_at IS NULL` check and each rotate to a new token.
+  const res = await db
     .prepare(
-      "SELECT * FROM refresh_tokens WHERE token_hash = ? AND revoked_at IS NULL AND expires_at > datetime('now')",
+      "UPDATE refresh_tokens SET revoked_at = datetime('now') WHERE token_hash = ? AND revoked_at IS NULL AND expires_at > datetime('now')",
     )
     .bind(hash)
-    .first();
-  if (!row) return null;
-  await db
-    .prepare("UPDATE refresh_tokens SET revoked_at = datetime('now') WHERE id = ?")
-    .bind(row.id)
     .run();
-  return row;
+  if (!res.meta.changes) return null;
+  return db.prepare("SELECT * FROM refresh_tokens WHERE token_hash = ?").bind(hash).first();
 }
 
 export async function revokeRefreshToken(db: D1Database, token: string) {
