@@ -1,0 +1,40 @@
+<!-- @dsCard group="Kid App" viewport="700x260" name="Avatar Variants — Girl/Boy × Age Mode" subtitle="Young, mid, and teen mode avatars (emoji stand-ins, no avatar art supplied yet)" -->
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<div id="root" style="padding:16px;background:var(--kid-cream)"></div>
+<script type="text/babel">
+const { AvatarBadge } = window.TaakHeldenDesignSystem_73e756;
+function Row({ label, children }){
+  return (
+    <div style={{display:'flex',alignItems:'center',gap:14}}>
+      <div style={{width:70,fontFamily:'var(--font-sans)',fontSize:12,color:'var(--color-text-muted)'}}>{label}</div>
+      <div style={{display:'flex',gap:16}}>{children}</div>
+    </div>
+  );
+}
+function Demo(){
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:14}}>
+      <Row label="Jong (4–7)">
+        <AvatarBadge emoji="👧" level={1} size={64} tone="kid" />
+        <AvatarBadge emoji="👦" level={1} size={64} tone="kid" />
+      </Row>
+      <Row label="Midden (8–12)">
+        <AvatarBadge emoji="🧒🏽" level={4} size={64} tone="kid" />
+        <AvatarBadge emoji="🧑🏻‍🦱" level={4} size={64} tone="kid" />
+      </Row>
+      <div style={{background:'var(--teen-navy)',padding:14,borderRadius:16,display:'flex',alignItems:'center',gap:14}}>
+        <div style={{width:70,fontFamily:'var(--font-sans)',fontSize:12,color:'var(--teen-muted)'}}>Tiener (13+)</div>
+        <div style={{display:'flex',gap:16}}>
+          <AvatarBadge emoji="👩🏾" level={8} size={64} tone="teen" />
+          <AvatarBadge emoji="🧑🏻" level={8} size={64} tone="teen" />
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+</script>

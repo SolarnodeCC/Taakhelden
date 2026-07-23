@@ -1,0 +1,28 @@
+<!-- @dsCard group="Components" viewport="700x200" name="Cards & Badges" subtitle="Content surface and status pills" -->
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<div id="root" style="padding:16px;background:var(--color-surface)"></div>
+<script type="text/babel">
+const { Card, Badge } = window.TaakHeldenDesignSystem_73e756;
+function Demo(){
+  return (
+    <div style={{display:'flex',gap:14}}>
+      <Card style={{width:260}}>
+        <div style={{display:'flex',justifyContent:'space-between',alignItems:'center'}}>
+          <strong style={{fontFamily:'var(--font-sans)',color:'var(--color-text)'}}>Sam — vaatwasser</strong>
+          <Badge tone="accent">Wacht op goedkeuring</Badge>
+        </div>
+      </Card>
+      <div style={{display:'flex',flexDirection:'column',gap:8}}>
+        <Badge tone="neutral">Open</Badge>
+        <Badge tone="success">Goedgekeurd</Badge>
+        <Badge tone="danger">Opnieuw</Badge>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+</script>

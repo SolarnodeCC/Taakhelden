@@ -1,0 +1,299 @@
+{
+  "plugins": [
+    "react",
+    "import"
+  ],
+  "rules": {
+    "react/forbid-elements": [
+      "warn",
+      {
+        "forbid": []
+      }
+    ],
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": [
+              "components/core/**",
+              "components/feedback/**",
+              "components/kids/**",
+              "components/navigation/**",
+              "ui_kits/kid-app/**",
+              "ui_kits/parent-dashboard/**",
+              "ui_kits/parent-dashboard/screens/**"
+            ],
+            "message": "Import design-system components from 'index.js', not component internals."
+          }
+        ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "warn",
+      {
+        "selector": "Literal[value=/#[0-9a-fA-F]{3,8}\\b/]",
+        "message": "Raw hex color — use a design-system color token via var()."
+      },
+      {
+        "selector": "Literal[value=/\\b\\d+px\\b/]",
+        "message": "Raw px value — use a design-system spacing token via var()."
+      },
+      {
+        "selector": "Literal[value=/font-family\\s*:\\s*(?!['\\\"]?(?:Fredoka))/i]",
+        "message": "Font not provided by the design system. Available: Fredoka."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Alert'] > JSXAttribute > JSXIdentifier[name!=/^(?:tone|children|key|ref|className|style|children)$/]",
+        "message": "<Alert> doesn't accept that prop. Declared props: tone, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Alert'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:danger|success)$/]",
+        "message": "<Alert> tone must be one of 'danger' | 'success'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='AvatarBadge'] > JSXAttribute > JSXIdentifier[name!=/^(?:emoji|level|size|tone|key|ref|className|style|children)$/]",
+        "message": "<AvatarBadge> doesn't accept that prop. Declared props: emoji, level, size, tone."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='AvatarBadge'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:kid|teen)$/]",
+        "message": "<AvatarBadge> tone must be one of 'kid' | 'teen'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Badge'] > JSXAttribute > JSXIdentifier[name!=/^(?:tone|children|key|ref|className|style|children)$/]",
+        "message": "<Badge> doesn't accept that prop. Declared props: tone, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Badge'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:neutral|accent|success|danger)$/]",
+        "message": "<Badge> tone must be one of 'neutral' | 'accent' | 'success' | 'danger'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute > JSXIdentifier[name!=/^(?:variant|size|disabled|icon|children|onClick|style|key|ref|className|style|children)$/]",
+        "message": "<Button> doesn't accept that prop. Declared props: variant, size, disabled, icon, children, onClick, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='variant'] > Literal[value!=/^(?:primary|secondary|ghost|danger)$/]",
+        "message": "<Button> variant must be one of 'primary' | 'secondary' | 'ghost' | 'danger'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Button'] > JSXAttribute[name.name='size'] > Literal[value!=/^(?:sm|md|lg)$/]",
+        "message": "<Button> size must be one of 'sm' | 'md' | 'lg'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Card'] > JSXAttribute > JSXIdentifier[name!=/^(?:children|padded|style|key|ref|className|style|children)$/]",
+        "message": "<Card> doesn't accept that prop. Declared props: children, padded, style."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='Field'] > JSXAttribute > JSXIdentifier[name!=/^(?:label|error|children|key|ref|className|style|children)$/]",
+        "message": "<Field> doesn't accept that prop. Declared props: label, error, children."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='PointsBadge'] > JSXAttribute > JSXIdentifier[name!=/^(?:points|key|ref|className|style|children)$/]",
+        "message": "<PointsBadge> doesn't accept that prop. Declared props: points."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ProgressBar'] > JSXAttribute > JSXIdentifier[name!=/^(?:value|max|tone|label|key|ref|className|style|children)$/]",
+        "message": "<ProgressBar> doesn't accept that prop. Declared props: value, max, tone, label."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='ProgressBar'] > JSXAttribute[name.name='tone'] > Literal[value!=/^(?:accent|kid)$/]",
+        "message": "<ProgressBar> tone must be one of 'accent' | 'kid'."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='RewardCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:icon|title|price|affordable|key|ref|className|style|children)$/]",
+        "message": "<RewardCard> doesn't accept that prop. Declared props: icon, title, price, affordable."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='NavEntry'] > JSXAttribute > JSXIdentifier[name!=/^(?:key|label|key|ref|className|style|children)$/]",
+        "message": "<NavEntry> doesn't accept that prop. Declared props: key, label."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='StreakBadge'] > JSXAttribute > JSXIdentifier[name!=/^(?:days|key|ref|className|style|children)$/]",
+        "message": "<StreakBadge> doesn't accept that prop. Declared props: days."
+      },
+      {
+        "selector": "JSXOpeningElement[name.name='TaskCard'] > JSXAttribute > JSXIdentifier[name!=/^(?:icon|title|points|done|onToggle|key|ref|className|style|children)$/]",
+        "message": "<TaskCard> doesn't accept that prop. Declared props: icon, title, points, done, onToggle."
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": [
+        "**/index.js"
+      ],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "x-omelette": {
+    "components": {
+      "Alert": {
+        "replaces": []
+      },
+      "AvatarBadge": {
+        "replaces": []
+      },
+      "Badge": {
+        "replaces": []
+      },
+      "Button": {
+        "replaces": []
+      },
+      "Card": {
+        "replaces": []
+      },
+      "Field": {
+        "replaces": []
+      },
+      "PointsBadge": {
+        "replaces": []
+      },
+      "ProgressBar": {
+        "replaces": []
+      },
+      "RewardCard": {
+        "replaces": []
+      },
+      "NavEntry": {
+        "replaces": []
+      },
+      "StreakBadge": {
+        "replaces": []
+      },
+      "TaskCard": {
+        "replaces": []
+      }
+    },
+    "tokens": [
+      "--color-accent",
+      "--color-accent-hover",
+      "--color-bg",
+      "--color-border",
+      "--color-danger",
+      "--color-danger-bg",
+      "--color-on-accent",
+      "--color-success",
+      "--color-success-bg",
+      "--color-surface",
+      "--color-text",
+      "--color-text-muted",
+      "--font-rounded",
+      "--font-sans",
+      "--kid-coral",
+      "--kid-coral-soft",
+      "--kid-cream",
+      "--kid-text",
+      "--kid-turquoise",
+      "--kid-turquoise-soft",
+      "--kid-yellow",
+      "--kid-yellow-soft",
+      "--leading-normal",
+      "--leading-tight",
+      "--radius",
+      "--radius-full",
+      "--radius-lg",
+      "--radius-sm",
+      "--radius-xl",
+      "--shadow-kid",
+      "--shadow-md",
+      "--shadow-sm",
+      "--space-1",
+      "--space-10",
+      "--space-12",
+      "--space-16",
+      "--space-2",
+      "--space-3",
+      "--space-4",
+      "--space-5",
+      "--space-6",
+      "--space-8",
+      "--teen-mint",
+      "--teen-muted",
+      "--teen-navy",
+      "--teen-navy-surface",
+      "--teen-text",
+      "--text-2xl",
+      "--text-3xl",
+      "--text-4xl",
+      "--text-base",
+      "--text-lg",
+      "--text-sm",
+      "--text-xl",
+      "--text-xs",
+      "--transition-base",
+      "--transition-fast",
+      "--weight-bold",
+      "--weight-medium",
+      "--weight-regular",
+      "--weight-semibold"
+    ],
+    "tokenKinds": {
+      "--color-bg": "color",
+      "--color-surface": "color",
+      "--color-border": "color",
+      "--color-text": "font",
+      "--color-text-muted": "font",
+      "--color-accent": "color",
+      "--color-accent-hover": "color",
+      "--color-on-accent": "color",
+      "--color-danger": "color",
+      "--color-danger-bg": "color",
+      "--color-success": "color",
+      "--color-success-bg": "color",
+      "--kid-coral": "color",
+      "--kid-coral-soft": "color",
+      "--kid-turquoise": "color",
+      "--kid-turquoise-soft": "color",
+      "--kid-yellow": "color",
+      "--kid-yellow-soft": "color",
+      "--kid-cream": "color",
+      "--kid-text": "font",
+      "--teen-navy": "color",
+      "--teen-navy-surface": "color",
+      "--teen-mint": "color",
+      "--teen-text": "font",
+      "--teen-muted": "color",
+      "--font-sans": "font",
+      "--font-rounded": "radius",
+      "--text-xs": "font",
+      "--text-sm": "font",
+      "--text-base": "font",
+      "--text-lg": "font",
+      "--text-xl": "font",
+      "--text-2xl": "font",
+      "--text-3xl": "font",
+      "--text-4xl": "font",
+      "--weight-regular": "font",
+      "--weight-medium": "font",
+      "--weight-semibold": "font",
+      "--weight-bold": "font",
+      "--leading-tight": "font",
+      "--leading-normal": "font",
+      "--space-1": "spacing",
+      "--space-2": "spacing",
+      "--space-3": "spacing",
+      "--space-4": "spacing",
+      "--space-5": "spacing",
+      "--space-6": "spacing",
+      "--space-8": "spacing",
+      "--space-10": "spacing",
+      "--space-12": "spacing",
+      "--space-16": "spacing",
+      "--radius-sm": "radius",
+      "--radius": "radius",
+      "--radius-lg": "radius",
+      "--radius-xl": "radius",
+      "--radius-full": "radius",
+      "--shadow-sm": "shadow",
+      "--shadow-md": "shadow",
+      "--shadow-kid": "shadow",
+      "--transition-fast": "other",
+      "--transition-base": "other"
+    },
+    "fontFamilies": [
+      "Fredoka"
+    ]
+  }
+}
