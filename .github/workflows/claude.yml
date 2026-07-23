@@ -1,0 +1,45 @@
+name: Claude Code
+
+# @claude-mentions in issues en PR's laten Claude Code meedenken/reviewen.
+# Bewust alleen op expliciete @claude-mention (geen auto-run op PR-open), zodat er
+# geen rode CI ontstaat zolang ANTHROPIC_API_KEY nog niet is gezet.
+# De bestaande ci.yml blijft de bron van waarheid voor groen/rood.
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+  issues:
+    types: [opened, assigned]
+
+jobs:
+  claude:
+    # Alleen draaien als een vertrouwde gebruiker (OWNER/MEMBER/COLLABORATOR) @claude
+    # noemt. Zonder deze author-gate kan iedereen die mag reageren de action met onze
+    # secrets en write-rechten aftrappen.
+    if: |
+      (github.event_name == 'issues' &&
+        contains(github.event.issue.body, '@claude') &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.issue.author_association)) ||
+      (github.event_name == 'issue_comment' &&
+        contains(github.event.comment.body, '@claude') &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association)) ||
+      (github.event_name == 'pull_request_review_comment' &&
+        contains(github.event.comment.body, '@claude') &&
+        contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Claude Code
+        # Vastgepind op een commit-SHA (supply-chain). Dependabot bumpt dit; werk de
+        # comment bij naar de bijbehorende versie bij een update.
+        uses: anthropics/claude-code-action@fa7e2f0a29a126f0b81cdcf360561b36e44cf608 # v1.0.180
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
