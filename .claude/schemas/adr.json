@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "taakhelden/adr",
+  "title": "TaakHelden Architecture Decision Record",
+  "description": "Shape the taakhelden-architect agent emits for an ADR.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["id", "title", "status", "context", "decision", "consequences"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ADR-[0-9]{4}$",
+      "description": "Sequential id, e.g. ADR-0007."
+    },
+    "title": { "type": "string", "minLength": 3 },
+    "status": {
+      "type": "string",
+      "enum": ["proposed", "accepted", "superseded", "deprecated"]
+    },
+    "date": { "type": "string", "format": "date" },
+    "supersedes": { "type": "string", "pattern": "^ADR-[0-9]{4}$" },
+    "context": {
+      "type": "string",
+      "description": "The problem / forces at play."
+    },
+    "decision": {
+      "type": "string",
+      "description": "The decision taken, in the active voice."
+    },
+    "consequences": {
+      "type": "string",
+      "description": "Resulting trade-offs, positive and negative."
+    },
+    "hardRulesImpact": {
+      "type": "array",
+      "description": "Which of the six hard rules this decision touches and how it stays compliant.",
+      "items": {
+        "type": "string",
+        "enum": [
+          "no-sql-in-routes",
+          "familyId-boundary",
+          "idempotency",
+          "ledger-source-of-truth",
+          "no-negative-mechanics",
+          "child-privacy",
+          "zod-validation"
+        ]
+      }
+    },
+    "affects": {
+      "type": "array",
+      "description": "Layers/paths affected.",
+      "items": {
+        "type": "string",
+        "enum": ["apps/api", "apps/web", "apps/ios", "packages/shared", "migrations", "FamilyRoom-DO", "R2", "D1"]
+      }
+    }
+  }
+}
