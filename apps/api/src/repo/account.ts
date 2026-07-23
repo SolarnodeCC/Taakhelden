@@ -46,6 +46,57 @@ export async function collectExport(db: D1Database, familyId: string) {
   };
 }
 
+// --- asynchrone data-export (AVG art. 20) ---
+
+/** Nieuwe export-job (status pending). */
+export async function createExportJob(db: D1Database, familyId: string, id: string): Promise<void> {
+  await db
+    .prepare("INSERT INTO account_exports (id, family_id, status) VALUES (?, ?, 'pending')")
+    .bind(id, familyId)
+    .run();
+}
+
+export async function getExportJob(db: D1Database, familyId: string, exportId: string) {
+  return db
+    .prepare("SELECT * FROM account_exports WHERE family_id = ? AND id = ?")
+    .bind(familyId, exportId)
+    .first<{ id: string; status: "pending" | "ready" | "failed"; r2_key: string | null }>();
+}
+
+export async function setExportReady(
+  db: D1Database,
+  familyId: string,
+  exportId: string,
+  r2Key: string,
+  byteSize: number,
+): Promise<void> {
+  await db
+    .prepare(
+      `UPDATE account_exports SET status = 'ready', r2_key = ?, byte_size = ?, ready_at = datetime('now')
+       WHERE family_id = ? AND id = ?`,
+    )
+    .bind(r2Key, byteSize, familyId, exportId)
+    .run();
+}
+
+export async function setExportFailed(db: D1Database, familyId: string, exportId: string): Promise<void> {
+  await db
+    .prepare("UPDATE account_exports SET status = 'failed' WHERE family_id = ? AND id = ?")
+    .bind(familyId, exportId)
+    .run();
+}
+
+/** Klaar-verklaarde foto's mét R2-key — nodig om de bytes in de ZIP te stoppen. */
+export async function listReadyPhotosForExport(db: D1Database, familyId: string) {
+  const { results } = await db
+    .prepare(
+      "SELECT id, r2_key, content_type FROM photos WHERE family_id = ? AND status = 'ready'",
+    )
+    .bind(familyId)
+    .all<{ id: string; r2_key: string; content_type: string }>();
+  return results;
+}
+
 /**
  * Zet het 7-daagse verwijdervenster in: markeer het gezin als verwijderd en trek
  * alle refresh tokens van gezinsleden in. Geeft het gebruikte tijdstip (ISO)
@@ -102,6 +153,7 @@ export async function purgeFamilyD1(db: D1Database, familyId: string): Promise<v
     scoped(`DELETE FROM refresh_tokens WHERE ${userScope}`),
     scoped(`DELETE FROM devices WHERE ${userScope}`),
     scoped(`DELETE FROM idempotency_keys WHERE ${userScope}`),
+    scoped("DELETE FROM account_exports WHERE family_id = ?"),
     scoped("DELETE FROM photos WHERE family_id = ?"),
     scoped("DELETE FROM redemptions WHERE family_id = ?"),
     scoped("DELETE FROM points_ledger WHERE family_id = ?"),

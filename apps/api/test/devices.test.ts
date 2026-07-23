@@ -6,6 +6,7 @@ import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
 import { seedFamily, parentToken, childToken, api } from "./helpers";
 import { isQuietTime } from "../src/services/notifier";
+import { deleteDeadDeviceToken } from "../src/repo/devices";
 
 describe("device-registratie", () => {
   it("kind registreert eigen token; ouder mag token aan kindprofiel hangen (iPad)", async () => {
@@ -51,6 +52,28 @@ describe("device-registratie", () => {
     const rows = await env.DB
       .prepare("SELECT COUNT(*) AS n FROM devices WHERE apns_token = ?")
       .bind("c".repeat(64))
+      .first<{ n: number }>();
+    expect(rows?.n).toBe(0);
+  });
+
+  it("APNs 410: een dood token wordt overal opgeruimd", async () => {
+    const fam = await seedFamily("dead");
+    const token = "d".repeat(64);
+    // Zelfde token aan twee profielen (gedeelde iPad).
+    await env.DB
+      .prepare("INSERT INTO devices (apns_token, user_id, platform) VALUES (?, ?, 'ios')")
+      .bind(token, fam.parentId)
+      .run();
+    await env.DB
+      .prepare("INSERT INTO devices (apns_token, user_id, platform) VALUES (?, ?, 'ios')")
+      .bind(token, fam.childA)
+      .run();
+
+    await deleteDeadDeviceToken(env.DB, token);
+
+    const rows = await env.DB
+      .prepare("SELECT COUNT(*) AS n FROM devices WHERE apns_token = ?")
+      .bind(token)
       .first<{ n: number }>();
     expect(rows?.n).toBe(0);
   });

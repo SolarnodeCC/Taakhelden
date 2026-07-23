@@ -13,6 +13,14 @@ export async function registerDevice(
     .run();
 }
 
+/**
+ * APNs meldde 410 (Unregistered): dit token is bij Apple ongeldig en dus overal
+ * dood. We ruimen het gezins-onafhankelijk op — het hoort nergens meer thuis.
+ */
+export async function deleteDeadDeviceToken(db: D1Database, apnsToken: string) {
+  await db.prepare("DELETE FROM devices WHERE apns_token = ?").bind(apnsToken).run();
+}
+
 /** Bij uitloggen: alle profiel-koppelingen van dit token binnen het gezin weg. */
 export async function deleteDeviceToken(db: D1Database, familyId: string, apnsToken: string) {
   await db
