@@ -25,7 +25,11 @@ export async function getInstance(db: D1Database, familyId: string, instanceId: 
 export async function listForDate(db: D1Database, familyId: string, date: string, childId?: string) {
   const base = `
     SELECT i.*, t.title, t.icon, t.category, t.points AS task_points,
-           t.photo_bonus_points, t.approval_required, t.daypart
+           t.photo_bonus_points, t.approval_required, t.daypart,
+           (SELECT p.id FROM photos p
+              WHERE p.family_id = i.family_id AND p.ref_id = i.id
+                AND p.purpose = 'task' AND p.status = 'ready'
+              ORDER BY p.created_at DESC LIMIT 1) AS photo_id
     FROM task_instances i JOIN tasks t ON t.id = i.task_id
     WHERE i.family_id = ? AND i.date = ?`;
   const stmt = childId

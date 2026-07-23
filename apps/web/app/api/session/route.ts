@@ -29,6 +29,8 @@ export async function GET() {
     userId: claims.sub,
     familyId: claims.fam,
     role: claims.role,
-    permissions: claims.perm ?? "full",
+    // Fail closed: a token missing the perm claim gets the least-privileged
+    // level so we never flash management nav to a parent who lacks it.
+    permissions: claims.perm ?? "approve_only",
   });
 }

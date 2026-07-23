@@ -27,6 +27,7 @@ function instanceView(row: Record<string, unknown>) {
     photoBonusPoints: row.photo_bonus_points,
     approvalRequired: Boolean(row.approval_required),
     daypart: row.daypart ?? null,
+    photoId: row.photo_id ?? null,
     pointsEarned: row.points_earned ?? null,
     redoNote: row.redo_note ?? null,
     completedAt: row.completed_at ?? null,

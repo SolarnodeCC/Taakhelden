@@ -1,7 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
-import SectionStub from "../SectionStub";
+import VandaagClient from "./VandaagClient";
 
 export default function VandaagPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
-  return <SectionStub sectionKey="vandaag" />;
+  return <VandaagClient />;
 }

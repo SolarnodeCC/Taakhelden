@@ -57,6 +57,28 @@ describe("auth-flow", () => {
     const refresh2 = await api("/auth/refresh", { body: { refreshToken: reg.refreshToken } });
     expect(refresh2.status).toBe(401);
   });
+
+  it("gelijktijdige refresh met dezelfde token: precies één wint (geen dubbele rotatie)", async () => {
+    const register = await api("/auth/register", {
+      body: {
+        email: "race@test.local",
+        password: "superveilig123",
+        familyName: "De Racers",
+        displayName: "Tess",
+        turnstileToken: "test",
+      },
+    });
+    const reg = (await register.json()) as { refreshToken: string };
+
+    // Twee parallelle refreshes met dezelfde single-use token. De atomische
+    // consume mag er hooguit één laten slagen — nooit beide (dubbel-issue).
+    const [a, b] = await Promise.all([
+      api("/auth/refresh", { body: { refreshToken: reg.refreshToken } }),
+      api("/auth/refresh", { body: { refreshToken: reg.refreshToken } }),
+    ]);
+    const statuses = [a.status, b.status].sort();
+    expect(statuses).toEqual([200, 401]);
+  });
 });
 
 describe("kernlus: afvinken → punten → idempotent", () => {

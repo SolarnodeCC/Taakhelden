@@ -25,15 +25,37 @@
     "loadError": "Kon gezinsgegevens niet laden.",
     "greeting": "Hoi {name}"
   },
+  "vandaag": {
+    "title": "Vandaag",
+    "loading": "Laden…",
+    "loadError": "Kon het overzicht niet laden.",
+    "noChildren": "Er zijn nog geen kinderen in dit gezin.",
+    "childEmpty": "Nog niets voor vandaag.",
+    "balance": "{points} punten",
+    "bucket": {
+      "open": "Te doen",
+      "awaiting": "Wacht op goedkeuring",
+      "done": "Af"
+    }
+  },
+  "goedkeuren": {
+    "title": "Goedkeuren",
+    "loading": "Laden…",
+    "loadError": "Kon de wachtrij niet laden.",
+    "empty": "Alles is bijgewerkt 🎉",
+    "submittedBy": "Ingediend door {name}",
+    "points": "{points} punten",
+    "approve": "Goedkeuren",
+    "redo": "Opnieuw",
+    "redoLabel": "Wat kan er nog beter?",
+    "redoPlaceholder": "Bijna! Nog even dit…",
+    "redoSubmit": "Stuur terug",
+    "cancel": "Annuleren",
+    "actionError": "Er ging iets mis. Probeer het nog eens.",
+    "photoAlt": "Foto van de afgeronde taak",
+    "photoUnavailable": "Foto is nog niet beschikbaar."
+  },
   "sections": {
-    "vandaag": {
-      "title": "Vandaag",
-      "body": "Binnenkort: per kind wat openstaat, wat af is en wat op goedkeuring wacht."
-    },
-    "goedkeuren": {
-      "title": "Goedkeuren",
-      "body": "Binnenkort: de goedkeuringswachtrij met foto's — in één tik goedkeuren of opnieuw laten doen."
-    },
     "taken": {
       "title": "Taken",
       "body": "Binnenkort: taken en beloningen beheren en de weekplanner."

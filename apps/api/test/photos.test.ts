@@ -142,6 +142,37 @@ describe("fotoflow: upload → strip → ready", () => {
     expect(result.newBalance).toBe(35); // 10 + dagbonus 20 + foto 5
   });
 
+  it("goedkeuringswachtrij: /instances/today toont photoId van een ingediende taak met foto", async () => {
+    const fam = await seedFamily("phq");
+    const taskId = await seedTask(fam.familyId, fam.childA, {
+      approvalRequired: true,
+      photoBonusPoints: 5,
+    });
+    const instanceId = await seedInstance(fam.familyId, taskId, fam.childA, todayAmsterdam());
+    await seedWeekFiller(fam.familyId, taskId, fam.childA, todayAmsterdam(), 4);
+    const childTok = await childToken(fam.childA, fam.familyId);
+
+    await api(`/instances/${instanceId}/complete`, {
+      method: "POST",
+      token: childTok,
+      idempotencyKey: crypto.randomUUID(),
+    });
+    const photoId = await uploadFlow(childTok, instanceId, fam.familyId);
+    await api(`/instances/${instanceId}/photo`, { method: "POST", token: childTok, body: { photoId } });
+
+    // Ouder ziet de ingediende taak mét de photoId, zodat het dashboard de foto
+    // via GET /photos/{id} kan tonen in de goedkeuringswachtrij.
+    const today = await api("/instances/today", { token: await parentToken(fam.parentId, fam.familyId) });
+    const body = (await today.json()) as {
+      children: { childId: string; instances: { id: string; status: string; photoId: string | null }[] }[];
+    };
+    const inst = body.children
+      .flatMap((c) => c.instances)
+      .find((i) => i.id === instanceId);
+    expect(inst?.status).toBe("submitted");
+    expect(inst?.photoId).toBe(photoId);
+  });
+
   it("vervalste of verlopen signature op de transfer-URL → 403", async () => {
     const fam = await seedFamily("phs");
     const taskId = await seedTask(fam.familyId, fam.childA);

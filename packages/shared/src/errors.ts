@@ -17,6 +17,7 @@ export const ErrorCodes = {
   INVALID_FAMILY_CODE: "INVALID_FAMILY_CODE",
   IDEMPOTENCY_REPLAY: "IDEMPOTENCY_REPLAY",
   RATE_LIMITED: "RATE_LIMITED",
+  UPSTREAM_UNAVAILABLE: "UPSTREAM_UNAVAILABLE", // BFF kon de Worker niet bereiken (geen client-fout)
 } as const;
 export type ErrorCode = (typeof ErrorCodes)[keyof typeof ErrorCodes];
 

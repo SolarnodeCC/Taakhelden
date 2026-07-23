@@ -52,7 +52,7 @@ async function proxy(req: Request, path: string[]): Promise<Response> {
     }
   } catch {
     return NextResponse.json(
-      { error: { code: ErrorCodes.VALIDATION_FAILED, message: "Kan de server niet bereiken." } },
+      { error: { code: ErrorCodes.UPSTREAM_UNAVAILABLE, message: "Kan de server niet bereiken." } },
       { status: 502 },
     );
   }

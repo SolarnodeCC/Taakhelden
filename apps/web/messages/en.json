@@ -25,15 +25,37 @@
     "loadError": "Couldn't load family details.",
     "greeting": "Hi {name}"
   },
+  "vandaag": {
+    "title": "Today",
+    "loading": "Loading…",
+    "loadError": "Couldn't load the overview.",
+    "noChildren": "There are no children in this family yet.",
+    "childEmpty": "Nothing for today yet.",
+    "balance": "{points} points",
+    "bucket": {
+      "open": "To do",
+      "awaiting": "Waiting for approval",
+      "done": "Done"
+    }
+  },
+  "goedkeuren": {
+    "title": "Approvals",
+    "loading": "Loading…",
+    "loadError": "Couldn't load the queue.",
+    "empty": "You're all caught up 🎉",
+    "submittedBy": "Submitted by {name}",
+    "points": "{points} points",
+    "approve": "Approve",
+    "redo": "Try again",
+    "redoLabel": "What could be better?",
+    "redoPlaceholder": "Almost there! Just this…",
+    "redoSubmit": "Send back",
+    "cancel": "Cancel",
+    "actionError": "Something went wrong. Please try again.",
+    "photoAlt": "Photo of the finished task",
+    "photoUnavailable": "Photo isn't available yet."
+  },
   "sections": {
-    "vandaag": {
-      "title": "Today",
-      "body": "Coming soon: per child, what's open, what's done, and what's waiting for approval."
-    },
-    "goedkeuren": {
-      "title": "Approvals",
-      "body": "Coming soon: the approval queue with photos — approve or ask for a redo in one tap."
-    },
     "taken": {
       "title": "Tasks",
       "body": "Coming soon: manage tasks and rewards, plus the weekly planner."
