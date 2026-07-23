@@ -8,6 +8,10 @@ description: Zet een nieuw API-endpoint op in de TaakHelden Worker volgens de ar
 Volg deze checklist bij elke nieuwe route (uit `CLAUDE.md` → Workflow). De vier lagen
 horen bij elkaar; sla er geen over.
 
+> Concrete, copy-pasteerbare code-templates voor alle vier de lagen staan in
+> [`references/templates.md`](references/templates.md) — lees dat bestand pas wanneer je
+> gaat scaffolden (progressive disclosure), niet op voorhand.
+
 ## 1. Zod-schema in `packages/shared`
 - Voeg een schema toe in `packages/shared/src/schemas/<resource>.ts` (body + response).
 - Exporteer het via `packages/shared/src/index.ts`.
@@ -36,7 +40,15 @@ horen bij elkaar; sla er geen over.
   `childToken`, `api`, `todayAmsterdam`.
 - Patroon: `apps/api/test/authz.test.ts`.
 
-## Afronden
-- `npm run typecheck` en `npm test` groen.
-- Loop de zes harde regels na (of roep `@architecture-reviewer` / `/arch-check` aan).
-- Denk aan de positieve NL-toon voor kindgerichte strings (`@dutch-child-copy`).
+## Afronden — verificatie (niet overslaan)
+Bevestig elk punt met bewijs, ga niet af op aanname:
+- [ ] Zod-schema bestaat én is geëxporteerd via `packages/shared/src/index.ts`.
+- [ ] Elke repo-functie heeft `familyId` als eerste arg en elke query filtert op
+      `family_id = ?`. Controleer met: `rg -n 'family_id' apps/api/src/repo/<resource>.ts`.
+- [ ] Route bevat geen ruwe SQL: `rg -n '\.prepare\(|\.batch\(' apps/api/src/routes/<resource>.ts`
+      geeft niets terug.
+- [ ] Router is gemount in `apps/api/src/index.ts`.
+- [ ] Authz-test bestaat en dekt cross-family + rol-overschrijding.
+- [ ] `npm run typecheck` en `npm test` groen (plak de uitkomst, verzin die niet).
+- [ ] Zes harde regels nagelopen — draai `/arch-check` (`@architecture-reviewer`).
+- [ ] Kindgerichte strings in positieve NL-toon (`@dutch-child-copy`).

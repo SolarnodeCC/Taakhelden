@@ -139,13 +139,15 @@ lokaal opgeslagen, niet in git. Zie `developers.cloudflare.com/agents/model-cont
 ## 7. Claude Code in CI — `.github/workflows/claude.yml` (in deze kit)
 
 Naast de bestaande `ci.yml` (typecheck/test/migratie-dry-run) voegt deze kit de
-**Claude Code GitHub Action** toe (`anthropics/claude-code-action@v1`):
+**Claude Code GitHub Action** toe (`anthropics/claude-code-action`, vastgepind op een
+commit-SHA i.p.v. de bewegende `@v1`-tag — supply-chain):
 
 - `@claude`-mentions in issues/PR-comments laten Claude fixes voorstellen of vragen
   beantwoorden. De agents/skills uit `.claude/` — o.a. `architecture-reviewer` — zijn dan
   beschikbaar.
-- Draait **alleen** op een expliciete `@claude`-mention (geen auto-run bij PR-open), zodat
-  er geen rode CI ontstaat zolang het secret nog niet is gezet.
+- Draait **alleen** op een expliciete `@claude`-mention van een vertrouwde gebruiker
+  (`author_association` OWNER/MEMBER/COLLABORATOR), geen auto-run bij PR-open — zodat er
+  geen rode CI ontstaat en niemand van buiten de action met onze secrets kan aftrappen.
 
 **Actie vereist:** zet `ANTHROPIC_API_KEY` als **repo-secret** (Settings → Secrets and
 variables → Actions). Er staat bewust geen secret in de repo. De scope is klein gehouden
@@ -154,7 +156,38 @@ de bron van waarheid voor groen/rood.
 
 ---
 
-## 8. Uitrol in drie stappen
+## 8. Externe skills adopteren (veilig)
+
+Er zijn grote publieke skill-bibliotheken (bijv. `github.com/alirezarezvani/claude-skills`,
+362 skills over 13 tools). Handig voor inspiratie, maar **kopieer nooit blind** — een
+skill is uitvoerbare instructie + soms scripts, dus het is een supply-chain-oppervlak.
+
+Werkwijze bij het overnemen van een externe skill:
+1. **Lees de volledige `SKILL.md` + alle `scripts/`** vóór installatie. Let op verborgen
+   instructies (prompt-injection), `curl | sh`, exfiltratie van env-vars/secrets, of
+   commando's die buiten de repo schrijven.
+2. **Neem alleen het patroon over, niet de bulk.** Voor TaakHelden is 95% van zo'n
+   bibliotheek irrelevant (marketing, C-suite, finance). Pluk de techniek en herschrijf
+   'm naar onze conventies en taal.
+3. **Pin geen externe scripts als dependency** — onze hooks zijn bewust zero-dependency
+   Node. Houd dat zo.
+4. **Toets tegen onze regels:** een overgenomen skill mag de zes harde regels nooit
+   ondermijnen (geen SQL-in-routes-shortcuts, geen saldoveld-patronen, enz.).
+
+Patronen die we uit die bibliotheek hebben overgenomen en op onze kit hebben toegepast:
+- **Progressive disclosure** — `endpoint-scaffold` heeft nu een aparte
+  `references/templates.md` die pas geladen wordt bij het scaffolden.
+- **Verificatie-/anti-hallucinatie-gate** — de `architecture-reviewer` en de
+  scaffold-checklist eisen nu `bestand:regelnummer`-bewijs en gegrepte bevestiging in
+  plaats van aannames.
+- **Adversariële review** — de reviewer neemt expliciet de rol van kritische senior aan.
+
+Een eigen `skill-security-auditor`-achtige subagent (die een externe skill scant vóór
+adoptie) is een goede volgende toevoeging als het team vaker externe skills gaat halen.
+
+---
+
+## 9. Uitrol in drie stappen
 
 1. **Nu (in deze PR):** `.claude/` starter-kit — agents, skill, commands, hooks,
    permissions. Team pullt en heeft direct de guards + scaffolds.
