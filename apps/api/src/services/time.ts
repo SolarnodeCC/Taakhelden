@@ -66,3 +66,32 @@ export function isoWeekNumber(dateStr: string): number {
 export function yesterdayOf(dateStr: string): string {
   return shiftDate(dateStr, -1);
 }
+
+/** Offset (lokale wandkloktijd − UTC) in ms voor `at` in `timezone`. */
+function tzOffsetMs(timezone: string, at: Date): number {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: timezone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(at);
+  const p: Record<string, number> = {};
+  for (const part of parts) if (part.type !== "literal") p[part.type] = Number(part.value);
+  const asUtc = Date.UTC(p.year!, p.month! - 1, p.day!, p.hour!, p.minute!, p.second!);
+  return asUtc - at.getTime();
+}
+
+/**
+ * UTC-tijdstempel ("YYYY-MM-DD HH:MM:SS") dat overeenkomt met 00:00 lokale tijd
+ * op `localDateStr` in `timezone`. Zo vergelijk je een UTC `created_at` correct
+ * met een gezins-lokale weekgrens, in plaats van de tijdzone-offset te negeren.
+ */
+export function localMidnightUtc(timezone: string, localDateStr: string): string {
+  const naive = new Date(`${localDateStr}T00:00:00Z`);
+  const offsetMs = tzOffsetMs(timezone, naive);
+  return new Date(naive.getTime() - offsetMs).toISOString().slice(0, 19).replace("T", " ");
+}

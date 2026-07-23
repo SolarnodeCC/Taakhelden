@@ -1,0 +1,15 @@
+<!-- @dsCard group="Components" viewport="260x300" name="Sidebar Nav" subtitle="Dashboard navigation, active state" -->
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<div id="root" style="padding:16px;background:var(--color-surface);width:220px"></div>
+<script type="text/babel">
+const { SidebarNav } = window.TaakHeldenDesignSystem_73e756;
+const items = [
+  {key:'vandaag',label:'Vandaag'},{key:'goedkeuren',label:'Goedkeuren'},
+  {key:'taken',label:'Taken'},{key:'winkel',label:'Winkel'},{key:'inzichten',label:'Inzichten'},
+];
+ReactDOM.createRoot(document.getElementById('root')).render(<SidebarNav items={items} activeKey="vandaag"/>);
+</script>

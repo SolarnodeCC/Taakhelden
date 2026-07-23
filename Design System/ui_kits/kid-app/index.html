@@ -1,0 +1,42 @@
+<!-- @dsCard group="Kid App (iOS)" viewport="420x900" name="Kid App — Mijn Dag / Winkel / Mijn Held" subtitle="3-tab kid app, click through tabs" -->
+<!-- @startingPoint section="Screens" subtitle="Kid app: Mijn Dag, Winkel, Mijn Held tabs" viewport="420x900" -->
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel" src="ios-frame.jsx"></script>
+<script type="text/babel" src="MijnDagScreen.jsx"></script>
+<script type="text/babel" src="WinkelScreen.jsx"></script>
+<script type="text/babel" src="MijnHeldScreen.jsx"></script>
+<script type="text/babel" src="TeenModeScreen.jsx"></script>
+<style>body{margin:0;display:flex;justify-content:center;padding:20px;background:#e9e9ec}</style>
+<div id="root"></div>
+<script type="text/babel">
+function TabBar({ tab, setTab }) {
+  const tabs = [{ key: 'dag', label: 'Mijn Dag', icon: '☀️' }, { key: 'winkel', label: 'Winkel', icon: '🛍️' }, { key: 'held', label: 'Mijn Held', icon: '🦸' }, { key: 'teen', label: 'Tienermodus', icon: '🎧' }];
+  return (
+    <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, display: 'flex', background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(8px)', borderTop: '1px solid var(--color-border)', paddingBottom: 20 }}>
+      {tabs.map((t) => (
+        <button key={t.key} onClick={() => setTab(t.key)} style={{ flex: 1, border: 'none', background: 'none', padding: '10px 0 0', fontFamily: 'var(--font-rounded)', color: tab === t.key ? 'var(--kid-turquoise)' : 'var(--color-text-muted)', fontWeight: 600, fontSize: 11, cursor: 'pointer' }}>
+          <div style={{ fontSize: 20 }}>{t.icon}</div>{t.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+function App() {
+  const [tab, setTab] = React.useState('dag');
+  const screens = { dag: window.MijnDagScreen, winkel: window.WinkelScreen, held: window.MijnHeldScreen, teen: window.TeenModeScreen };
+  const Screen = screens[tab];
+  return (
+    <window.IOSDevice title="TaakHelden">
+      <div style={{ position: 'relative', height: '100%', overflowY: 'auto' }}>
+        <Screen />
+        <TabBar tab={tab} setTab={setTab} />
+      </div>
+    </window.IOSDevice>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>

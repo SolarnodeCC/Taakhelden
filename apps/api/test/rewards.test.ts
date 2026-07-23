@@ -5,6 +5,8 @@
 import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
 import { seedFamily, parentToken, childToken, api } from "./helpers";
+import { localMidnightUtc } from "../src/services/time";
+import { countRedemptionsSince } from "../src/repo/rewards";
 
 /** Punten rechtstreeks in het ledger zetten (testopzet, geen saldoveld!). */
 async function seedPoints(familyId: string, childId: string, amount: number) {
@@ -200,6 +202,71 @@ describe("inlossen: kopen → afboeking → annuleren → terugboeking", () => {
       idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(404);
+  });
+});
+
+describe("inlossen: idempotentie tegen de dubbel-afboek-race", () => {
+  it("twee gelijktijdige redeems met dezelfde Idempotency-Key boeken maar één keer af", async () => {
+    const fam = await seedFamily("race");
+    const created = await api("/rewards", {
+      token: await parentToken(fam.parentId, fam.familyId),
+      body: { title: "Schermtijd", price: 50 },
+    });
+    const reward = (await created.json()) as { id: string };
+    await seedPoints(fam.familyId, fam.childA, 80);
+    const childTok = await childToken(fam.childA, fam.familyId);
+    const key = crypto.randomUUID();
+
+    // Beide requests missen de KV-cache (die schrijft pas ná afloop); alleen de
+    // DO-side dedup binnen de geserialiseerde turn voorkomt de tweede afboeking.
+    const [a, b] = await Promise.all([
+      api(`/rewards/${reward.id}/redeem`, { method: "POST", token: childTok, idempotencyKey: key }),
+      api(`/rewards/${reward.id}/redeem`, { method: "POST", token: childTok, idempotencyKey: key }),
+    ]);
+    expect(a.status).toBe(200);
+    expect(b.status).toBe(200);
+    const ra = (await a.json()) as { redemptionId: string };
+    const rb = (await b.json()) as { redemptionId: string };
+    expect(rb.redemptionId).toBe(ra.redemptionId);
+
+    // Eén afboeking (80 − 50 = 30) en precies één redemption-rij.
+    expect(await ledgerSum(fam.familyId, fam.childA)).toBe(30);
+    const rows = await env.DB
+      .prepare("SELECT COUNT(*) AS n FROM redemptions WHERE family_id = ? AND child_id = ?")
+      .bind(fam.familyId, fam.childA)
+      .first<{ n: number }>();
+    expect(rows?.n).toBe(1);
+  });
+});
+
+describe("weeklimiet in gezins-lokale tijd", () => {
+  it("localMidnightUtc rekent lokale middernacht naar UTC om", () => {
+    expect(localMidnightUtc("Europe/Amsterdam", "2026-07-20")).toBe("2026-07-19 22:00:00"); // CEST (+2)
+    expect(localMidnightUtc("Europe/Amsterdam", "2026-01-19")).toBe("2026-01-18 23:00:00"); // CET (+1)
+    expect(localMidnightUtc("UTC", "2026-07-20")).toBe("2026-07-20 00:00:00");
+  });
+
+  it("telt een inlossing kort na lokale maandag-middernacht mee (UTC-grens)", async () => {
+    const fam = await seedFamily("tzlim");
+    const rewardId = `rw_tz${crypto.randomUUID().slice(0, 8)}`;
+    await env.DB
+      .prepare(
+        "INSERT INTO rewards (id, family_id, title, icon, price, limit_per_week) VALUES (?, ?, 'Uitslapen', 'sleep', 10, 1)",
+      )
+      .bind(rewardId, fam.familyId)
+      .run();
+    // Inlossing op lokale maandag 01:00 Amsterdam (CEST) = 2026-07-19 23:00 UTC —
+    // dezelfde week als 2026-07-20, maar vóór lokale middernacht in UTC-tekst.
+    await env.DB
+      .prepare(
+        "INSERT INTO redemptions (id, family_id, reward_id, child_id, status, created_at) VALUES (?, ?, ?, ?, 'pending', ?)",
+      )
+      .bind(`rd_tz${crypto.randomUUID().slice(0, 8)}`, fam.familyId, rewardId, fam.childA, "2026-07-19 23:00:00")
+      .run();
+
+    const sinceUtc = localMidnightUtc("Europe/Amsterdam", "2026-07-20");
+    const n = await countRedemptionsSince(env.DB, fam.familyId, fam.childA, rewardId, sinceUtc);
+    expect(n).toBe(1); // met de oude UTC/lokaal-vergelijking zou dit ten onrechte 0 zijn
   });
 });
 

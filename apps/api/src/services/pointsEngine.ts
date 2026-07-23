@@ -16,7 +16,7 @@ import * as photos from "../repo/photos";
 import * as badges from "../repo/badges";
 import { qualifyingBadgeIds } from "./badges";
 import { newId } from "./ids";
-import { localDate, weekDates, weekKey, yesterdayOf } from "./time";
+import { localDate, weekDates, weekKey, yesterdayOf, localMidnightUtc } from "./time";
 
 const UNDO_WINDOW_MS = 5 * 60 * 1000;
 
@@ -399,7 +399,8 @@ export async function applyRedeem(
   if (reward.limit_per_week !== null) {
     const family = (await getFamily(db, familyId)) as unknown as { timezone: string };
     const monday = weekDates(localDate(family.timezone))[0]!;
-    const used = await rewards.countRedemptionsSince(db, familyId, childId, rewardId, monday);
+    const sinceUtc = localMidnightUtc(family.timezone, monday);
+    const used = await rewards.countRedemptionsSince(db, familyId, childId, rewardId, sinceUtc);
     if (used >= reward.limit_per_week) {
       throw new ApiException(
         409,

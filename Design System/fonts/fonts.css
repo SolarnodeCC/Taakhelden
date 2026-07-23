@@ -1,0 +1,6 @@
+/* SF Rounded (used by the real iOS app for kid-mode display type) has no
+distributable web font file — Fredoka from Google Fonts is the nearest visual
+match (rounded terminals, friendly weight range) and stands in for it here.
+Flagged for the team: swap this file for real SF Rounded / licensed webfonts
+if pixel-accurate iOS type matching is needed on web. */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap');

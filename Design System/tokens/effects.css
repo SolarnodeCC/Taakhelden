@@ -1,0 +1,7 @@
+:root{
+--shadow-sm:0 1px 3px rgba(27,31,36,0.10);
+--shadow-md:0 6px 16px rgba(27,31,36,0.14);
+--shadow-kid:0 8px 20px rgba(255,111,89,0.28);
+--transition-fast:150ms ease; /* @kind other */
+--transition-base:200ms ease; /* @kind other */
+}
