@@ -115,11 +115,38 @@
       "cancel": "Annuleren"
     }
   },
+  "winkel": {
+    "title": "Winkel",
+    "loading": "Laden…",
+    "loadError": "Kon de winkel niet laden.",
+    "requestsHeading": "Inwisselverzoeken",
+    "noRequests": "Geen openstaande verzoeken.",
+    "requestedBy": "Gevraagd door {name}",
+    "price": "{points} punten",
+    "fulfill": "Ingelost",
+    "cancelRequest": "Annuleren",
+    "rewardsHeading": "Beloningen",
+    "newReward": "Nieuwe beloning",
+    "noRewards": "Nog geen beloningen. Voeg er een toe.",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "deleteConfirm": "Deze beloning verwijderen? De historie blijft bewaard.",
+    "limitPerWeek": "max {count}x per week",
+    "form": {
+      "createTitle": "Nieuwe beloning",
+      "editTitle": "Beloning bewerken",
+      "fldTitle": "Naam",
+      "fldIcon": "Icoon",
+      "fldPrice": "Puntenprijs",
+      "fldLimited": "Beperk hoe vaak per week",
+      "fldLimitPerWeek": "Max per week",
+      "errorSave": "Kon de beloning niet opslaan.",
+      "save": "Opslaan",
+      "saving": "Bezig met opslaan…",
+      "cancel": "Annuleren"
+    }
+  },
   "sections": {
-    "winkel": {
-      "title": "Winkel",
-      "body": "Binnenkort: beloningen instellen en inwisselverzoeken bekijken."
-    },
     "inzichten": {
       "title": "Inzichten",
       "body": "Binnenkort: trends per week als hulp voor het gesprek — nooit als controlemiddel."

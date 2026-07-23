@@ -140,3 +140,44 @@ export interface TaskFormPayload {
   recurrence: Recurrence | null;
   daypart: Daypart | null;
 }
+
+// --- Winkel (rewards + redemptions) — mirrors apps/api rewardView + redemptions. ---
+export const RewardView = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    icon: z.string().nullable().optional(),
+    price: z.number(),
+    limitPerWeek: z.number().nullable().optional(),
+  })
+  .passthrough();
+export type RewardView = z.infer<typeof RewardView>;
+
+export const RewardList = z.array(RewardView);
+
+export interface RewardFormPayload {
+  title: string;
+  icon: string;
+  price: number;
+  limitPerWeek: number | null;
+}
+
+export const RedemptionStatus = z.enum(["pending", "fulfilled", "cancelled"]);
+export type RedemptionStatus = z.infer<typeof RedemptionStatus>;
+
+export const RedemptionView = z
+  .object({
+    id: z.string(),
+    rewardId: z.string(),
+    title: z.string(),
+    icon: z.string().nullable().optional(),
+    price: z.number(),
+    childId: z.string(),
+    status: RedemptionStatus,
+    createdAt: z.string(),
+    handledAt: z.string().nullable().optional(),
+  })
+  .passthrough();
+export type RedemptionView = z.infer<typeof RedemptionView>;
+
+export const RedemptionList = z.array(RedemptionView);

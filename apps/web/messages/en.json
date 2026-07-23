@@ -115,11 +115,38 @@
       "cancel": "Cancel"
     }
   },
+  "winkel": {
+    "title": "Shop",
+    "loading": "Loading…",
+    "loadError": "Couldn't load the shop.",
+    "requestsHeading": "Redemption requests",
+    "noRequests": "No open requests.",
+    "requestedBy": "Requested by {name}",
+    "price": "{points} points",
+    "fulfill": "Fulfilled",
+    "cancelRequest": "Cancel",
+    "rewardsHeading": "Rewards",
+    "newReward": "New reward",
+    "noRewards": "No rewards yet. Add one.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this reward? Its history is kept.",
+    "limitPerWeek": "max {count}x per week",
+    "form": {
+      "createTitle": "New reward",
+      "editTitle": "Edit reward",
+      "fldTitle": "Name",
+      "fldIcon": "Icon",
+      "fldPrice": "Point price",
+      "fldLimited": "Limit how often per week",
+      "fldLimitPerWeek": "Max per week",
+      "errorSave": "Couldn't save the reward.",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    }
+  },
   "sections": {
-    "winkel": {
-      "title": "Shop",
-      "body": "Coming soon: set up rewards and review redemption requests."
-    },
     "inzichten": {
       "title": "Insights",
       "body": "Coming soon: weekly trends to support the conversation — never as a monitoring tool."
