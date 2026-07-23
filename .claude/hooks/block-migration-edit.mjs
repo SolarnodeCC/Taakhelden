@@ -32,6 +32,7 @@ const isNumberedMigration = /apps\/api\/migrations\/\d+[^/]*\.sql$/.test(filePat
 if (isNumberedMigration) {
   const modifiesExisting =
     tool === "Edit" ||
+    tool === "MultiEdit" ||
     tool === "NotebookEdit" ||
     (tool === "Write" && existsSync(filePath));
 

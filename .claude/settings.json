@@ -18,22 +18,22 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "Edit|Write|NotebookEdit",
+        "matcher": "Edit|MultiEdit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/block-migration-edit.mjs"
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-migration-edit.mjs\""
           }
         ]
       }
     ],
     "PostToolUse": [
       {
-        "matcher": "Edit|Write",
+        "matcher": "Edit|MultiEdit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "node .claude/hooks/guard-route-sql.mjs"
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-route-sql.mjs\""
           }
         ]
       }
