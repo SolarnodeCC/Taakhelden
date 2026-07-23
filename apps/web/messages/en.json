@@ -55,11 +55,67 @@
     "photoAlt": "Photo of the finished task",
     "photoUnavailable": "Photo isn't available yet."
   },
-  "sections": {
-    "taken": {
-      "title": "Tasks",
-      "body": "Coming soon: manage tasks and rewards, plus the weekly planner."
+  "taken": {
+    "title": "Tasks",
+    "loading": "Loading…",
+    "loadError": "Couldn't load tasks.",
+    "newTask": "New task",
+    "empty": "No tasks yet. Create one to get started.",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteConfirm": "Delete this task? Its history is kept.",
+    "points": "{points} points",
+    "category": {
+      "household": "Household",
+      "homework": "Homework",
+      "selfcare": "Self-care",
+      "custom": "Other"
     },
+    "daypart": {
+      "any": "All day",
+      "morning": "Morning",
+      "afternoon": "Afternoon",
+      "evening": "Evening"
+    },
+    "recurrence": {
+      "once": "One-off",
+      "daily": "Daily",
+      "weekly": "Weekly"
+    },
+    "weekday": {
+      "MO": "Mon",
+      "TU": "Tue",
+      "WE": "Wed",
+      "TH": "Thu",
+      "FR": "Fri",
+      "SA": "Sat",
+      "SU": "Sun"
+    },
+    "badge": {
+      "approval": "Approval",
+      "photoBonus": "+{points} photo"
+    },
+    "form": {
+      "createTitle": "New task",
+      "editTitle": "Edit task",
+      "fldTitle": "Title",
+      "fldCategory": "Category",
+      "fldIcon": "Icon",
+      "fldPoints": "Points",
+      "fldPhotoBonus": "Photo bonus",
+      "fldApproval": "Requires parent approval",
+      "fldAssignees": "For whom",
+      "fldDaypart": "Time of day",
+      "fldRecurrence": "Repeat",
+      "fldDays": "Days",
+      "assigneesRequired": "Pick at least one child.",
+      "errorSave": "Couldn't save the task.",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    }
+  },
+  "sections": {
     "winkel": {
       "title": "Shop",
       "body": "Coming soon: set up rewards and review redemption requests."

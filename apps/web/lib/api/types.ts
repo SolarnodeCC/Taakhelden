@@ -89,3 +89,54 @@ export const PhotoView = z.object({
   url: z.string().nullable(),
 });
 export type PhotoView = z.infer<typeof PhotoView>;
+
+// --- Task management (Taken) — mirrors apps/api taskView + TaskBody. ---
+export const TaskCategory = z.enum(["household", "homework", "selfcare", "custom"]);
+export type TaskCategory = z.infer<typeof TaskCategory>;
+
+export const Daypart = z.enum(["morning", "afternoon", "evening"]);
+export type Daypart = z.infer<typeof Daypart>;
+
+export const Weekday = z.enum(["MO", "TU", "WE", "TH", "FR", "SA", "SU"]);
+export type Weekday = z.infer<typeof Weekday>;
+
+export const Recurrence = z.object({
+  freq: z.enum(["daily", "weekly"]),
+  days: z.array(Weekday).optional(),
+});
+export type Recurrence = z.infer<typeof Recurrence>;
+
+export const TaskView = z
+  .object({
+    id: z.string(),
+    title: z.string(),
+    category: TaskCategory,
+    icon: z.string().nullable().optional(),
+    points: z.number(),
+    photoBonusPoints: z.number(),
+    approvalRequired: z.boolean(),
+    assignees: z.array(z.string()),
+    rotation: z.array(z.string()).nullable().optional(),
+    recurrence: Recurrence.nullable().optional(),
+    daypart: Daypart.nullable().optional(),
+    activeFrom: z.string().nullable().optional(),
+    activeUntil: z.string().nullable().optional(),
+  })
+  .passthrough();
+export type TaskView = z.infer<typeof TaskView>;
+
+export const TaskList = z.array(TaskView);
+
+// The payload the Taken form sends to POST/PATCH /tasks. Server applies the same
+// defaults, so PATCH can carry a subset; here we always send the full form.
+export interface TaskFormPayload {
+  title: string;
+  category: TaskCategory;
+  icon: string;
+  points: number;
+  photoBonusPoints: number;
+  approvalRequired: boolean;
+  assignees: string[];
+  recurrence: Recurrence | null;
+  daypart: Daypart | null;
+}

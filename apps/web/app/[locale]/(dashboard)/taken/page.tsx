@@ -1,7 +1,7 @@
 import { setRequestLocale } from "next-intl/server";
-import SectionStub from "../SectionStub";
+import TakenClient from "./TakenClient";
 
 export default function TakenPage({ params }: { params: { locale: string } }) {
   setRequestLocale(params.locale);
-  return <SectionStub sectionKey="taken" />;
+  return <TakenClient />;
 }
