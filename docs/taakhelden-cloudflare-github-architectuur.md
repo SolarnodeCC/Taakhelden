@@ -94,7 +94,7 @@ Eén bron van waarheid voor het API-contract: Zod-schemas in `packages/shared`, 
 ### 4.2 Branch- & omgevingsstrategie
 
 - `main` = productie; korte feature branches + PR's; squash merge.
-- **GitHub Environments**: `dev` → `staging` → `production`, elk met eigen Cloudflare-resources (aparte D1-database, R2-bucket, Worker) en eigen secrets. Production met required reviewer.
+- **GitHub Environments**: `dev` → `production`, elk met eigen Cloudflare-resources (aparte D1-database, R2-bucket, Worker) en eigen secrets.
 - Branch protection op `main`: PR verplicht, CI groen, geen force-push.
 - Preview per PR: Workers preview-URL voor API én web, zodat je elke wijziging klikbaar kunt testen.
 
@@ -103,8 +103,7 @@ Eén bron van waarheid voor het API-contract: Zod-schemas in `packages/shared`, 
 | Workflow | Trigger | Doet |
 |---|---|---|
 | `ci.yml` | elke PR | Lint, typecheck, unit tests (Vitest + `@cloudflare/vitest-pool-workers` — draait tests in echte Workers-runtime), D1-migraties dry-run |
-| `deploy-staging.yml` | merge naar `main` | `wrangler d1 migrations apply` (staging) → `wrangler deploy` API + web naar staging → smoke test |
-| `deploy-prod.yml` | handmatige approval / tag | Zelfde stappen naar production |
+| `deploy-prod.yml` | merge naar `main` (of handmatig) | `wrangler d1 migrations apply` (production) → `wrangler deploy` API naar production → smoke test |
 | `ios.yml` | PR die `apps/ios` raakt | Xcode build + tests (macOS-runner); TestFlight-upload via Fastlane bij release-tag |
 | `security` | wekelijks + PR | Dependabot, CodeQL, secret scanning (staat aan op repo-niveau) |
 
@@ -149,7 +148,7 @@ Totaal infra: richting **< €20/maand** tot ruim boven de eerste duizenden gezi
 
 1. GitHub-repo + monorepo-skelet + branch protection + Environments.
 2. Cloudflare-account: Workers Paid, D1 (`weur`), R2 (`eu`-jurisdiction, lifecycle 30 d), API-token voor CI.
-3. Hono-Worker "hello world" + eerste D1-migratie (Family/User) + CI-pipeline end-to-end naar staging.
+3. Hono-Worker "hello world" + eerste D1-migratie (Family/User) + CI-pipeline end-to-end naar production.
 4. Auth-flow ouder (Sign in with Apple + e-mail) en gezinscode-flow kind.
 5. Next.js-dashboard-skelet gedeployed met preview-per-PR.
 6. ADR-001/002 vastleggen; DPIA-document starten in `docs/`.

@@ -29,5 +29,5 @@ npm run dev            # API op http://localhost:8787
 ```
 
 ## Werkwijze
-Feature branch → PR naar `main` (CI verplicht) → automatische deploy naar staging →
-handmatige, gereviewde deploy naar production. Migraties draaien altijd via de pipeline.
+Feature branch → PR naar `main` (CI verplicht) → merge naar `main` deployt
+automatisch naar production. Migraties draaien altijd via de pipeline.
