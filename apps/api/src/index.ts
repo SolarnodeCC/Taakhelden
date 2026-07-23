@@ -15,6 +15,7 @@ import deviceRoutes from "./routes/devices";
 import syncRoutes from "./routes/sync";
 import badgeRoutes from "./routes/badges";
 import accountRoutes, { exportDownload } from "./routes/account";
+import insightsRoutes from "./routes/insights";
 import notificationRoutes from "./routes/notifications";
 import wsRoutes, { handleWsUpgrade } from "./routes/ws";
 
@@ -49,6 +50,7 @@ app.route("/devices", deviceRoutes);
 app.route("/sync", syncRoutes);
 app.route("/badges", badgeRoutes);
 app.route("/account", accountRoutes);
+app.route("/insights", insightsRoutes);
 app.route("/notification-settings", notificationRoutes);
 app.route("/ws", wsRoutes);
 

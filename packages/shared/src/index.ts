@@ -10,5 +10,6 @@ export * from "./schemas/device";
 export * from "./schemas/sync";
 export * from "./schemas/badge";
 export * from "./schemas/account";
+export * from "./schemas/insights";
 export * from "./schemas/notification";
 export * from "./schemas/ws";
