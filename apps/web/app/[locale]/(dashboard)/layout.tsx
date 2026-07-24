@@ -13,10 +13,11 @@ export default async function DashboardLayout({
   params,
 }: {
   children: React.ReactNode;
-  params: { locale: string };
+  params: Promise<{ locale: string }>;
 }) {
   if (!(await isAuthenticated())) {
-    redirect({ href: "/login", locale: params.locale });
+    const { locale } = await params;
+    redirect({ href: "/login", locale });
   }
 
   return <AppShell>{children}</AppShell>;

@@ -68,10 +68,11 @@ async function proxy(req: Request, path: string[]): Promise<Response> {
   });
 }
 
-type Ctx = { params: { path: string[] } };
+// Next 15: route-handler context `params` is a Promise.
+type Ctx = { params: Promise<{ path: string[] }> };
 
-export const GET = (req: Request, { params }: Ctx) => proxy(req, params.path);
-export const POST = (req: Request, { params }: Ctx) => proxy(req, params.path);
-export const PUT = (req: Request, { params }: Ctx) => proxy(req, params.path);
-export const PATCH = (req: Request, { params }: Ctx) => proxy(req, params.path);
-export const DELETE = (req: Request, { params }: Ctx) => proxy(req, params.path);
+export const GET = async (req: Request, { params }: Ctx) => proxy(req, (await params).path);
+export const POST = async (req: Request, { params }: Ctx) => proxy(req, (await params).path);
+export const PUT = async (req: Request, { params }: Ctx) => proxy(req, (await params).path);
+export const PATCH = async (req: Request, { params }: Ctx) => proxy(req, (await params).path);
+export const DELETE = async (req: Request, { params }: Ctx) => proxy(req, (await params).path);
