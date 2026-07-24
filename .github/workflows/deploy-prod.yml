@@ -53,5 +53,8 @@ jobs:
           accountId: "5546763229b35df670e33d9316d7f2e0"
           workingDirectory: apps/api
           command: deploy
+      # Smoke-test tegen de workers.dev-URL zolang api.taakhelden.nl nog niet
+      # als custom domain aan de worker gekoppeld is. Zet dit terug naar
+      # https://api.taakhelden.nl/v1/health zodra dat domein gekoppeld is.
       - name: Smoke test
-        run: curl --fail https://api.taakhelden.nl/v1/health
+        run: curl --fail https://taakhelden-api.oostelaar.workers.dev/v1/health
