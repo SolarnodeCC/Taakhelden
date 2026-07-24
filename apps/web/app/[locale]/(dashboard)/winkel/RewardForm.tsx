@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { RewardView, RewardFormPayload } from "../../../../lib/api/types";
+import { Button, Alert } from "../../../../components/ui";
 
 const fieldClass =
   "mt-1 w-full rounded border border-border bg-bg px-3 py-2 text-sm outline-none focus:border-accent";
@@ -96,28 +97,15 @@ export default function RewardForm({ initial, onSubmit, onCancel }: Props) {
         </label>
       )}
 
-      {error && (
-        <p role="alert" className="mt-3 text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error && <div className="mt-3"><Alert tone="danger">{error}</Alert></div>}
 
       <div className="mt-4 flex gap-2">
-        <button
-          type="submit"
-          disabled={busy}
-          className="rounded bg-accent px-4 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover disabled:opacity-60"
-        >
+        <Button type="submit" disabled={busy}>
           {busy ? t("saving") : t("save")}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={busy}
-          className="rounded border border-border px-4 py-2 text-sm font-medium text-text transition-colors hover:bg-bg disabled:opacity-60"
-        >
+        </Button>
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={busy}>
           {t("cancel")}
-        </button>
+        </Button>
       </div>
     </form>
   );

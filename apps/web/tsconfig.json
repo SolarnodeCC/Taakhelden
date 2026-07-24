@@ -25,6 +25,7 @@
   },
   "include": [
     "app",
+    "components",
     "i18n",
     "lib",
     "middleware.ts",

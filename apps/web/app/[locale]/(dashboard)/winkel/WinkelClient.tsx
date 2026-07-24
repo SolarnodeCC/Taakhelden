@@ -13,6 +13,7 @@ import {
   type RedemptionView,
 } from "../../../../lib/api/types";
 import { useRouter } from "../../../../i18n/navigation";
+import { Button } from "../../../../components/ui";
 import RewardForm from "./RewardForm";
 
 type FormState = { mode: "create" } | { mode: "edit"; reward: RewardView } | null;
@@ -216,13 +217,9 @@ export default function WinkelClient() {
             {t("rewardsHeading")}
           </h2>
           {form === null && (
-            <button
-              type="button"
-              onClick={() => setForm({ mode: "create" })}
-              className="rounded bg-accent px-4 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover"
-            >
+            <Button type="button" onClick={() => setForm({ mode: "create" })}>
               {t("newReward")}
-            </button>
+            </Button>
           )}
         </div>
 

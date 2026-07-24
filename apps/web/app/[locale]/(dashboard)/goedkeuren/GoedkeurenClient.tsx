@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { ParentTodayView, PhotoView, type InstanceView } from "../../../../lib/api/types";
 import { useRouter } from "../../../../i18n/navigation";
+import { Button } from "../../../../components/ui";
 
 // A submitted task plus the child it belongs to — the unit of the approval queue.
 interface QueueItem extends InstanceView {
@@ -114,22 +115,17 @@ function QueueCard({ item, onResolve }: { item: QueueItem; onResolve: (id: strin
 
       {!redoOpen ? (
         <div className="mt-3 flex gap-2">
-          <button
-            type="button"
-            onClick={approve}
-            disabled={busy}
-            className="rounded bg-accent px-4 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover disabled:opacity-60"
-          >
+          <Button type="button" onClick={approve} disabled={busy}>
             {t("approve")}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            variant="secondary"
             onClick={() => setRedoOpen(true)}
             disabled={busy}
-            className="rounded border border-border px-4 py-2 text-sm font-medium text-text transition-colors hover:bg-bg disabled:opacity-60"
           >
             {t("redo")}
-          </button>
+          </Button>
         </div>
       ) : (
         <form onSubmit={submitRedo} className="mt-3 flex flex-col gap-2">
@@ -146,25 +142,21 @@ function QueueCard({ item, onResolve }: { item: QueueItem; onResolve: (id: strin
             />
           </label>
           <div className="flex gap-2">
-            <button
-              type="submit"
-              disabled={busy || note.trim().length === 0}
-              className="rounded bg-accent px-4 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover disabled:opacity-60"
-            >
+            <Button type="submit" disabled={busy || note.trim().length === 0}>
               {t("redoSubmit")}
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
+              variant="secondary"
               onClick={() => {
                 setRedoOpen(false);
                 setNote("");
                 setError(null);
               }}
               disabled={busy}
-              className="rounded border border-border px-4 py-2 text-sm font-medium text-text transition-colors hover:bg-bg disabled:opacity-60"
             >
               {t("cancel")}
-            </button>
+            </Button>
           </div>
         </form>
       )}

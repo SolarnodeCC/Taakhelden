@@ -54,6 +54,10 @@ laten rondslingeren. Drie zijn er nu, elk gekoppeld aan een concrete regel:
   nooit een bestaande migratie, en draait de local dry-run.
 - **`dutch-child-copy`** — genereert/reviewt kindgerichte NL-teksten volgens de
   positieve stijlgids (§3.7), zonder schuldgevoel-taal.
+- **`ui-design-reviewer`** — controleert een UI-diff tegen het design system
+  (`Design System/` + `globals.css`): token-adherentie (geen ruwe hex/px), juist
+  register (dashboard/kind/teen), herbruik van primitives, en NL-copy in beide talen.
+  Read-only. Roep aan via `/design-check`.
 
 Aanroepen: `@architecture-reviewer kijk naar mijn wijzigingen` of laat Claude ze
 automatisch kiezen op basis van de `description`. Model per agent instelbaar in de
@@ -75,6 +79,9 @@ meenemen.
   architectuur: Zod-schema in `packages/shared`, repo-functie met `familyId` als
   eerste argument, route die alleen repo-functies aanroept, plus de verplichte
   authz-test. Dit is precies de checklist uit `CLAUDE.md` → "Bij elke nieuwe route".
+- **`design-system`** — bouwt/wijzigt user-facing UI volgens `Design System/`: juist
+  register, token-utilities i.p.v. ruwe hex/px, en herbruik van de primitives in
+  `apps/web/components/ui/`. Progressive disclosure via `references/tokens.md`.
 
 Nieuwe skills maak je het makkelijkst met de meegeleverde **`skill-creator`**-skill.
 Goede volgende kandidaten: `d1-migration` (met SQL-conventies + seed-patroon),
@@ -89,6 +96,7 @@ Snelkoppelingen voor herhaalprompts; `$ARGUMENTS` vult je invoer in.
 - **`/new-endpoint <resource>`** — kickt de endpoint-scaffold skill af voor een resource.
 - **`/arch-check`** — draait de architecture-reviewer op de huidige diff.
 - **`/new-migration <beschrijving>`** — nieuw genummerd migratiebestand + dry-run.
+- **`/design-check`** — draait de ui-design-reviewer op de huidige UI-diff.
 
 Commands mogen zelf Bash uitvoeren (via `!`-prefix) en bestanden inladen (`@`), dus
 je kunt er ook een `/ci-local` van maken die typecheck + test + migratie-dry-run

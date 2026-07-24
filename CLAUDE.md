@@ -37,6 +37,21 @@ huishoudelijke taken. Ouders beheren taken en beloningen. Doelgroep: gezinnen in
 - Notificatie- en fouttekst voor kinderen: altijd positief geformuleerd
   (zie stijlgids in het productvoorstel, §3.7). Nooit schuldgevoel-taal.
 
+## UI & Design
+- **`Design System/`** (repo-root) is leidend voor alle visuele keuzes: tokens,
+  componenten, en UI-kits. Lees `Design System/readme.md` bij UI-werk.
+- **Twee registers, één token-set.** Ouder-dashboard = kalm/neutraal (wit, één teal
+  accent, dunne randen). Kind-app = warm/rond (koraal/turquoise/geel op crème). Teen
+  mode = gedempt (donkerblauw/mint). Kies bewust het juiste register.
+- **`apps/web/app/globals.css` is de token-bron** voor de web-app (gespiegeld in
+  `Design System/tokens/`). Gebruik altijd de token-variabelen / Tailwind-utilities
+  (`bg-accent`, `rounded-xl`, `shadow-kid`); **nooit ruwe hex/px** hardcoderen.
+- Kid/teen-paletten zijn **inferred/placeholder** tot echte branding er is — zie de
+  vlaggen in `globals.css` en de readme.
+- Herbruik de primitives in `apps/web/components/ui/` i.p.v. ad-hoc markup.
+- Bij UI-werk: gebruik de **`design-system`**-skill; check de diff met **`/design-check`**
+  (`@ui-design-reviewer`). Kindgerichte tekst blijft via `@dutch-child-copy`.
+
 ## Commands
 - `npm run dev:api` — Worker lokaal (wrangler dev)
 - `npm run dev:web` — Next.js dev server

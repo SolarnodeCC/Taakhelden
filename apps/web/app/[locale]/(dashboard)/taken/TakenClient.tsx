@@ -11,6 +11,7 @@ import {
   type TaskFormPayload,
 } from "../../../../lib/api/types";
 import { useRouter } from "../../../../i18n/navigation";
+import { Button } from "../../../../components/ui";
 import TaskForm from "./TaskForm";
 
 type FormState = { mode: "create" } | { mode: "edit"; task: TaskView } | null;
@@ -143,13 +144,9 @@ export default function TakenClient() {
       <div className="flex items-center justify-between gap-3">
         <h1 className="text-xl font-semibold text-text">{t("title")}</h1>
         {form === null && (
-          <button
-            type="button"
-            onClick={() => setForm({ mode: "create" })}
-            className="rounded bg-accent px-4 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover"
-          >
+          <Button type="button" onClick={() => setForm({ mode: "create" })}>
             {t("newTask")}
-          </button>
+          </Button>
         )}
       </div>
 

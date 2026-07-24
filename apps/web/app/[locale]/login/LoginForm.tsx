@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { LoginBody, ErrorCodes, type ErrorCode } from "@taakhelden/shared";
 import { apiClient, ApiClientError } from "../../../lib/api/client";
 import { useRouter } from "../../../i18n/navigation";
+import { Field, Input, Alert, Button } from "../../../components/ui";
 
 // Server-round-trip errors we surface with tailored copy; anything else (incl.
 // 5xx/network with no code) falls back to the generic message. Bad input is
@@ -45,49 +46,34 @@ export default function LoginForm() {
     }
   }
 
-  const fieldClass =
-    "rounded border border-border bg-bg px-3 py-2 text-sm outline-none focus:border-accent";
-
   return (
     <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
-      <label className="flex flex-col gap-1 text-sm font-medium text-text">
-        {t("email")}
-        <input
+      <Field label={t("email")}>
+        <Input
           type="email"
           name="email"
           autoComplete="email"
           required
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className={fieldClass}
         />
-      </label>
-      <label className="flex flex-col gap-1 text-sm font-medium text-text">
-        {t("password")}
-        <input
+      </Field>
+      <Field label={t("password")}>
+        <Input
           type="password"
           name="password"
           autoComplete="current-password"
           required
           value={password}
           onChange={(e) => setPassword(e.target.value)}
-          className={fieldClass}
         />
-      </label>
+      </Field>
 
-      {error && (
-        <p role="alert" className="text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error && <Alert tone="danger">{error}</Alert>}
 
-      <button
-        type="submit"
-        disabled={busy}
-        className="mt-1 rounded bg-accent px-4 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover disabled:opacity-60"
-      >
+      <Button type="submit" disabled={busy} className="mt-1">
         {busy ? t("submitting") : t("submit")}
-      </button>
+      </Button>
     </form>
   );
 }
