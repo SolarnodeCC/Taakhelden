@@ -70,7 +70,7 @@ describe("ws-upgrade", () => {
 
     const received = new Promise<{ event: string; data: { instanceId?: string } }>((resolve, reject) => {
       const timer = setTimeout(() => reject(new Error("geen broadcast ontvangen")), 5000);
-      socket.addEventListener("message", (ev) => {
+      socket.addEventListener("message", (ev: MessageEvent) => {
         clearTimeout(timer);
         resolve(JSON.parse(ev.data as string));
       });

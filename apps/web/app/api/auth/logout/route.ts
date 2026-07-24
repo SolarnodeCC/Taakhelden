@@ -5,7 +5,7 @@ import { clearTokens } from "../../../../lib/auth/session";
 
 /** BFF logout: best-effort revoke on the Worker, then clear cookies. */
 export async function POST() {
-  const refreshToken = getRefreshCookie();
+  const refreshToken = await getRefreshCookie();
 
   if (refreshToken) {
     try {
@@ -20,6 +20,6 @@ export async function POST() {
     }
   }
 
-  clearTokens();
+  await clearTokens();
   return NextResponse.json({ ok: true });
 }

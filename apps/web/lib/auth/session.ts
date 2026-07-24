@@ -12,21 +12,21 @@ import {
  * these functions run in Route Handlers and server components.
  */
 
-export function getAccessToken(): string | undefined {
+export function getAccessToken(): Promise<string | undefined> {
   return getAccessCookie();
 }
 
 /** A session exists as long as we still hold a refresh token (access may be expired). */
-export function isAuthenticated(): boolean {
-  return Boolean(getRefreshCookie() ?? getAccessCookie());
+export async function isAuthenticated(): Promise<boolean> {
+  return Boolean((await getRefreshCookie()) ?? (await getAccessCookie()));
 }
 
-export function setTokens(tokens: TokenPair): void {
-  setAuthCookies(tokens);
+export function setTokens(tokens: TokenPair): Promise<void> {
+  return setAuthCookies(tokens);
 }
 
-export function clearTokens(): void {
-  clearAuthCookies();
+export function clearTokens(): Promise<void> {
+  return clearAuthCookies();
 }
 
 // Single-flight refresh: the API rotates refresh tokens as single-use, so if a
@@ -44,9 +44,9 @@ const inFlightRefresh = new Map<string, Promise<string | null>>();
  * access token, or null when refresh is impossible (missing/expired/revoked).
  * Concurrent callers for the same refresh token are coalesced into one request.
  */
-export function refreshTokens(): Promise<string | null> {
-  const refreshToken = getRefreshCookie();
-  if (!refreshToken) return Promise.resolve(null);
+export async function refreshTokens(): Promise<string | null> {
+  const refreshToken = await getRefreshCookie();
+  if (!refreshToken) return null;
 
   const existing = inFlightRefresh.get(refreshToken);
   if (existing) return existing;
@@ -70,16 +70,16 @@ async function doRefresh(refreshToken: string): Promise<string | null> {
   }
 
   if (!res.ok) {
-    clearAuthCookies();
+    await clearAuthCookies();
     return null;
   }
 
   const parsed = TokenPair.safeParse(await res.json());
   if (!parsed.success) {
-    clearAuthCookies();
+    await clearAuthCookies();
     return null;
   }
 
-  setAuthCookies(parsed.data);
+  await setAuthCookies(parsed.data);
   return parsed.data.accessToken;
 }

@@ -8,14 +8,14 @@ import AppShell from "./AppShell";
  * dynamically, which is correct for an authenticated area. Authenticated pages
  * render inside the shared app shell (nav + header).
  */
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
   params,
 }: {
   children: React.ReactNode;
   params: { locale: string };
 }) {
-  if (!isAuthenticated()) {
+  if (!(await isAuthenticated())) {
     redirect({ href: "/login", locale: params.locale });
   }
 

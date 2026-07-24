@@ -45,6 +45,6 @@ export async function POST(req: Request) {
     );
   }
 
-  setTokens(tokens.data);
+  await setTokens(tokens.data);
   return NextResponse.json({ ok: true });
 }

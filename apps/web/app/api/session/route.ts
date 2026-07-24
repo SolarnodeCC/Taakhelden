@@ -9,7 +9,7 @@ import { decodeJwtPayload } from "../../../lib/auth/jwt";
  * expired). Returns the info the shell needs to gate nav and greet the user.
  */
 export async function GET() {
-  const token = getAccessToken() ?? (await refreshTokens());
+  const token = (await getAccessToken()) ?? (await refreshTokens());
   if (!token) {
     return NextResponse.json(
       { error: { code: ErrorCodes.UNAUTHORIZED, message: "Inloggen vereist." } },
