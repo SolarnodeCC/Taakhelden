@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "taakhelden/api-contract",
+  "title": "TaakHelden API Contract",
+  "description": "Shape the taakhelden-architect agent emits when specifying a new/changed endpoint. Mirrors the conventions in docs/taakhelden-api-specificatie.md and the packages/shared Zod schemas.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["resource", "method", "path", "role", "sharedSchema", "repoFunction", "familyScoped"],
+  "properties": {
+    "resource": {
+      "type": "string",
+      "description": "Resource name, e.g. reminders. Drives file names: packages/shared/src/schemas/<resource>.ts, apps/api/src/repo/<resource>.ts, apps/api/src/routes/<resource>.ts, apps/api/test/<resource>.test.ts."
+    },
+    "method": { "type": "string", "enum": ["GET", "POST", "PATCH", "DELETE"] },
+    "path": { "type": "string", "pattern": "^/", "description": "Route path, e.g. /tasks/:id/complete." },
+    "role": {
+      "type": "string",
+      "enum": ["parent", "child", "either"],
+      "description": "Which authenticated role may call it (requireParent for parent-only)."
+    },
+    "sharedSchema": {
+      "type": "string",
+      "description": "Name of the Zod schema exported from packages/shared for request + response validation."
+    },
+    "repoFunction": {
+      "type": "string",
+      "description": "The repo function that owns the SQL. Must take familyId as its first argument after the DB handle."
+    },
+    "familyScoped": {
+      "type": "boolean",
+      "const": true,
+      "description": "Every endpoint is family-scoped; queries filter family_id = ?. This is the security boundary."
+    },
+    "idempotent": {
+      "type": "boolean",
+      "description": "Required true for POST/PATCH/DELETE — mutations run through the Idempotency-Key header."
+    },
+    "touchesLedger": {
+      "type": "boolean",
+      "description": "If true, point changes are written through the FamilyRoom DO into points_ledger; no balance column is updated."
+    },
+    "authzTest": {
+      "type": "string",
+      "description": "Path to the required authz test proving cross-family denial + role gating."
+    },
+    "errorCodes": {
+      "type": "array",
+      "description": "Error codes returned, from packages/shared/src/errors.ts (ErrorCodes).",
+      "items": { "type": "string" }
+    }
+  }
+}
