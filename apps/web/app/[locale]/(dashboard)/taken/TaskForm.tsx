@@ -10,6 +10,7 @@ import {
   type Weekday,
 } from "../../../../lib/api/types";
 import type { MemberView } from "../../../../lib/api/types";
+import { Button, Alert } from "../../../../components/ui";
 
 const CATEGORIES: TaskCategory[] = ["household", "homework", "selfcare", "custom"];
 const DAYPARTS: Daypart[] = ["morning", "afternoon", "evening"];
@@ -235,28 +236,15 @@ export default function TaskForm({ children, initial, onSubmit, onCancel }: Prop
         {tf("fldApproval")}
       </label>
 
-      {error && (
-        <p role="alert" className="mt-3 text-sm text-danger">
-          {error}
-        </p>
-      )}
+      {error && <div className="mt-3"><Alert tone="danger">{error}</Alert></div>}
 
       <div className="mt-4 flex gap-2">
-        <button
-          type="submit"
-          disabled={busy}
-          className="rounded bg-accent px-4 py-2 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover disabled:opacity-60"
-        >
+        <Button type="submit" disabled={busy}>
           {busy ? tf("saving") : tf("save")}
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          disabled={busy}
-          className="rounded border border-border px-4 py-2 text-sm font-medium text-text transition-colors hover:bg-bg disabled:opacity-60"
-        >
+        </Button>
+        <Button type="button" variant="secondary" onClick={onCancel} disabled={busy}>
           {tf("cancel")}
-        </button>
+        </Button>
       </div>
     </form>
   );
