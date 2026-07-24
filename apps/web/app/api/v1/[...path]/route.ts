@@ -28,7 +28,7 @@ async function proxy(req: Request, path: string[]): Promise<Response> {
   const send = (token: string) =>
     fetch(url, { method: req.method, headers: buildHeaders(token), body, cache: "no-store" });
 
-  let token = getAccessToken() ?? (await refreshTokens());
+  let token = (await getAccessToken()) ?? (await refreshTokens());
   if (!token) {
     return NextResponse.json(
       { error: { code: ErrorCodes.UNAUTHORIZED, message: "Inloggen vereist." } },
@@ -42,7 +42,7 @@ async function proxy(req: Request, path: string[]): Promise<Response> {
     if (res.status === 401) {
       const refreshed = await refreshTokens();
       if (!refreshed) {
-        clearTokens();
+        await clearTokens();
         return NextResponse.json(
           { error: { code: ErrorCodes.UNAUTHORIZED, message: "Sessie verlopen." } },
           { status: 401 },

@@ -3,7 +3,7 @@ main = "src/index.ts"
 compatibility_date = "2026-07-01"
 compatibility_flags = ["nodejs_compat"]
 
-# --- staging is de default omgeving ---
+# --- default/base-omgeving (production erft hiervan via [env.production]) ---
 [[d1_databases]]
 binding = "DB"
 database_name = "taakhelden-db"

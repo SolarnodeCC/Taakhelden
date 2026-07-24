@@ -15,8 +15,8 @@ const baseOptions = {
 };
 
 /** Persist the parent access (+ optional refresh) token as httpOnly cookies. */
-export function setAuthCookies(tokens: TokenPair): void {
-  const store = cookies();
+export async function setAuthCookies(tokens: TokenPair): Promise<void> {
+  const store = await cookies();
   store.set(ACCESS_COOKIE, tokens.accessToken, {
     ...baseOptions,
     maxAge: tokens.expiresIn,
@@ -29,16 +29,16 @@ export function setAuthCookies(tokens: TokenPair): void {
   }
 }
 
-export function clearAuthCookies(): void {
-  const store = cookies();
+export async function clearAuthCookies(): Promise<void> {
+  const store = await cookies();
   store.delete(ACCESS_COOKIE);
   store.delete(REFRESH_COOKIE);
 }
 
-export function getAccessCookie(): string | undefined {
-  return cookies().get(ACCESS_COOKIE)?.value;
+export async function getAccessCookie(): Promise<string | undefined> {
+  return (await cookies()).get(ACCESS_COOKIE)?.value;
 }
 
-export function getRefreshCookie(): string | undefined {
-  return cookies().get(REFRESH_COOKIE)?.value;
+export async function getRefreshCookie(): Promise<string | undefined> {
+  return (await cookies()).get(REFRESH_COOKIE)?.value;
 }

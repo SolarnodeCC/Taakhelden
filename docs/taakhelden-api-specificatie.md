@@ -5,7 +5,7 @@
 
 ## 1. Uitgangspunten
 
-- **Base URL**: `https://api.taakhelden.nl/v1` (staging: `api-staging.…`)
+- **Base URL**: `https://api.taakhelden.nl/v1`
 - **Auth**: `Authorization: Bearer <JWT>` op alles behalve `/auth/*` en `/health`.
 - **JWT-claims**: `sub` (user_id), `fam` (family_id), `role` (`parent` | `child`), `exp`. Kind-tokens: 24 u geldig; ouder-tokens: 1 u access + 30 d refresh.
 - **Autorisatie**: middleware bindt élke query aan `fam`; rol-checks per endpoint (matrix in §8). Cross-family toegang is per definitie onmogelijk in de repository-laag.

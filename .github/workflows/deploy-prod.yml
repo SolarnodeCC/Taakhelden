@@ -1,6 +1,8 @@
 name: Deploy production
 on:
-  workflow_dispatch:   # handmatig, met required reviewer op het environment
+  push:
+    branches: [main]   # elke merge naar main deployt naar production
+  workflow_dispatch:   # ook handmatig te starten
 
 concurrency: deploy-prod
 

@@ -1,17 +1,16 @@
-import { useTranslations } from "next-intl";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { redirect } from "../../../i18n/navigation";
 import { isAuthenticated } from "../../../lib/auth/session";
 import LoginForm from "./LoginForm";
 
-export default function LoginPage({ params }: { params: { locale: string } }) {
+export default async function LoginPage({ params }: { params: { locale: string } }) {
   // Already signed in? Skip the form and go straight to the dashboard.
-  if (isAuthenticated()) {
+  if (await isAuthenticated()) {
     redirect({ href: "/", locale: params.locale });
   }
 
   setRequestLocale(params.locale);
-  const t = useTranslations("auth");
+  const t = await getTranslations("auth");
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-16">
