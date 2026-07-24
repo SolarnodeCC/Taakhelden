@@ -4,11 +4,16 @@
 
 /*
  * Design tokens — single source of truth, framework-agnostic CSS variables so
- * iOS can adopt the same values later (productvoorstel §4.2). Palette is a
- * placeholder pending design: white/neutral base + one calm accent, per the
- * "zakelijker en rustiger" brief. Swap the hex values here to rebrand.
+ * iOS can adopt the same values later (productvoorstel §4.2). These mirror
+ * `Design System/tokens/*.css` exactly; keep the two in sync when either
+ * changes (a shared token package is a planned follow-up).
+ *
+ * The parent-dashboard palette below is the real, shipping set: white/neutral
+ * base + one calm teal accent, per the "zakelijker en rustiger" brief. Swap the
+ * hex values here to rebrand.
  */
 :root {
+  /* Parent dashboard — neutral/semantic (real, shipping tokens) */
   --color-bg: #ffffff;
   --color-surface: #f6f7f9;
   --color-border: #e5e8ec;
@@ -18,7 +23,74 @@
   --color-accent-hover: #0c8c7d;
   --color-on-accent: #ffffff;
   --color-danger: #b00020;
+  --color-danger-bg: #fdecef;
   --color-success: #1f9254;
-  --radius: 0.625rem;
+  --color-success-bg: #eaf7ef;
+
+  /*
+   * Kid + teen palettes — INFERRED / PLACEHOLDER pending design.
+   * Translated from the product proposal's named colours ("koraal, turquoise,
+   * zonnig geel op crème" / "donkerblauw/mint", productvoorstel §4.1) into
+   * approximate hex. Not brand-final — see `Design System/readme.md`. Used by
+   * the warm kid register and the muted teen mode.
+   */
+  --kid-coral: #ff6f59;
+  --kid-coral-soft: #ffe1da;
+  --kid-turquoise: #0e9f8e;
+  --kid-turquoise-soft: #d9f2ef;
+  --kid-yellow: #ffc93c;
+  --kid-yellow-soft: #fff3d6;
+  --kid-cream: #fff8ec;
+  --kid-text: #2b2116;
+  --teen-navy: #1f2a44;
+  --teen-navy-surface: #26314d;
+  --teen-mint: #7fd8c4;
+  --teen-text: #e9edf5;
+  --teen-muted: #9aa6c3;
+
+  /* Typography — system stack (dashboard) + rounded display (kid app).
+   * --font-rounded uses Fredoka as a substitute for Apple's SF Rounded; supply
+   * a licensed face if pixel-accurate matching to the iOS build is needed. */
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-rounded: "Fredoka", var(--font-sans);
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+
+  /* Spacing — 4px base scale */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Radii — dashboard uses sm/default; kid mode takes lg/xl for warm shapes */
+  --radius-sm: 0.375rem;
+  --radius: 0.625rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+  --radius-full: 999px;
+
+  /* Effects — flat/quiet dashboard shadows + warm kid shadow */
+  --shadow-sm: 0 1px 3px rgba(27, 31, 36, 0.1);
+  --shadow-md: 0 6px 16px rgba(27, 31, 36, 0.14);
+  --shadow-kid: 0 8px 20px rgba(255, 111, 89, 0.28);
+  --transition-fast: 150ms ease;
+  --transition-base: 200ms ease;
 }
