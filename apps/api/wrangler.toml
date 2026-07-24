@@ -24,7 +24,7 @@ class_name = "FamilyRoom"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["FamilyRoom"]
+new_sqlite_classes = ["FamilyRoom"]  # SQLite-backed DO (KV-backed niet meer toegestaan op nieuwe accounts)
 
 [[queues.producers]]
 binding = "PHOTO_QUEUE"
