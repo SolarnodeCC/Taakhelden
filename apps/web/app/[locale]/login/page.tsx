@@ -3,13 +3,14 @@ import { redirect } from "../../../i18n/navigation";
 import { isAuthenticated } from "../../../lib/auth/session";
 import LoginForm from "./LoginForm";
 
-export default async function LoginPage({ params }: { params: { locale: string } }) {
+export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
   // Already signed in? Skip the form and go straight to the dashboard.
   if (await isAuthenticated()) {
-    redirect({ href: "/", locale: params.locale });
+    redirect({ href: "/", locale });
   }
 
-  setRequestLocale(params.locale);
+  setRequestLocale(locale);
   const t = await getTranslations("auth");
 
   return (

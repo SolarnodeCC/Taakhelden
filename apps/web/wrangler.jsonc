@@ -1,0 +1,16 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "taakhelden-web",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-03-25",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Server-side base-URL voor de BFF-proxy → de live API-worker.
+  // Geen geheim; de browser praat alleen same-origin met de web-worker.
+  "vars": {
+    "API_BASE_URL": "https://taakhelden-api.oostelaar.workers.dev/v1"
+  }
+}

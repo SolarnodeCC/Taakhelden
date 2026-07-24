@@ -1,7 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 import GoedkeurenClient from "./GoedkeurenClient";
 
-export default function GoedkeurenPage({ params }: { params: { locale: string } }) {
-  setRequestLocale(params.locale);
+export default async function GoedkeurenPage({ params }: { params: Promise<{ locale: string }> }) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return <GoedkeurenClient />;
 }
