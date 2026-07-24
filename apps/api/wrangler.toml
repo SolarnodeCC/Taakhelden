@@ -11,7 +11,8 @@ database_id = "031e773c-bad4-40fa-ad65-984f40c1992c"   # wrangler d1 create taak
 
 [[r2_buckets]]
 binding = "PHOTOS"
-bucket_name = "taakhelden-photos"                  # aanmaken met jurisdiction=eu
+bucket_name = "taakhelden-photos"
+jurisdiction = "eu"                                # EU data-residency voor kinderfoto's (AVG)
 
 [[kv_namespaces]]
 binding = "KV"
