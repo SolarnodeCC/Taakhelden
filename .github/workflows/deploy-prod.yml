@@ -20,12 +20,12 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: apps/api
-          command: d1 migrations apply taakhelden-db --remote --env production
+          command: d1 migrations apply taakhelden-db --remote
       - name: Deploy API
         uses: cloudflare/wrangler-action@v4
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           workingDirectory: apps/api
-          command: deploy --env production
+          command: deploy
       - name: Smoke test
         run: curl --fail https://api.taakhelden.nl/v1/health
