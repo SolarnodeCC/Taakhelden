@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "build:cf": "opennextjs-cloudflare build",
+    "deploy:cf": "opennextjs-cloudflare deploy",
+    "preview:cf": "opennextjs-cloudflare preview"
   },
   "dependencies": {
     "@taakhelden/shared": "*",
@@ -16,11 +19,13 @@
     "react-dom": "^18.3.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.2",
     "@types/react": "^18.3.0",
     "@types/node": "^20.14.0",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "wrangler": "^4.114.0"
   }
 }

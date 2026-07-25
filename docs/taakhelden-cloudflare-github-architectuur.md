@@ -103,7 +103,8 @@ Eén bron van waarheid voor het API-contract: Zod-schemas in `packages/shared`, 
 | Workflow | Trigger | Doet |
 |---|---|---|
 | `ci.yml` | elke PR | Lint, typecheck, unit tests (Vitest + `@cloudflare/vitest-pool-workers` — draait tests in echte Workers-runtime), D1-migraties dry-run |
-| `deploy-prod.yml` | merge naar `main` (of handmatig) | `wrangler d1 migrations apply` (production) → `wrangler deploy` API naar production → smoke test |
+| `deploy-prod.yml` | merge naar `main` (of handmatig) | queues/R2 aanmaken → `wrangler d1 migrations apply` (production) → `wrangler deploy` API naar production → smoke test |
+| `deploy-web.yml` | merge naar `main` (of handmatig) | OpenNext-build (`@opennextjs/cloudflare`) → `wrangler deploy` van het ouder-dashboard (Next.js) naar de `taakhelden-web` Worker → smoke test |
 | `ios.yml` | PR die `apps/ios` raakt | Xcode build + tests (macOS-runner); TestFlight-upload via Fastlane bij release-tag |
 | `security` | wekelijks + PR | Dependabot, CodeQL, secret scanning (staat aan op repo-niveau) |
 
