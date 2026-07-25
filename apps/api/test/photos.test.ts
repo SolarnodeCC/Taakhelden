@@ -154,7 +154,9 @@ describe("fotoflow: upload → strip → ready", () => {
     });
     const { uploadUrl } = (await intent.json()) as { uploadUrl: string };
 
-    const tampered = uploadUrl.replace(/sig=./, "sig=0");
+    // Flip het eerste sig-teken naar een gegárandeerd ander teken (anders is de
+    // "gemanipuleerde" handtekening soms toevallig gelijk aan de echte → flaky).
+    const tampered = uploadUrl.replace(/sig=(.)/, (_m, ch) => `sig=${ch === "0" ? "1" : "0"}`);
     const res = await SELF.fetch(tampered, { method: "PUT", body: jpegWithExif() });
     expect(res.status).toBe(403);
   });
