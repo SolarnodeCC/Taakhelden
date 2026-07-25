@@ -14,6 +14,28 @@ const points = new Hono<AppBindings>();
 
 type FamilyRow = { timezone: string; week_bonus_threshold: number };
 
+/**
+ * Decodeert de opaque base64-cursor uit de query. Een kapotte cursor is een
+ * cliëntfout (400), geen 500 — atob/JSON.parse mogen nooit ongevangen falen.
+ */
+function decodeCursor(raw?: string): { createdAt: string; id: string } | undefined {
+  if (!raw) return undefined;
+  try {
+    const decoded = JSON.parse(atob(raw)) as unknown;
+    if (
+      typeof decoded === "object" &&
+      decoded !== null &&
+      typeof (decoded as { createdAt?: unknown }).createdAt === "string" &&
+      typeof (decoded as { id?: unknown }).id === "string"
+    ) {
+      return decoded as { createdAt: string; id: string };
+    }
+  } catch {
+    /* valt hieronder in de 400 */
+  }
+  throw new ApiException(400, ErrorCodes.VALIDATION_FAILED, "Ongeldige cursor.");
+}
+
 /** Kind: eigen saldo + voortgang + streak. Ouder: alle kinderen. */
 points.get("/balance", async (c) => {
   const { familyId, userId, role } = c.get("auth");
@@ -48,10 +70,7 @@ points.get("/ledger", async (c) => {
   }
 
   const limit = Math.min(Number(c.req.query("limit") ?? 50), 100);
-  const rawCursor = c.req.query("cursor");
-  const cursor = rawCursor
-    ? (JSON.parse(atob(rawCursor)) as { createdAt: string; id: string })
-    : undefined;
+  const cursor = decodeCursor(c.req.query("cursor"));
 
   const rows = await listEntries(c.env.DB, auth.familyId, requested, { limit, cursor });
   const page = rows.slice(0, limit);
