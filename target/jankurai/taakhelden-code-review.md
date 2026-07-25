@@ -72,7 +72,11 @@ Severity legend: 🔴 high · 🟠 medium · 🟡 low · 🟢 verified-good (no 
 
 ## Findings
 
-### 🟠 F1 — Malformed `?cursor=` on `GET /points/ledger` returns 500, not 400
+### 🟠 F1 — Malformed `?cursor=` on `GET /points/ledger` returns 500, not 400 — ✅ FIXED
+> Resolved in this PR: cursor decoding moved into a `decodeCursor` helper that
+> catches `atob`/`JSON.parse` failures and shape-mismatches and throws
+> `400 VALIDATION_FAILED`. Regression test added at `apps/api/test/ledger.test.ts`.
+
 `apps/api/src/routes/points.ts:53`
 ```ts
 const cursor = rawCursor
@@ -164,7 +168,7 @@ AI product — **none of these subsystems exist in TaakHelden.** (The KV entries
 that *do* exist — `idem:*`, `pinfail:*`, `photoq:*` — all set explicit TTLs.)
 
 ## Suggested priority order
-1. **F1** (small, real bug) — fix now.
+1. ~~**F1** (small, real bug) — fix now.~~ ✅ done in this PR.
 2. **F2**, **F5** — cheap correctness/robustness hardening.
 3. **F3**, **F4** — security hygiene, schedule.
 4. **F6**, **F7** — documentation.
