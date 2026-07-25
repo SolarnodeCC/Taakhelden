@@ -1,10 +1,16 @@
 name: Jankurai (advisory)
 
-# Read-only Jankurai-audit die evidence naar target/jankurai/ schrijft en een
-# job-summary op de PR plaatst. BEWUST niet-blokkerend: ci.yml blijft de bron
-# van waarheid voor groen/rood (zie claude.yml). Deze workflow faalt de PR
-# nooit — hij levert alleen inzicht. Zet 'm pas als required check als het team
-# de scores een paar runs heeft gezien en bewust wil poorten.
+# Read-only, niet-blokkerende Jankurai-audit via de officiële action. De action
+# bouwt de CLI uit háár eigen checkout (`cargo install --path .../crates/jankurai`)
+# zodat de JSON-schemas naast de binary staan — precies wat de losse
+# prebuilt-binary miste, waardoor `jankurai audit` eerder faalde met
+# "repo-score.schema.json: No such file or directory".
+#
+# BEWUST niet-blokkerend: ci.yml blijft de bron van waarheid voor groen/rood
+# (zie claude.yml). Deze workflow faalt de PR nooit — hij levert alleen inzicht
+# en een evidence-artifact. Zet 'm pas op `mode: ratchet` met een baseline als
+# het team de scores een paar runs heeft gezien en bewust wil poorten
+# (zie agent/baselines/README.md).
 on:
   pull_request:
   workflow_dispatch:
@@ -15,80 +21,25 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    # Dubbele garantie dat een audit-fout de run niet rood maakt: op job-niveau
-    # (telt niet mee voor de workflow-conclusie) én per stap hieronder.
+    # Advies, geen poort: een audit- of build-fout mag de run niet rood maken.
     continue-on-error: true
     steps:
       - uses: actions/checkout@v7
         with:
-          fetch-depth: 0 # --changed-from origin/main / witness heeft git-historie nodig
+          fetch-depth: 0 # ratchet/diff-vergelijkingen hebben git-historie nodig
 
-      # Vastgepind op versie + SHA-256 (supply-chain): een gewijzigde release
-      # faalt de checksum-controle i.p.v. stil binnen te glippen. Bump beide
+      # Officiële Jankurai-action, vastgepind op de commit-SHA van v1.5.1
+      # (supply-chain — net als claude-code-action). De action installeert de
+      # Rust-toolchain, bouwt de CLI uit haar checkout en draait
+      # `jankurai audit . --mode advisory` met de juiste v1.5.1-vlaggen
+      # (--json/--md/--sarif/--github-step-summary/--repair-queue-jsonl) en
+      # publiceert de samenvatting zelf in de job-summary. Bump SHA + comment
       # samen bij een update.
-      - name: Install Jankurai (checksum-verified)
-        env:
-          JANKURAI_VERSION: "1.5.1"
-          JANKURAI_SHA256: "a12dbb4a3805dee807fc101d4b073ac9386936b33c5579f606a655fe90d0bbac"
-        run: |
-          set -euo pipefail
-          asset="jankurai-${JANKURAI_VERSION}-x86_64-unknown-linux-gnu.tar.gz"
-          url="https://github.com/neverhuman/jankurai/releases/download/v${JANKURAI_VERSION}/${asset}"
-          curl -fsSL "$url" -o "$asset"
-          echo "${JANKURAI_SHA256}  ${asset}" | sha256sum -c -
-          tar -xzf "$asset"
-          install -m 0755 "jankurai-${JANKURAI_VERSION}-x86_64-unknown-linux-gnu/jankurai" /usr/local/bin/jankurai
-          jankurai --version
-
-      - name: Full advisory audit
+      - name: Jankurai audit (advisory)
         continue-on-error: true
-        run: |
-          mkdir -p target/jankurai
-          jankurai audit . \
-            --mode advisory \
-            --json target/jankurai/repo-score.json \
-            --md   target/jankurai/repo-score.md
-
-      - name: Security evidence
-        continue-on-error: true
-        run: jankurai security run .
-
-      - name: Copy-code redundancy
-        continue-on-error: true
-        run: |
-          jankurai copy-code . \
-            --out target/jankurai/copy-code.json \
-            --md  target/jankurai/copy-code.md
-
-      # Merge-witness vergelijkt de PR met een vastgelegde baseline. Draait alleen
-      # als die baseline gecommit is; anders overgeslagen (geen fout). Zie README
-      # hieronder om de baseline te leggen.
-      - name: Merge witness (alleen met baseline)
-        continue-on-error: true
-        run: |
-          if [ -f agent/baselines/main.repo-score.json ]; then
-            jankurai witness . \
-              --changed-from origin/main \
-              --baseline agent/baselines/main.repo-score.json \
-              --out target/jankurai/merge-witness.json \
-              --md  target/jankurai/merge-witness.md
-          else
-            echo "Geen agent/baselines/main.repo-score.json — witness overgeslagen." \
-              | tee -a "$GITHUB_STEP_SUMMARY"
-          fi
-
-      - name: Publiceer score in de job-summary
-        if: always()
-        run: |
-          {
-            echo "## Jankurai — advisory audit"
-            echo
-            if [ -f target/jankurai/repo-score.md ]; then
-              cat target/jankurai/repo-score.md
-            else
-              echo "_Geen repo-score.md geproduceerd — zie de stap-logs hierboven._"
-            fi
-          } >> "$GITHUB_STEP_SUMMARY"
+        uses: neverhuman/jankurai@6f1aa45fca09ebb523f79b38ad465da28a86dfb1 # v1.5.1
+        with:
+          mode: advisory
 
       - name: Upload evidence-artifacts
         if: always()
