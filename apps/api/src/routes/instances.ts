@@ -1,5 +1,11 @@
 import { Hono } from "hono";
-import { RedoBody, AttachPhotoBody, ErrorCodes } from "@taakhelden/shared";
+import {
+  RedoBody,
+  AttachPhotoBody,
+  ChildTodayView,
+  ErrorCodes,
+  ParentTodayView,
+} from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
@@ -49,11 +55,11 @@ instances.get("/today", async (c) => {
   if (role === "child") {
     const rows = await listForDate(c.env.DB, familyId, today, userId);
     const balance = await computeBalance(c.env.DB, familyId, family, userId);
-    return c.json({
+    return c.json(ChildTodayView.parse({
       date: today,
       instances: rows.map((r) => instanceView(r as Record<string, unknown>)),
       balance,
-    });
+    }));
   }
 
   const children = await listChildren(c.env.DB, familyId);
@@ -69,7 +75,7 @@ instances.get("/today", async (c) => {
       balance: await computeBalance(c.env.DB, familyId, family, child.id as string),
     })),
   );
-  return c.json({ date: today, children: byChild });
+  return c.json(ParentTodayView.parse({ date: today, children: byChild }));
 });
 
 /** Historie (paginated) — alleen ouders. */

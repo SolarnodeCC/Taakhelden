@@ -57,7 +57,8 @@ presigned-flow.
 Vervangt de stub door een overzicht per kind.
 
 - **Data**: `GET /api/v1/instances/today`. Voor een ouder levert dit
-  `{ date, children: [{ childId, displayName, avatarId, instances[], balance }] }`
+  `{ date, children: [{ childId, displayName, avatarId, instances[], balance:`
+  ` { childId, balance, todayCompleted, todayTotal, weekProgress, streakDays } }] }`
   (zie `apps/api/src/routes/instances.ts:58-71`).
 - **UI**: één kaart per kind met naam/avatar en het puntensaldo, en daaronder de
   taken gegroepeerd op status: **open**, **ingediend/wacht op goedkeuring**,
