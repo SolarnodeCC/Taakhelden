@@ -18,19 +18,16 @@ in `CLAUDE.md` — use those. Notes below are the non-obvious bits for running l
 - **iOS** (`apps/ios`) — README only, no Xcode project yet; not runnable here.
 
 ### Running the API locally (gotchas)
-- Auth flows need a `JWT_SECRET`. Create `apps/api/.dev.vars` (gitignored) with a line like
-  `JWT_SECRET=local-dev-secret`. Without it the Worker still boots and `/v1/health` returns
+- Auth flows need a `JWT_SECRET`. Copy `apps/api/.dev.vars.example` to `apps/api/.dev.vars`
+  (gitignored). Without it the Worker still boots and `/v1/health` returns
   `{ ok: true }`, but register/login and any authed endpoint fail.
 - Apply local D1 migrations before first use: `npm run db:migrate:local -w apps/api`
   (writes to `apps/api/.wrangler/state`). Re-run after adding a migration.
 - Turnstile, email invites, APNs push, and Sign in with Apple are env-guarded no-ops when
   their secrets are unset — email/password auth works without any of them locally.
-- `wrangler` here is v3.90; it warns that the `compatibility_date` (2026-07-01) is newer than
-  the bundled runtime and falls back to the latest supported date. This warning is harmless.
 - Miniflare does not auto-fire cron triggers; use `wrangler dev --test-scheduled` to test them.
 
 ### Lint / test / build
-- `npm run lint` is a **no-op**: no workspace defines a `lint` script. CI (`.github/workflows/ci.yml`)
-  runs only `npm run typecheck`, `npm test` (Vitest in the Workers runtime), and a D1 migration
-  dry-run. Match that when validating changes.
-- `npm test` runs the API test suite via `@cloudflare/vitest-pool-workers` (real Workers runtime).
+- `npm run lint` runs ESLint across all TypeScript/React source with zero warnings allowed.
+- `npm test` runs both the API suite via `@cloudflare/vitest-pool-workers` (real Workers
+  runtime) and the web contract tests.

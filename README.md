@@ -16,16 +16,29 @@ CLAUDE.md         projectcontext + architectuurregels (leest Claude Code automat
 ## Eerste keer opzetten
 ```bash
 npm install
-# Cloudflare-resources (eenmalig):
-cd apps/api
-npx wrangler d1 create taakhelden-db --location=weur   # id → wrangler.toml
-npx wrangler kv namespace create KV                    # id → wrangler.toml
-npx wrangler r2 bucket create taakhelden-photos --jurisdiction=eu
-npx wrangler queues create photo-processing
-npx wrangler secret put JWT_SECRET
-# Lokaal draaien:
-npm run db:migrate:local
-npm run dev            # API op http://localhost:8787
+cp apps/api/.dev.vars.example apps/api/.dev.vars
+npm run db:migrate:local -w apps/api
+
+# Start in twee terminals:
+npm run dev:api        # API op http://localhost:8787
+npm run dev:web        # ouderdashboard op http://localhost:3000
+```
+
+Wrangler emuleert D1, R2, KV, Durable Objects en Queues lokaal via Miniflare.
+Voor lokale ontwikkeling is daarom geen Cloudflare-account of remote resource nodig.
+De secrets in `.dev.vars.example` zijn uitsluitend veilige lokale placeholders; gebruik
+ze nooit in productie. Externe integraties (Turnstile, e-mail, APNs en Apple-login) zijn
+optioneel voor de lokale e-mail/wachtwoord-flow.
+
+De remote Cloudflare-resources worden door de deployment-infrastructuur beheerd; maak ze
+niet aan als onderdeel van de lokale setup.
+
+## Controleren
+```bash
+npm run lint
+npm run typecheck
+npm test
+npm run build -w apps/web
 ```
 
 ## Werkwijze

@@ -12,6 +12,7 @@ jobs:
       - uses: actions/setup-node@v7
         with: { node-version: 20, cache: npm }
       - run: npm ci
+      - run: npm run lint
       - run: npm run typecheck
       - name: Tests (Workers-runtime)
         run: npm test

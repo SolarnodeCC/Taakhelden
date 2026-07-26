@@ -6,15 +6,6 @@ import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
 import { seedFamily, seedTask, seedInstance, seedWeekFiller, childToken, api, todayAmsterdam } from "./helpers";
 
-async function seedPoints(familyId: string, childId: string, amount: number) {
-  await env.DB
-    .prepare(
-      "INSERT INTO points_ledger (id, family_id, child_id, type, amount) VALUES (?, ?, ?, 'adjustment', ?)",
-    )
-    .bind(`pl_seed${crypto.randomUUID().slice(0, 8)}`, familyId, childId, amount)
-    .run();
-}
-
 describe("POST /sync", () => {
   it("past mutaties op volgorde toe en levert een changes-delta", async () => {
     const fam = await seedFamily("syn");
