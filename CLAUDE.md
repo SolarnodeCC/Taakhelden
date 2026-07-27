@@ -7,6 +7,7 @@ huishoudelijke taken. Ouders beheren taken en beloningen. Doelgroep: gezinnen in
 - `docs/taakhelden-productvoorstel.md` — functioneel ontwerp, gamification, UI-richtlijnen
 - `docs/taakhelden-cloudflare-github-architectuur.md` — infrastructuur en CI/CD
 - `docs/taakhelden-api-specificatie.md` — het API-contract (leidend voor alle endpoints)
+- `docs/taakhelden-ios-bouwvoorstel.md` — iOS-bouwvoorstel (SwiftUI ↔ API/web/DS)
 
 ## Stack
 - **API**: Cloudflare Worker, Hono, TypeScript — `apps/api`
