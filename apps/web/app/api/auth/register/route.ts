@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { RegisterBody, TokenPair, ErrorCodes } from "@taakhelden/shared";
-import { getApiBaseUrl } from "../../../../lib/api/config";
+import { apiFetch } from "../../../../lib/api/config";
 import { setTokens } from "../../../../lib/auth/session";
 
 /** BFF register: creates parent + family, then stores tokens in httpOnly cookies. */
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
   let res: Response;
   try {
-    res = await fetch(`${getApiBaseUrl()}/auth/register`, {
+    res = await apiFetch("/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(parsed.data),
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
-    // Non-JSON upstream (e.g. wrong API_BASE_URL → plain 404) must not look like
+    // Non-JSON upstream (misconfigured binding / plain 404) must not look like
     // a validation failure to the client.
     if (!data) {
       return NextResponse.json(

@@ -46,9 +46,9 @@ jobs:
           code_export=$?
           echo "$out_photo"
           echo "$out_export"
-          # 0 = created; non-zero with "already exists" is OK; other errors fail.
-          echo "$out_photo" | grep -qi "already exists" && code_photo=0
-          echo "$out_export" | grep -qi "already exists" && code_export=0
+          # 0 = created; non-zero with "already exists" / "already taken" is OK.
+          echo "$out_photo" | grep -Eqi "already exists|already taken" && code_photo=0
+          echo "$out_export" | grep -Eqi "already exists|already taken" && code_export=0
           test "$code_photo" -eq 0 && test "$code_export" -eq 0
       # R2-bucket in de EU-jurisdictie (AVG/data-residency voor kinderfoto's),
       # passend bij `jurisdiction = "eu"` op de PHOTOS-binding. Idempotent.

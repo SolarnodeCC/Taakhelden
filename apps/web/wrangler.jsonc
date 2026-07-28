@@ -8,8 +8,15 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
-  // Server-side base-URL voor de BFF-proxy → de live API-worker.
-  // Geen geheim; de browser praat alleen same-origin met de web-worker.
+  // Worker→Worker: global fetch() between Workers on the same *.workers.dev zone
+  // fails. The BFF must call the API via this service binding.
+  "services": [
+    {
+      "binding": "API",
+      "service": "taakhelden-api"
+    }
+  ],
+  // Public API base (incl. /v1) — used for Request URLs and browser WebSocket URLs.
   "vars": {
     "API_BASE_URL": "https://taakhelden-api.oostelaar.workers.dev/v1"
   }

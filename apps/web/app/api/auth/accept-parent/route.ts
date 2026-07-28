@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ParentAcceptBody, TokenPair, ErrorCodes } from "@taakhelden/shared";
-import { getApiBaseUrl } from "../../../../lib/api/config";
+import { apiFetch } from "../../../../lib/api/config";
 import { setTokens } from "../../../../lib/auth/session";
 
 /**
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
   let res: Response;
   try {
-    res = await fetch(`${getApiBaseUrl()}/families/parents/accept`, {
+    res = await apiFetch("/families/parents/accept", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(parsed.data),
@@ -44,7 +44,6 @@ export async function POST(req: Request) {
     return NextResponse.json(data, { status: res.status });
   }
 
-  // ParentSessionResult extends TokenPair — parse the token fields we need for cookies.
   const tokens = TokenPair.safeParse(data);
   if (!tokens.success) {
     return NextResponse.json(
@@ -53,7 +52,6 @@ export async function POST(req: Request) {
     );
   }
 
-  // Overwrite any existing session (Batch 8 decision: no separate logout step).
   await setTokens(tokens.data);
   return NextResponse.json({ ok: true });
 }

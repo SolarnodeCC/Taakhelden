@@ -1,5 +1,5 @@
 import { TokenPair } from "@taakhelden/shared";
-import { getApiBaseUrl } from "../api/config";
+import { apiFetch } from "../api/config";
 import {
   getAccessCookie,
   getRefreshCookie,
@@ -59,7 +59,7 @@ export async function refreshTokens(): Promise<string | null> {
 async function doRefresh(refreshToken: string): Promise<string | null> {
   let res: Response;
   try {
-    res = await fetch(`${getApiBaseUrl()}/auth/refresh`, {
+    res = await apiFetch("/auth/refresh", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refreshToken }),
