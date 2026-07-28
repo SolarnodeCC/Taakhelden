@@ -13,6 +13,8 @@ vi.mock("../../../../lib/auth/session", () => ({
 
 vi.mock("../../../../lib/api/config", () => ({
   getApiBaseUrl: () => "http://worker.test/v1",
+  apiFetch: (path: string, init?: RequestInit) =>
+    fetch(`http://worker.test/v1${path.startsWith("/") ? path : `/${path}`}`, init),
 }));
 
 describe("POST /api/ws/connect", () => {

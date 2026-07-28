@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { LoginBody, TokenPair, ErrorCodes } from "@taakhelden/shared";
-import { getApiBaseUrl } from "../../../../lib/api/config";
+import { apiFetch } from "../../../../lib/api/config";
 import { setTokens } from "../../../../lib/auth/session";
 
 /** BFF login: forwards credentials to the Worker and stores tokens in httpOnly cookies. */
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
   let res: Response;
   try {
-    res = await fetch(`${getApiBaseUrl()}/auth/login`, {
+    res = await apiFetch("/auth/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(parsed.data),
@@ -37,7 +37,6 @@ export async function POST(req: Request) {
         { status: 502 },
       );
     }
-    // Pass the Worker's error envelope (and status) straight through.
     return NextResponse.json(data, { status: res.status });
   }
 

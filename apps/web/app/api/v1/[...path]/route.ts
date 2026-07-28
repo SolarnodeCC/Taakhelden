@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ErrorCodes } from "@taakhelden/shared";
-import { getApiBaseUrl } from "../../../../lib/api/config";
+import { apiFetch } from "../../../../lib/api/config";
 import { getAccessToken, refreshTokens, clearTokens } from "../../../../lib/auth/session";
 
 /**
@@ -10,7 +10,7 @@ import { getAccessToken, refreshTokens, clearTokens } from "../../../../lib/auth
  */
 async function proxy(req: Request, path: string[]): Promise<Response> {
   const target = new URL(req.url);
-  const url = `${getApiBaseUrl()}/${path.join("/")}${target.search}`;
+  const upstreamPath = `/${path.join("/")}${target.search}`;
 
   const hasBody = req.method !== "GET" && req.method !== "HEAD";
   const body = hasBody ? await req.text() : undefined;
@@ -26,7 +26,7 @@ async function proxy(req: Request, path: string[]): Promise<Response> {
   };
 
   const send = (token: string) =>
-    fetch(url, { method: req.method, headers: buildHeaders(token), body, cache: "no-store" });
+    apiFetch(upstreamPath, { method: req.method, headers: buildHeaders(token), body, cache: "no-store" });
 
   const token = (await getAccessToken()) ?? (await refreshTokens());
   if (!token) {

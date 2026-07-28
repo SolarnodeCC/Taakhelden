@@ -24,6 +24,9 @@ export async function issueParentTokens(
   secret: string,
   user: { id: string; family_id: string; permissions: string },
 ): Promise<TokenPair> {
+  if (!secret) {
+    throw new Error("JWT_SECRET is not configured");
+  }
   const payload: JwtPayload = {
     sub: user.id,
     fam: user.family_id,
