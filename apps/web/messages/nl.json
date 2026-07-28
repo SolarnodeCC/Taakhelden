@@ -134,7 +134,45 @@
     },
     "badge": {
       "approval": "Goedkeuring",
-      "photoBonus": "+{points} foto"
+      "photoBonus": "+{points} foto",
+      "rotation": "Wisselend: {names}",
+      "dateRange": "{from} t/m {until}",
+      "fromDate": "vanaf {from}",
+      "untilDate": "tot {until}"
+    },
+    "tab": {
+      "list": "Overzicht",
+      "week": "Week"
+    },
+    "fromTemplate": "Uit sjabloon",
+    "templates": {
+      "title": "Suggesties per leeftijd",
+      "hint": "Kies een kind en voeg een taak toe met één tik. Je kunt alles nog aanpassen.",
+      "fldChild": "Kind",
+      "fldAge": "Leeftijd",
+      "ageYears": "{age} jaar",
+      "ageFilter": "Suggesties voor {age} jaar",
+      "use": "Gebruiken",
+      "cancel": "Sluiten",
+      "empty": "Geen suggesties voor deze leeftijd.",
+      "loadError": "Kon de suggesties niet laden.",
+      "noChildren": "Voeg eerst een kind toe op Gezin."
+    },
+    "week": {
+      "prevWeek": "Vorige week",
+      "nextWeek": "Volgende week",
+      "thisWeek": "Deze week",
+      "filterChild": "Kind",
+      "allChildren": "Hele gezin",
+      "loadError": "Kon het weekoverzicht niet laden.",
+      "empty": "Geen taken gepland in deze week.",
+      "status": {
+        "open": "open",
+        "completed": "af",
+        "submitted": "wacht op goedkeuring",
+        "open_redo": "opnieuw",
+        "approved": "goedgekeurd"
+      }
     },
     "form": {
       "createTitle": "Nieuwe taak",
@@ -149,6 +187,15 @@
       "fldDaypart": "Dagdeel",
       "fldRecurrence": "Herhaling",
       "fldDays": "Dagen",
+      "fldRotation": "Wisselen tussen kinderen",
+      "rotationHint": "Elke week is een ander kind aan de beurt (volgorde hieronder).",
+      "fldActiveFrom": "Startdatum (optioneel)",
+      "fldActiveUntil": "Einddatum (optioneel)",
+      "rotationRequired": "Kies minstens twee kinderen voor wisselen.",
+      "dateRangeInvalid": "De einddatum moet op of na de startdatum liggen.",
+      "moveUp": "Omhoog",
+      "moveDown": "Omlaag",
+      "removeFromRotation": "Verwijderen uit wisseling",
       "assigneesRequired": "Kies minstens één kind.",
       "errorSave": "Kon de taak niet opslaan.",
       "save": "Opslaan",
