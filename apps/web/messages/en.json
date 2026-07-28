@@ -134,7 +134,45 @@
     },
     "badge": {
       "approval": "Approval",
-      "photoBonus": "+{points} photo"
+      "photoBonus": "+{points} photo",
+      "rotation": "Rotating: {names}",
+      "dateRange": "{from} – {until}",
+      "fromDate": "from {from}",
+      "untilDate": "until {until}"
+    },
+    "tab": {
+      "list": "Overview",
+      "week": "Week"
+    },
+    "fromTemplate": "From template",
+    "templates": {
+      "title": "Age-based suggestions",
+      "hint": "Pick a child and add a task in one tap. You can still adjust everything.",
+      "fldChild": "Child",
+      "fldAge": "Age",
+      "ageYears": "age {age}",
+      "ageFilter": "Suggestions for age {age}",
+      "use": "Use",
+      "cancel": "Close",
+      "empty": "No suggestions for this age.",
+      "loadError": "Couldn't load suggestions.",
+      "noChildren": "Add a child on Family first."
+    },
+    "week": {
+      "prevWeek": "Previous week",
+      "nextWeek": "Next week",
+      "thisWeek": "This week",
+      "filterChild": "Child",
+      "allChildren": "Whole family",
+      "loadError": "Couldn't load the week overview.",
+      "empty": "Nothing planned this week.",
+      "status": {
+        "open": "open",
+        "completed": "done",
+        "submitted": "awaiting approval",
+        "open_redo": "try again",
+        "approved": "approved"
+      }
     },
     "form": {
       "createTitle": "New task",
@@ -149,6 +187,15 @@
       "fldDaypart": "Time of day",
       "fldRecurrence": "Repeat",
       "fldDays": "Days",
+      "fldRotation": "Rotate between children",
+      "rotationHint": "A different child each week (order below).",
+      "fldActiveFrom": "Start date (optional)",
+      "fldActiveUntil": "End date (optional)",
+      "rotationRequired": "Pick at least two children to rotate.",
+      "dateRangeInvalid": "End date must be on or after the start date.",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "removeFromRotation": "Remove from rotation",
       "assigneesRequired": "Pick at least one child.",
       "errorSave": "Couldn't save the task.",
       "save": "Save",

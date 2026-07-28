@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { InstanceView } from "@taakhelden/shared";
 export {
   ChildToday,
   ChildTodayView,
@@ -123,6 +124,33 @@ export type TaskView = z.infer<typeof TaskView>;
 
 export const TaskList = z.array(TaskView);
 
+/** Partial task fields returned by GET /tasks/templates. */
+export const TaskTemplate = z
+  .object({
+    title: z.string(),
+    category: TaskCategory.optional(),
+    icon: z.string().optional(),
+    points: z.number().optional(),
+    photoBonusPoints: z.number().optional(),
+    approvalRequired: z.boolean().optional(),
+    recurrence: Recurrence.nullable().optional(),
+    daypart: Daypart.nullable().optional(),
+  })
+  .passthrough();
+export type TaskTemplate = z.infer<typeof TaskTemplate>;
+
+export const TaskTemplatesResponse = z.object({
+  age: z.number(),
+  templates: z.array(TaskTemplate),
+});
+export type TaskTemplatesResponse = z.infer<typeof TaskTemplatesResponse>;
+
+export const InstanceHistoryResponse = z.object({
+  instances: z.array(InstanceView),
+  nextCursor: z.string().nullable(),
+});
+export type InstanceHistoryResponse = z.infer<typeof InstanceHistoryResponse>;
+
 // The payload the Taken form sends to POST/PATCH /tasks. Server applies the same
 // defaults, so PATCH can carry a subset; here we always send the full form.
 export interface TaskFormPayload {
@@ -133,9 +161,31 @@ export interface TaskFormPayload {
   photoBonusPoints: number;
   approvalRequired: boolean;
   assignees: string[];
+  rotation?: string[];
   recurrence: Recurrence | null;
   daypart: Daypart | null;
+  activeFrom?: string;
+  activeUntil?: string | null;
 }
+
+/** Prefill for TaskForm from a template or partial task. */
+export type TaskFormPrefill = Partial<
+  Pick<
+    TaskView,
+    | "title"
+    | "category"
+    | "icon"
+    | "points"
+    | "photoBonusPoints"
+    | "approvalRequired"
+    | "assignees"
+    | "recurrence"
+    | "daypart"
+    | "rotation"
+    | "activeFrom"
+    | "activeUntil"
+  >
+>;
 
 // --- Winkel (rewards + redemptions) — mirrors apps/api rewardView + redemptions. ---
 export const RewardView = z

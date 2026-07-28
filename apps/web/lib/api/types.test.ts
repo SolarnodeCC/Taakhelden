@@ -10,8 +10,11 @@ import {
   FamilyView,
   InviteCodeResult,
   InviteParentResult,
+  InstanceHistoryResponse,
   MemberList,
   ParentTodayView,
+  TaskTemplatesResponse,
+  TaskView,
 } from "./types";
 import { AVATAR_PLACEHOLDERS, avatarEmoji } from "../avatars";
 
@@ -204,5 +207,71 @@ describe("Batch 8 schemas", () => {
     expect(() =>
       ParentAcceptBody.parse({ token: "tok_abc", password: "kort" }),
     ).toThrow();
+  });
+});
+
+describe("Batch 9 schemas", () => {
+  it("parses TaskView with rotation and active window", () => {
+    const parsed = TaskView.parse({
+      id: "tsk_1",
+      title: "Vaatwasser",
+      category: "household",
+      icon: "dishwasher",
+      points: 15,
+      photoBonusPoints: 0,
+      approvalRequired: false,
+      assignees: ["ch_a", "ch_b"],
+      rotation: ["ch_a", "ch_b"],
+      recurrence: { freq: "weekly", days: ["MO", "WE"] },
+      daypart: "evening",
+      activeFrom: "2026-08-01",
+      activeUntil: "2026-08-31",
+    });
+    expect(parsed.rotation).toEqual(["ch_a", "ch_b"]);
+    expect(parsed.activeUntil).toBe("2026-08-31");
+  });
+
+  it("parses task templates response", () => {
+    const parsed = TaskTemplatesResponse.parse({
+      age: 8,
+      templates: [
+        {
+          title: "Vaatwasser uitruimen",
+          category: "household",
+          icon: "dishwasher",
+          points: 15,
+        },
+      ],
+    });
+    expect(parsed.templates[0]?.title).toBe("Vaatwasser uitruimen");
+  });
+
+  it("parses instance history response", () => {
+    const parsed = InstanceHistoryResponse.parse({
+      instances: [
+        {
+          id: "ti_1",
+          taskId: "tsk_1",
+          childId: "ch_1",
+          date: "2026-07-28",
+          status: "open",
+          title: "Kamer opruimen",
+          icon: "star",
+          category: "household",
+          points: 10,
+          photoBonusPoints: 0,
+          approvalRequired: false,
+          daypart: null,
+          photoId: null,
+          photoStatus: null,
+          pointsEarned: null,
+          redoNote: null,
+          completedAt: null,
+          approvedAt: null,
+        },
+      ],
+      nextCursor: null,
+    });
+    expect(parsed.instances).toHaveLength(1);
   });
 });
