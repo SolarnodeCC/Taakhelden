@@ -13,5 +13,6 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "goedkeuren", href: "/goedkeuren", requiresFull: false },
   { key: "taken", href: "/taken", requiresFull: true },
   { key: "winkel", href: "/winkel", requiresFull: true },
+  { key: "gezin", href: "/gezin", requiresFull: true },
   { key: "inzichten", href: "/inzichten", requiresFull: false },
 ];

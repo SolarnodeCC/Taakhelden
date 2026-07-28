@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
-import { ParentTodayView } from "./types";
+import { CreateChildBody, RegisterBody } from "@taakhelden/shared";
+import { FamilyView, InviteCodeResult, MemberList, ParentTodayView } from "./types";
+import { AVATAR_PLACEHOLDERS, avatarEmoji } from "../avatars";
 
 const parentTodayResponse = {
   date: "2026-07-26",
@@ -58,5 +60,74 @@ describe("ParentTodayView", () => {
         children: [{ ...parentTodayResponse.children[0], balance: 145 }],
       }),
     ).toThrow();
+  });
+});
+
+describe("Batch 7 schemas", () => {
+  it("parses RegisterBody with turnstile token", () => {
+    const parsed = RegisterBody.parse({
+      email: "ouder@example.nl",
+      password: "veiliggenoeg",
+      familyName: "Familie Jansen",
+      displayName: "Sam",
+      turnstileToken: "dev-bypass",
+    });
+    expect(parsed.familyName).toBe("Familie Jansen");
+  });
+
+  it("rejects short passwords on RegisterBody", () => {
+    expect(() =>
+      RegisterBody.parse({
+        email: "ouder@example.nl",
+        password: "kort",
+        familyName: "Familie Jansen",
+        displayName: "Sam",
+        turnstileToken: "dev-bypass",
+      }),
+    ).toThrow();
+  });
+
+  it("parses CreateChildBody", () => {
+    const parsed = CreateChildBody.parse({
+      displayName: "Sofie",
+      birthYear: 2016,
+      pincode: "1234",
+      avatarId: "fox",
+    });
+    expect(parsed.avatarId).toBe("fox");
+  });
+
+  it("parses family view with invite code", () => {
+    const parsed = FamilyView.parse({
+      id: "fam_1",
+      name: "Jansen",
+      timezone: "Europe/Amsterdam",
+      inviteCode: "AB12CD",
+    });
+    expect(parsed.inviteCode).toBe("AB12CD");
+  });
+
+  it("parses invite-code regenerate result", () => {
+    expect(InviteCodeResult.parse({ inviteCode: "ZZ99YY" }).inviteCode).toBe("ZZ99YY");
+  });
+
+  it("parses member list with child age fields", () => {
+    const members = MemberList.parse([
+      {
+        id: "ch_1",
+        role: "child",
+        displayName: "Sofie",
+        birthYear: 2016,
+        ageMode: "mid",
+        avatarId: "fox",
+      },
+    ]);
+    expect(members[0]?.ageMode).toBe("mid");
+  });
+
+  it("resolves avatar placeholders", () => {
+    expect(AVATAR_PLACEHOLDERS.length).toBeGreaterThanOrEqual(5);
+    expect(avatarEmoji("fox")).toBe("🦊");
+    expect(avatarEmoji(null)).toBeNull();
   });
 });
