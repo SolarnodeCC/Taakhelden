@@ -1,0 +1,6 @@
+"welcome.parent" = "Ik ben een ouder";
+"welcome.child" = "Ik heb al een gezinscode";
+"child.pin.visible" = "Gebruik pincode";
+"child.offline.safe" = "Wordt bewaard - sturen we zo.";
+"child.all.done" = "Alles gedaan - je bent vandaag al een TaakHeld!";
+"parent.gate.title" = "Ouderpoort";

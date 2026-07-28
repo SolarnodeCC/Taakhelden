@@ -1,0 +1,6 @@
+"welcome.parent" = "I'm a parent";
+"welcome.child" = "I already have a family code";
+"child.pin.visible" = "Use PIN";
+"child.offline.safe" = "Saved for later - we'll send it soon.";
+"child.all.done" = "All done - you were a hero today!";
+"parent.gate.title" = "Parent gate";

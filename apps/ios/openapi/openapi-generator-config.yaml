@@ -1,0 +1,15 @@
+generate:
+  - types
+  - client
+accessModifier: internal
+filter:
+  paths:
+    - /auth/family-code
+    - /auth/child-session
+    - /auth/child-session/refresh
+    - /families/me
+    - /instances/today
+    - /points/balance
+    - /rewards
+    - /redemptions
+namingStrategy: idiomatic
