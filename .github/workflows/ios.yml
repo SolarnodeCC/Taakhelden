@@ -48,11 +48,30 @@ jobs:
       - name: Build and test iOS target
         if: steps.detect.outputs.present == 'true'
         run: |
+          set -euo pipefail
           cd apps/ios
+
+          # macos-latest simulator names drift (iPhone 16 → 17 → …). Pick the
+          # newest available iPhone UDID instead of hardcoding a device name.
+          UDID="$(
+            xcrun simctl list devices available \
+              | grep -E 'iPhone .+\([0-9A-Fa-f-]{36}\)' \
+              | grep -v unavailable \
+              | tail -1 \
+              | grep -oE '[0-9A-Fa-f-]{36}' \
+              | tail -1
+          )"
+          if [[ -z "${UDID}" ]]; then
+            echo "No available iPhone simulator found" >&2
+            xcrun simctl list devices available >&2
+            exit 1
+          fi
+
+          echo "Using iPhone simulator: ${UDID}"
           xcodebuild test \
             -scheme TaakHelden \
-            -destination 'platform=iOS Simulator,name=iPhone 16' \
-            -quiet
+            -destination "platform=iOS Simulator,id=${UDID}" \
+            CODE_SIGNING_ALLOWED=NO
       - name: Placeholder until iOS source lands
         if: steps.detect.outputs.present == 'false'
         run: echo "No Xcode project yet; workflow currently enforces the shared contract snapshot only."
