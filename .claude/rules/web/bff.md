@@ -10,16 +10,18 @@ Jankurai HLT-006 flags the proxy route as "wrong layer"; here that is **intentio
 
 ## BFF only — no D1/SQL
 
-- `app/api/v1/[...path]/route.ts` forwards to `API_BASE_URL` — no database access from web.
-- No Cloudflare bindings in the Next app for D1/R2/DO.
+- `app/api/v1/[...path]/route.ts` forwards via `apiFetch()` — no database access from web.
+- No D1/R2/DO bindings on the web Worker. The only cross-Worker binding is
+  service binding `API` → `taakhelden-api` (see `wrangler.jsonc`).
 
 ## Secrets and URLs
 
 - `API_BASE_URL` is **server-only** — never `NEXT_PUBLIC_API_*`.
   Read it via `getApiBaseUrl()` / call the Worker via `apiFetch()`
-  (`lib/api/config.ts`). On Cloudflare, `apiFetch` uses the `API` service
-  binding — global `fetch()` between Workers on the same `*.workers.dev` zone
-  fails and previously caused BFF 502s.
+  (`lib/api/config.ts`). On Cloudflare, `apiFetch` **must** use the `API`
+  service binding — global `fetch()` between Workers on the same
+  `*.workers.dev` zone fails (BFF 502). Do not fall back to global fetch for
+  `*.workers.dev` URLs.
 - Session tokens in `httpOnly` cookies (`lib/api/cookies.ts`): `secure` in production,
   `sameSite=lax`.
 - Proxy responses: `Cache-Control: no-store` for authenticated routes.
