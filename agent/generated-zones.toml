@@ -1,0 +1,16 @@
+# Generated/derived paths — see docs/audit-rubric.md#generated-zones.
+# Regenerate; never hand-edit.
+
+[[zone]]
+path = "target/jankurai/"
+source = "jankurai CLI"
+command = "jankurai audit . --mode advisory --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md"
+read_only = false
+write_policy = "auditor_output"
+
+[[zone]]
+path = "Design System/_ds_bundle.js"
+source = "Design System preview-app bundler"
+command = "see Design System/readme.md"
+read_only = true
+write_policy = "generator_only"
