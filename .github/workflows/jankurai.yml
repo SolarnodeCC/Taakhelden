@@ -37,7 +37,7 @@ jobs:
       # samen bij een update.
       - name: Jankurai audit (advisory)
         continue-on-error: true
-        uses: neverhuman/jankurai@6f1aa45fca09ebb523f79b38ad465da28a86dfb1 # v1.5.1
+        uses: neverhuman/jankurai@3c804453e6c7a6e0e4028d95cc3bccea467277ef # v1.6.10
         with:
           mode: advisory
 
