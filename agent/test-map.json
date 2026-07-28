@@ -1,0 +1,25 @@
+{
+  "workspace": "taakhelden",
+  "tests": {
+    "apps/api/": {
+      "command": "npm test",
+      "purpose": "Vitest suite in the Workers runtime (@cloudflare/vitest-pool-workers) covering routes, repo, and services"
+    },
+    "apps/api/migrations/": {
+      "command": "npx wrangler d1 migrations apply taakhelden-db --local",
+      "purpose": "dry-run new D1 migrations locally before they reach CI"
+    },
+    "apps/web/": {
+      "command": "npm run typecheck --workspaces --if-present",
+      "purpose": "no Vitest/Playwright suite exists yet for the Next.js dashboard; typecheck is the current gate"
+    },
+    "packages/shared/": {
+      "command": "npm run typecheck --workspaces --if-present",
+      "purpose": "Zod schemas are exercised indirectly by apps/api's test suite; typecheck catches contract drift"
+    },
+    ".": {
+      "command": "npm run typecheck && npm test",
+      "purpose": "root-level gate mirroring .github/workflows/ci.yml"
+    }
+  }
+}

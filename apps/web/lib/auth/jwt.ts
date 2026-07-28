@@ -11,14 +11,24 @@ export interface JwtClaims {
   perm?: "full" | "approve_only";
 }
 
+/** Narrows an unknown decoded payload into JwtClaims — no blind `as`-cast. */
+function isJwtClaims(value: unknown): value is JwtClaims {
+  if (typeof value !== "object" || value === null) return false;
+  const v = value as Record<string, unknown>;
+  if (typeof v.sub !== "string" || !v.sub) return false;
+  if (typeof v.fam !== "string" || !v.fam) return false;
+  if (v.role !== "parent" && v.role !== "child") return false;
+  if (v.perm !== undefined && v.perm !== "full" && v.perm !== "approve_only") return false;
+  return true;
+}
+
 export function decodeJwtPayload(token: string): JwtClaims | null {
   const part = token.split(".")[1];
   if (!part) return null;
   try {
     const json = decodeBase64Url(part);
-    const claims = JSON.parse(json) as Partial<JwtClaims>;
-    if (!claims.sub || !claims.fam || !claims.role) return null;
-    return claims as JwtClaims;
+    const claims: unknown = JSON.parse(json);
+    return isJwtClaims(claims) ? claims : null;
   } catch {
     return null;
   }

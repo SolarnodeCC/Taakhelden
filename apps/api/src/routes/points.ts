@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { AdjustBody, Balance, BalanceViewerResponse, ErrorCodes } from "@taakhelden/shared";
+import { AdjustBody, Balance, BalanceViewerResponse, ErrorCodes, LedgerCursor } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
@@ -21,22 +21,19 @@ type FamilyRow = { timezone: string; week_bonus_threshold: number };
  * Decodeert de opaque base64-cursor uit de query. Een kapotte cursor is een
  * cliëntfout (400), geen 500 — atob/JSON.parse mogen nooit ongevangen falen.
  */
-function decodeCursor(raw?: string): { createdAt: string; id: string } | undefined {
+function decodeCursor(raw?: string): LedgerCursor | undefined {
   if (!raw) return undefined;
+  let json: unknown;
   try {
-    const decoded = JSON.parse(atob(raw)) as unknown;
-    if (
-      typeof decoded === "object" &&
-      decoded !== null &&
-      typeof (decoded as { createdAt?: unknown }).createdAt === "string" &&
-      typeof (decoded as { id?: unknown }).id === "string"
-    ) {
-      return decoded as { createdAt: string; id: string };
-    }
+    json = JSON.parse(atob(raw));
   } catch {
-    /* valt hieronder in de 400 */
+    throw new ApiException(400, ErrorCodes.VALIDATION_FAILED, "Ongeldige cursor.");
   }
-  throw new ApiException(400, ErrorCodes.VALIDATION_FAILED, "Ongeldige cursor.");
+  const parsed = LedgerCursor.safeParse(json);
+  if (!parsed.success) {
+    throw new ApiException(400, ErrorCodes.VALIDATION_FAILED, "Ongeldige cursor.");
+  }
+  return parsed.data;
 }
 
 /** Kind: eigen saldo + voortgang + streak. Ouder: alle kinderen. */

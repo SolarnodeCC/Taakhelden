@@ -79,6 +79,13 @@ export const TodayViewerResponse = z.discriminatedUnion("viewer", [
 ]);
 export type TodayViewerResponse = z.infer<typeof TodayViewerResponse>;
 
+/** Opaque pagination cursor for GET /instances (history). */
+export const HistoryCursor = z.object({
+  date: z.string(),
+  id: z.string(),
+});
+export type HistoryCursor = z.infer<typeof HistoryCursor>;
+
 export const RedoBody = z.object({
   note: z.string().min(1).max(200), // vriendelijke toelichting, verplicht
 });
