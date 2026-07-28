@@ -4,21 +4,16 @@ Centraal overzicht van onderdelen die in het product staan maar nog niet (volled
 in `apps/web` zijn gebouwd. Implementatieplannen per batch:
 `docs/web-batch-*-plan.md`.
 
-**Laatst bijgewerkt:** na Batch 10 (notificaties, punten, privacy); Batch 11-plan
-(realtime) staat klaar, implementatie volgt.
+**Laatst bijgewerkt:** na Batch 12 (weekplanner drag-drop); Inzichten blijft Fase 2.
 
 ## Openstaande onderdelen
 
 | Onderwerp | Waar gepland | Notitie |
 | --- | --- | --- |
 | **Inzichten** (statistieken/trends) | Batch 6 / Fase 2 | Nog `SectionStub` op `/inzichten` |
-| **Realtime WebSocket** (live Vandaag/Goedkeuren) | [Batch 11](./web-batch-11-plan.md) | API bestaat al (`POST /ws/token`, `GET /ws`); web-client nog niet |
-| **Drag-drop weekplanner** | Batch 12[^1] | Vereist nieuw instance-move API-contract |
 | SIWA op web, wachtwoord-vergeten, marketing-landing, profielfoto-upload | Diverse batches / post-MVP | Bewust buiten scope gebleven (zie hieronder) |
 
-[^1]: Eerdere batch-plannen noemden **Batch 11+**; het [Batch 11-plan](./web-batch-11-plan.md) zet realtime eerst en schuift drag-drop expliciet door naar **Batch 12** om scope te beperken.
-
-## Bewust buiten web-MVP (niet in batches 1–11)
+## Bewust buiten web-MVP (niet in batches 1–12)
 
 Deze items komen terug in meerdere batch-plannen als **niet in deze batch**; er is
 nog geen apart batch-nummer voor:
@@ -32,7 +27,7 @@ nog geen apart batch-nummer voor:
 | Device-sessions revoke | Batch 8, 10 | API mogelijk; geen web-UI |
 | Kind-login op web | Batch 7–10 | Kind-app is iOS; web is ouder-only |
 
-## Batch-overzicht (1–11)
+## Batch-overzicht (1–12)
 
 | Batch | Inhoud | Status |
 | --- | --- | --- |
@@ -42,7 +37,7 @@ nog geen apart batch-nummer voor:
 | 6 | Inzichten | Stub — zie backlog |
 | 7 | Registratie + Gezin/kinderen | Done |
 | 8 | Co-ouder + gezinsinstellingen | Done |
-| 9 | Taken-verdieping (templates, weekoverzicht) | Done |
+| 9 | Taken-verdieping (templates, weekoverzicht read-only) | Done |
 | 10 | Notificaties + punten + privacy/AVG | Done |
-| 11 | Realtime WebSocket (Vandaag, Goedkeuren, Winkel) | Plan — [web-batch-11-plan.md](./web-batch-11-plan.md) |
-| 12 | Weekplanner drag-drop (voorstel) | Nog geen plan; vereist API-contract |
+| 11 | Realtime WebSocket (Vandaag, Goedkeuren, Winkel) | Done — [web-batch-11-plan.md](./web-batch-11-plan.md) |
+| 12 | Weekplanner drag-drop (instance-move) | Done — [web-batch-12-plan.md](./web-batch-12-plan.md) |

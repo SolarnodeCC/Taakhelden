@@ -11,7 +11,7 @@ describe("auth-flow", () => {
     const register = await api("/auth/register", {
       body: {
         email: "ouder@test.local",
-        password: "superveilig123",
+        password: "TestPassword_NotASecret_123",
         familyName: "De Testjes",
         displayName: "Merel",
         turnstileToken: "test",
@@ -100,7 +100,7 @@ describe("auth-flow", () => {
     const register = await api("/auth/register", {
       body: {
         email: "race@test.local",
-        password: "superveilig123",
+        password: "TestPassword_NotASecret_123",
         familyName: "De Racers",
         displayName: "Tess",
         turnstileToken: "test",

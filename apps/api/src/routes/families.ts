@@ -1,5 +1,6 @@
 import { Hono } from "hono";
 import { FamilyPatchBody, FamilyViewerResponse, InviteParentBody, ParentAcceptBody, ErrorCodes } from "@taakhelden/shared";
+import { z } from "zod";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
@@ -9,6 +10,7 @@ import { newFamilyCode, newId, newToken } from "../services/ids";
 import { hashSecret } from "../services/passwords";
 import { issueParentTokens } from "../services/session";
 import { sendParentInvite } from "../services/email";
+import { parseJsonOrThrow } from "../services/jsonParse";
 import {
   getFamily,
   updateFamilySettings,
@@ -20,6 +22,12 @@ import { emailInUse, getUserById } from "../repo/auth";
 
 /** Uitnodiging blijft 7 dagen geldig (tot de tweede ouder een wachtwoord zet). */
 const PARENT_INVITE_TTL = 7 * 24 * 3600;
+
+const ParentInvitePayload = z.object({
+  familyId: z.string().min(1),
+  userId: z.string().min(1),
+});
+
 
 const families = new Hono<AppBindings>();
 
@@ -118,7 +126,9 @@ parentAccept.post("/parents/accept", validate("json", ParentAcceptBody), async (
   if (!raw) {
     throw new ApiException(400, ErrorCodes.INVALID_INVITE, "Deze uitnodiging is ongeldig of verlopen.");
   }
-  const { familyId, userId } = JSON.parse(raw) as { familyId: string; userId: string };
+  const { familyId, userId } = parseJsonOrThrow(raw, ParentInvitePayload, () => {
+    throw new ApiException(400, ErrorCodes.INVALID_INVITE, "Deze uitnodiging is ongeldig of verlopen.");
+  });
 
   const activated = await activatePendingParent(c.env.DB, familyId, userId, {
     passwordHash: await hashSecret(password),
@@ -130,10 +140,14 @@ parentAccept.post("/parents/accept", validate("json", ParentAcceptBody), async (
   }
 
   const user = await getUserById(c.env.DB, userId);
+  const permissions =
+    user && typeof user.permissions === "string" && (user.permissions === "full" || user.permissions === "approve_only")
+      ? user.permissions
+      : "approve_only";
   const tokens = await issueParentTokens(c.env.DB, c.env.JWT_SECRET, {
     id: userId,
     family_id: familyId,
-    permissions: (user?.permissions as string) ?? "approve_only",
+    permissions,
   });
   return c.json({ familyId, userId, ...tokens });
 });

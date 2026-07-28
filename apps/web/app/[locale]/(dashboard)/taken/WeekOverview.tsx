@@ -10,7 +10,10 @@ import {
   type TaskView,
 } from "../../../../lib/api/types";
 import { addDays, mondayOfWeek, weekRange } from "../../../../lib/taken/dates";
+import { useRealtimeRefetch } from "../../../../lib/realtime/FamilyRealtimeContext";
+import { WEEK_REALTIME_EVENTS } from "../../../../lib/realtime/events";
 import { Alert } from "../../../../components/ui";
+import WeekPlannerGrid, { WeekPlannerAlert, useWeekMove } from "./WeekPlannerGrid";
 
 const fieldClass =
   "rounded border border-border bg-bg px-2 py-1.5 text-sm outline-none focus:border-accent";
@@ -41,20 +44,6 @@ async function fetchWeekInstances(
   return all;
 }
 
-function statusTone(status: InstanceView["status"]): string {
-  switch (status) {
-    case "approved":
-    case "completed":
-      return "bg-accent/10 text-accent";
-    case "submitted":
-      return "bg-accent/15 text-accent";
-    case "open_redo":
-      return "border border-border text-muted";
-    default:
-      return "border border-border text-text";
-  }
-}
-
 export default function WeekOverview({ children, tasks, onEditTask }: Props) {
   const t = useTranslations("taken");
   const tw = useTranslations("taken.week");
@@ -66,9 +55,14 @@ export default function WeekOverview({ children, tasks, onEditTask }: Props) {
 
   const range = useMemo(() => weekRange(weekStart), [weekStart]);
 
-  const childName = useCallback(
-    (id: string) => children.find((c) => c.id === id)?.displayName ?? "—",
+  const childMembers = useMemo(
+    () => children.filter((m) => m.role === "child"),
     [children],
+  );
+
+  const visibleChildren = useMemo(
+    () => (childFilter ? childMembers.filter((c) => c.id === childFilter) : childMembers),
+    [childFilter, childMembers],
   );
 
   const load = useCallback(async () => {
@@ -90,19 +84,18 @@ export default function WeekOverview({ children, tasks, onEditTask }: Props) {
     void load();
   }, [load]);
 
-  const byDate = useMemo(() => {
-    const map = new Map<string, InstanceView[]>();
-    for (const day of range.days) {
-      map.set(day, []);
-    }
-    for (const inst of instances ?? []) {
-      const list = map.get(inst.date);
-      if (list) list.push(inst);
-    }
-    return map;
-  }, [instances, range.days]);
+  useRealtimeRefetch(WEEK_REALTIME_EVENTS, load);
+
+  const { move, error: moveError, moving } = useWeekMove(setInstances);
 
   const weekLabel = `${range.from} – ${range.to}`;
+
+  const handleEditTask = useCallback(
+    (taskId: string) => {
+      if (tasks.some((tsk) => tsk.id === taskId)) onEditTask(taskId);
+    },
+    [onEditTask, tasks],
+  );
 
   return (
     <div>
@@ -132,6 +125,7 @@ export default function WeekOverview({ children, tasks, onEditTask }: Props) {
             →
           </button>
           <span className="text-sm font-medium text-text">{weekLabel}</span>
+          {moving && <span className="text-xs text-muted">{tw("moving")}</span>}
         </div>
 
         <label className="flex items-center gap-2 text-sm text-text">
@@ -142,7 +136,7 @@ export default function WeekOverview({ children, tasks, onEditTask }: Props) {
             className={fieldClass}
           >
             <option value="">{tw("allChildren")}</option>
-            {children.map((child) => (
+            {childMembers.map((child) => (
               <option key={child.id} value={child.id}>
                 {child.displayName}
               </option>
@@ -157,6 +151,8 @@ export default function WeekOverview({ children, tasks, onEditTask }: Props) {
         </div>
       )}
 
+      <WeekPlannerAlert message={moveError} />
+
       {instances === null && !failed && (
         <p className="mt-4 text-sm text-muted">{t("loading")}</p>
       )}
@@ -165,65 +161,15 @@ export default function WeekOverview({ children, tasks, onEditTask }: Props) {
         <p className="mt-4 text-sm text-muted">{tw("empty")}</p>
       )}
 
-      {instances !== null && instances.length > 0 && (
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[640px] border-collapse text-left text-sm">
-            <thead>
-              <tr>
-                {range.days.map((day) => {
-                  const d = new Date(`${day}T12:00:00`);
-                  const weekday = d.toLocaleDateString(undefined, { weekday: "short" });
-                  return (
-                    <th
-                      key={day}
-                      className="border-b border-border px-2 py-2 font-medium text-muted"
-                    >
-                      <div>{weekday}</div>
-                      <div className="text-xs font-normal">{day.slice(5)}</div>
-                    </th>
-                  );
-                })}
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                {range.days.map((day) => (
-                  <td
-                    key={day}
-                    className="align-top border-b border-border px-1 py-2"
-                  >
-                    <ul className="flex flex-col gap-1.5">
-                      {(byDate.get(day) ?? []).map((inst) => {
-                        const taskExists = tasks.some((tsk) => tsk.id === inst.taskId);
-                        return (
-                          <li key={inst.id}>
-                            <button
-                              type="button"
-                              disabled={!taskExists}
-                              onClick={() => onEditTask(inst.taskId)}
-                              className={
-                                "w-full rounded px-2 py-1.5 text-left text-xs transition-colors " +
-                                (taskExists
-                                  ? "cursor-pointer hover:bg-bg"
-                                  : "cursor-default opacity-60") +
-                                " " +
-                                statusTone(inst.status)
-                              }
-                            >
-                              <span className="block font-medium">{inst.title}</span>
-                              <span className="block text-[11px] opacity-80">
-                                {childName(inst.childId)} · {tw(`status.${inst.status}`)}
-                              </span>
-                            </button>
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </td>
-                ))}
-              </tr>
-            </tbody>
-          </table>
+      {instances !== null && instances.length > 0 && visibleChildren.length > 0 && !failed && (
+        <div className="mt-4">
+          <WeekPlannerGrid
+            childMembers={visibleChildren}
+            days={range.days}
+            instances={instances}
+            onEditTask={handleEditTask}
+            onMove={move}
+          />
         </div>
       )}
     </div>

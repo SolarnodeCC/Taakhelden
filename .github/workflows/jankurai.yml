@@ -17,11 +17,9 @@ name: Jankurai (regression gate)
 #
 # Bekende valse-positieve categorieën in de huidige score (geverifieerd bij
 # het leggen van de baseline, geen echte bugs):
-#   - `stub.fetch(...)` (Durable Object binding, Cloudflare-idioom) wordt
-#     gelezen als een "vibe-coding stub/placeholder"-marker.
 #   - Whitelisted-column dynamic UPDATE (`SET ${sets.join(", ")}` met alleen
-#     gebonden `?`-waarden, zie apps/api/src/repo/{tasks,families}.ts) wordt
-#     gelezen als "raw command SQL" / injection-risico.
+#     gebonden `?`-waarden, zie apps/api/src/repo/tasks.ts) wordt gelezen als
+#     "raw command SQL" / injection-risico.
 #   - `JSON.parse(...) as T` na een D1-read wordt als ongevalideerde any-cast
 #     geflagged, ook waar een handmatige guard er meteen achteraan staat.
 # Een regressiemelding op exact deze patronen is vermoedelijk ruis, niet een
@@ -42,7 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           fetch-depth: 0 # ratchet-vergelijking heeft git-historie nodig
 

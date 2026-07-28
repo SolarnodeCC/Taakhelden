@@ -1,5 +1,6 @@
 import { Hono } from "hono";
-import { TaskBody, TaskPatchBody, ErrorCodes } from "@taakhelden/shared";
+import { TaskBody, TaskPatchBody, ErrorCodes, Recurrence } from "@taakhelden/shared";
+import { z } from "zod";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
@@ -8,8 +9,20 @@ import { listTasks, getTask, createTask, updateTask, archiveTask } from "../repo
 import { getFamily } from "../repo/families";
 import { generateInstancesForFamily } from "../services/taskEngine";
 import { localDate } from "../services/time";
+import { parseJsonColumn } from "../services/jsonParse";
 
 const tasks = new Hono<AppBindings>();
+const StringIdList = z.array(z.string().min(1));
+
+function asRow(row: unknown): Record<string, unknown> {
+  if (!row || typeof row !== "object") return {};
+  return row as Record<string, unknown>;
+}
+
+function timezoneOf(family: unknown): string {
+  const row = asRow(family);
+  return typeof row.timezone === "string" ? row.timezone : "Europe/Amsterdam";
+}
 
 function taskView(row: Record<string, unknown>) {
   return {
@@ -20,9 +33,9 @@ function taskView(row: Record<string, unknown>) {
     points: row.points,
     photoBonusPoints: row.photo_bonus_points,
     approvalRequired: Boolean(row.approval_required),
-    assignees: JSON.parse((row.assignees as string) ?? "[]"),
-    rotation: row.rotation ? JSON.parse(row.rotation as string) : null,
-    recurrence: row.recurrence ? JSON.parse(row.recurrence as string) : null,
+    assignees: parseJsonColumn(row.assignees, StringIdList, []),
+    rotation: row.rotation ? parseJsonColumn(row.rotation, StringIdList, null) : null,
+    recurrence: row.recurrence ? parseJsonColumn(row.recurrence, Recurrence, null) : null,
     daypart: row.daypart ?? null,
     activeFrom: row.active_from ?? null,
     activeUntil: row.active_until ?? null,
@@ -32,7 +45,7 @@ function taskView(row: Record<string, unknown>) {
 tasks.get("/", async (c) => {
   const { familyId } = requireParent(c);
   const rows = await listTasks(c.env.DB, familyId);
-  return c.json(rows.results.map((r) => taskView(r as Record<string, unknown>)));
+  return c.json(rows.results.map((r) => taskView(asRow(r))));
 });
 
 tasks.post("/", validate("json", TaskBody), async (c) => {
@@ -40,15 +53,15 @@ tasks.post("/", validate("json", TaskBody), async (c) => {
   const body = c.req.valid("json");
 
   const family = await getFamily(c.env.DB, familyId);
-  const today = localDate((family?.timezone as string) ?? "Europe/Amsterdam");
+  const today = localDate(timezoneOf(family));
   // activeFrom default = vandaag, zodat eenmalige taken meteen een dag hebben.
   const id = await createTask(c.env.DB, familyId, { ...body, activeFrom: body.activeFrom ?? today });
 
   // Vandaag al aan de beurt? Dan meteen instances aanmaken — niet wachten op de nachtelijke cron.
-  await generateInstancesForFamily(c.env.DB, familyId, family as { vacation_mode?: unknown }, today);
+  await generateInstancesForFamily(c.env.DB, familyId, asRow(family), today);
 
   const row = await getTask(c.env.DB, familyId, id);
-  return c.json(taskView(row as Record<string, unknown>), 201);
+  return c.json(taskView(asRow(row)), 201);
 });
 
 tasks.patch("/:id", validate("json", TaskPatchBody), async (c) => {
@@ -61,7 +74,7 @@ tasks.patch("/:id", validate("json", TaskPatchBody), async (c) => {
   // Werkt alleen door op toekomstige instances; bestaande punten blijven staan.
   await updateTask(c.env.DB, familyId, taskId, c.req.valid("json"));
   const row = await getTask(c.env.DB, familyId, taskId);
-  return c.json(taskView(row as Record<string, unknown>));
+  return c.json(taskView(asRow(row)));
 });
 
 tasks.delete("/:id", async (c) => {

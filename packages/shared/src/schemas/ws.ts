@@ -27,6 +27,7 @@ export const WsInstanceUpdatedData = z.object({
   instanceId: z.string(),
   status: z.string(),
   childId: z.string(),
+  date: z.string().optional(),
   photoStatus: z.string().optional(),
 });
 export type WsInstanceUpdatedData = z.infer<typeof WsInstanceUpdatedData>;

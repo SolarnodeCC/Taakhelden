@@ -150,16 +150,22 @@ export async function familyUserIds(db: D1Database, familyId: string): Promise<s
  */
 export async function purgeFamilyD1(db: D1Database, familyId: string): Promise<void> {
   const scoped = (sql: string) => db.prepare(sql).bind(familyId);
-  const childScope = "child_id IN (SELECT id FROM users WHERE family_id = ?)";
-  const userScope = "user_id IN (SELECT id FROM users WHERE family_id = ?)";
   await db.batch([
     scoped("UPDATE users SET consent_by = NULL WHERE family_id = ?"),
-    scoped(`DELETE FROM child_badges WHERE ${childScope}`),
-    scoped(`DELETE FROM pinned_rewards WHERE ${childScope}`),
-    scoped(`DELETE FROM refresh_tokens WHERE ${userScope}`),
+    scoped(
+      "DELETE FROM child_badges WHERE child_id IN (SELECT id FROM users WHERE family_id = ?)",
+    ),
+    scoped(
+      "DELETE FROM pinned_rewards WHERE child_id IN (SELECT id FROM users WHERE family_id = ?)",
+    ),
+    scoped(
+      "DELETE FROM refresh_tokens WHERE user_id IN (SELECT id FROM users WHERE family_id = ?)",
+    ),
     scoped("DELETE FROM child_device_sessions WHERE family_id = ?"),
-    scoped(`DELETE FROM devices WHERE ${userScope}`),
-    scoped(`DELETE FROM idempotency_keys WHERE ${userScope}`),
+    scoped("DELETE FROM devices WHERE user_id IN (SELECT id FROM users WHERE family_id = ?)"),
+    scoped(
+      "DELETE FROM idempotency_keys WHERE user_id IN (SELECT id FROM users WHERE family_id = ?)",
+    ),
     scoped("DELETE FROM account_exports WHERE family_id = ?"),
     scoped("DELETE FROM photos WHERE family_id = ?"),
     scoped("DELETE FROM redemptions WHERE family_id = ?"),

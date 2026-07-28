@@ -21,11 +21,15 @@ export async function listCatalogue(db: D1Database): Promise<BadgeRow[]> {
 
 export async function getBadges(db: D1Database, ids: string[]): Promise<BadgeRow[]> {
   if (ids.length === 0) return [];
-  const placeholders = ids.map(() => "?").join(",");
-  const { results } = await db
-    .prepare(`SELECT id, title, description, icon FROM badges WHERE id IN (${placeholders})`)
-    .bind(...ids)
-    .all<BadgeRow>();
+  const unique = [...new Set(ids)];
+  const results: BadgeRow[] = [];
+  for (const id of unique) {
+    const row = await db
+      .prepare("SELECT id, title, description, icon FROM badges WHERE id = ?")
+      .bind(id)
+      .first<BadgeRow>();
+    if (row) results.push(row);
+  }
   return results;
 }
 

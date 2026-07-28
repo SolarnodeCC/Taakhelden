@@ -9,6 +9,8 @@ export const APPROVAL_REALTIME_EVENTS: WsServerEvent[] = ["instance.updated"];
 
 export const SHOP_REALTIME_EVENTS: WsServerEvent[] = ["redemption.created", "redemption.updated"];
 
+export const WEEK_REALTIME_EVENTS: WsServerEvent[] = ["instance.updated"];
+
 /** Events the web dashboard reacts to; badge.earned is parsed but not surfaced. */
 export function isActionableRealtimeEvent(event: WsServerEvent): boolean {
   return event !== "badge.earned";

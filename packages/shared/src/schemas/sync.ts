@@ -26,3 +26,13 @@ export const SyncBody = z.object({
 export type SyncBody = z.infer<typeof SyncBody>;
 
 export const SyncResultStatus = z.enum(["applied", "rejected"]);
+
+export const SyncResult = z.object({
+  key: z.string().min(1),
+  status: SyncResultStatus,
+  points: z.number().optional(),
+  newBalance: z.number().optional(),
+  code: z.string().optional(),
+  message: z.string().optional(),
+});
+export type SyncResult = z.infer<typeof SyncResult>;

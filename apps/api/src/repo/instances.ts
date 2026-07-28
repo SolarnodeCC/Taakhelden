@@ -21,6 +21,61 @@ export async function getInstance(db: D1Database, familyId: string, instanceId: 
     .first<InstanceRow>();
 }
 
+/** Instance met taakinfo (zelfde join als listForDate) voor move-response. */
+export async function getInstanceWithTask(db: D1Database, familyId: string, instanceId: string) {
+  return db
+    .prepare(
+      `SELECT i.*, t.title, t.icon, t.category, t.points AS task_points,
+              t.photo_bonus_points, t.approval_required, t.daypart,
+              (SELECT p.id FROM photos p
+                 WHERE p.family_id = i.family_id AND p.ref_id = i.id
+                   AND p.purpose = 'task' AND p.status = 'ready'
+                 ORDER BY p.created_at DESC LIMIT 1) AS photo_id
+       FROM task_instances i JOIN tasks t ON t.id = i.task_id
+       WHERE i.family_id = ? AND i.id = ?`,
+    )
+    .bind(familyId, instanceId)
+    .first<Record<string, unknown>>();
+}
+
+/** Of er al een instance bestaat voor task+kind+datum (exclusief huidige id). */
+export async function hasInstanceSlot(
+  db: D1Database,
+  familyId: string,
+  taskId: string,
+  childId: string,
+  date: string,
+  excludeInstanceId: string,
+) {
+  const row = await db
+    .prepare(
+      `SELECT 1 FROM task_instances
+       WHERE family_id = ? AND task_id = ? AND child_id = ? AND date = ? AND id != ?
+       LIMIT 1`,
+    )
+    .bind(familyId, taskId, childId, date, excludeInstanceId)
+    .first();
+  return Boolean(row);
+}
+
+/** Wijzigt datum en/of kind; alleen open/open_redo. Retourneert of er een rij is bijgewerkt. */
+export async function moveInstance(
+  db: D1Database,
+  familyId: string,
+  instanceId: string,
+  target: { date: string; childId: string },
+) {
+  const result = await db
+    .prepare(
+      `UPDATE task_instances
+       SET date = ?, child_id = ?
+       WHERE family_id = ? AND id = ? AND status IN ('open', 'open_redo')`,
+    )
+    .bind(target.date, target.childId, familyId, instanceId)
+    .run();
+  return (result.meta.changes ?? 0) > 0;
+}
+
 /** Instances van één dag, met taakinfo erbij (titel/punten/daypart voor de UI). */
 export async function listForDate(db: D1Database, familyId: string, date: string, childId?: string) {
   const base = `

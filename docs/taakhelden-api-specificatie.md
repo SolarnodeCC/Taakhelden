@@ -125,6 +125,7 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 | `POST /instances/{id}/approve` | parent | Goedkeuren → punten definitief in ledger, push naar kind. |
 | `POST /instances/{id}/redo` | parent | `{note}`: vriendelijke toelichting, terug naar `open_redo`. **Geen puntenaftrek.** |
 | `POST /instances/{id}/undo` | child (eigen, < 5 min) | Oeps-knop: afvinken ongedaan maken zolang niet goedgekeurd. |
+| `POST /instances/{id}/move` | parent (`full`) | Instance verplaatsen naar `{ date, childId }`. Alleen `open` / `open_redo`. `Idempotency-Key` verplicht. Geen ledger-wijziging. 409 `INSTANCE_SLOT_TAKEN` bij bezette doelslot. |
 
 **Statusmachine:** `open → completed | submitted → approved → (punten in ledger)` en `submitted → open_redo → submitted`. Zonder `approvalRequired` gaat `complete` direct naar `approved`.
 

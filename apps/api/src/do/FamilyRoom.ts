@@ -22,6 +22,7 @@ import {
 } from "../services/pointsEngine";
 import { notifyChild, notifyParents, memberName, childCopy, parentCopy } from "../services/notifier";
 import { processSyncBatch } from "../services/syncService";
+import { applyMoveInstance } from "../services/instanceService";
 import type { SyncMutation, CompleteResult } from "@taakhelden/shared";
 
 interface MutationBody {
@@ -29,12 +30,13 @@ interface MutationBody {
   instanceId?: string;
   actor: Actor;
   note?: string;
-  childId?: string;
-  amount?: number;
-  rewardId?: string;
-  redemptionId?: string;
-  photoId?: string;
-  mutations?: SyncMutation[];
+    childId?: string;
+    amount?: number;
+    rewardId?: string;
+    redemptionId?: string;
+    photoId?: string;
+    date?: string;
+    mutations?: SyncMutation[];
   since?: string;
   idempotencyKey?: string;
 }
@@ -200,6 +202,17 @@ export class FamilyRoom implements DurableObject {
         });
         this.broadcast("points.changed", { childId: body.childId, newBalance });
         return { newBalance };
+      }
+      case "/move": {
+        const { view, status, childId, date } = await applyMoveInstance(
+          db,
+          familyId,
+          body.instanceId!,
+          actor,
+          { date: body.date!, childId: body.childId! },
+        );
+        this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId, date });
+        return view;
       }
       default:
         throw new ApiException(404, "NOT_FOUND", "Onbekende mutatie.");

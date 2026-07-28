@@ -172,6 +172,11 @@
       "allChildren": "Whole family",
       "loadError": "Couldn't load the week overview.",
       "empty": "Nothing planned this week.",
+      "dragHint": "Drag an open task to another day or another child.",
+      "moveError": "Couldn't move the task. Please try again.",
+      "slotTaken": "This child already has that task on this day.",
+      "notMovable": "This task can no longer be moved.",
+      "moving": "Moving…",
       "status": {
         "open": "open",
         "completed": "done",

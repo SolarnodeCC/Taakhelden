@@ -17,8 +17,8 @@ sync.post("/", validate("json", SyncBody), async (c) => {
   const actor: Actor = { userId, role };
   const body = c.req.valid("json");
 
-  const stub = c.env.FAMILY_DO.get(c.env.FAMILY_DO.idFromName(familyId));
-  const res = await stub.fetch("https://family-room.internal/sync", {
+  const familyRoom = c.env.FAMILY_DO.get(c.env.FAMILY_DO.idFromName(familyId));
+  const res = await familyRoom.fetch("https://family-room.internal/sync", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ familyId, actor, mutations: body.mutations, since: body.since }),
