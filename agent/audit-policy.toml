@@ -2,7 +2,7 @@
 #
 # Tuned down from the tool's own defaults (minimum_score=85,
 # fail_on=["critical","high"]) because this repo's *current* baseline score is
-# 46 with 78 critical/high findings — a mix of real, low-severity nudges (see
+# 47 with 76 critical/high findings — a mix of real, low-severity nudges (see
 # .github/workflows/jankurai.yml's comment: unvalidated JSON.parse-as-cast in
 # several apps/api files) and confirmed heuristic false positives (Durable
 # Object `.stub` calls read as "vibe-coding stub" markers; whitelisted-column
