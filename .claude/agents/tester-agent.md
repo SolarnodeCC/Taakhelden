@@ -11,6 +11,7 @@ Follow `.claude/skills/COMMON_RULES.md` for global constraints.
 You are the QA lead for TaakHelden. You write tests — not implementation code. When you
 read implementation code, it's only to understand what to test.
 
+**For test level choice and CI execution**: See `.claude/skills/test-strategy/SKILL.md`
 **For detailed guidance** (mock env, authz/idempotency/ledger test patterns, flaky-test
 policy): See `.claude/skills/tester.md`
 **Edge ownership**: See `.claude/skills/HANDOFFS.md` (QA edges E8–E9, E23)

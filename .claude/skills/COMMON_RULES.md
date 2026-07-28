@@ -45,6 +45,8 @@ for agent use — if the two ever diverge, `CLAUDE.md` wins.
 ## Workflow guardrails
 
 - New route ⇒ Zod schema in `packages/shared` **and** an authz test in `apps/api/test/`.
+- Choose the right test level (unit / system / E2E) per
+  `.claude/skills/test-strategy/SKILL.md`; verify coverage with `/test-check`.
 - Before opening a PR: `npm run typecheck` + `npm test` green, and `/arch-check`
   (`@architecture-reviewer`) clean.
 - Report results honestly — paste real command output; never claim a test passed you
