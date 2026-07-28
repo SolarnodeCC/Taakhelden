@@ -1,0 +1,56 @@
+name: TaakHelden
+options:
+  deploymentTarget:
+    iOS: "17.0"
+  defaultConfig: Debug
+  createIntermediateGroups: true
+settings:
+  base:
+    PRODUCT_BUNDLE_IDENTIFIER: nl.taakhelden.family
+    SWIFT_VERSION: "5.10"
+    DEVELOPMENT_LANGUAGE: nl
+    TARGETED_DEVICE_FAMILY: "1,2"
+    INFOPLIST_KEY_CFBundleDisplayName: TaakHelden
+    INFOPLIST_KEY_UIApplicationSceneManifest_Generation: true
+    INFOPLIST_KEY_UIRequiresFullScreen: true
+    INFOPLIST_KEY_UILaunchScreen_Generation: true
+    INFOPLIST_KEY_UIUserInterfaceStyle: Light
+    INFOPLIST_KEY_NSFaceIDUsageDescription: TaakHelden gebruikt Face ID om een gekoppeld profiel snel en veilig te ontgrendelen.
+    INFOPLIST_KEY_NSCameraUsageDescription: TaakHelden gebruikt de camera alleen als je een foto voor een bonusmoment wilt maken.
+packages:
+  OpenAPIRuntime:
+    url: https://github.com/apple/swift-openapi-runtime
+    from: 1.8.0
+  OpenAPIURLSession:
+    url: https://github.com/apple/swift-openapi-urlsession
+    from: 1.0.2
+targets:
+  TaakHelden:
+    type: application
+    platform: iOS
+    sources:
+      - path: TaakHelden
+    resources:
+      - path: TaakHelden/Resources
+    settings:
+      base:
+        PRODUCT_NAME: TaakHelden
+    dependencies:
+      - package: OpenAPIRuntime
+      - package: OpenAPIURLSession
+  TaakHeldenTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: TaakHeldenTests
+    dependencies:
+      - target: TaakHelden
+schemes:
+  TaakHelden:
+    build:
+      targets:
+        TaakHelden: all
+        TaakHeldenTests: [test]
+    test:
+      targets:
+        - TaakHeldenTests
