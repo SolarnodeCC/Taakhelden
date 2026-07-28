@@ -11,6 +11,10 @@ import {
   type TaskFormPayload,
 } from "../../../../lib/api/types";
 import { useRouter } from "../../../../i18n/navigation";
+import {
+  FullParentForbidden,
+  useRequireFullParent,
+} from "../../../../lib/auth/RequireFullParent";
 import { Button } from "../../../../components/ui";
 import TaskForm from "./TaskForm";
 
@@ -88,6 +92,7 @@ function TaskRow({
 export default function TakenClient() {
   const t = useTranslations("taken");
   const router = useRouter();
+  const gate = useRequireFullParent();
   const [tasks, setTasks] = useState<TaskView[] | null>(null);
   const [children, setChildren] = useState<MemberView[]>([]);
   const [failed, setFailed] = useState(false);
@@ -111,13 +116,22 @@ export default function TakenClient() {
   }, [router]);
 
   useEffect(() => {
+    if (gate !== "ok") return;
     void load();
-  }, [load]);
+  }, [gate, load]);
 
   const childName = useCallback(
     (id: string) => children.find((c) => c.id === id)?.displayName ?? "—",
     [children],
   );
+
+  if (gate === "forbidden") {
+    return <FullParentForbidden />;
+  }
+
+  if (gate === "loading") {
+    return <p className="text-sm text-muted">{t("loading")}</p>;
+  }
 
   async function submit(payload: TaskFormPayload) {
     if (form?.mode === "edit") {

@@ -30,7 +30,28 @@
         "VALIDATION_FAILED": "Please check that all fields look right (password at least 10 characters).",
         "generic": "Something went wrong while creating your account. Please try again in a bit."
       }
+    },
+    "accept": {
+      "intro": "You've been invited as a caregiver. Choose a password to join.",
+      "loading": "Loading…",
+      "displayName": "First name (optional)",
+      "displayNameHint": "Leave blank to keep the name from the invite.",
+      "password": "Password",
+      "passwordHint": "At least 8 characters.",
+      "submit": "Accept invitation",
+      "submitting": "Working…",
+      "missingToken": "This link is missing an invitation. Ask the other parent to send a new one.",
+      "loginLink": "Go to sign in",
+      "errors": {
+        "INVALID_INVITE": "This invitation has expired or already been used — ask the other parent for a new one.",
+        "VALIDATION_FAILED": "Check your password (at least 8 characters) and try again.",
+        "generic": "Something went wrong. Please try again in a bit."
+      }
     }
+  },
+  "guards": {
+    "forbidden": "This page is only for parents with full access.",
+    "backToToday": "Back to Today"
   },
   "nav": {
     "vandaag": "Today",
@@ -205,10 +226,57 @@
     },
     "parents": {
       "title": "Parents & caregivers",
+      "empty": "No caregivers loaded yet.",
       "permissions": {
         "full": "full access",
         "approve_only": "approvals only"
       }
+    },
+    "inviteParent": {
+      "title": "Invite a co-parent",
+      "hint": "Send an invitation by email. Share the link below if the email doesn't arrive.",
+      "email": "Email address",
+      "permissionsLabel": "Permissions",
+      "permissions": {
+        "approve_only": "Approvals only",
+        "approve_onlyHint": "Sees Today and Approvals.",
+        "full": "Full access",
+        "fullHint": "Can also manage Tasks, Shop, and Family."
+      },
+      "submit": "Send invitation",
+      "submitting": "Working…",
+      "success": "Invitation ready for {name}.",
+      "shareHint": "Share this link if the email doesn't arrive:",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "errors": {
+        "EMAIL_IN_USE": "This email is already in use on TaakHelden.",
+        "VALIDATION_FAILED": "Please enter a valid email address.",
+        "FORBIDDEN": "Only parents with full access can invite.",
+        "generic": "Couldn't send the invitation. Please try again."
+      }
+    },
+    "settings": {
+      "title": "Family settings",
+      "hint": "Name, timezone, quiet hours, bonuses, and vacation mode.",
+      "name": "Family name",
+      "timezone": "Timezone",
+      "timezoneFilter": "Search timezone…",
+      "quietStart": "Quiet hours from",
+      "quietEnd": "Quiet hours until",
+      "quietHint": "We won't send push notifications during this period.",
+      "dayBonus": "Day bonus (points)",
+      "weekBonus": "Week bonus (points)",
+      "weekThreshold": "Week threshold (%)",
+      "bonusHint": "Threshold is the share of completed tasks for the week bonus (50–100%).",
+      "vacation": "Vacation mode",
+      "vacationHint": "Pauses streaks and bonuses while this is on.",
+      "save": "Save settings",
+      "saving": "Saving…",
+      "saved": "Settings saved.",
+      "errorValidation": "Please check the fields and try again.",
+      "errorSave": "Couldn't save. Please try again.",
+      "errorForbidden": "Only full access can change settings."
     },
     "form": {
       "createTitle": "Add child",

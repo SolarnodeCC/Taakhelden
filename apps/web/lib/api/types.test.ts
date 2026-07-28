@@ -1,6 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { CreateChildBody, RegisterBody } from "@taakhelden/shared";
-import { FamilyView, InviteCodeResult, MemberList, ParentTodayView } from "./types";
+import {
+  CreateChildBody,
+  FamilyPatchBody,
+  InviteParentBody,
+  ParentAcceptBody,
+  RegisterBody,
+} from "@taakhelden/shared";
+import {
+  FamilyView,
+  InviteCodeResult,
+  InviteParentResult,
+  MemberList,
+  ParentTodayView,
+} from "./types";
 import { AVATAR_PLACEHOLDERS, avatarEmoji } from "../avatars";
 
 const parentTodayResponse = {
@@ -129,5 +141,68 @@ describe("Batch 7 schemas", () => {
     expect(AVATAR_PLACEHOLDERS.length).toBeGreaterThanOrEqual(5);
     expect(avatarEmoji("fox")).toBe("🦊");
     expect(avatarEmoji(null)).toBeNull();
+  });
+});
+
+describe("Batch 8 schemas", () => {
+  it("parses FamilyView with settings fields", () => {
+    const parsed = FamilyView.parse({
+      id: "fam_1",
+      name: "Jansen",
+      timezone: "Europe/Amsterdam",
+      inviteCode: "AB12CD",
+      quietStart: "19:30",
+      quietEnd: "07:00",
+      dayBonusPoints: 20,
+      weekBonusPoints: 100,
+      weekBonusThreshold: 0.8,
+      vacationMode: false,
+    });
+    expect(parsed.vacationMode).toBe(false);
+    expect(parsed.weekBonusThreshold).toBe(0.8);
+  });
+
+  it("parses FamilyPatchBody partial", () => {
+    const parsed = FamilyPatchBody.parse({
+      name: "Familie de Vries",
+      vacationMode: true,
+      weekBonusThreshold: 0.5,
+    });
+    expect(parsed.vacationMode).toBe(true);
+    expect(parsed.weekBonusThreshold).toBe(0.5);
+  });
+
+  it("rejects weekBonusThreshold below 0.5", () => {
+    expect(() => FamilyPatchBody.parse({ weekBonusThreshold: 0.4 })).toThrow();
+  });
+
+  it("parses InviteParentBody with default permissions", () => {
+    const parsed = InviteParentBody.parse({ email: "opa@example.nl" });
+    expect(parsed.permissions).toBe("approve_only");
+  });
+
+  it("parses InviteParentResult", () => {
+    const parsed = InviteParentResult.parse({
+      userId: "usr_1",
+      email: "opa@example.nl",
+      permissions: "full",
+      inviteToken: "tok_abc",
+    });
+    expect(parsed.inviteToken).toBe("tok_abc");
+  });
+
+  it("parses ParentAcceptBody with min password 8", () => {
+    const parsed = ParentAcceptBody.parse({
+      token: "tok_abc",
+      password: "achttekens",
+      displayName: "Opa",
+    });
+    expect(parsed.displayName).toBe("Opa");
+  });
+
+  it("rejects short passwords on ParentAcceptBody", () => {
+    expect(() =>
+      ParentAcceptBody.parse({ token: "tok_abc", password: "kort" }),
+    ).toThrow();
   });
 });
