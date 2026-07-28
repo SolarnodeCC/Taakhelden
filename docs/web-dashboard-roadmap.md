@@ -44,5 +44,5 @@ nog geen apart batch-nummer voor:
 | 8 | Co-ouder + gezinsinstellingen | Done |
 | 9 | Taken-verdieping (templates, weekoverzicht) | Done |
 | 10 | Notificaties + punten + privacy/AVG | Done |
-| 11 | Realtime WebSocket | Plan — [web-batch-11-plan.md](./web-batch-11-plan.md) |
+| 11 | Realtime WebSocket (Vandaag, Goedkeuren, Winkel) | Plan — [web-batch-11-plan.md](./web-batch-11-plan.md) |
 | 12 | Weekplanner drag-drop (voorstel) | Nog geen plan; vereist API-contract |

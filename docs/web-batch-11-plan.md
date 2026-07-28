@@ -20,14 +20,15 @@ gezinsbeheer-dashboard + bestaande Vandaag/Goedkeuren-pagina's).
 | 8 | **Co-ouder** + **gezinsinstellingen** + route-guards | Done |
 | 9 | **Taken-verdieping** (templates, roulatie, weekoverzicht) | Done |
 | 10 | **Notificaties** + **punten/ledger** + **privacy/AVG** | Done |
-| **11** | **Realtime** (FamilyRoom WebSocket-client) | Dit plan |
+| **11** | **Realtime** (FamilyRoom WS: Vandaag, Goedkeuren, Winkel) | Dit plan |
 
 Na Batch 10 is het ouder-dashboard functioneel compleet voor setup, privacy en
 dagelijks beheer. Wat product §3.1 / architectuurdoc §3 belooft maar de web-UI
 nog mist:
 
-- **Realtime updates** op Vandaag en Goedkeuren wanneer een kind een taak afvinkt
-  of indient — zonder handmatig verversen of tight-polling.
+- **Realtime updates** op Vandaag, Goedkeuren en Winkel wanneer kinderen taken
+  afvinken, indienen of beloningen kopen — zonder handmatig verversen of
+  tight-polling.
 
 De API is hiervoor **volledig klaar**:
 
@@ -47,10 +48,11 @@ reageert live op kind-acties.
 
 1. **Gedeelde WS-client** — één verbinding per ingelogde ouder-sessie in de
    dashboard-shell; reconnect met backoff; geen tight-polling.
-2. **Vandaag** — bij relevante events de dagweergave verversen (statuskolommen +
-   saldo).
+2. **Vandaag** — bij relevante events debounced refetch van `/instances/today`.
 3. **Goedkeuren** — nieuwe `submitted`-items verschijnen automatisch in de queue;
    goedkeuring door co-ouder op ander device verdwijnt uit de queue.
+4. **Winkel** — pending inwisselverzoeken live bij `redemption.created` /
+   `redemption.updated` (zelfde refetch-patroon).
 
 ### Waarom realtime nu, en niet drag-drop / Inzichten
 
@@ -81,11 +83,10 @@ implementeerbaar.
 
 - **Batch 12 — Weekplanner drag-drop**: instance verplaatsen (nieuw API-contract +
   Worker-repo).
-- **Stretch (niet default)**: Winkel live bij `redemption.created` /
-  `redemption.updated`; badge-toasts op Vandaag.
 - **Fase 2 — Inzichten**: statistieken, streaks-dashboard, ouder-analytics.
-- **Niet in deze batch**: WS-proxy via Next.js upgrade-handler (tenzij review
-  BFF-only eist), kind-WS (privacyverbod), SIWA, marketing-landing, push op web.
+- **Niet in deze batch**: `badge.earned`-UI/toasts, WS-proxy via Next.js
+  upgrade-handler (tenzij review BFF-only eist), kind-WS (privacyverbod), SIWA,
+  marketing-landing, push op web.
 
 ## Wat we bouwen
 
@@ -111,7 +112,8 @@ implementeerbaar.
 **Probleem**: `apiClient` praat alleen same-origin met de BFF; de browser moet
 wel naar de Worker upgraden (native WebSocket, geen `Authorization`-header).
 
-**Voorstel (A)** — nieuwe route `POST /api/ws/connect` (server-only):
+**Beslissing (review):** `POST /api/ws/connect` retourneert `{ token, wsUrl }`
+server-afgeleid — geen `NEXT_PUBLIC_*` env.
 
 1. Leest ouder-sessie uit cookies (zelfde patroon als `/api/v1` proxy).
 2. Roept Worker `POST /v1/ws/token` aan met bearer.
@@ -119,8 +121,7 @@ wel naar de Worker upgraden (native WebSocket, geen `Authorization`-header).
    afgeleid van `API_BASE_URL` (`http→ws`, `https→wss`, pad `/v1/ws`).
 4. **Geen** `NEXT_PUBLIC_*` nodig; deployment-URL blijft server-config.
 
-**Alternatief (B)**: alleen bestaande `POST /api/v1/ws/token` proxy + aparte
-`NEXT_PUBLIC_WS_BASE_URL` — minder voorkeur (extra env, URL-lek naar client-config).
+Nieuwe route: `POST /api/ws/connect` (server-only).
 
 ### 3. `useFamilyRealtime` hook + provider
 
@@ -144,8 +145,8 @@ wel naar de Worker upgraden (native WebSocket, geen `Authorization`-header).
 - `approve_only` en `full` mogen verbinden (beide zijn ouder).
 
 **Provider**: `FamilyRealtimeProvider` om `AppShell` heen (of in `layout.tsx`
-client-wrapper), zodat Vandaag/Goedkeuren (en optioneel Winkel) kunnen
-subscriben zonder eigen socket.
+client-wrapper), zodat Vandaag, Goedkeuren en Winkel kunnen subscriben zonder
+eigen socket.
 
 ### 4. Vandaag — live verversen
 
@@ -156,13 +157,9 @@ subscriben zonder eigen socket.
 
 - Extract `loadToday()` (herbruikbare fetch + parse).
 - Subscribe op realtime-context; bij `instance.updated` of `points.changed`:
-  **debounced refetch** (voorstel **300 ms**) van `GET /instances/today`.
-- Rationale: event-payload mist `title`/`icon`/`photoId` — refetch is
-  eenvoudiger en consistenter dan partiële patch (iOS-bouwvoorstel §6.3:
-  “bij reconnect REST-refetch”).
-- Optionele micro-optimalisatie: bij alleen `points.changed` saldo in state
-  patchen (`childId` + `newBalance`) **én** debounced refetch — alleen als het
-  geen extra complexiteit geeft; default = refetch only.
+  **debounced volledige refetch** (**300 ms**) van `GET /instances/today`.
+- **Beslissing (review):** geen partiële state-patch — altijd refetch (simpel,
+  consistent; event-payload mist `title`/`icon`/`photoId`).
 - Bij reconnect (status → `connected`): direct één refetch.
 
 **UX**: geen flitsende skeleton bij refetch als data al geladen is — toon
@@ -192,11 +189,18 @@ bestaande kaarten en vervang stilletjes (loading alleen op eerste load).
 - Geen schuldtaal; dashboard blijft bruikbaar via handmatige refresh (F5) en
   bestaande mutatie-flows.
 
-### 7. Stretch: Winkel (alleen bij tijd over)
+### 7. Winkel — live inwisselverzoeken
 
-- Subscribe op `redemption.created` / `redemption.updated` → debounced refetch
-  van `GET /redemptions?status=pending`.
-- Niet in Definition of Done tenzij review expliciet meeneemt.
+**Huidige staat**: eenmalige load van pending redemptions in `WinkelClient.tsx`.
+
+**Nieuwe gedrag**:
+
+- Subscribe op `redemption.created` / `redemption.updated`.
+- **Debounced volledige refetch** (300 ms) van `GET /redemptions?status=pending`
+  (+ bestaande members-load indien nodig voor kindnamen).
+- Co-ouder die fulfil/cancel doet op ander device → queue van de ander ververst
+  live.
+- `badge.earned` wordt **niet** in de UI getoond (geen toast/badge-overlay).
 
 ## Techniek & conventies
 
@@ -223,7 +227,8 @@ bestaande kaarten en vervang stilletjes (loading alleen op eerste load).
   4. Worker herstart / netwerk uit → backoff + reconnect + refetch.
   5. Uitloggen → socket gesloten, geen errors in console.
   6. `approve_only` ouder: WS werkt; Vandaag/Goedkeuren updaten live.
-  7. Locale EN: statuscopy vertaald.
+  7. Kind koopt beloning → verzoek verschijnt op Winkel van ouder zonder refresh.
+  8. Locale EN: statuscopy vertaald.
 
 ## Definition of done
 
@@ -233,6 +238,8 @@ bestaande kaarten en vervang stilletjes (loading alleen op eerste load).
 - [ ] Reconnect backoff 2/4/8 s; refetch bij reconnect en na events.
 - [ ] Vandaag verversen op `instance.updated` / `points.changed`.
 - [ ] Goedkeuren-queue verversen op `instance.updated` (submitted/approved/redo).
+- [ ] Winkel pending-queue verversen op `redemption.created` / `redemption.updated`.
+- [ ] Geen `badge.earned`-UI (events worden genegeerd of alleen geparsed).
 - [ ] Subtiele verbindingsstatus; geen PII/tokens in logs.
 - [ ] nl + en strings compleet.
 - [ ] `typecheck` + lint + tests groen; CI groen.
@@ -250,33 +257,24 @@ bestaande kaarten en vervang stilletjes (loading alleen op eerste load).
 | 6 | Lang offline (> 30 s) | Rustige offline-indicator; handmatig verversen werkt nog |
 | 7 | Uitloggen | Geen hangende WS; schone login opnieuw |
 | 8 | `approve_only` ouder | Realtime werkt op Vandaag/Goedkeuren |
-| 9 | Locale EN | Statuscopy in het Engels |
+| 9 | Kind koopt beloning; ouder op Winkel | Inwisselverzoek verschijnt live |
+| 10 | Locale EN | Statuscopy in het Engels |
 
-## Open vragen voor review
+## Beslissingen (review afgerond)
 
-1. **BFF vs. public WS-URL**:
-   - **A (voorstel):** `POST /api/ws/connect` retourneert `{ token, wsUrl }`
-     server-afgeleid — geen extra client env.
-   - **B:** `NEXT_PUBLIC_WS_BASE_URL` + bestaande `/api/v1/ws/token` proxy.
-2. **Update-strategie**:
-   - **A (voorstel):** debounced volledige refetch van `/instances/today` bij
-     relevante events — simpel en consistent.
-   - **B:** partiële state-patch op `points.changed` + refetch alleen bij
-     `instance.updated`.
-3. **Winkel meenemen?**
-   - **A (voorstel):** nee — focus Vandaag/Goedkeuren; Winkel is stretch.
-   - **B:** ja — `redemption.*` events hooken in dezelfde PR.
-4. **Badge-toasts**: `badge.earned` visueel tonen op web?
-   - **A (voorstel):** nee — kind-UX; web toont badges niet in MVP.
-   - **B:** subtiele toast op Vandaag (extra copy + design).
-5. **Shared/API sync**: `redemption.updated` en exacte payload-vormen in
-   API-spec §3.13 bijwerken in dezelfde PR als shared?
+| # | Onderwerp | Beslissing |
+| --- | --- | --- |
+| 1 | Winkel meenemen | **Ja** — `redemption.*` events in dezelfde PR |
+| 2 | Update-strategie | **Volledige debounced refetch** — geen partiële patch |
+| 3 | Badge-toasts (`badge.earned`) | **Nee** — geen web-UI voor badges |
+| 4 | BFF connect | `POST /api/ws/connect` met server-afgeleide `wsUrl` |
+| 5 | API-spec §3.13 | Bijwerken in dezelfde PR als shared enum (open: bevestig in implementatie-PR) |
 
 ## Agents / skills bij implementatie
 
 | Onderdeel | Agent / skill |
 | --- | --- |
-| WS-hook, provider, Vandaag/Goedkeuren integratie | `@taakhelden-web` |
+| WS-hook, provider, Vandaag/Goedkeuren/Winkel integratie | `@taakhelden-web` |
 | BFF `/api/ws/connect` | `@taakhelden-web` |
 | Shared `WsMessage` + enum-alignment | `@taakhelden-backend` (klein) |
 | Reconnect/backoff + privacy (geen kind-WS) | `@taakhelden-architect` |
@@ -290,7 +288,6 @@ bestaande kaarten en vervang stilletjes (loading alleen op eerste load).
 ## Samenvatting
 
 Batch 11 maakt de dagelijkse ouderlus **live**: één FamilyRoom WebSocket per
-dashboard-sessie, reconnect met backoff, en automatische verversing van Vandaag
-en Goedkeuren wanneer kinderen taken afvinken of indienen. De API en DO bestaan
-al; het werk zit in BFF-connect, een gedeelde realtime-hook, en debounced refetch
-op bestaande endpoints. Weekplanner drag-drop en Inzichten blijven bewust later.
+dashboard-sessie, reconnect met backoff, en debounced **volledige refetch** op
+Vandaag, Goedkeuren en Winkel. Geen badge-toasts. Weekplanner drag-drop en
+Inzichten blijven bewust later.
