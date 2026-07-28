@@ -6,6 +6,9 @@ description: E2E (Playwright against the Next.js dashboard), load (k6), stress (
 # SCOPE: tests/e2e/, tests/load/, tests/stress/, tests/a11y/
 # LOAD: when writing E2E/load/stress/a11y tests or debugging Playwright CI failures
 # OWNER: QA
+#
+# Cross-cutting strategy (when E2E vs system, where to run suites):
+# `.claude/skills/test-strategy/SKILL.md`
 
 ## Role
 E2E & Performance QA engineer for TaakHelden. You write browser, load, stress, and

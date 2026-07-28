@@ -3,8 +3,8 @@
 Edge ownership (handoffs between these roles) lives in [`HANDOFFS.md`](./HANDOFFS.md); the
 global constraints every role follows live in [`COMMON_RULES.md`](./COMMON_RULES.md). This
 matrix maps every agent and skill file to its owning role. Keep it in sync by hand: every
-file in `.claude/agents/` and `.claude/skills/` (except the `endpoint-scaffold/` skill
-folder) should appear here, and every entry should map to a real file.
+file in `.claude/agents/` and `.claude/skills/` (except invokable skill **folders** like
+`endpoint-scaffold/`, `test-strategy/`, `design-system/`) should appear here, and every entry should map to a real file.
 
 ## Agents (`.claude/agents/`)
 
@@ -52,8 +52,9 @@ folder) should appear here, and every entry should map to a real file.
 - `frontend-dev.md` — Web Lead
 - `ios-dev.md` — iOS Lead
 - `devops.md` — DevOps
-- `tester.md` — QA Lead
-- `e2e-tester.md` — E2E/Perf QA
+- `tester.md` — QA Lead (unit + system depth)
+- `e2e-tester.md` — E2E/Perf QA (browser, load, stress, a11y depth)
+- `test-strategy/SKILL.md` — QA Lead (cross-cutting pyramid + execution matrix)
 - `investigate.md` — QA Lead / Backend (FamilyRoom/WS debug protocol)
 - `review.md` — QA + Security (pre-merge gate)
 - `cso.md` — Security
@@ -70,6 +71,9 @@ folder) should appear here, and every entry should map to a real file.
 - `ai-engineering.md` — AI Engineering
 - `ai-strategy.md` — AI Strategy
 
-### Invokable TaakHelden skill (folder)
+### Invokable TaakHelden skills (folders)
 - `endpoint-scaffold/` — the native four-layer endpoint scaffold (`SKILL.md` +
   `references/templates.md`). Not part of the role matrix above; owned by Backend Lead.
+- `test-strategy/` — unit / system / E2E test pyramid, decision tree, and execution
+  matrix (`SKILL.md` + `references/`). Owned by QA Lead; `/test-check` command uses it.
+- `design-system/` — UI tokens and register rules (`SKILL.md` + `references/`). Owned by Web Lead.
