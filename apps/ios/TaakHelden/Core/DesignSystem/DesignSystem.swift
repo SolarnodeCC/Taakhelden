@@ -84,6 +84,9 @@ enum THPalettes {
 
 struct THCard<Content: View>: View {
     let palette: THPalette
+    var cornerRadius: CGFloat = THRadius.xlarge
+    var shadowRadius: CGFloat = 14
+    var shadowYOffset: CGFloat = 6
     @ViewBuilder var content: Content
 
     var body: some View {
@@ -93,18 +96,19 @@ struct THCard<Content: View>: View {
         .padding(THSpacing.lg)
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(palette.surface.color)
-        .clipShape(RoundedRectangle(cornerRadius: THRadius.xlarge, style: .continuous))
-        .shadow(color: palette.shadow.color, radius: 14, y: 6)
+        .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
+        .shadow(color: palette.shadow.color, radius: shadowRadius, y: shadowYOffset)
     }
 }
 
 struct THBadge: View {
     let text: LocalizedStringKey
     let palette: THPalette
+    var fontDesign: Font.Design = .rounded
 
     var body: some View {
         Text(text)
-            .font(.system(size: 14, weight: .semibold, design: .rounded))
+            .font(.system(size: 14, weight: .semibold, design: fontDesign))
             .foregroundStyle(palette.text.color)
             .padding(.horizontal, THSpacing.md)
             .padding(.vertical, THSpacing.sm)

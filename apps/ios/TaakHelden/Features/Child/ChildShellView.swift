@@ -70,7 +70,7 @@ struct ChildShellView: View {
             }
         }
         .sheet(isPresented: Binding(
-            get: { appState.parentGate.isParentSheetPresented },
+            get: { appState.parentGate.isChallengePresented },
             set: { isPresented in
                 if !isPresented {
                     appState.parentGate.closeGate()
@@ -79,6 +79,16 @@ struct ChildShellView: View {
         )) {
             ParentGateView()
                 .presentationDetents([.medium])
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { appState.parentGate.isParentModePresented },
+            set: { isPresented in
+                if !isPresented {
+                    appState.closeParentMode()
+                }
+            }
+        )) {
+            ParentModeRootView()
         }
     }
 
@@ -343,10 +353,10 @@ private struct MijnHeldTabView: View {
             }
             .background(palette.background.color.ignoresSafeArea())
             .onLongPressGesture(minimumDuration: 1.5) {
-                appState.parentGate.openGate()
+                appState.openParentGate(from: .heroWordmarkLongPress)
             }
             .onTapGesture(count: 5) {
-                appState.parentGate.openGate()
+                appState.openParentGate(from: .buildNumberFiveTap)
             }
             .accessibilityHint("Houd lang vast om de ouderpoort te openen")
         }
