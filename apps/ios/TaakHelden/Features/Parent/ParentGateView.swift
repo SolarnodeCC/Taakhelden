@@ -1,3 +1,4 @@
+import LocalAuthentication
 import SwiftUI
 
 struct ParentGateView: View {
@@ -47,8 +48,6 @@ struct ParentGateView: View {
         }
     }
 }
-
-import LocalAuthentication
 
 enum LAContextWrapper {
     static func evaluateDeviceOwner(reason: String) async throws -> Bool {

@@ -48,7 +48,7 @@ enum HTTPTransportError: LocalizedError {
     }
 }
 
-final class URLSessionTransport: HTTPTransporting {
+final class TaakURLSessionTransport: HTTPTransporting {
     private let baseURL: URL
     private let session: URLSession
     private let decoder = JSONDecoder()

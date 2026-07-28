@@ -17,7 +17,7 @@ final class AppEnvironment {
         let keychain: KeychainStore = usePreviewData ? InMemoryKeychainStore() : SystemKeychainStore()
         let authStore = AuthStore(previewKeychain: keychain)
         let baseURL = URL(string: ProcessInfo.processInfo.environment["TAAKHELDEN_API_BASE_URL"] ?? "http://localhost:8787/v1")!
-        let transport = URLSessionTransport(baseURL: baseURL)
+        let transport = TaakURLSessionTransport(baseURL: baseURL)
         let apiClient = TaakHeldenAPIClient(transport: transport, authStore: authStore)
         let mutationQueue = MutationQueue(store: usePreviewData ? InMemoryMutationQueueStore() : FileMutationQueueStore())
         let syncEngine = SyncEngine(apiClient: apiClient, mutationQueue: mutationQueue)
