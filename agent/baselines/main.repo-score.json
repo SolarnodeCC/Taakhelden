@@ -1,6 +1,6 @@
 {
-  "report_fingerprint": "sha256:7ed5a68198f8c44f704cf750709d90a4bb243ca8cdfda005cd7351aa784d0ecd",
-  "input_fingerprint": "sha256:952fffda7d5efe7e82dd77c06d0d193f52ef91037969773bbb6b9d4bfdafbfdc",
+  "report_fingerprint": "sha256:371fb9a0eab3f6dfb514de8b8691271a3f966b97b4bc23b610038eaf6e68e8dd",
+  "input_fingerprint": "sha256:c2c5d58da2e99ac138acba32d64baa43bcdb4dde1a22aaf8d8fff2fc02b13b76",
   "policy_fingerprint": "sha256:6631c4be7f31b04dbbdb36f47f2f92889bd18434d7c89d081bdf88b5dcea25e6",
   "manifest_fingerprints": {
     "owner_map": "sha256:e65154219d36ab15dbf4cbc400456fa05e716bfa1adfc3ffcb8d6032db33a180",
@@ -8,7 +8,7 @@
     "generated_zones": "sha256:8e884fbb53897f8e3197fc9ea998412b5a235c56b065800f1771c4097b4698e7"
   },
   "dirty_worktree": false,
-  "generated_at": "1785229293",
+  "generated_at": "1785235607",
   "schema_url": "schemas/repo-score.schema.json",
   "standard": "jankurai",
   "standard_version": "0.9.0",
@@ -45,6 +45,9 @@
     "HLT-042-CI-LOCAL-PARITY on .github/workflows/deploy-web.yml",
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-web.yml",
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-web.yml",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/ios.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ios.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ios.yml",
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
     "HLT-042-CI-LOCAL-PARITY on .github/workflows/jankurai.yml",
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
@@ -77,6 +80,7 @@
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/services/taskEngine.ts",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/services/taskEngine.ts",
     "HLT-010-SECRET-SPRAWL on apps/api/test/account.test.ts",
+    "HLT-000-SCORE-DIMENSION:stack on apps/ios/TaakHelden/App/AppDelegate.swift",
     "HLT-013-RENDERED-UX-GAP on apps/web",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/web/app/[locale]/(dashboard)/goedkeuren/GoedkeurenClient.tsx",
     "HLT-006-DIRECT-DB-WRONG-LAYER on apps/web/app/api/v1/[...path]/route.ts",
@@ -84,54 +88,36 @@
     "HLT-025-RELEASE-READINESS-GAP on docs/release.md"
   ],
   "repo": ".",
-  "run_id": "1785229293",
-  "started_at": "1785229293",
-  "elapsed_ms": 2308,
+  "run_id": "1785235607",
+  "started_at": "1785235607",
+  "elapsed_ms": 2412,
   "scope": {
     "mode": "full",
     "paths": []
   },
-  "score": 47,
-  "raw_score": 47,
+  "score": 46,
+  "raw_score": 46,
   "decision": {
-    "status": "fail",
+    "status": "advisory",
     "minimum_score": 40,
-    "passed": false,
+    "passed": true,
     "hard_findings": 0,
-    "soft_findings": 76,
+    "soft_findings": 80,
     "ratchet": {
-      "baseline_score": 47,
+      "baseline_score": 46,
       "allowed_drop": 0,
-      "passed": false,
+      "passed": true,
       "score_delta": 0,
-      "baseline_report_fingerprint": "sha256:b3b12534f783f209e007f970a9e70ebc14da23fa84fa2b58b2f9d9b1a0fe65e4",
-      "baseline_input_fingerprint": "sha256:9b45782b516d075e540800f5a1a13fbd1b41644a6d8b6b713ad67b9b220f643e",
-      "baseline_policy_fingerprint": "sha256:6631c4be7f31b04dbbdb36f47f2f92889bd18434d7c89d081bdf88b5dcea25e6",
+      "baseline_report_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "baseline_input_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "baseline_policy_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
       "new_caps": [],
-      "new_hard_findings": [
-        "sha256:0605f668a099b9b6fec27eca477b917e0b274b41a28ab44435e34297798e7650",
-        "sha256:12b320fe08e30716d8ad7092248791e24bdc8be4cc6b74cc616de2f04f3f8b6c",
-        "sha256:1d9cf58912f7e228392cb99b903c0b8c71b5bcc5ea2950b4ae1b229004315c95",
-        "sha256:26f0ebbaf9ae316b524815478e5a31e53d8d76f67f6af9452915547400cafb6e",
-        "sha256:3d7cef8509a8022f290044f468f314ac3c01dd083687a932a9ab90042a4b4a3b",
-        "sha256:3ea5ddd13c907457b2e609104b1ae8463113e2b72c6478fde591b5d10191fd42",
-        "sha256:453e1894cc0ad3237b3adb10db26683890e718fce94bb9514c1258a6e8837115",
-        "sha256:485ade5b0314cd3e04976e420c5c7162d43ff533466b4667e2ebb0534d4289fe",
-        "sha256:6741d48f6855876ce6fa3b344a618a72caa37446fdf024c04b68c282de7cadab",
-        "sha256:73cd0e59f610e1a21a30e18685d285f9f4fde0c0e15ee0d89aabb601ad6fe75b",
-        "sha256:79d8ed943fae4804a17bd5c8be26eb1d76c28bdcc27d33a9451c6304fdca031a",
-        "sha256:992bf29f88e0bc7471750b04ae97981b6e701ee25a5851f507093d8d44fabe21",
-        "sha256:c75adeef0bee64ae6c211bac03de0ae5f122ddb29feec17546647cfc0bd33b48",
-        "sha256:ccd50c1d49b3ece3dadb977a9314beda02ec8dda1337b264bdb2f7faa49c4e12",
-        "sha256:cfdd108c277a8520b3125feed4a15d2f5a924f60c94d57065aa83b4281707355",
-        "sha256:ed3026d9ac05a599c1ef2b005a3fcd38194fe07d4a2ea4464541f6b8c9305461",
-        "sha256:fd39be2eeb8d3538bafca30719316d91b5b386d7e21ab6a0eed7b2627064f853"
-      ],
+      "new_hard_findings": [],
       "policy_changed": false
     }
   },
   "git": {
-    "head": "96204fb",
+    "head": "6f68fcb",
     "base": null,
     "changed_files": 0,
     "mode": "full",
@@ -145,7 +131,7 @@
       "medium",
       "low"
     ],
-    "mode": "ratchet",
+    "mode": "advisory",
     "standard_version": "0.9.0",
     "auditor_version": "1.6.10",
     "schema_version": "1.9.0",
@@ -157,6 +143,7 @@
     "no-security-lane-on-high-risk-repo",
     "no-secret-or-dependency-scanning-in-ci",
     "no-jankurai-audit-lane-in-ci",
+    "non-optimal-product-language-found",
     "vibe-placeholders-in-product-code",
     "future-hostile-dead-language-in-product-code",
     "direct-db-access-from-wrong-layer",
@@ -399,14 +386,15 @@
     {
       "name": "Proof lanes and test routing",
       "weight": 12,
-      "score": 63,
-      "weighted_points": 7.56,
+      "score": 67,
+      "weighted_points": 8.04,
       "evidence": [
         "deterministic fast lane found",
         "test runner present in automation surface",
         "GitHub workflow files present",
         "test/proof routing map present",
         "web e2e lane present or no web surface",
+        "DOM geometry UX QA runtime found",
         "Rust property/integration tests present or no Rust surface"
       ],
       "notes": [
@@ -422,9 +410,9 @@
       "weighted_points": 3.12,
       "evidence": [
         "lockfile present",
-        "sql bad-behavior advisory signals: 8",
+        "sql bad-behavior advisory signals: 9",
         "typescript bad-behavior hard findings: 14",
-        "ci bad-behavior hard findings: 13",
+        "ci bad-behavior hard findings: 15",
         "gittools bad-behavior advisory signals: 1",
         "web security bad-behavior advisory signals: 3"
       ],
@@ -439,15 +427,15 @@
       "score": 6,
       "weighted_points": 0.72,
       "evidence": [
-        "largest authored code file: apps/api/src/services/pointsEngine.ts (532 LOC)",
+        "largest authored code file: apps/api/src/services/pointsEngine.ts (534 LOC)",
         "code file exceeds 500 LOC",
         "most code files stay under 300 LOC",
         "copy-code advisory classes found: 3 (advisory only, no score impact)",
         "TODO/stub marker found",
         "future-hostile/dead-language marker found",
-        "sql bad-behavior advisory signals: 8",
+        "sql bad-behavior advisory signals: 9",
         "typescript bad-behavior hard findings: 14",
-        "ci bad-behavior hard findings: 13",
+        "ci bad-behavior hard findings: 15",
         "gittools bad-behavior advisory signals: 1"
       ],
       "notes": [
@@ -470,11 +458,12 @@
     {
       "name": "Observability and repair evidence",
       "weight": 8,
-      "score": 23,
-      "weighted_points": 1.84,
+      "score": 15,
+      "weighted_points": 1.2,
       "evidence": [],
       "notes": [
-        "no agent-friendly exception pattern found"
+        "no agent-friendly exception pattern found",
+        "free-form logging appears in scope"
       ]
     },
     {
@@ -517,12 +506,15 @@
     {
       "name": "Python containment and polyglot hygiene",
       "weight": 4,
-      "score": 100,
-      "weighted_points": 4.0,
+      "score": 90,
+      "weighted_points": 3.6,
       "evidence": [
-        "no Python files in scope"
+        "no Python files in scope",
+        "non-optimal product language marker"
       ],
-      "notes": []
+      "notes": [
+        "runtime code should converge to Rust, TypeScript, SQL, generated contracts, and rare advanced-ML/data Python exceptions"
+      ]
     },
     {
       "name": "Build speed signals",
@@ -545,7 +537,6 @@
     "has_rendered_ux_lane": false,
     "missing_categories": [
       "Playwright screenshot capture",
-      "visual review or geometry runtime",
       "generated API mocks"
     ],
     "evidence": {
@@ -566,10 +557,14 @@
       ],
       "design_tokens": [
         ".claude/skills/frontend-dev.md",
+        "agent/baselines/main.repo-score.json",
         "apps/web/app/globals.css"
       ],
-      "geometry_runtime": [],
+      "geometry_runtime": [
+        "agent/baselines/main.repo-score.json"
+      ],
       "layout_stability": [
+        "agent/baselines/main.repo-score.json",
         "eslint.config.mjs",
         "package-lock.json"
       ],
@@ -577,7 +572,9 @@
       "storybook": [
         "agent/baselines/main.repo-score.json"
       ],
-      "visual_review": []
+      "visual_review": [
+        "agent/baselines/main.repo-score.json"
+      ]
     }
   },
   "tool_adoption": {
@@ -1098,7 +1095,7 @@
   "copy_code": {
     "schema_version": "1.1.0",
     "generated_by": "jankurai copy-code",
-    "generated_at": "2026-07-28T09:01:31.003920342+00:00",
+    "generated_at": "2026-07-28T10:46:45.363670697+00:00",
     "repo": ".",
     "auditor_version": "1.6.10",
     "status": "review",
@@ -1136,9 +1133,9 @@
       ]
     },
     "summary": {
-      "files_scanned": 247,
-      "files_considered": 122,
-      "active_files": 122,
+      "files_scanned": 307,
+      "files_considered": 125,
+      "active_files": 125,
       "exact_file_classes": 0,
       "hard_classes": 0,
       "warning_classes": 3,
@@ -1217,8 +1214,8 @@
           {
             "path": "apps/api/src/services/session.ts",
             "language": "typescript",
-            "start_line": 13,
-            "end_line": 16,
+            "start_line": 17,
+            "end_line": 20,
             "unit_name": "randomToken"
           }
         ]
@@ -1491,7 +1488,7 @@
       "problem": "`Code shape and semantic surface` scored 6 below the standard floor of 85",
       "agent_fix": "split large or ambiguous authored code into smaller semantic modules with focused tests",
       "evidence": [
-        "largest authored code file: apps/api/src/services/pointsEngine.ts (532 LOC)",
+        "largest authored code file: apps/api/src/services/pointsEngine.ts (534 LOC)",
         "code file exceeds 500 LOC",
         "most code files stay under 300 LOC",
         "copy-code advisory classes found: 3 (advisory only, no score impact)"
@@ -1501,7 +1498,7 @@
       "confidence": 0.76,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:002cf09afd80729a2d20a6a185760636f3f8b66799422d7ef6caff7c4ae56285",
+      "fingerprint": "sha256:da9a06150c1f5f41b94895dfc80c079df2136f7dd61bd5544d3a2b2fa2c4bb79",
       "rule_id": "HLT-001-DEAD-MARKER",
       "tlr": "Entropy",
       "lane": "fast",
@@ -2170,6 +2167,90 @@
       "reason": "tag or branch refs can change without review"
     },
     {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/ios.yml",
+      "problem": "workflow inlines CI commands instead of delegating to ops/ci/*.sh",
+      "agent_fix": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "evidence": [
+        "detector=ci.local-parity.workflow-not-thin",
+        "path=.github/workflows/ios.yml",
+        "line=18",
+        "proof_window=None",
+        "snippet=jobs:"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:210385cfd65de10f515924bc0f73167953a05c7e974eb25b383afc98ab30409f",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 18,
+      "matched_term": "ci.local-parity.workflow-not-thin",
+      "reason": "without a single source of truth, local runs drift from CI and breakage is only visible after push"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ios.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/ios.yml",
+        "line=23",
+        "proof_window=None",
+        "snippet=- uses: actions/checkout@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:e0a3881233d6d883a6f704fcea382adea1096649d39988f031675be1fee2a2f9",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 23,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ios.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/ios.yml",
+        "line=24",
+        "proof_window=None",
+        "snippet=- uses: actions/setup-node@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:6aecf09d6f477137e5c984238957cf88a2271fef05221a536c5534926d6dc2f1",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 24,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
       "severity": "medium",
       "category": "security",
       "path": ".github/workflows/jankurai.yml",
@@ -2177,16 +2258,16 @@
       "agent_fix": "wire secret, dependency, provenance, and workflow scans into an operational CI lane",
       "evidence": [
         "lockfile present",
-        "sql bad-behavior advisory signals: 8",
+        "sql bad-behavior advisory signals: 9",
         "typescript bad-behavior hard findings: 14",
-        "ci bad-behavior hard findings: 13"
+        "ci bad-behavior hard findings: 15"
       ],
       "check_id": "HLT-016-SUPPLY-CHAIN-DRIFT:security",
       "hardness": "soft",
       "confidence": 0.76,
       "evidence_kind": "workflow-command",
       "rerun_command": "just security",
-      "fingerprint": "sha256:610c6de8d84ff0e0bc2b31ea8e48fb6e73002e7f7c49c166974597b347c70669",
+      "fingerprint": "sha256:0ce372bccce6ac5438e19bb2b6ae6ae8dfe647ff05fec82298317d6db03049bb",
       "rule_id": "HLT-016-SUPPLY-CHAIN-DRIFT",
       "tlr": "Security, secrets, agency",
       "lane": "security",
@@ -2377,7 +2458,7 @@
       "severity": "medium",
       "category": "proof",
       "path": "agent/test-map.json",
-      "problem": "`Proof lanes and test routing` scored 63 below the standard floor of 85",
+      "problem": "`Proof lanes and test routing` scored 67 below the standard floor of 85",
       "agent_fix": "route each owned path to a deterministic proof command and make the lane executable in CI",
       "evidence": [
         "deterministic fast lane found",
@@ -2390,7 +2471,7 @@
       "confidence": 0.76,
       "evidence_kind": "policy-manifest",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:e9d971427e8ad4c1b11e75b69af4b0f7288a68f1d4e826f550ce23138e5a92e1",
+      "fingerprint": "sha256:ffc2dc75e66c53062ef7eca5264a9d8aefcacda8eec563c17eb12659c5bb30f8",
       "rule_id": "HLT-004-UNMAPPED-PROOF",
       "tlr": "Verification",
       "lane": "fast",
@@ -2641,7 +2722,7 @@
       "evidence": [
         "detector=typescript.security.raw-command-sql",
         "path=apps/api/src/repo/account.ts",
-        "line=153",
+        "line=159",
         "snippet=scoped(`DELETE FROM refresh_tokens WHERE ${userScope}`),"
       ],
       "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
@@ -2649,13 +2730,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:989601a36f9d98ca8ef60aeed0c01943c5bcbd5e9b00242384a92f3ef13ac6b8",
+      "fingerprint": "sha256:fafd33243a28d7f04b4a4a4ad917535b8f6fb951d397b1c8c6b686d403cec0d3",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
       "tlr": "Contracts/data",
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "api",
-      "line": 153,
+      "line": 159,
       "matched_term": "typescript.security.raw-command-sql",
       "reason": "trusted input proof is missing"
     },
@@ -2668,7 +2749,7 @@
       "evidence": [
         "detector=typescript.security.raw-command-sql",
         "path=apps/api/src/repo/account.ts",
-        "line=154",
+        "line=161",
         "snippet=scoped(`DELETE FROM devices WHERE ${userScope}`),"
       ],
       "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
@@ -2676,13 +2757,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:c674bd5ed3251f039e77ac9634cc99c5c1117931fc58d21c3b5669fab43f752f",
+      "fingerprint": "sha256:3404ba377581ecf5d0fc3d81cb1e1c5c69e9b7178d4d096d3542b71ef152b909",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
       "tlr": "Contracts/data",
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "api",
-      "line": 154,
+      "line": 161,
       "matched_term": "typescript.security.raw-command-sql",
       "reason": "trusted input proof is missing"
     },
@@ -2695,7 +2776,7 @@
       "evidence": [
         "detector=typescript.security.raw-command-sql",
         "path=apps/api/src/repo/account.ts",
-        "line=155",
+        "line=162",
         "snippet=scoped(`DELETE FROM idempotency_keys WHERE ${userScope}`),"
       ],
       "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
@@ -2703,13 +2784,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:edddb46e88538389dd62ba1ad4b930b678ed19475bef1eb9f01be76cbb534b2a",
+      "fingerprint": "sha256:49fe25b304a37dc30641d7782d66f62f66218452f933f7f9ab48847b425bb693",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
       "tlr": "Contracts/data",
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "api",
-      "line": 155,
+      "line": 162,
       "matched_term": "typescript.security.raw-command-sql",
       "reason": "trusted input proof is missing"
     },
@@ -2800,7 +2881,7 @@
       "evidence": [
         "detector=typescript.types.any-boundary",
         "path=apps/api/src/routes/families.ts",
-        "line=116",
+        "line=121",
         "snippet=const { familyId, userId } = JSON.parse(raw) as { familyId: string; userId: string };"
       ],
       "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
@@ -2808,13 +2889,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:d4fa8dfdae10299541f07cb85bbc21421d0ac5ee6fc88e16d214671c31221286",
+      "fingerprint": "sha256:de6c1eb87a8e6b187df30dbe77726ef78c2b1b546b1df2f54750cbe0929b7530",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
       "tlr": "Contracts/data",
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "api",
-      "line": 116,
+      "line": 121,
       "matched_term": "typescript.types.any-boundary",
       "reason": "value shape is not proven before the cast"
     },
@@ -3122,6 +3203,26 @@
     },
     {
       "severity": "high",
+      "category": "stack",
+      "path": "apps/ios/TaakHelden/App/AppDelegate.swift",
+      "problem": "runtime code uses a language outside the chosen optimal stack",
+      "agent_fix": "move product runtime behavior to Rust core, TypeScript web, SQL migrations, or generated contracts; Python needs a dated advanced-ML/data exception",
+      "evidence": [
+        "apps/ios/TaakHelden/App/AppDelegate.swift uses `.swift`",
+        "Rust core + TypeScript/React/Vite + PostgreSQL + generated contracts + exception-only Python AI/data service"
+      ],
+      "check_id": "HLT-000-SCORE-DIMENSION:stack",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just score",
+      "fingerprint": "sha256:cb9173349fa7163e23d240e362efec1bb099e199e924aa46116e3511561f1c63",
+      "tlr": "Context/setup",
+      "lane": "audit",
+      "owner": "ios"
+    },
+    {
+      "severity": "high",
       "category": "ux-qa",
       "path": "apps/web",
       "problem": "web surface lacks layered rendered UX QA evidence",
@@ -3309,17 +3410,18 @@
       "severity": "medium",
       "category": "observability",
       "path": "docs/testing.md",
-      "problem": "`Observability and repair evidence` scored 23 below the standard floor of 85",
+      "problem": "`Observability and repair evidence` scored 15 below the standard floor of 85",
       "agent_fix": "add structured errors, telemetry, and repair receipts that tell the next agent where to rerun proof",
       "evidence": [
-        "no agent-friendly exception pattern found"
+        "no agent-friendly exception pattern found",
+        "free-form logging appears in scope"
       ],
       "check_id": "HLT-017-OPAQUE-OBSERVABILITY:observability",
       "hardness": "soft",
       "confidence": 0.76,
       "evidence_kind": "repository-scan",
       "rerun_command": "just score",
-      "fingerprint": "sha256:cbf8cf3bdcb20bbe520845bfe2183ae66b7fe87d99444a3b0f5d15b0ca456c89",
+      "fingerprint": "sha256:19d97d626648e05df7fd6f1a2711ff395456fe7e0b4dd518ab6ecde34240bc1f",
       "rule_id": "HLT-017-OPAQUE-OBSERVABILITY",
       "tlr": "Repair",
       "lane": "observability",
@@ -3565,6 +3667,16 @@
       "why": "workflow inlines CI commands instead of delegating to ops/ci/*.sh"
     },
     {
+      "path": ".github/workflows/ios.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "why": "workflow inlines CI commands instead of delegating to ops/ci/*.sh"
+    },
+    {
       "path": ".github/workflows/jankurai.yml",
       "priority": "high",
       "rule_id": "HLT-042-CI-LOCAL-PARITY",
@@ -3612,7 +3724,7 @@
       "lane": "fast",
       "owner": "agent",
       "task": "route each owned path to a deterministic proof command and make the lane executable in CI",
-      "why": "`Proof lanes and test routing` scored 63 below the standard floor of 85"
+      "why": "`Proof lanes and test routing` scored 67 below the standard floor of 85"
     },
     {
       "path": "docs/testing.md",
@@ -3642,7 +3754,7 @@
       "lane": "observability",
       "owner": "docs",
       "task": "add structured errors, telemetry, and repair receipts that tell the next agent where to rerun proof",
-      "why": "`Observability and repair evidence` scored 23 below the standard floor of 85"
+      "why": "`Observability and repair evidence` scored 15 below the standard floor of 85"
     },
     {
       "path": ".github/workflows",
@@ -3652,6 +3764,15 @@
       "owner": "ops",
       "task": "add a CI job that runs `jankurai . --json .jankurai/repo-score.json --md .jankurai/repo-score.md` and uploads both artifacts",
       "why": "CI does not run the jankurai audit lane"
+    },
+    {
+      "path": "apps/ios/TaakHelden/App/AppDelegate.swift",
+      "priority": "high",
+      "tlr": "Context/setup",
+      "lane": "audit",
+      "owner": "ios",
+      "task": "move product runtime behavior to Rust core, TypeScript web, SQL migrations, or generated contracts; Python needs a dated advanced-ML/data exception",
+      "why": "runtime code uses a language outside the chosen optimal stack"
     },
     {
       "path": ".github",
@@ -3804,6 +3925,16 @@
     },
     {
       "path": ".github/workflows/deploy-web.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "pin every external action to a 40-character commit SHA",
+      "why": "workflow uses an external action not pinned to a full commit SHA"
+    },
+    {
+      "path": ".github/workflows/ios.yml",
       "priority": "high",
       "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
       "tlr": "Security, secrets, agency",
