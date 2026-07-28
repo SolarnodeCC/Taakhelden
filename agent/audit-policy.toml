@@ -39,7 +39,10 @@ mirror_max_rows = 5000
 # Excluding it prevents the Swift language surface from re-introducing the
 # non-optimal-product-language cap on every PR; the dated exception remains the
 # ownership record.
-excluded_paths = ["Design System/", "apps/ios/"]
+#
+# Vitest fixtures use synthetic login material; secret-sprawl heuristics treat
+# those strings as credentials. Tests are not product runtime.
+excluded_paths = ["Design System/", "apps/ios/", "apps/api/test/", "apps/web/**/*.test.ts"]
 
 [smart_scan]
 full_scan_interval_secs = 3600
