@@ -10,6 +10,10 @@ import {
   SessionInfo,
   type MemberView,
 } from "../../../lib/api/types";
+import {
+  FamilyRealtimeProvider,
+  useFamilyRealtime,
+} from "../../../lib/realtime/FamilyRealtimeContext";
 import { FAMILY_UPDATED_EVENT } from "./gezin/FamilySettingsForm";
 import { NAV_ITEMS } from "./nav";
 import LanguageSwitcher from "../LanguageSwitcher";
@@ -22,7 +26,20 @@ interface ShellData {
   children: MemberView[];
 }
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+function ShellRealtimeStatus() {
+  const t = useTranslations("shell.realtime");
+  const { status } = useFamilyRealtime();
+
+  if (status === "connected") return null;
+
+  return (
+    <p className="text-xs text-muted" role="status">
+      {status === "connecting" ? t("connecting") : t("offline")}
+    </p>
+  );
+}
+
+function AppShellInner({ children }: { children: React.ReactNode }) {
   const t = useTranslations("shell");
   const tNav = useTranslations("nav");
   const pathname = usePathname();
@@ -115,6 +132,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 {t("greeting", { name: data.userName })}
               </p>
             )}
+            <ShellRealtimeStatus />
           </div>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
@@ -125,5 +143,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 px-6 py-8">{children}</main>
       </div>
     </div>
+  );
+}
+
+export default function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <FamilyRealtimeProvider>
+      <AppShellInner>{children}</AppShellInner>
+    </FamilyRealtimeProvider>
   );
 }
