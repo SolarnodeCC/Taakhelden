@@ -1,14 +1,14 @@
 {
-  "report_fingerprint": "sha256:7ed5a68198f8c44f704cf750709d90a4bb243ca8cdfda005cd7351aa784d0ecd",
-  "input_fingerprint": "sha256:952fffda7d5efe7e82dd77c06d0d193f52ef91037969773bbb6b9d4bfdafbfdc",
+  "report_fingerprint": "sha256:044c98319dee6c5df6eee65e3ce1ec02584add4a0df5be54b485f497e9f9b6b4",
+  "input_fingerprint": "sha256:a3f934ac356ccaf26a00cdbab0529f17927fb5838a7340cf8e84439a4924da86",
   "policy_fingerprint": "sha256:6631c4be7f31b04dbbdb36f47f2f92889bd18434d7c89d081bdf88b5dcea25e6",
   "manifest_fingerprints": {
-    "owner_map": "sha256:e65154219d36ab15dbf4cbc400456fa05e716bfa1adfc3ffcb8d6032db33a180",
+    "owner_map": "sha256:3b06acff282adb26e61cf9c6b4af52457e345dd2532b30606ae1909792f32e3f",
     "test_map": "sha256:b4dfceccd0b8d87446132a282d38079acea31cd19fa19e5dea56e6f7c33ac869",
     "generated_zones": "sha256:8e884fbb53897f8e3197fc9ea998412b5a235c56b065800f1771c4097b4698e7"
   },
   "dirty_worktree": false,
-  "generated_at": "1785229293",
+  "generated_at": "1785252969",
   "schema_url": "schemas/repo-score.schema.json",
   "standard": "jankurai",
   "standard_version": "0.9.0",
@@ -45,6 +45,12 @@
     "HLT-042-CI-LOCAL-PARITY on .github/workflows/deploy-web.yml",
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-web.yml",
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-web.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ios.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ios.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ios.yml",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/ios.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ios.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ios.yml",
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
     "HLT-042-CI-LOCAL-PARITY on .github/workflows/jankurai.yml",
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
@@ -71,22 +77,23 @@
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/routes/tasks.ts",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/routes/tasks.ts",
     "HLT-001-DEAD-MARKER on apps/api/src/routes/ws.ts",
-    "HLT-001-DEAD-MARKER on apps/api/src/services/familyRoom.ts",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/services/syncService.ts",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/services/taskEngine.ts",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/services/taskEngine.ts",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/services/taskEngine.ts",
     "HLT-010-SECRET-SPRAWL on apps/api/test/account.test.ts",
+    "HLT-000-SCORE-DIMENSION:stack on apps/ios/TaakHelden/App/AppState.swift",
     "HLT-013-RENDERED-UX-GAP on apps/web",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/web/app/[locale]/(dashboard)/goedkeuren/GoedkeurenClient.tsx",
     "HLT-006-DIRECT-DB-WRONG-LAYER on apps/web/app/api/v1/[...path]/route.ts",
     "HLT-017-OPAQUE-OBSERVABILITY on crates/domain",
     "HLT-025-RELEASE-READINESS-GAP on docs/release.md"
   ],
   "repo": ".",
-  "run_id": "1785229293",
-  "started_at": "1785229293",
-  "elapsed_ms": 2308,
+  "run_id": "1785252969",
+  "started_at": "1785252969",
+  "elapsed_ms": 2376,
   "scope": {
     "mode": "full",
     "paths": []
@@ -94,44 +101,26 @@
   "score": 47,
   "raw_score": 47,
   "decision": {
-    "status": "fail",
+    "status": "advisory",
     "minimum_score": 40,
-    "passed": false,
+    "passed": true,
     "hard_findings": 0,
-    "soft_findings": 76,
+    "soft_findings": 83,
     "ratchet": {
       "baseline_score": 47,
       "allowed_drop": 0,
-      "passed": false,
+      "passed": true,
       "score_delta": 0,
-      "baseline_report_fingerprint": "sha256:b3b12534f783f209e007f970a9e70ebc14da23fa84fa2b58b2f9d9b1a0fe65e4",
-      "baseline_input_fingerprint": "sha256:9b45782b516d075e540800f5a1a13fbd1b41644a6d8b6b713ad67b9b220f643e",
-      "baseline_policy_fingerprint": "sha256:6631c4be7f31b04dbbdb36f47f2f92889bd18434d7c89d081bdf88b5dcea25e6",
+      "baseline_report_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "baseline_input_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "baseline_policy_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
       "new_caps": [],
-      "new_hard_findings": [
-        "sha256:0605f668a099b9b6fec27eca477b917e0b274b41a28ab44435e34297798e7650",
-        "sha256:12b320fe08e30716d8ad7092248791e24bdc8be4cc6b74cc616de2f04f3f8b6c",
-        "sha256:1d9cf58912f7e228392cb99b903c0b8c71b5bcc5ea2950b4ae1b229004315c95",
-        "sha256:26f0ebbaf9ae316b524815478e5a31e53d8d76f67f6af9452915547400cafb6e",
-        "sha256:3d7cef8509a8022f290044f468f314ac3c01dd083687a932a9ab90042a4b4a3b",
-        "sha256:3ea5ddd13c907457b2e609104b1ae8463113e2b72c6478fde591b5d10191fd42",
-        "sha256:453e1894cc0ad3237b3adb10db26683890e718fce94bb9514c1258a6e8837115",
-        "sha256:485ade5b0314cd3e04976e420c5c7162d43ff533466b4667e2ebb0534d4289fe",
-        "sha256:6741d48f6855876ce6fa3b344a618a72caa37446fdf024c04b68c282de7cadab",
-        "sha256:73cd0e59f610e1a21a30e18685d285f9f4fde0c0e15ee0d89aabb601ad6fe75b",
-        "sha256:79d8ed943fae4804a17bd5c8be26eb1d76c28bdcc27d33a9451c6304fdca031a",
-        "sha256:992bf29f88e0bc7471750b04ae97981b6e701ee25a5851f507093d8d44fabe21",
-        "sha256:c75adeef0bee64ae6c211bac03de0ae5f122ddb29feec17546647cfc0bd33b48",
-        "sha256:ccd50c1d49b3ece3dadb977a9314beda02ec8dda1337b264bdb2f7faa49c4e12",
-        "sha256:cfdd108c277a8520b3125feed4a15d2f5a924f60c94d57065aa83b4281707355",
-        "sha256:ed3026d9ac05a599c1ef2b005a3fcd38194fe07d4a2ea4464541f6b8c9305461",
-        "sha256:fd39be2eeb8d3538bafca30719316d91b5b386d7e21ab6a0eed7b2627064f853"
-      ],
+      "new_hard_findings": [],
       "policy_changed": false
     }
   },
   "git": {
-    "head": "96204fb",
+    "head": "18befd5",
     "base": null,
     "changed_files": 0,
     "mode": "full",
@@ -145,7 +134,7 @@
       "medium",
       "low"
     ],
-    "mode": "ratchet",
+    "mode": "advisory",
     "standard_version": "0.9.0",
     "auditor_version": "1.6.10",
     "schema_version": "1.9.0",
@@ -157,6 +146,7 @@
     "no-security-lane-on-high-risk-repo",
     "no-secret-or-dependency-scanning-in-ci",
     "no-jankurai-audit-lane-in-ci",
+    "non-optimal-product-language-found",
     "vibe-placeholders-in-product-code",
     "future-hostile-dead-language-in-product-code",
     "direct-db-access-from-wrong-layer",
@@ -399,14 +389,15 @@
     {
       "name": "Proof lanes and test routing",
       "weight": 12,
-      "score": 63,
-      "weighted_points": 7.56,
+      "score": 67,
+      "weighted_points": 8.04,
       "evidence": [
         "deterministic fast lane found",
         "test runner present in automation surface",
         "GitHub workflow files present",
         "test/proof routing map present",
         "web e2e lane present or no web surface",
+        "DOM geometry UX QA runtime found",
         "Rust property/integration tests present or no Rust surface"
       ],
       "notes": [
@@ -422,11 +413,11 @@
       "weighted_points": 3.12,
       "evidence": [
         "lockfile present",
-        "sql bad-behavior advisory signals: 8",
-        "typescript bad-behavior hard findings: 14",
-        "ci bad-behavior hard findings: 13",
+        "sql bad-behavior advisory signals: 9",
+        "typescript bad-behavior hard findings: 15",
+        "ci bad-behavior hard findings: 18",
         "gittools bad-behavior advisory signals: 1",
-        "web security bad-behavior advisory signals: 3"
+        "web security bad-behavior advisory signals: 4"
       ],
       "notes": [
         "no explicit security lane found",
@@ -439,15 +430,15 @@
       "score": 6,
       "weighted_points": 0.72,
       "evidence": [
-        "largest authored code file: apps/api/src/services/pointsEngine.ts (532 LOC)",
+        "largest authored code file: apps/api/src/services/pointsEngine.ts (534 LOC)",
         "code file exceeds 500 LOC",
         "most code files stay under 300 LOC",
         "copy-code advisory classes found: 3 (advisory only, no score impact)",
         "TODO/stub marker found",
         "future-hostile/dead-language marker found",
-        "sql bad-behavior advisory signals: 8",
-        "typescript bad-behavior hard findings: 14",
-        "ci bad-behavior hard findings: 13",
+        "sql bad-behavior advisory signals: 9",
+        "typescript bad-behavior hard findings: 15",
+        "ci bad-behavior hard findings: 18",
         "gittools bad-behavior advisory signals: 1"
       ],
       "notes": [
@@ -517,12 +508,15 @@
     {
       "name": "Python containment and polyglot hygiene",
       "weight": 4,
-      "score": 100,
-      "weighted_points": 4.0,
+      "score": 90,
+      "weighted_points": 3.6,
       "evidence": [
-        "no Python files in scope"
+        "no Python files in scope",
+        "non-optimal product language marker"
       ],
-      "notes": []
+      "notes": [
+        "runtime code should converge to Rust, TypeScript, SQL, generated contracts, and rare advanced-ML/data Python exceptions"
+      ]
     },
     {
       "name": "Build speed signals",
@@ -544,19 +538,23 @@
     "web_surface": true,
     "has_rendered_ux_lane": false,
     "missing_categories": [
-      "Playwright screenshot capture",
-      "visual review or geometry runtime",
-      "generated API mocks"
+      "Playwright screenshot capture"
     ],
     "evidence": {
       "accessibility": [
         ".claude/agents/e2e-tester-agent.md",
         ".claude/agents/frontend-agent.md",
+        ".claude/rules/web/ui.md",
         ".claude/skills/HANDOFFS.md",
-        ".claude/skills/e2e-tester.md",
-        ".claude/skills/frontend-dev.md"
+        ".claude/skills/e2e-tester.md"
       ],
-      "api_mocks": [],
+      "api_mocks": [
+        "apps/web/app/[locale]/(dashboard)/gezin/ChildForms.tsx",
+        "apps/web/app/[locale]/(dashboard)/gezin/FamilySettingsForm.tsx",
+        "apps/web/app/[locale]/(dashboard)/gezin/PointsPanel.tsx",
+        "apps/web/app/[locale]/(dashboard)/instellingen/NotificationSettingsSection.tsx",
+        "apps/web/messages/en.json"
+      ],
       "artifact_backed_proof": [
         ".claude/agents/cso-agent.md",
         ".claude/agents/knowledge-agent.md",
@@ -565,19 +563,29 @@
         ".claude/skills/cso.md"
       ],
       "design_tokens": [
+        ".claude/rules/always/workflow.md",
         ".claude/skills/frontend-dev.md",
+        "agent/baselines/main.repo-score.json",
+        "apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx",
         "apps/web/app/globals.css"
       ],
-      "geometry_runtime": [],
+      "geometry_runtime": [
+        "agent/baselines/main.repo-score.json"
+      ],
       "layout_stability": [
+        "agent/baselines/main.repo-score.json",
         "eslint.config.mjs",
         "package-lock.json"
       ],
       "playwright_visual": [],
       "storybook": [
+        ".claude/rules/PROPOSAL.md",
+        ".claude/rules/web/ui.md",
         "agent/baselines/main.repo-score.json"
       ],
-      "visual_review": []
+      "visual_review": [
+        "agent/baselines/main.repo-score.json"
+      ]
     }
   },
   "tool_adoption": {
@@ -1098,7 +1106,7 @@
   "copy_code": {
     "schema_version": "1.1.0",
     "generated_by": "jankurai copy-code",
-    "generated_at": "2026-07-28T09:01:31.003920342+00:00",
+    "generated_at": "2026-07-28T15:36:06.795705058+00:00",
     "repo": ".",
     "auditor_version": "1.6.10",
     "status": "review",
@@ -1136,9 +1144,9 @@
       ]
     },
     "summary": {
-      "files_scanned": 247,
-      "files_considered": 122,
-      "active_files": 122,
+      "files_scanned": 343,
+      "files_considered": 157,
+      "active_files": 157,
       "exact_file_classes": 0,
       "hard_classes": 0,
       "warning_classes": 3,
@@ -1217,8 +1225,8 @@
           {
             "path": "apps/api/src/services/session.ts",
             "language": "typescript",
-            "start_line": 13,
-            "end_line": 16,
+            "start_line": 17,
+            "end_line": 20,
             "unit_name": "randomToken"
           }
         ]
@@ -1491,7 +1499,7 @@
       "problem": "`Code shape and semantic surface` scored 6 below the standard floor of 85",
       "agent_fix": "split large or ambiguous authored code into smaller semantic modules with focused tests",
       "evidence": [
-        "largest authored code file: apps/api/src/services/pointsEngine.ts (532 LOC)",
+        "largest authored code file: apps/api/src/services/pointsEngine.ts (534 LOC)",
         "code file exceeds 500 LOC",
         "most code files stay under 300 LOC",
         "copy-code advisory classes found: 3 (advisory only, no score impact)"
@@ -1501,7 +1509,7 @@
       "confidence": 0.76,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:002cf09afd80729a2d20a6a185760636f3f8b66799422d7ef6caff7c4ae56285",
+      "fingerprint": "sha256:da9a06150c1f5f41b94895dfc80c079df2136f7dd61bd5544d3a2b2fa2c4bb79",
       "rule_id": "HLT-001-DEAD-MARKER",
       "tlr": "Entropy",
       "lane": "fast",
@@ -2170,6 +2178,174 @@
       "reason": "tag or branch refs can change without review"
     },
     {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ios.yml",
+      "problem": "workflow is missing concurrency control",
+      "agent_fix": "add workflow-level concurrency with cancel-in-progress",
+      "evidence": [
+        "detector=ci.concurrency.missing",
+        "path=.github/workflows/ios.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: iOS scaffold"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:4e41b4d29256fee39c776a4786a8546b781b99afa0f6830d24168cc7c35307b3",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.concurrency.missing",
+      "reason": "workflow can run duplicate stale audits for the same ref"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ios.yml",
+      "problem": "workflow is missing explicit top-level permissions",
+      "agent_fix": "add top-level `permissions: contents: read` and job-specific write scopes only where needed",
+      "evidence": [
+        "detector=ci.permissions.missing",
+        "path=.github/workflows/ios.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: iOS scaffold"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:db53f3ef0d86032ec33a81e9560e489b46dc7d73b6a5dbee222bc082ccbddc7d",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.permissions.missing",
+      "reason": "workflow permissions default is not pinned in source"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ios.yml",
+      "problem": "workflow job is missing timeout-minutes",
+      "agent_fix": "set an explicit timeout-minutes on each job",
+      "evidence": [
+        "detector=ci.timeout.missing",
+        "path=.github/workflows/ios.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: iOS scaffold"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:3b1a09775b4f88e195929528dc932df004923b3df2cba825c3d0ad8c67df9d74",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.timeout.missing",
+      "reason": "workflow can run without a checked time bound"
+    },
+    {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/ios.yml",
+      "problem": "workflow inlines CI commands instead of delegating to ops/ci/*.sh",
+      "agent_fix": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "evidence": [
+        "detector=ci.local-parity.workflow-not-thin",
+        "path=.github/workflows/ios.yml",
+        "line=11",
+        "proof_window=None",
+        "snippet=jobs:"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:dec99355101ddf7115de0f2e3a45d7f6b82300555f28b0a6ee6ab77d85a75a7b",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 11,
+      "matched_term": "ci.local-parity.workflow-not-thin",
+      "reason": "without a single source of truth, local runs drift from CI and breakage is only visible after push"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ios.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/ios.yml",
+        "line=15",
+        "proof_window=None",
+        "snippet=- uses: actions/checkout@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:59100537762eb65db84045df608aa0ecf6986aec04bef3ff7ed8d1b16bf33563",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 15,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ios.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/ios.yml",
+        "line=16",
+        "proof_window=None",
+        "snippet=- uses: actions/setup-node@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:8c66cc25b9f8a3298558e3e2fb7ab15c88429138fd7a96670823fde204f5dd7c",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 16,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
       "severity": "medium",
       "category": "security",
       "path": ".github/workflows/jankurai.yml",
@@ -2177,16 +2353,16 @@
       "agent_fix": "wire secret, dependency, provenance, and workflow scans into an operational CI lane",
       "evidence": [
         "lockfile present",
-        "sql bad-behavior advisory signals: 8",
-        "typescript bad-behavior hard findings: 14",
-        "ci bad-behavior hard findings: 13"
+        "sql bad-behavior advisory signals: 9",
+        "typescript bad-behavior hard findings: 15",
+        "ci bad-behavior hard findings: 18"
       ],
       "check_id": "HLT-016-SUPPLY-CHAIN-DRIFT:security",
       "hardness": "soft",
       "confidence": 0.76,
       "evidence_kind": "workflow-command",
       "rerun_command": "just security",
-      "fingerprint": "sha256:610c6de8d84ff0e0bc2b31ea8e48fb6e73002e7f7c49c166974597b347c70669",
+      "fingerprint": "sha256:2724a3cf75c37bd4be0cc99e9deb0c3fe2eb0d95633225d57906a33f144f6ead",
       "rule_id": "HLT-016-SUPPLY-CHAIN-DRIFT",
       "tlr": "Security, secrets, agency",
       "lane": "security",
@@ -2377,7 +2553,7 @@
       "severity": "medium",
       "category": "proof",
       "path": "agent/test-map.json",
-      "problem": "`Proof lanes and test routing` scored 63 below the standard floor of 85",
+      "problem": "`Proof lanes and test routing` scored 67 below the standard floor of 85",
       "agent_fix": "route each owned path to a deterministic proof command and make the lane executable in CI",
       "evidence": [
         "deterministic fast lane found",
@@ -2390,7 +2566,7 @@
       "confidence": 0.76,
       "evidence_kind": "policy-manifest",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:e9d971427e8ad4c1b11e75b69af4b0f7288a68f1d4e826f550ce23138e5a92e1",
+      "fingerprint": "sha256:ffc2dc75e66c53062ef7eca5264a9d8aefcacda8eec563c17eb12659c5bb30f8",
       "rule_id": "HLT-004-UNMAPPED-PROOF",
       "tlr": "Verification",
       "lane": "fast",
@@ -2641,7 +2817,7 @@
       "evidence": [
         "detector=typescript.security.raw-command-sql",
         "path=apps/api/src/repo/account.ts",
-        "line=153",
+        "line=159",
         "snippet=scoped(`DELETE FROM refresh_tokens WHERE ${userScope}`),"
       ],
       "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
@@ -2649,13 +2825,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:989601a36f9d98ca8ef60aeed0c01943c5bcbd5e9b00242384a92f3ef13ac6b8",
+      "fingerprint": "sha256:fafd33243a28d7f04b4a4a4ad917535b8f6fb951d397b1c8c6b686d403cec0d3",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
       "tlr": "Contracts/data",
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "api",
-      "line": 153,
+      "line": 159,
       "matched_term": "typescript.security.raw-command-sql",
       "reason": "trusted input proof is missing"
     },
@@ -2668,7 +2844,7 @@
       "evidence": [
         "detector=typescript.security.raw-command-sql",
         "path=apps/api/src/repo/account.ts",
-        "line=154",
+        "line=161",
         "snippet=scoped(`DELETE FROM devices WHERE ${userScope}`),"
       ],
       "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
@@ -2676,13 +2852,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:c674bd5ed3251f039e77ac9634cc99c5c1117931fc58d21c3b5669fab43f752f",
+      "fingerprint": "sha256:3404ba377581ecf5d0fc3d81cb1e1c5c69e9b7178d4d096d3542b71ef152b909",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
       "tlr": "Contracts/data",
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "api",
-      "line": 154,
+      "line": 161,
       "matched_term": "typescript.security.raw-command-sql",
       "reason": "trusted input proof is missing"
     },
@@ -2695,7 +2871,7 @@
       "evidence": [
         "detector=typescript.security.raw-command-sql",
         "path=apps/api/src/repo/account.ts",
-        "line=155",
+        "line=162",
         "snippet=scoped(`DELETE FROM idempotency_keys WHERE ${userScope}`),"
       ],
       "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
@@ -2703,13 +2879,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:edddb46e88538389dd62ba1ad4b930b678ed19475bef1eb9f01be76cbb534b2a",
+      "fingerprint": "sha256:49fe25b304a37dc30641d7782d66f62f66218452f933f7f9ab48847b425bb693",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
       "tlr": "Contracts/data",
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "api",
-      "line": 155,
+      "line": 162,
       "matched_term": "typescript.security.raw-command-sql",
       "reason": "trusted input proof is missing"
     },
@@ -2800,7 +2976,7 @@
       "evidence": [
         "detector=typescript.types.any-boundary",
         "path=apps/api/src/routes/families.ts",
-        "line=116",
+        "line=121",
         "snippet=const { familyId, userId } = JSON.parse(raw) as { familyId: string; userId: string };"
       ],
       "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
@@ -2808,13 +2984,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:d4fa8dfdae10299541f07cb85bbc21421d0ac5ee6fc88e16d214671c31221286",
+      "fingerprint": "sha256:de6c1eb87a8e6b187df30dbe77726ef78c2b1b546b1df2f54750cbe0929b7530",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
       "tlr": "Contracts/data",
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "api",
-      "line": 116,
+      "line": 121,
       "matched_term": "typescript.types.any-boundary",
       "reason": "value shape is not proven before the cast"
     },
@@ -2969,29 +3145,6 @@
     },
     {
       "severity": "high",
-      "category": "vibe",
-      "path": "apps/api/src/services/familyRoom.ts",
-      "problem": "future-hostile/dead-language term `stub` appears in product/runtime code",
-      "agent_fix": "remove or rename the marker, implement the intended behavior, model a typed unsupported state, or move docs/generated/vendor/product-copy text into an allowlisted context",
-      "evidence": [
-        "apps/api/src/services/familyRoom.ts:38",
-        "future-hostile/dead-language term `stub` appears"
-      ],
-      "check_id": "HLT-001-DEAD-MARKER:vibe",
-      "hardness": "hard",
-      "confidence": 0.88,
-      "evidence_kind": "repository-scan",
-      "rerun_command": "just fast",
-      "fingerprint": "sha256:b5b6a7ea8106d69d25d2d19e56dd172e4635d7f1b108c69fe7ea3f58fae7086f",
-      "rule_id": "HLT-001-DEAD-MARKER",
-      "tlr": "Entropy",
-      "lane": "fast",
-      "docs_url": "docs/audit-rubric.md#future-hostile-language-rule",
-      "owner": "api",
-      "line": 38
-    },
-    {
-      "severity": "high",
       "category": "boundary",
       "path": "apps/api/src/services/syncService.ts",
       "problem": "unchecked boundary cast or parse result crosses a trust boundary",
@@ -3122,6 +3275,26 @@
     },
     {
       "severity": "high",
+      "category": "stack",
+      "path": "apps/ios/TaakHelden/App/AppState.swift",
+      "problem": "runtime code uses a language outside the chosen optimal stack",
+      "agent_fix": "move product runtime behavior to Rust core, TypeScript web, SQL migrations, or generated contracts; Python needs a dated advanced-ML/data exception",
+      "evidence": [
+        "apps/ios/TaakHelden/App/AppState.swift uses `.swift`",
+        "Rust core + TypeScript/React/Vite + PostgreSQL + generated contracts + exception-only Python AI/data service"
+      ],
+      "check_id": "HLT-000-SCORE-DIMENSION:stack",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just score",
+      "fingerprint": "sha256:4ed173bff58bc1f61d23b353901df157d1cb7833112ec43e590e2e40700a9851",
+      "tlr": "Context/setup",
+      "lane": "audit",
+      "owner": "ios"
+    },
+    {
+      "severity": "high",
       "category": "ux-qa",
       "path": "apps/web",
       "problem": "web surface lacks layered rendered UX QA evidence",
@@ -3169,13 +3342,40 @@
     {
       "severity": "high",
       "category": "boundary",
+      "path": "apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx",
+      "problem": "TypeScript suppression comment hides type checking or lint evidence",
+      "agent_fix": "remove the broad suppression or scope it to a single justified line",
+      "evidence": [
+        "detector=typescript.suppress.ts-nocheck",
+        "path=apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx",
+        "line=68",
+        "snippet=// eslint-disable-next-line @next/next/no-img-element"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:bad147016d10f8aec97e9239718e4466dca6e2e5d558f79fcefae7ae5e34a75e",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "web",
+      "line": 68,
+      "matched_term": "typescript.suppress.ts-nocheck",
+      "reason": "broad suppression is hard to audit"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
       "path": "apps/web/app/[locale]/(dashboard)/goedkeuren/GoedkeurenClient.tsx",
       "problem": "TypeScript suppression comment hides type checking or lint evidence",
       "agent_fix": "remove the broad suppression or scope it to a single justified line",
       "evidence": [
         "detector=typescript.suppress.ts-nocheck",
         "path=apps/web/app/[locale]/(dashboard)/goedkeuren/GoedkeurenClient.tsx",
-        "line=51",
+        "line=53",
         "snippet=// eslint-disable-next-line @next/next/no-img-element -- signed, short-lived R2 URL; not a static asset"
       ],
       "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
@@ -3183,13 +3383,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:6655b28af6ac50579df30b9fc6bd28016b980fc57a24a714a604ecb8ebb6f46b",
+      "fingerprint": "sha256:40358696f0fb3b7da2995d1917101340a3291f92c6d02bb2359f6835a252f9eb",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
       "tlr": "Contracts/data",
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "web",
-      "line": 51,
+      "line": 53,
       "matched_term": "typescript.suppress.ts-nocheck",
       "reason": "broad suppression is hard to audit"
     },
@@ -3437,6 +3637,16 @@
       "why": "unchecked boundary cast or parse result crosses a trust boundary"
     },
     {
+      "path": "apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "web",
+      "task": "remove the broad suppression or scope it to a single justified line",
+      "why": "TypeScript suppression comment hides type checking or lint evidence"
+    },
+    {
       "path": "apps/web/app/[locale]/(dashboard)/goedkeuren/GoedkeurenClient.tsx",
       "priority": "high",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
@@ -3565,6 +3775,16 @@
       "why": "workflow inlines CI commands instead of delegating to ops/ci/*.sh"
     },
     {
+      "path": ".github/workflows/ios.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "why": "workflow inlines CI commands instead of delegating to ops/ci/*.sh"
+    },
+    {
       "path": ".github/workflows/jankurai.yml",
       "priority": "high",
       "rule_id": "HLT-042-CI-LOCAL-PARITY",
@@ -3612,7 +3832,7 @@
       "lane": "fast",
       "owner": "agent",
       "task": "route each owned path to a deterministic proof command and make the lane executable in CI",
-      "why": "`Proof lanes and test routing` scored 63 below the standard floor of 85"
+      "why": "`Proof lanes and test routing` scored 67 below the standard floor of 85"
     },
     {
       "path": "docs/testing.md",
@@ -3652,6 +3872,15 @@
       "owner": "ops",
       "task": "add a CI job that runs `jankurai . --json .jankurai/repo-score.json --md .jankurai/repo-score.md` and uploads both artifacts",
       "why": "CI does not run the jankurai audit lane"
+    },
+    {
+      "path": "apps/ios/TaakHelden/App/AppState.swift",
+      "priority": "high",
+      "tlr": "Context/setup",
+      "lane": "audit",
+      "owner": "ios",
+      "task": "move product runtime behavior to Rust core, TypeScript web, SQL migrations, or generated contracts; Python needs a dated advanced-ML/data exception",
+      "why": "runtime code uses a language outside the chosen optimal stack"
     },
     {
       "path": ".github",
@@ -3813,6 +4042,46 @@
       "why": "workflow uses an external action not pinned to a full commit SHA"
     },
     {
+      "path": ".github/workflows/ios.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "add workflow-level concurrency with cancel-in-progress",
+      "why": "workflow is missing concurrency control"
+    },
+    {
+      "path": ".github/workflows/ios.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "add top-level `permissions: contents: read` and job-specific write scopes only where needed",
+      "why": "workflow is missing explicit top-level permissions"
+    },
+    {
+      "path": ".github/workflows/ios.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "set an explicit timeout-minutes on each job",
+      "why": "workflow job is missing timeout-minutes"
+    },
+    {
+      "path": ".github/workflows/ios.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "pin every external action to a 40-character commit SHA",
+      "why": "workflow uses an external action not pinned to a full commit SHA"
+    },
+    {
       "path": ".github/workflows/jankurai.yml",
       "priority": "high",
       "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
@@ -3864,16 +4133,6 @@
     },
     {
       "path": "apps/api/src/routes/ws.ts",
-      "priority": "high",
-      "rule_id": "HLT-001-DEAD-MARKER",
-      "tlr": "Entropy",
-      "lane": "fast",
-      "owner": "api",
-      "task": "remove or rename the marker, implement the intended behavior, model a typed unsupported state, or move docs/generated/vendor/product-copy text into an allowlisted context",
-      "why": "future-hostile/dead-language term `stub` appears in product/runtime code"
-    },
-    {
-      "path": "apps/api/src/services/familyRoom.ts",
       "priority": "high",
       "rule_id": "HLT-001-DEAD-MARKER",
       "tlr": "Entropy",
