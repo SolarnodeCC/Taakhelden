@@ -113,15 +113,15 @@ Nieuwe dashboard-sectie in de navigatie.
 
 - Grote, goed leesbare **6-cijferige code** (`inviteCode`).
 - **Kopiëren** naar klembord + korte bevestiging.
-- Optioneel: **QR-code** gegenereerd client-side uit de code-string
-  (geen API nodig; bibliotheek licht houden, bijv. `qrcode` of SVG-lib).
-  Als QR te zwaar voelt voor de PR: code + kopiëren is MVP; QR als
-  follow-up in dezelfde batch als het meevalt.
+- **QR-code** (must): client-side gegenereerd uit de code-string — geen
+  API nodig. Lichte dependency (bijv. `qrcode` → SVG/canvas). Na
+  hergenereren moet de QR mee updaten. Toegankelijk: `aria-label` met de
+  code; code blijft altijd als tekst zichtbaar naast de QR.
 - Korte ouder-copy: “Open de TaakHelden-app op het kindertoestel en vul
   deze code in.” — géén kindgerichte UI hier.
 - Actie **Nieuwe code maken** → `POST /api/v1/families/me/invite-code`
   (idempotent via `apiClient`). Bevestigingsdialoog: “De oude code werkt
-  meteen niet meer.” Toon nieuwe code na succes.
+  meteen niet meer.” Toon nieuwe code + QR na succes.
 
 #### 2b. Kindlijst
 
@@ -147,7 +147,7 @@ Velden uit `CreateChildBody`:
 | --- | --- | --- |
 | `displayName` | 1–30 | “Roepnaam” |
 | `birthYear` | int, min 2005, max (huidig jaar − 3) | Jaarkiezer, geen volledige geboortedatum (privacy) |
-| `avatarId` | optioneel | Eenvoudige vaste set placeholders (emoji/id’s) tot de echte avatar-bibliotheek er is; mag weggelaten worden |
+| `avatarId` | optioneel | **Vaste placeholder-set** (5–8 id’s, bijv. emoji/kleur-tegels) tot de echte avatar-bibliotheek er is; default `null` als niets gekozen |
 | `pincode` | `/^\d{4}$/` | Twee velden: PIN + bevestiging; nooit in logs |
 
 **AVG-toestemming (art. 8):**
@@ -165,18 +165,16 @@ Velden uit `CreateChildBody`:
 
 #### 2d. Onboarding-flow na registratie
 
-Minimale wizard, geen aparte multi-page stack als dat overkill is:
+**Besloten: query-param op `/gezin`**, geen aparte `/onboarding/*`-routes.
 
 1. Register → cookies gezet.
 2. Redirect naar `/gezin?onboarding=1`.
 3. Banner/stappenindicator: “Stap 2 — Voeg je eerste kind toe”.
 4. Na succesvol kind: banner wordt “Stap 3 — Deel de gezinscode met het
-   kindertoestel” en scroll/focus naar de code-kaart.
+   kindertoestel” en scroll/focus naar de code-kaart (+ QR).
 5. CTA “Naar vandaag” → `/vandaag` wanneer minstens één kind bestaat.
-
-Geen aparte `/onboarding/*`-routes tenzij de UX dat eist tijdens
-implementatie; query-param + conditional UI op `/gezin` houdt de
-oppervlakte klein (consistent met batch-4-filosofie).
+6. Query-param mag verdwijnen na afronden (client `router.replace('/gezin')`)
+   zodat een refresh niet opnieuw in wizard-modus landt.
 
 ## Techniek & conventies
 
@@ -241,7 +239,9 @@ oppervlakte klein (consistent met batch-4-filosofie).
 - [ ] Kindprofiel aanmaken met roepnaam, geboortejaar, PIN + expliciete
       AVG-toestemming (UI); server legt consent vast.
 - [ ] Kind bewerken + pincode resetten werken.
-- [ ] Gezinscode zichtbaar, kopieerbaar, hergenereerbaar.
+- [ ] Gezinscode zichtbaar, kopieerbaar, hergenereerbaar; QR toont dezelfde
+      code en update na hergenereren.
+- [ ] Avatar-keuze via vaste placeholder-set (optioneel veld).
 - [ ] Nav-item **Gezin** voor `full` parents; route-guard tegen `approve_only`.
 - [ ] nl + en strings compleet; positieve/kalme ouder-copy; geen stub-teksten.
 - [ ] Geen PII/pincodes/invite codes in logs.
@@ -257,23 +257,20 @@ oppervlakte klein (consistent met batch-4-filosofie).
 | 4 | Turnstile ontbreekt/faalt (prod) | `VALIDATION_FAILED`, geen account |
 | 5 | Eerste kind aanmaken zonder AVG-check | Submit disabled |
 | 6 | Kind aanmaken met check | Kind in lijst; Vandaag toont het kind |
-| 7 | Gezinscode hergenereren | Oude code ongeldig; UI toont nieuwe |
-| 8 | `approve_only` opent `/gezin` | Redirect / geen beheer-UI |
-| 9 | Locale EN | Alle nieuwe copy in het Engels |
+| 7 | Gezinscode hergenereren | Oude code ongeldig; UI toont nieuwe code **en** QR |
+| 8 | QR scannen / lezen | QR encodeert de 6-cijferige code; tekst blijft ernaast zichtbaar |
+| 9 | `approve_only` opent `/gezin` | Redirect / geen beheer-UI |
+| 10 | Locale EN | Alle nieuwe copy in het Engels |
 
-## Open vragen voor review
+## Beslissingen (review vastgelegd)
 
-1. **Akkoord met scope Registratie + Gezin/kinderen** voor batch 7, met
-   co-ouder + gezinsinstellingen naar batch 8?
-2. **QR-code in scope of follow-up?** Voorstel: code + kopiëren = must;
-   QR = should (zelfde PR als het meevalt, anders ticket in batch 7.1).
-3. **Avatar-picker**: vaste placeholder-set (5–8 id’s) of `avatarId`
-   weglaten tot de echte bibliotheek klaar is? Voorstel: optioneel veld met
-   kleine vaste set; default `null`.
-4. **Onboarding als query-param op `/gezin`** vs. aparte `/onboarding/kind`-
-   route? Voorstel: query-param (kleinere oppervlakte).
-5. **Soft-delete kind** (`DELETE /members/{id}`) meenemen? Voorstel: **nee**
-   — hoort bij privacy/AVG-batch samen met account-export/verwijdering.
+| # | Vraag | Besluit |
+| --- | --- | --- |
+| 1 | Scope batch 7 | **Akkoord** — registratie + gezin/kinderen. Co-ouder + gezinsinstellingen → batch 8. |
+| 2 | QR-code | **In scope (must)** — client-side QR naast code + kopiëren. |
+| 3 | Avatar | **Placeholder-set** (5–8 id’s); optioneel, default `null`. |
+| 4 | Onboarding-routing | **Query-param** `/gezin?onboarding=1` — geen aparte onboarding-routes. |
+| 5 | Soft-delete kind | **Nee** — hoort bij latere privacy/AVG-batch (export + verwijdering). |
 
 ## Agents / skills bij implementatie
 
