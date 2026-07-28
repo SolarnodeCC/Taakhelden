@@ -97,7 +97,7 @@ struct TodayBalanceDTO: Codable, Equatable {
     let lifetimeEarned: Int
 }
 
-struct ChildTodayViewDTO: Codable {
+struct ChildTodayViewDTO: Codable, Equatable {
     let viewer: String
     let date: String
     let instances: [InstanceViewDTO]
