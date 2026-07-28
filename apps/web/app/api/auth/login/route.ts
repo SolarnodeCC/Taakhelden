@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { LoginBody, TokenPair, ErrorCodes } from "@taakhelden/shared";
-import { API_BASE_URL } from "../../../../lib/api/config";
+import { getApiBaseUrl } from "../../../../lib/api/config";
 import { setTokens } from "../../../../lib/auth/session";
 
 /** BFF login: forwards credentials to the Worker and stores tokens in httpOnly cookies. */
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
   let res: Response;
   try {
-    res = await fetch(`${API_BASE_URL}/auth/login`, {
+    res = await fetch(`${getApiBaseUrl()}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(parsed.data),
@@ -31,10 +31,14 @@ export async function POST(req: Request) {
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
+    if (!data) {
+      return NextResponse.json(
+        { error: { code: ErrorCodes.UPSTREAM_UNAVAILABLE, message: "Kan de server niet bereiken." } },
+        { status: 502 },
+      );
+    }
     // Pass the Worker's error envelope (and status) straight through.
-    return NextResponse.json(data ?? { error: { code: ErrorCodes.UNAUTHORIZED, message: "Inloggen mislukt." } }, {
-      status: res.status,
-    });
+    return NextResponse.json(data, { status: res.status });
   }
 
   const tokens = TokenPair.safeParse(data);

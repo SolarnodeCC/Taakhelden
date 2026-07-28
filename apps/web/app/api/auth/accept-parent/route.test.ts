@@ -13,7 +13,7 @@ vi.mock("../../../../lib/auth/session", () => ({
 }));
 
 vi.mock("../../../../lib/api/config", () => ({
-  API_BASE_URL: "http://worker.test/v1",
+  getApiBaseUrl: () => "http://worker.test/v1",
 }));
 
 describe("POST /api/auth/accept-parent", () => {

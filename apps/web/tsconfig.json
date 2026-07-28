@@ -31,6 +31,7 @@
     "middleware.ts",
     "tailwind.config.ts",
     "next-env.d.ts",
+    "cloudflare-env.d.ts",
     ".next/types/**/*.ts"
   ],
   "exclude": [
