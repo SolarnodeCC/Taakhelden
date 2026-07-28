@@ -1,7 +1,9 @@
 import SwiftUI
+import UIKit
 
 @main
 struct TaakHeldenApp: App {
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @State private var appState = AppState(usePreviewData: false)
 
     var body: some Scene {
@@ -42,8 +44,19 @@ struct RootView: View {
                     appState.route = .childUnlock
                 }
             }
-            if phase == .active, appState.route == .childHome {
-                Task { _ = await appState.syncEngine.syncNow() }
+            if phase == .active {
+                if appState.route == .childHome {
+                    Task { _ = await appState.syncEngine.syncNow() }
+                }
+                Task {
+                    await UIApplication.shared.registerForRemoteNotifications()
+                    await appState.pushService.registerIfNeeded(tokenProvider: APNSTokenStore.shared)
+                }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .pushDeepLinkReceived)) { _ in
+            if appState.route == .childHome {
+                appState.parentGate.openGate()
             }
         }
     }

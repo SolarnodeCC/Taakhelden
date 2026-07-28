@@ -16,15 +16,23 @@ final class ChildDayViewModel {
     private let mutationQueue: MutationQueue
     private let syncEngine: SyncEngine
     private let celebrationService: CelebrationService
+    private let photoBonusService: PhotoBonusService
 
     var state: ChildDayLoadState = .loading
     var optimisticCompletedIDs: Set<String> = []
 
-    init(apiClient: TaakHeldenAPIClient, mutationQueue: MutationQueue, syncEngine: SyncEngine, celebrationService: CelebrationService) {
+    init(
+        apiClient: TaakHeldenAPIClient,
+        mutationQueue: MutationQueue,
+        syncEngine: SyncEngine,
+        celebrationService: CelebrationService,
+        photoBonusService: PhotoBonusService
+    ) {
         self.apiClient = apiClient
         self.mutationQueue = mutationQueue
         self.syncEngine = syncEngine
         self.celebrationService = celebrationService
+        self.photoBonusService = photoBonusService
     }
 
     @MainActor
@@ -55,6 +63,16 @@ final class ChildDayViewModel {
 
         _ = await syncEngine.syncNow()
         await load()
+    }
+
+    @MainActor
+    func uploadPhoto(for instanceID: String, jpegData: Data) async {
+        do {
+            try await photoBonusService.uploadTaskPhoto(instanceID: instanceID, jpegData: jpegData)
+            await load()
+        } catch {
+            state = .error(error.localizedDescription)
+        }
     }
 }
 

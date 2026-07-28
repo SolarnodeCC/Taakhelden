@@ -21,6 +21,9 @@ final class AppState {
     var syncEngine: SyncEngine { environment.syncEngine }
     var parentGate: ParentGateCoordinator { environment.parentGate }
     var localAuth: LocalAuthenticationClient { environment.localAuth }
+    var celebrationService: CelebrationService { environment.celebrationService }
+    var photoBonusService: PhotoBonusService { environment.photoBonusService }
+    var pushService: PushRegistrationService { environment.pushService }
 
     init(usePreviewData: Bool = false) {
         environment = AppEnvironment(usePreviewData: usePreviewData)

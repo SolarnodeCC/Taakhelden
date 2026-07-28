@@ -26,6 +26,11 @@ jobs:
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
           fi
+      - name: Generate Swift OpenAPI client (optional)
+        if: steps.detect.outputs.present == 'true'
+        run: |
+          brew install swift-openapi-generator 2>/dev/null || true
+          bash apps/ios/Scripts/generate-openapi-client.sh
       - name: Install XcodeGen
         if: steps.detect.outputs.present == 'true'
         run: brew install xcodegen

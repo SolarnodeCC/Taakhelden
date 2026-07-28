@@ -32,9 +32,12 @@ targets:
       - path: TaakHelden
     resources:
       - path: TaakHelden/Resources
+    entitlements:
+      path: TaakHelden/TaakHelden.entitlements
     settings:
       base:
         PRODUCT_NAME: TaakHelden
+        CODE_SIGN_ENTITLEMENTS: TaakHelden/TaakHelden.entitlements
     dependencies:
       - package: OpenAPIRuntime
       - package: OpenAPIURLSession

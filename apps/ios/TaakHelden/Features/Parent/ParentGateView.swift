@@ -3,6 +3,7 @@ import SwiftUI
 struct ParentGateView: View {
     @Environment(AppState.self) private var appState
     @State private var statusMessage: String?
+    @State private var soundsEnabled = AppSettings.childSoundsEnabled
 
     var body: some View {
         VStack(alignment: .leading, spacing: THSpacing.lg) {
@@ -11,6 +12,11 @@ struct ParentGateView: View {
 
             Text("Alleen ouders komen hier. Kind-pincode opent dit scherm bewust niet.")
                 .foregroundStyle(.secondary)
+
+            Toggle("Geluid bij taak klaar", isOn: $soundsEnabled)
+                .onChange(of: soundsEnabled) { _, enabled in
+                    AppSettings.childSoundsEnabled = enabled
+                }
 
             Button("Ontgrendel met Face ID of toestelcode") {
                 Task { await unlockWithDeviceOwner() }

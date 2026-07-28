@@ -12,6 +12,10 @@ enum AvatarCatalog {
 
     static let selectableIDs = ["fox", "panda", "lion", "octopus", "unicorn", "tiger"]
 
+    static func id(forEmoji emoji: String) -> String {
+        emojiByID.first(where: { $0.value == emoji })?.key ?? selectableIDs[0]
+    }
+
     static func emoji(for avatarID: String?) -> String {
         guard let avatarID, let emoji = emojiByID[avatarID] else {
             return "🦊"

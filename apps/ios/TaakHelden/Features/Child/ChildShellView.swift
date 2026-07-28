@@ -1,4 +1,6 @@
 import SwiftUI
+import UIKit
+import UserNotifications
 
 enum ChildTab: Hashable {
     case mijnDag
@@ -44,7 +46,8 @@ struct ChildShellView: View {
                     apiClient: appState.apiClient,
                     mutationQueue: appState.mutationQueue,
                     syncEngine: appState.syncEngine,
-                    celebrationService: appState.environment.celebrationService
+                    celebrationService: appState.celebrationService,
+                    photoBonusService: appState.photoBonusService
                 )
             }
             if shopViewModel == nil {
@@ -52,6 +55,10 @@ struct ChildShellView: View {
             }
             await dayViewModel?.load()
             await shopViewModel?.load()
+            await registerPushIfNeeded()
+        }
+        .overlay {
+            ConfettiOverlay(token: appState.celebrationService.confettiToken)
         }
         .overlay(alignment: .top) {
             if appState.mutationQueue.hasPendingWork || appState.syncEngine.isSyncing {
@@ -70,6 +77,17 @@ struct ChildShellView: View {
             ParentGateView()
                 .presentationDetents([.medium])
         }
+    }
+
+    @MainActor
+    private func registerPushIfNeeded() async {
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+        if settings.authorizationStatus == .notDetermined {
+            _ = try? await center.requestAuthorization(options: [.alert, .badge, .sound])
+        }
+        await UIApplication.shared.registerForRemoteNotifications()
+        await appState.pushService.registerIfNeeded(tokenProvider: APNSTokenStore.shared)
     }
 }
 
@@ -165,7 +183,11 @@ private struct MijnDagTabView: View {
                     Text("+\(instance.points) punten")
                         .foregroundStyle(palette.mutedText.color)
                     if let photoStatus = instance.photoStatus {
-                        Text(photoStatus == "ready" ? "Foto wordt nagekeken…" : "Foto wordt nagekeken…")
+                        Text(photoStatus == "ready" ? "Foto is klaar — bonus volgt na goedkeuring!" : "Foto wordt nagekeken…")
+                            .font(.footnote)
+                            .foregroundStyle(palette.mutedText.color)
+                    } else if isDone, instance.photoBonusPoints > 0, instance.photoId == nil {
+                        Text("+\(instance.photoBonusPoints) bonuspunten met een foto")
                             .font(.footnote)
                             .foregroundStyle(palette.mutedText.color)
                     }
@@ -182,6 +204,12 @@ private struct MijnDagTabView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(palette.accent.color)
+                }
+            }
+
+            if isDone, instance.photoBonusPoints > 0, instance.photoId == nil {
+                PhotoBonusActionsView(palette: palette) { jpegData in
+                    Task { await viewModel?.uploadPhoto(for: instance.id, jpegData: jpegData) }
                 }
             }
         }
