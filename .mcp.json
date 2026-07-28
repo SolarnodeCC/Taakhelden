@@ -8,6 +8,14 @@
     "cloudflare-bindings": {
       "command": "npx",
       "args": ["-y", "mcp-remote", "https://bindings.mcp.cloudflare.com/sse"]
+    },
+    "cloudflare-docs": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://docs.mcp.cloudflare.com/sse"]
+    },
+    "cloudflare-builds": {
+      "command": "npx",
+      "args": ["-y", "mcp-remote", "https://builds.mcp.cloudflare.com/sse"]
     }
   }
 }
