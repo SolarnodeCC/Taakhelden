@@ -66,7 +66,11 @@
   "shell": {
     "loading": "Laden…",
     "loadError": "Kon gezinsgegevens niet laden.",
-    "greeting": "Hoi {name}"
+    "greeting": "Hoi {name}",
+    "realtime": {
+      "connecting": "Live verbinding maken…",
+      "offline": "Live verbinding verbroken — gegevens kunnen verouderd zijn"
+    }
   },
   "vandaag": {
     "title": "Vandaag",

@@ -66,7 +66,11 @@
   "shell": {
     "loading": "Loading…",
     "loadError": "Couldn't load family details.",
-    "greeting": "Hi {name}"
+    "greeting": "Hi {name}",
+    "realtime": {
+      "connecting": "Connecting live updates…",
+      "offline": "Live connection lost — data may be out of date"
+    }
   },
   "vandaag": {
     "title": "Today",

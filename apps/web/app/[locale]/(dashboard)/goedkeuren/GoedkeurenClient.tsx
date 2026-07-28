@@ -1,9 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { ParentTodayView, PhotoView, type InstanceView } from "../../../../lib/api/types";
+import { useRealtimeRefetch } from "../../../../lib/realtime/FamilyRealtimeContext";
+import { APPROVAL_REALTIME_EVENTS } from "../../../../lib/realtime/events";
 import { useRouter } from "../../../../i18n/navigation";
 import { Button } from "../../../../components/ui";
 
@@ -169,27 +171,29 @@ export default function GoedkeurenClient() {
   const router = useRouter();
   const [queue, setQueue] = useState<QueueItem[] | null>(null);
   const [failed, setFailed] = useState(false);
+  const hadDataRef = useRef(false);
+
+  const loadQueue = useCallback(async () => {
+    try {
+      const raw = await apiClient.get("/api/v1/instances/today");
+      const view = ParentTodayView.parse(raw);
+      setQueue(toQueue(view));
+      hadDataRef.current = true;
+      setFailed(false);
+    } catch (err) {
+      if (err instanceof ApiClientError && err.status === 401) {
+        router.push("/login");
+        return;
+      }
+      if (!hadDataRef.current) setFailed(true);
+    }
+  }, [router]);
 
   useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const raw = await apiClient.get("/api/v1/instances/today");
-        const view = ParentTodayView.parse(raw);
-        if (active) setQueue(toQueue(view));
-      } catch (err) {
-        if (!active) return;
-        if (err instanceof ApiClientError && err.status === 401) {
-          router.push("/login");
-          return;
-        }
-        setFailed(true);
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, [router]);
+    void loadQueue();
+  }, [loadQueue]);
+
+  useRealtimeRefetch(APPROVAL_REALTIME_EVENTS, loadQueue);
 
   const resolve = useCallback((id: string) => {
     setQueue((prev) => (prev ? prev.filter((item) => item.id !== id) : prev));

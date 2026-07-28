@@ -1,9 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { ParentTodayView, type ChildToday, type InstanceView } from "../../../../lib/api/types";
+import { useRealtimeRefetch } from "../../../../lib/realtime/FamilyRealtimeContext";
+import { TODAY_REALTIME_EVENTS } from "../../../../lib/realtime/events";
 import { useRouter } from "../../../../i18n/navigation";
 import { Card } from "../../../../components/ui";
 
@@ -79,27 +81,29 @@ export default function VandaagClient() {
   const router = useRouter();
   const [children, setChildren] = useState<ChildToday[] | null>(null);
   const [failed, setFailed] = useState(false);
+  const hadDataRef = useRef(false);
+
+  const loadToday = useCallback(async () => {
+    try {
+      const raw = await apiClient.get("/api/v1/instances/today");
+      const today = ParentTodayView.parse(raw);
+      setChildren(today.children);
+      hadDataRef.current = true;
+      setFailed(false);
+    } catch (err) {
+      if (err instanceof ApiClientError && err.status === 401) {
+        router.push("/login");
+        return;
+      }
+      if (!hadDataRef.current) setFailed(true);
+    }
+  }, [router]);
 
   useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const raw = await apiClient.get("/api/v1/instances/today");
-        const today = ParentTodayView.parse(raw);
-        if (active) setChildren(today.children);
-      } catch (err) {
-        if (!active) return;
-        if (err instanceof ApiClientError && err.status === 401) {
-          router.push("/login");
-          return;
-        }
-        setFailed(true);
-      }
-    })();
-    return () => {
-      active = false;
-    };
-  }, [router]);
+    void loadToday();
+  }, [loadToday]);
+
+  useRealtimeRefetch(TODAY_REALTIME_EVENTS, loadToday);
 
   return (
     <div className="max-w-4xl">

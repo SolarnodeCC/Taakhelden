@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+  WsMessage,
+  WsInstanceUpdatedData,
+  WsPointsChangedData,
+  WsRedemptionUpdatedData,
+} from "@taakhelden/shared";
+import {
   CreateChildBody,
   FamilyPatchBody,
   InviteParentBody,
@@ -346,5 +352,31 @@ describe("Batch 10 schemas", () => {
     expect(() =>
       AdjustBody.parse({ childId: "ch_1", amount: -1, note: "x" }),
     ).toThrow();
+  });
+});
+
+describe("WsMessage", () => {
+  it("parses instance.updated", () => {
+    const msg = WsMessage.parse({
+      event: "instance.updated",
+      data: { instanceId: "ti_1", status: "submitted", childId: "ch_1" },
+    });
+    expect(WsInstanceUpdatedData.parse(msg.data).instanceId).toBe("ti_1");
+  });
+
+  it("parses points.changed", () => {
+    const msg = WsMessage.parse({
+      event: "points.changed",
+      data: { childId: "ch_1", newBalance: 42 },
+    });
+    expect(WsPointsChangedData.parse(msg.data).newBalance).toBe(42);
+  });
+
+  it("parses redemption.updated", () => {
+    const msg = WsMessage.parse({
+      event: "redemption.updated",
+      data: { redemptionId: "rd_1", status: "fulfilled", childId: "ch_1" },
+    });
+    expect(WsRedemptionUpdatedData.parse(msg.data).status).toBe("fulfilled");
   });
 });
