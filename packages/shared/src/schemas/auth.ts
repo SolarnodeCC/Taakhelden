@@ -50,12 +50,25 @@ export const ChildProfile = z.object({
 });
 export type ChildProfile = z.infer<typeof ChildProfile>;
 
+export const FamilyCodeResult = z.object({
+  familyName: z.string(),
+  children: z.array(ChildProfile),
+});
+export type FamilyCodeResult = z.infer<typeof FamilyCodeResult>;
+
 export const TokenPair = z.object({
   accessToken: z.string(),
   refreshToken: z.string().optional(), // kind-sessies hebben geen refresh token
   expiresIn: z.number(),
 });
 export type TokenPair = z.infer<typeof TokenPair>;
+
+export const ParentSessionResult = TokenPair.extend({
+  userId: z.string(),
+  familyId: z.string(),
+  refreshToken: z.string(),
+});
+export type ParentSessionResult = z.infer<typeof ParentSessionResult>;
 
 export const ChildSessionResult = z.object({
   accessToken: z.string(),

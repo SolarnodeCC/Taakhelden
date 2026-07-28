@@ -12,6 +12,7 @@ jobs:
       - uses: actions/setup-node@v7
         with: { node-version: 22, cache: npm }   # wrangler 4 vereist Node >= 22
       - run: npm ci
+      - run: npm run openapi:check
       - run: npm run lint
       - run: npm run typecheck
       - name: Tests (Workers-runtime)

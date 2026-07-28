@@ -42,7 +42,13 @@ export async function runCron(cron: string, env: Env) {
       for (const row of open) {
         if (reminded.has(row.child_id)) continue; // één herinnering per kind
         reminded.add(row.child_id);
-        await notifyChild(env, family.id as string, row.child_id, childCopy.taskOpen(row.title, row.points));
+        await notifyChild(
+          env,
+          family.id as string,
+          row.child_id,
+          childCopy.taskOpen(row.title, row.points),
+          { type: "task_open", childId: row.child_id },
+        );
       }
     }
   }

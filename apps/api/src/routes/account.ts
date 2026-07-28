@@ -13,6 +13,7 @@ import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
 import { verifySecret } from "../services/passwords";
+import { verifyAppleIdentityToken } from "../services/apple";
 import { newId } from "../services/ids";
 import { getUserById } from "../repo/auth";
 import {
@@ -63,12 +64,24 @@ account.get("/export/:id", async (c) => {
 /** Verwijder het hele gezin — bevestigd met wachtwoord-herinvoer. */
 account.delete("/", validate("json", AccountDeleteBody), async (c) => {
   const { familyId, userId } = requireParent(c, { full: true });
+  const body = c.req.valid("json");
 
   const user = await getUserById(c.env.DB, userId);
   const hash = user?.password_hash as string | undefined;
-  const confirmed = hash && (await verifySecret(c.req.valid("json").password, hash));
+  const appleSub = user?.apple_sub as string | undefined;
+  let confirmed = false;
+  if (hash && body.password) {
+    confirmed = await verifySecret(body.password, hash);
+  } else if (appleSub && body.appleIdentityToken) {
+    const claims = await verifyAppleIdentityToken(body.appleIdentityToken, c.env.APPLE_CLIENT_ID);
+    confirmed = claims?.sub === appleSub;
+  }
   if (!confirmed) {
-    throw new ApiException(401, ErrorCodes.INVALID_CREDENTIALS, "Wachtwoord klopt niet.");
+    throw new ApiException(
+      401,
+      ErrorCodes.INVALID_CREDENTIALS,
+      appleSub ? "Bevestig opnieuw met Apple om je account te verwijderen." : "Wachtwoord klopt niet.",
+    );
   }
 
   const deletedAt = await softDeleteFamily(c.env.DB, familyId);

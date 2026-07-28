@@ -44,8 +44,10 @@ queue = "export-processing"
 crons = ["5 0 * * *", "*/15 * * * *"]  # 00:05 instance-generatie · elke 15 min notificaties
 
 # Secrets (via `wrangler secret put`): JWT_SECRET, APNS_KEY, APNS_KEY_ID,
-# APNS_TEAM_ID, APPLE_CLIENT_ID, TURNSTILE_SECRET, EMAIL_API_KEY, EMAIL_FROM
-# Vars (optioneel): APP_BASE_URL (voor uitnodigings-links in e-mail)
+# APNS_TEAM_ID, APPLE_CLIENT_ID, APPLE_BUNDLE_ID, TURNSTILE_SECRET,
+# EMAIL_API_KEY, EMAIL_FROM
+# Vars (optioneel): APP_BASE_URL (voor uitnodigings-links in e-mail), APNS_ENV
+# (`sandbox` in dev/TestFlight, `production` in App Store/prod)
 
 [env.production]
 name = "taakhelden-api-prod"

@@ -115,6 +115,12 @@ export async function softDeleteFamily(db: D1Database, familyId: string): Promis
          WHERE user_id IN (SELECT id FROM users WHERE family_id = ?) AND revoked_at IS NULL`,
       )
       .bind(deletedAt, familyId),
+    db
+      .prepare(
+        `UPDATE child_device_sessions SET revoked_at = ?
+         WHERE family_id = ? AND revoked_at IS NULL`,
+      )
+      .bind(deletedAt, familyId),
   ]);
   return deletedAt;
 }
@@ -151,6 +157,7 @@ export async function purgeFamilyD1(db: D1Database, familyId: string): Promise<v
     scoped(`DELETE FROM child_badges WHERE ${childScope}`),
     scoped(`DELETE FROM pinned_rewards WHERE ${childScope}`),
     scoped(`DELETE FROM refresh_tokens WHERE ${userScope}`),
+    scoped("DELETE FROM child_device_sessions WHERE family_id = ?"),
     scoped(`DELETE FROM devices WHERE ${userScope}`),
     scoped(`DELETE FROM idempotency_keys WHERE ${userScope}`),
     scoped("DELETE FROM account_exports WHERE family_id = ?"),

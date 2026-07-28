@@ -13,6 +13,9 @@ Zie **[`docs/taakhelden-ios-bouwvoorstel.md`](../../docs/taakhelden-ios-bouwvoor
 - SwiftUI × design-tokens mapping
 - faseplan (fase 0 contract → MVP kind → v1 ouder)
 
+Het gegenereerde fase-0-contractsnapshot staat in
+`docs/openapi/taakhelden-core-v1.json` en wordt in CI op drift gecontroleerd.
+
 Tot die beslissingen vastliggen: geen handmatige JSON-DTO’s “tijdelijk” — dat wordt permanente drift.
 
 ## Geplande structuur

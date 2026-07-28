@@ -192,6 +192,7 @@ auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
           c.env,
           family.id as string,
           parentCopy.pinLock(child.display_name as string),
+          { type: "pin_lock", childId: child.id as string },
         ).catch(() => {}),
       );
       throw new ApiException(403, ErrorCodes.PIN_LOCKED, "Even pauze! Probeer het over een kwartiertje nog eens.");

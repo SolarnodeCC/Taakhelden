@@ -11,7 +11,9 @@
     "dev:web": "npm run dev -w apps/web",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
-    "lint": "eslint . --max-warnings=0"
+    "lint": "eslint . --max-warnings=0",
+    "openapi:generate": "npm run openapi:generate -w packages/shared",
+    "openapi:check": "npm run openapi:check -w packages/shared"
   },
   "engines": {
     "node": ">=22"
