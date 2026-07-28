@@ -2,7 +2,7 @@
 
 *Senior architectuur- + UI-voorstel. Aansluiting op `apps/api`, `apps/web` en `Design System/`. Status: voorstel ter beslissing — geen implementatie.*
 
-**Kopconclusie:** de API is ver genoeg om vandaag te beginnen; de iOS-app is dat niet. Het gat zit niet in “welke SwiftUI-views”, maar in **contractfundament** (OpenAPI/response-schemas — met migratiepad voor de *bestaande* webclient —, kind-sessie-verlenging, APNs-sandbox), **UI-states & gate-ontwerp** (empty/error, onboarding-schermen, parental gate, iPad lock), **privacy-beleid** naast code-invarianten, **tests voor sync/ledger-edge cases**, en **productkeuzes** (één app of twee, wie levert ouder-onboarding). Zonder die beslissingen bouwen we drift en herwerk.
+**Kopconclusie:** de API is ver genoeg om vandaag te beginnen; de iOS-app is dat niet. Het gat zit niet in “welke SwiftUI-views”, maar in **contractfundament** (OpenAPI/response-schemas — met migratiepad voor de *bestaande* webclient —, kind-sessie-verlenging, APNs-sandbox), **UI-states & gate-ontwerp**, **App Store-compliance** (Face ID/PIN onder 13, familie-metadata, push/foto-dataminimalisatie, één-device review), **privacy-beleid**, **tests**, en **productkeuzes**. Zonder die beslissingen bouwen we drift en herwerk.
 
 ---
 
@@ -82,7 +82,7 @@ Notifier hardcodet productie-host; sandbox-tokens van debug/TestFlight falen sti
 
 | # | Vraag | Aanbeveling | Waarom |
 |---|---|---|---|
-| **P1** | Één app of twee App Store-listings? | **Één familie-app, twee modi** (kind + ouder) | Past bij gedeelde iPad, SIWA-onboarding, parental gate = verborgen gebaar + LA/ouder-login (§5.3). Productvoorstel §6.10 prefereert “familie-app met kindermodus” boven formele Kids Category. |
+| **P1** | Één app of twee App Store-listings? | **Één familie-app, twee modi** (kind + ouder) | Past bij gedeelde iPad, SIWA-onboarding, parental gate = verborgen gebaar + LA/ouder-login (§5.3). Productvoorstel §6.10 + store-metadata familie-first (§14.1); niet Kids Category. |
 | **P2** | Wie levert ouder-onboarding? | **iOS in MVP** (web parallel later) | SIWA + fysieke koppeling; web mist kindbeheer sowieso. |
 | **P3** | Turnstile op native registratie? | **SIWA primair**; e-mail/wachtwoord fallback via web of later | Turnstile is web-native; SIWA heeft geen Turnstile nodig op de API. |
 | **P4** | Min. iOS-versie | **iOS 17** | `@Observable`, betere SwiftData, `ContentUnavailableView`. README zei 16 — herzien. |
@@ -176,7 +176,7 @@ App Store Review Guidelines (biometrics / account auth, update juni 2026): apps 
 | Opt-in | Face ID is aanzetten na koppeling, nooit verplicht; weigeren Face ID = gewoon PIN-first forever. |
 | Keychain | Biometrie ontgrendelt het Keychain-item; PIN is de altijd-werkende route naar hetzelfde secret — geen aparte “noodgreep” die verstopt zit. |
 
-Implícite PIN-only-als-Face-ID-faalt is **niet voldoende** voor review. UI-mock: ontgrendelkaart toont biometrie-prompt **plus** een duidelijke secundaire knop naar het numerieke PIN-pad (§7.2.3).
+Impliciete PIN-only-als-Face-ID-faalt is **niet voldoende** voor review. UI-mock: ontgrendelkaart toont biometrie-prompt **plus** een duidelijke secundaire knop naar het numerieke PIN-pad (§7.2.3).
 
 ### 5.3 Parental gate — interactie-ontwerp, niet alleen auth
 
