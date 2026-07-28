@@ -2,7 +2,7 @@
 
 *Senior architectuur- + UI-voorstel. Aansluiting op `apps/api`, `apps/web` en `Design System/`. Status: voorstel ter beslissing — geen implementatie.*
 
-**Kopconclusie:** de API is ver genoeg om vandaag te beginnen; de iOS-app is dat niet. Het gat zit niet in “welke SwiftUI-views”, maar in **contractfundament** (OpenAPI/response-schemas, kind-sessie-verlenging, APNs-sandbox) en **productkeuzes** (één app of twee, wie levert ouder-onboarding). Zonder die beslissingen bouwen we drift en herwerk.
+**Kopconclusie:** de API is ver genoeg om vandaag te beginnen; de iOS-app is dat niet. Het gat zit niet in “welke SwiftUI-views”, maar in **contractfundament** (OpenAPI/response-schemas — met migratiepad voor de *bestaande* webclient —, kind-sessie-verlenging, APNs-sandbox), **privacy-beleid** naast code-invarianten, **tests voor sync/ledger-edge cases**, en **productkeuzes** (één app of twee, wie levert ouder-onboarding). Zonder die beslissingen bouwen we drift en herwerk.
 
 ---
 
