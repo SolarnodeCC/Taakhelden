@@ -116,6 +116,53 @@ export async function revokeRefreshToken(db: D1Database, token: string) {
     .run();
 }
 
+export async function storeChildDeviceSession(
+  db: D1Database,
+  familyId: string,
+  childId: string,
+  token: string,
+  ttlDays: number,
+) {
+  const expires = new Date(Date.now() + ttlDays * 24 * 3600 * 1000).toISOString();
+  await db
+    .prepare(
+      `INSERT INTO child_device_sessions (id, family_id, child_id, token_hash, expires_at)
+       VALUES (?, ?, ?, ?, ?)`,
+    )
+    .bind(newId("cds"), familyId, childId, await sha256Hex(token), expires)
+    .run();
+}
+
+export async function consumeChildDeviceSession(db: D1Database, token: string) {
+  const hash = await sha256Hex(token);
+  const res = await db
+    .prepare(
+      `UPDATE child_device_sessions
+       SET revoked_at = datetime('now'), last_used_at = datetime('now')
+       WHERE token_hash = ? AND revoked_at IS NULL AND expires_at > datetime('now')`,
+    )
+    .bind(hash)
+    .run();
+  if (!res.meta.changes) return null;
+  return db.prepare("SELECT * FROM child_device_sessions WHERE token_hash = ?").bind(hash).first();
+}
+
+export async function revokeChildDeviceSessions(
+  db: D1Database,
+  familyId: string,
+  childId: string,
+): Promise<number> {
+  const res = await db
+    .prepare(
+      `UPDATE child_device_sessions
+       SET revoked_at = datetime('now')
+       WHERE family_id = ? AND child_id = ? AND revoked_at IS NULL`,
+    )
+    .bind(familyId, childId)
+    .run();
+  return res.meta.changes ?? 0;
+}
+
 export async function getUserById(db: D1Database, userId: string) {
   return db.prepare("SELECT * FROM users WHERE id = ? AND deleted_at IS NULL").bind(userId).first();
 }

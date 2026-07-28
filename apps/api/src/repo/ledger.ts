@@ -32,6 +32,21 @@ export async function balance(db: D1Database, familyId: string, childId: string)
   return row?.balance ?? 0;
 }
 
+/**
+ * Totaal ooit verdiende punten voor level/progress-UI. Terugboeking van een
+ * geannuleerde redemption telt niet als nieuw verdiend puntmoment.
+ */
+export async function lifetimeEarned(db: D1Database, familyId: string, childId: string): Promise<number> {
+  const row = await db
+    .prepare(
+      `SELECT COALESCE(SUM(amount), 0) AS earned FROM points_ledger
+       WHERE family_id = ? AND child_id = ? AND amount > 0 AND type != 'redemption_cancel'`,
+    )
+    .bind(familyId, childId)
+    .first<{ earned: number }>();
+  return row?.earned ?? 0;
+}
+
 /** Is deze bonus (dag/week/foto met deze ref) al geboekt? */
 export async function bonusExists(
   db: D1Database,

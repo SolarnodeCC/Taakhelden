@@ -1,5 +1,12 @@
 import { Hono } from "hono";
-import { CreateChildBody, UpdateMemberBody, PincodeBody, AttachPhotoBody, ErrorCodes } from "@taakhelden/shared";
+import {
+  CreateChildBody,
+  UpdateMemberBody,
+  PincodeBody,
+  AttachPhotoBody,
+  RevokeChildSessionsResult,
+  ErrorCodes,
+} from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
@@ -7,6 +14,7 @@ import { validate } from "../middleware/validate";
 import { newId } from "../services/ids";
 import { hashSecret } from "../services/passwords";
 import * as repo from "../repo/families";
+import { revokeChildDeviceSessions } from "../repo/auth";
 import { getPhoto, setMemberPhotoKey } from "../repo/photos";
 
 const members = new Hono<AppBindings>();
@@ -94,6 +102,21 @@ members.post("/:id/pincode", validate("json", PincodeBody), async (c) => {
   }
   await repo.setMemberPincode(c.env.DB, familyId, memberId, await hashSecret(c.req.valid("json").pincode));
   return c.json({ ok: true });
+});
+
+members.post("/:id/device-sessions/revoke", async (c) => {
+  const { familyId } = requireParent(c, { full: true });
+  const memberId = c.req.param("id");
+  const member = await repo.getMember(c.env.DB, familyId, memberId);
+  if (!member || member.role !== "child") {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
+  }
+  return c.json(
+    RevokeChildSessionsResult.parse({
+      ok: true,
+      revokedCount: await revokeChildDeviceSessions(c.env.DB, familyId, memberId),
+    }),
+  );
 });
 
 /** Profielfoto koppelen na de presigned-flow (§3.6). Zichtbaar zodra 'ready'. */

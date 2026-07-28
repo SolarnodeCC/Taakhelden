@@ -492,11 +492,12 @@ export async function computeBalance(
   childId: string,
 ) {
   const today = localDate(family.timezone);
-  const [bal, day, week, bonusDates] = await Promise.all([
+  const [bal, day, week, bonusDates, lifetimeEarned] = await Promise.all([
     ledger.balance(db, familyId, childId),
     instances.dayStats(db, familyId, childId, today),
     instances.weekStats(db, familyId, childId, weekDates(today)),
     ledger.dayBonusDates(db, familyId, childId),
+    ledger.lifetimeEarned(db, familyId, childId),
   ]);
 
   return {
@@ -506,6 +507,7 @@ export async function computeBalance(
     todayTotal: day.total,
     weekProgress: week.total === 0 ? 0 : week.approved / week.total,
     streakDays: computeStreak(bonusDates, today),
+    lifetimeEarned,
   };
 }
 

@@ -87,9 +87,15 @@ export function childToken(userId: string, familyId: string, opts: { ttl?: numbe
 
 export function api(
   path: string,
-  opts: { method?: string; token?: string; body?: unknown; idempotencyKey?: string } = {},
+  opts: {
+    method?: string;
+    token?: string;
+    body?: unknown;
+    idempotencyKey?: string;
+    headers?: Record<string, string>;
+  } = {},
 ) {
-  const headers: Record<string, string> = {};
+  const headers: Record<string, string> = { ...(opts.headers ?? {}) };
   if (opts.token) headers.Authorization = `Bearer ${opts.token}`;
   if (opts.body !== undefined) headers["Content-Type"] = "application/json";
   if (opts.idempotencyKey) headers["Idempotency-Key"] = opts.idempotencyKey;

@@ -19,6 +19,7 @@ export const InstanceView = z.object({
   approvalRequired: z.boolean(),
   daypart: z.string().nullable(),
   photoId: z.string().nullable(),
+  photoStatus: z.enum(["processing", "ready"]).nullable(),
   pointsEarned: z.number().int().nullable(),
   redoNote: z.string().nullable(),
   completedAt: z.string().nullable(),
@@ -60,6 +61,22 @@ export const ParentTodayView = z.object({
   children: z.array(ChildToday),
 });
 export type ParentTodayView = z.infer<typeof ParentTodayView>;
+
+export const ViewerChildTodayView = ChildTodayView.extend({
+  viewer: z.literal("child"),
+});
+export type ViewerChildTodayView = z.infer<typeof ViewerChildTodayView>;
+
+export const ViewerParentTodayView = ParentTodayView.extend({
+  viewer: z.literal("parent"),
+});
+export type ViewerParentTodayView = z.infer<typeof ViewerParentTodayView>;
+
+export const TodayViewerResponse = z.discriminatedUnion("viewer", [
+  ViewerChildTodayView,
+  ViewerParentTodayView,
+]);
+export type TodayViewerResponse = z.infer<typeof TodayViewerResponse>;
 
 export const RedoBody = z.object({
   note: z.string().min(1).max(200), // vriendelijke toelichting, verplicht

@@ -23,6 +23,10 @@ export const ChildSessionBody = z.object({
   pincode: z.string().regex(/^\d{4}$/),
 });
 
+export const ChildSessionRefreshBody = z.object({
+  refreshToken: z.string().min(1),
+});
+
 export const AppleAuthBody = z.object({
   identityToken: z.string().min(1),
   // Alleen gebruikt bij een eerste login (accountcreatie):
@@ -52,3 +56,17 @@ export const TokenPair = z.object({
   expiresIn: z.number(),
 });
 export type TokenPair = z.infer<typeof TokenPair>;
+
+export const ChildSessionResult = z.object({
+  accessToken: z.string(),
+  refreshToken: z.string(),
+  expiresIn: z.number(),
+  child: ChildProfile,
+});
+export type ChildSessionResult = z.infer<typeof ChildSessionResult>;
+
+export const RevokeChildSessionsResult = z.object({
+  ok: z.literal(true),
+  revokedCount: z.number().int().nonnegative(),
+});
+export type RevokeChildSessionsResult = z.infer<typeof RevokeChildSessionsResult>;
