@@ -22,7 +22,7 @@ function taskRunsOnDate(task: Record<string, unknown>, date: string): boolean {
   const rule = parseJsonColumn(raw, Recurrence, null);
   if (!rule) return false;
   if (rule.freq === "daily") return true;
-  return (rule.days ?? []).includes(weekdayCode(date) as "MO" | "TU" | "WE" | "TH" | "FR" | "SA" | "SU");
+  return (rule.days ?? []).includes(weekdayCode(date));
 }
 
 function assigneesForDate(task: Record<string, unknown>, date: string): string[] {
