@@ -2,7 +2,7 @@
 
 *Senior architectuur- + UI-voorstel. Aansluiting op `apps/api`, `apps/web` en `Design System/`. Status: voorstel ter beslissing — geen implementatie.*
 
-**Kopconclusie:** de API is ver genoeg om vandaag te beginnen; de iOS-app is dat niet. Het gat zit niet in “welke SwiftUI-views”, maar in **contractfundament** (OpenAPI/response-schemas — met migratiepad voor de *bestaande* webclient —, kind-sessie-verlenging, APNs-sandbox), **privacy-beleid** naast code-invarianten, **tests voor sync/ledger-edge cases**, en **productkeuzes** (één app of twee, wie levert ouder-onboarding). Zonder die beslissingen bouwen we drift en herwerk.
+**Kopconclusie:** de API is ver genoeg om vandaag te beginnen; de iOS-app is dat niet. Het gat zit niet in “welke SwiftUI-views”, maar in **contractfundament** (OpenAPI/response-schemas — met migratiepad voor de *bestaande* webclient —, kind-sessie-verlenging, APNs-sandbox), **UI-states & gate-ontwerp** (empty/error, onboarding-schermen, parental gate, iPad lock), **privacy-beleid** naast code-invarianten, **tests voor sync/ledger-edge cases**, en **productkeuzes** (één app of twee, wie levert ouder-onboarding). Zonder die beslissingen bouwen we drift en herwerk.
 
 ---
 
@@ -149,9 +149,9 @@ Web blijft het rustige commandocentrum. iOS is het speelveld van het kind én de
 ```
 [Eerste keer]  Gezinscode → profielkiezer → PIN
                → child access JWT + device-bound refresh
-               → Keychain (accessControl: userPresence)
+               → Keychain (accessControl: biometryOrPasscode / applicationPassword)
 
-[Dagelijks]    Face ID / Touch ID ontgrendelt Keychain
+[Dagelijks]    Ontgrendel-scherm met Face ID/Touch ID **én** zichtbare “Gebruik pincode”
                → refresh access indien nodig
                → géén gezinscode meer
 
@@ -161,6 +161,22 @@ Web blijft het rustige commandocentrum. iOS is het speelveld van het kind én de
 Backend-werk (fase 0): migratie `child_device_sessions` (of uitbreiding `devices`), `POST /auth/child-session/refresh`, revoke vanuit ouderprofiel.
 
 **Gedeelde iPad:** `POST /devices` ondersteunt al multi-profiel per APNs-token. iOS toont een profielkiezer; wisselen = lokale unlock van ander Keychain-item, geen “één user per app”-aanname.
+
+#### Face ID / biometrie — App Store (onder 13) + LocalAuthentication
+
+App Store Review Guidelines (biometrics / account auth, update juni 2026): apps die gezichtsherkenning voor accountauthenticatie gebruiken moeten voor gebruikers **onder 13** altijd een **alternatieve authenticatiemethode** bieden naast Face ID, en gezichtsherkenning mag **alleen via LocalAuthentication** — niet ARKit of andere vision-API’s.
+
+**Concreet voor TaakHelden (vast in child-refresh-ADR):**
+
+| Regel | Implementatie |
+|---|---|
+| Alleen LA | `LocalAuthentication` (`LAContext`) voor Face ID / Touch ID; géén ARKit/TrueDepth-custom face auth. |
+| Alternatief onder 13 | Voor `ageMode` young **én** mid (geboortejaar → leeftijd < 13) is de **4-cijferige PIN permanent beschikbaar en zichtbaar** op het ontgrendel-scherm (“Gebruik pincode”), niet alleen als fallback ná een mislukte Face ID-poging. |
+| Teen (13+) | Face ID mag primair zijn; PIN blijft bereikbaar (instellingen / “Andere opties”) — consistent en eenvoudiger dan twee codepaden. |
+| Opt-in | Face ID is aanzetten na koppeling, nooit verplicht; weigeren Face ID = gewoon PIN-first forever. |
+| Keychain | Biometrie ontgrendelt het Keychain-item; PIN is de altijd-werkende route naar hetzelfde secret — geen aparte “noodgreep” die verstopt zit. |
+
+Implícite PIN-only-als-Face-ID-faalt is **niet voldoende** voor review. UI-mock: ontgrendelkaart toont biometrie-prompt **plus** een duidelijke secundaire knop naar het numerieke PIN-pad (§7.2.3).
 
 ### 5.3 Parental gate — interactie-ontwerp, niet alleen auth
 
@@ -229,12 +245,30 @@ FamilyRoom-WS is **ouder-only** (`POST /ws/token` → `requireParent`). Kind lee
 
 ### 6.4 Push
 
-- Tokenregistratie via `POST /devices` (multi-profiel ok).
+- Tokenregistratie via `POST /devices` (multi-profiel ok) — **opt-in**, na uitleg; weigeren mag de app niet breken.
+- **App moet volledig werken zonder push** (Review Guidelines): afvinken, sync, winkel, goedkeuren via openen van de app / pull / WS blijven beschikbaar. Geen “zet meldingen aan om door te gaan”-wall.
 - Backend: quiet hours + max 2/dag/kind; copy via stijlgids §3.7.
 - Nodig vóór nuttige deep links: `PushPayload` in shared (`type`, `refId`, `childId`) + `content-available` op approve/redo.
 - APNs sandbox/productie splitsen (anders TestFlight dood).
 
-**Foto-upload praktisch:** iOS exporteert altijd **JPEG ~2 MP** (geen HEIC naar de brittle EXIF-strip). Minder falen, snellere upload, past in 5-min TTL.
+**Geen gevoelige info op het lockscreen** (Guidelines + gedeelde iPad):
+
+| Slecht (zichtbaar voor anderen) | Goed |
+|---|---|
+| “Foto van Kamer opruimen wacht op goedkeuring” | “Er wacht iets op je goedkeuring” |
+| “Sam heeft een beloning gekocht” | “Er is nieuws in TaakHelden” |
+| Kindnaam / taaktitel / foto-hint in `aps.alert` | Generieke alert; details pas **in-app na ontgrendelen** (deep link → gate of kind-unlock) |
+
+Custom payload mag ids bevatten voor routing; de **zichtbare** alert-tekst blijft generiek. Zelfde regel voor kind-pushes (“Er staat iets leuks klaar” i.p.v. taakinhoud op het lockscreen als het toestel gedeeld wordt).
+
+### 6.5 Foto-bonus — dataminimalisatie (PHPicker / camera)
+
+Fase 1 kiest **geen** volledige Photos-library-toegang (`NSPhotoLibraryUsageDescription` voor unlimited read):
+
+- **Camera** (`UIImagePickerController` / `AVCapture`) voor “maak nu een foto”, of
+- **Out-of-process picker** (`PHPickerViewController` / SwiftUI `PhotosPicker`) voor één bestaande foto — systeem deelt alleen de selectie, geen album-scan.
+
+Dat volgt Apple’s dataminimalisatie (vraag alleen wat de functie strikt nodig heeft) en scheelt een zware privacy-uitleg in App Privacy + reviewer notes. Export altijd als **JPEG ~2 MP** vóór upload (geen HEIC naar de brittle EXIF-strip). Lokale staging wissen na geslaagde confirm.
 
 ---
 
@@ -300,7 +334,7 @@ Onboarding is een **schermreeks**, geen endpoint-lijst. Raakt mid (8+) nu al —
 2. **Profielkiezer:** grote avatar-tegels (roepnaam eronder); één tik = selectie. Geen dropdown.
 3. **Avatar bevestigen / kiezen** (als ouder nog placeholder zette): grid met diverse opties (emoji-catalogus MVP); grote tap-targets (≥44 pt, liever 64+).
 4. **PIN invoeren:** **numerieke PIN-pad** (4 cijfers), grote toetsen, geen QWERTY. Visuele feedback als dots/stenen, niet alleen tekst. Mid mag cijfers zien; young later: beeld-gebaseerd patroon (3 dieren in volgorde) als apart ontwerp — niet improviseren in mid door “maar iets met plaatjes”.
-5. Face ID aanbieden voor volgende keren (“Zal Face ID je de volgende keer helpen?”) — opt-in, positief.
+5. Face ID / Touch ID **opt-in** voor volgende keren (“Zal Face ID je de volgende keer helpen?”). Weigeren = PIN-first. Ontgrendel-UI toont daarna altijd een zichtbare PIN-route voor kinderen onder 13 (§5.2) — ook als Face ID aan staat.
 
 Teen: zelfde flow, strakkere typografie, minder confetti bij “je bent gekoppeld”.
 
@@ -471,9 +505,9 @@ Code-invarianten (“geen kind-PII in logs”, EXIF-strip, family-scoped repo’
 
 ### 10.3 iOS-specifieke privacy-keuzes
 
-- Foto’s blijven in een lokale staging-store alleen tot upload lukt; daarna wissen; Photo Library-access via `PHPicker` / camera limited library — geen bulk-toegang.
-- Keychain voor tokens; Face ID-poort is lokale unlock, geen biometrie naar de server.
-- Push-payloads bevatten ids (`instanceId`, …), **geen** kindnamen of foto-URLs in de notificatie-body.
+- Foto’s: alleen **camera** of **PHPicker/PhotosPicker** (één selectie) — geen full Photo Library entitlement (§6.5). Staging wissen na upload; JPEG ~2 MP.
+- Keychain voor tokens; Face ID via **LocalAuthentication** only; PIN blijvend zichtbaar voor onder 13 (§5.2).
+- Push: app werkt zonder; zichtbare alert-tekst generiek — geen kindnamen/taaktitels/foto-hints op het lockscreen (§6.4). Ids alleen in stille/custom payload.
 - Privacyverklaring + toestemmingsmoment bereikbaar achter parental gate; kind-UI linkt niet naar externe web zonder poort.
 
 **Ondergrens:** geen productie-APNs-fotoflow naar echte gezinnen tot retentie-copy, subprocessors-lijst en datalek-runbook (concept) bestaan — ook als de code al “werkt”.
@@ -487,7 +521,7 @@ Code-invarianten (“geen kind-PII in logs”, EXIF-strip, family-scoped repo’
 Zonder dit is elke Swift-regel technische schuld.
 
 1. ADR: responsevorm bij rol-endpoints (discriminator **of** gesplitste paden) **inclusief web-migratiepad** (§2.2 optie A/B/C), geraakte BFF/fetchers, versieheader of dual-shape, en exit-criterium “web typecheck + tests groen vóór iOS `v2`-codegen”.
-2. ADR: kind device-refresh + revoke.
+2. ADR: kind device-refresh + revoke; **Face ID alleen via LocalAuthentication; PIN permanent zichtbaar als alternatief voor kinderen onder 13** (§5.2).
 3. ADR: één familie-app; parental gate = verborgen gebaar + LA/ouder-login (geen ouder-tab); kindmodus `UIRequiresFullScreen`; Xcode in `apps/ios/`; min. iOS 17; **dark mode kind expliciet uit** tot branding-pass.
 4. Response-schemas in `packages/shared` voor alles wat iOS **én** web raakt; routes gebruiken die schemas.
 5. OpenAPI-generatie + CI-drift-check; contract-fixtures voor Swift (§9).
@@ -504,15 +538,17 @@ Zonder dit is elke Swift-regel technische schuld.
 **Doel:** kind vinkt af (ook offline), ziet punten/streak/winkel/held; ouder kan gezin + kind + code aanmaken via SIWA.
 
 - Scaffold XcodeGen + DesignSystem-tokens + TabView (3 kind-tabs; geen ouder-tab).
-- Auth: SIWA ouder; onboarding-schermen §7.2.3 (profielgrid, numerieke PIN-pad); Face ID; Keychain.
+- Auth: SIWA ouder; onboarding-schermen §7.2.3 (profielgrid, numerieke PIN-pad); Face ID opt-in via LA + **altijd zichtbare PIN** voor onder 13; Keychain.
 - Parental gate §5.3 + iPad `UIRequiresFullScreen` §5.4; dark mode kind geforceerd light.
 - Mijn Dag / Winkel / Mijn Held met empty/loading/error-states §7.2.2 (vierend “alles af”, “nog X punten”, sync-indicator).
-- MutationQueue + `/sync`; beloningsmoment = confetti **of** Reduce-Motion-alternatief + chime + haptic (§7.4); JPEG foto-bonus.
+- MutationQueue + `/sync`; beloningsmoment = confetti **of** Reduce-Motion-alternatief + chime + haptic (§7.4).
+- Foto-bonus: **PHPicker of camera only** (§6.5), JPEG ~2 MP — geen full library access.
+- Push opt-in; app bruikbaar zonder; generieke lockscreen-teksten (§6.4).
 - Palette contrast-tests (WCAG AA) in CI (§7.5).
 - Unit-tests §9.2 groen vóór “offline afvinken” als done.
-- Push alerts + deep link (achter gate waar nodig).
+- Push deep links achter gate waar nodig.
 - A11y baseline (Dynamic Type, VoiceOver, Reduce Motion-pad).
-- Demo-account / TestFlight-script voor review.
+- **App Review-pakket (één device):** demo-ouderaccount + voorgeconfigureerde **gezinscode + kind-PIN** + korte review notes (hoe parental gate, hoe kindflow zonder tweede telefoon). Zie §14.2.
 - DPIA gestart; staging-foto’s alleen synthetisch / ouder-eigen.
 
 **Exit-criteria:** end-to-end happy path op twee fysieke devices (ouder iPhone + kind iPhone/iPad) tegen staging Worker; web blijft groen op het gekozen contract-migratiepad.
@@ -565,6 +601,11 @@ Watch, coöperatieve gezinsdoelen, avatar-shop, onderhandel-knop (teen), co-oude
 | Optimistic sync dubbelt punten / stuck queue | Unit-tests §9.2 + bestaande API idempotency-tests |
 | Privacy “goed in code”, zwak in beleid | §10-minimum vóór productie-foto’s; DPIA |
 | Zichtbare ouder-tab / Split View omzeilt gate | Verborgen gebaar + LA (§5.3); `UIRequiresFullScreen` (§5.4) |
+| Face ID zonder PIN-alternatief onder 13 | Ontgrendel-UI: PIN altijd zichtbaar; alleen LocalAuthentication (§5.2) |
+| Listing oogt als kinderapp → gedwongen Kids Category | Familie-first metadata (§14.1); juridisch/marketing review vóór submit |
+| Reviewer kan kindflow niet op 1 device | Review notes: gezinscode + kind-PIN (§14.2) |
+| Gevoelige push op gedeeld lockscreen | Generieke `aps.alert`; details in-app (§6.4) |
+| Full Photos-access onnodig | PHPicker / camera only (§6.5) |
 | Reduce Motion = geen beloning | Vervangend visueel moment + chime/haptic (§7.4) |
 | Placeholder kleuren zakken onder AA | Contrast-contract-tests op Palette (§7.5) |
 | SwiftUI dark mode “per ongeluk” | Kind light geforceerd tot branding-besluit |
@@ -576,12 +617,45 @@ Watch, coöperatieve gezinsdoelen, avatar-shop, onderhandel-knop (teen), co-oude
 
 ---
 
-## 14. Wat we bewust níet doen in MVP
+## 14. App Store-positionering, metadata & review
+
+### 14.1 Kids Category-grens is scherper dan “geen kids in de titel”
+
+Niet in de Kids Category zitten is **niet** alleen: vermijd het woord “kids” in de naam. Guidelines (juni 2026): apps **buiten** de Kids Category mogen in naam, subtitel, icoon, screenshots of beschrijving **niet impliceren dat kinderen de primaire doelgroep zijn** — ook zonder het woord “kids”. Review trekt de listing anders alsnog richting Kids Category (met alle Kids-eisen).
+
+Tegelijk: het verbod op third-party analytics/ads geldt niet alleen formeel voor Kids Category, maar voor elke app die **op functionaliteit** primair voor kinderen bedoeld is — consistent met wat we al uitsluiten.
+
+| Surface | Wel (familie-app) | Niet (kinderapp-signaal) |
+|---|---|---|
+| Naam / subtitel | “TaakHelden — taken & beloningen voor het gezin” | “De app voor kinderen…”, “kids chores”, speelse kind-only claim |
+| Icoon / screenshots | Ouder + kind samen, dashboardachtige ouderflows én kindtabs; Lifestyle/Productivity-framing | Alleen kind-UI, speelgoedachtig icoon, “voor jouw kind”-hero |
+| Beschrijving | Ouders beheren; kinderen verdienen punten in een veilige gezinsruimte | “Gemaakt voor kinderen van 4–12”, onderwijskundige kind-first pitch zonder ouderrol |
+| Categorie | Lifestyle of Productivity | Kids Category (bewuste non-keuze tot juridische toets anders beslist) |
+| Age rating / privacy | Eerlijk over data; geen tracking in kind-pad | Verborgen tracking “alleen voor ouders” die toch kind-events meeneemt |
+
+**Product waarheid vs. store-framing:** de *inhoud* is kind-first; de *listing* is familie-first. Dat is geen greenwashing richting review — het matcht P1 (één familie-app met kindermodus) en productvoorstel §6.10. Juridisch/marketing laten meelezen vóór submit.
+
+### 14.2 Reviewaanpak voor een twee-rollen-app
+
+Apple eist volledige toegang tot accountgebonden functionaliteit: werkende demo-credentials **of** een volwaardige demomodus. Onze happy path veronderstelt twee devices — review gebeurt vaak op **één** toestel.
+
+**Review notes (fase 1 deliverable) bevatten minimaal:**
+
+1. Demo-ouderlogin (SIWA-testaccount of e-mail/wachtwoord op staging).
+2. Voorgeconfigureerde **gezinscode + kind-PIN** + welk demo-kindprofiel.
+3. Stappen: ouderflow → code tonen → “log uit / wissel naar kind” op hetzelfde device met die code+PIN (geen tweede iPhone nodig).
+4. Parental gate: welk gebaar + dat device-passcode/Face ID van het review-toestel de poort is.
+5. Push: vermelden dat de app zonder meldingen werkt; eventuele test-pushes zijn generiek geformuleerd.
+6. Foto: PHPicker/camera only — geen full library permission-dialog verwacht.
+
+Demodata bevat geen echte kinderfoto’s; synthetische placeholders in de goedkeuringsqueue.
+
+### 14.3 Wat we bewust níet doen in MVP (overig)
 
 - Young-modus (4–7) en mascotte “Vinkie”.
 - Volledig ouder-dashboard-pariteit met web (weekplanner drag-drop, inzichten).
-- Kids Category (juridisch toetsen; default = Lifestyle/Productivity familie-app).
-- Third-party analytics SDK in kind-pad.
+- Formele Kids Category (default = Lifestyle/Productivity familie-app; metadata volgens §14.1).
+- Third-party analytics/ads in het kind-pad (én geen “stiekem” via ouder-SDK over kind-events).
 - Lokale saldo-authoriteit of “points cache” die de UI vertrouwt boven de server.
 - GraphQL / eigen BFF op iOS — praat direct met `/v1` (zelfde contract als web-BFF upstream).
 - God-mode support-toegang tot gezinsdata / kinderfoto’s.
@@ -590,17 +664,20 @@ Watch, coöperatieve gezinsdoelen, avatar-shop, onderhandel-knop (teen), co-oude
 - Dark mode in kindmodus (tot bewuste branding-beslissing).
 - Beeld-gebaseerde PIN voor mid improviseren (hoort bij young-ontwerp).
 - Confetti weglaten bij Reduce Motion zonder vervangend beloningsmoment.
+- Full Photo Library-access voor de foto-bonus.
+- Push verplicht stellen of taak-/kinddetails in lockscreen-alerts.
+- Face ID zonder permanente zichtbare PIN-route voor onder 13; biometrie via iets anders dan LocalAuthentication.
 
 ---
 
 ## 15. Beslislijst voor kickoff
 
-1. Bevestig **P1–P6** (§3), inclusief parental-gate-interactie (§5.3) en iPad full-screen (§5.4).
-2. Keur **fase 0 ADR’s** goed (discriminator **+ web-migratiepad A/B/C**, child-refresh, in-repo Xcode, dark mode uit).
+1. Bevestig **P1–P6** (§3), inclusief parental-gate-interactie (§5.3), iPad full-screen (§5.4), en **App Store familie-metadata** (§14.1).
+2. Keur **fase 0 ADR’s** goed (discriminator **+ web-migratiepad A/B/C**, child-refresh **+ Face ID/PIN onder 13**, in-repo Xcode, dark mode uit).
 3. Wijs eigenaar: backend+web fase 0 || iOS scaffold parallel (web-reviewer verplicht bij contract-PR).
-4. Branding-minimum: akkoord op placeholder kid/teen tokens + gebundelde avatar-IDs + **AA-contrast-contract**.
+4. Branding-minimum: akkoord op placeholder kid/teen tokens + gebundelde avatar-IDs + **AA-contrast-contract**; store-listing-toon familie-first.
 5. Pedagogische/levelcurve-input agenderen vóór Mijn Held “Level N” live zet.
-6. Akkoord op privacy-ondergrens (§10), testminimum (§9), en UI-states/onboarding/goedkeuren (§7.2) als definition-of-done.
+6. Akkoord op privacy-ondergrens (§10), testminimum (§9), UI-states (§7.2), push/foto-Guidelines (§6.4–6.5), en review-pakket één device (§14.2).
 
 ---
 
@@ -614,3 +691,4 @@ Watch, coöperatieve gezinsdoelen, avatar-shop, onderhandel-knop (teen), co-oude
 - Contract: `packages/shared/src/schemas/`
 - Huidige iOS-stub: `apps/ios/README.md`
 - Skills: `.claude/skills/ios-dev.md`, `Design System/SKILL.md`
+- App Store Review Guidelines (Apple, laatste check juni 2026) — biometrics/auth onder 13, Kids Category vs. metadata, push, photo dataminimalisatie, demo-access voor review
