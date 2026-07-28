@@ -47,6 +47,7 @@ private struct ConfettiBurstView: View {
     private func spawnPieces() {
         let colors: [Color] = [
             THPalettes.kid.accent.color,
+            THPalettes.kid.secondary.color,
             THPalettes.kid.highlight.color,
             THPalettes.kid.accentSoft.color,
         ]

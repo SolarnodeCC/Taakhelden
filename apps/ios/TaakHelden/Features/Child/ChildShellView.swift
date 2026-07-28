@@ -36,7 +36,6 @@ struct ChildShellView: View {
 
             MijnHeldTabView(
                 palette: palette,
-                isTeen: isTeen,
                 displayName: session?.displayName ?? "Held",
                 avatar: session?.avatar ?? "🦊",
                 balance: dayViewModel?.state
@@ -305,7 +304,6 @@ private struct MijnHeldTabView: View {
     @Environment(AppState.self) private var appState
 
     let palette: THPalette
-    let isTeen: Bool
     let displayName: String
     let avatar: String
     let balance: ChildDayLoadState?
