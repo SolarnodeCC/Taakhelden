@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ErrorCodes } from "@taakhelden/shared";
-import { API_BASE_URL } from "../../../../lib/api/config";
+import { getApiBaseUrl } from "../../../../lib/api/config";
 import { getAccessToken, refreshTokens, clearTokens } from "../../../../lib/auth/session";
 
 /**
@@ -10,7 +10,7 @@ import { getAccessToken, refreshTokens, clearTokens } from "../../../../lib/auth
  */
 async function proxy(req: Request, path: string[]): Promise<Response> {
   const target = new URL(req.url);
-  const url = `${API_BASE_URL}/${path.join("/")}${target.search}`;
+  const url = `${getApiBaseUrl()}/${path.join("/")}${target.search}`;
 
   const hasBody = req.method !== "GET" && req.method !== "HEAD";
   const body = hasBody ? await req.text() : undefined;

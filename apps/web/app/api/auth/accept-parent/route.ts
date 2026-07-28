@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ParentAcceptBody, TokenPair, ErrorCodes } from "@taakhelden/shared";
-import { API_BASE_URL } from "../../../../lib/api/config";
+import { getApiBaseUrl } from "../../../../lib/api/config";
 import { setTokens } from "../../../../lib/auth/session";
 
 /**
@@ -19,7 +19,7 @@ export async function POST(req: Request) {
 
   let res: Response;
   try {
-    res = await fetch(`${API_BASE_URL}/families/parents/accept`, {
+    res = await fetch(`${getApiBaseUrl()}/families/parents/accept`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(parsed.data),
@@ -35,10 +35,13 @@ export async function POST(req: Request) {
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
-    return NextResponse.json(
-      data ?? { error: { code: ErrorCodes.INVALID_INVITE, message: "Uitnodiging mislukt." } },
-      { status: res.status },
-    );
+    if (!data) {
+      return NextResponse.json(
+        { error: { code: ErrorCodes.UPSTREAM_UNAVAILABLE, message: "Kan de server niet bereiken." } },
+        { status: 502 },
+      );
+    }
+    return NextResponse.json(data, { status: res.status });
   }
 
   // ParentSessionResult extends TokenPair — parse the token fields we need for cookies.

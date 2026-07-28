@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { API_BASE_URL } from "../../../../lib/api/config";
+import { getApiBaseUrl } from "../../../../lib/api/config";
 import { getRefreshCookie } from "../../../../lib/api/cookies";
 import { clearTokens } from "../../../../lib/auth/session";
 
@@ -9,7 +9,7 @@ export async function POST() {
 
   if (refreshToken) {
     try {
-      await fetch(`${API_BASE_URL}/auth/logout`, {
+      await fetch(`${getApiBaseUrl()}/auth/logout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ refreshToken }),

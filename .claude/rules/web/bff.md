@@ -16,6 +16,8 @@ Jankurai HLT-006 flags the proxy route as "wrong layer"; here that is **intentio
 ## Secrets and URLs
 
 - `API_BASE_URL` is **server-only** — never `NEXT_PUBLIC_API_*`.
+  Read it via `getApiBaseUrl()` (`lib/api/config.ts`), which prefers the
+  Cloudflare Worker binding (`wrangler.jsonc` vars) over `process.env`.
 - Session tokens in `httpOnly` cookies (`lib/api/cookies.ts`): `secure` in production,
   `sameSite=lax`.
 - Proxy responses: `Cache-Control: no-store` for authenticated routes.

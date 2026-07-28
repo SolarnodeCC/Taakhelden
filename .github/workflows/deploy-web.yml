@@ -31,4 +31,16 @@ jobs:
       # Retry: een verse deploy heeft enkele seconden nodig om wereldwijd te
       # propageren, dus de eerste hit kan 404 geven.
       - name: Smoke test
-        run: curl --fail -sSL --retry 6 --retry-delay 5 --retry-all-errors https://taakhelden-web.oostelaar.workers.dev/nl/login
+        run: |
+          set -e
+          # Pages need a few seconds to propagate after deploy.
+          curl --fail -sSL --retry 6 --retry-delay 5 --retry-all-errors \
+            https://taakhelden-web.oostelaar.workers.dev/nl/login >/dev/null
+          # BFF must reach the API Worker (wrong API_BASE_URL previously yielded
+          # opaque 404s on /api/auth/*). Login with unknown credentials → 401.
+          code=$(curl -sS -o /tmp/bff-login.json -w "%{http_code}" \
+            -X POST https://taakhelden-web.oostelaar.workers.dev/api/auth/login \
+            -H "Content-Type: application/json" \
+            -d '{"email":"smoke@example.com","password":"not-a-real-password"}')
+          echo "BFF login status=$code body=$(cat /tmp/bff-login.json)"
+          test "$code" = "401"

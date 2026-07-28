@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { RegisterBody, TokenPair, ErrorCodes } from "@taakhelden/shared";
-import { API_BASE_URL } from "../../../../lib/api/config";
+import { getApiBaseUrl } from "../../../../lib/api/config";
 import { setTokens } from "../../../../lib/auth/session";
 
 /** BFF register: creates parent + family, then stores tokens in httpOnly cookies. */
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
   let res: Response;
   try {
-    res = await fetch(`${API_BASE_URL}/auth/register`, {
+    res = await fetch(`${getApiBaseUrl()}/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(parsed.data),
@@ -31,10 +31,15 @@ export async function POST(req: Request) {
   const data = await res.json().catch(() => null);
 
   if (!res.ok) {
-    return NextResponse.json(
-      data ?? { error: { code: ErrorCodes.VALIDATION_FAILED, message: "Registratie mislukt." } },
-      { status: res.status },
-    );
+    // Non-JSON upstream (e.g. wrong API_BASE_URL → plain 404) must not look like
+    // a validation failure to the client.
+    if (!data) {
+      return NextResponse.json(
+        { error: { code: ErrorCodes.UPSTREAM_UNAVAILABLE, message: "Kan de server niet bereiken." } },
+        { status: 502 },
+      );
+    }
+    return NextResponse.json(data, { status: res.status });
   }
 
   const tokens = TokenPair.safeParse(data);

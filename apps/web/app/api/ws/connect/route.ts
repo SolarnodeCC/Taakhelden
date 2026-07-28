@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ErrorCodes, WsTokenResponse } from "@taakhelden/shared";
-import { API_BASE_URL } from "../../../../lib/api/config";
+import { getApiBaseUrl } from "../../../../lib/api/config";
 import { apiBaseToWsUrl } from "../../../../lib/realtime/wsUrl";
 import { WsConnectResponse } from "../../../../lib/realtime/types";
 import { getAccessToken, refreshTokens, clearTokens } from "../../../../lib/auth/session";
@@ -10,8 +10,9 @@ import { getAccessToken, refreshTokens, clearTokens } from "../../../../lib/auth
  * The browser cannot send Authorization on WebSocket, so connect uses ?token=.
  */
 export async function POST(): Promise<Response> {
+  const apiBase = getApiBaseUrl();
   const send = (token: string) =>
-    fetch(`${API_BASE_URL}/ws/token`, {
+    fetch(`${apiBase}/ws/token`, {
       method: "POST",
       headers: { Authorization: `Bearer ${token}` },
       cache: "no-store",
@@ -67,7 +68,7 @@ export async function POST(): Promise<Response> {
 
   const payload: WsConnectResponse = {
     ...parsed.data,
-    wsUrl: apiBaseToWsUrl(API_BASE_URL),
+    wsUrl: apiBaseToWsUrl(apiBase),
   };
 
   return NextResponse.json(payload, { headers: { "Cache-Control": "no-store" } });
