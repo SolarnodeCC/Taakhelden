@@ -225,7 +225,7 @@ Velden uit `CreateChildBody`:
 - Handmatige rooktest:
   1. Uitgelogd → `/register` → account + gezin aanmaken → cookies gezet.
   2. Land op `/gezin` onboarding → kind toevoegen (AVG-check) → kind in lijst.
-  3. Gezinscode zichtbaar → kopiëren → hergenereren → nieuwe code.
+  3. Gezinscode zichtbaar + QR → kopiëren → hergenereren → nieuwe code én QR.
   4. Pincode resetten voor het kind.
   5. `approve_only`-ouder (indien testbaar) ziet Gezin niet in nav en wordt
      weggeleid bij directe URL.
