@@ -30,7 +30,28 @@
         "VALIDATION_FAILED": "Controleer of alle velden goed zijn ingevuld (wachtwoord minstens 10 tekens).",
         "generic": "Er ging iets mis bij het aanmaken. Probeer het straks nog eens."
       }
+    },
+    "accept": {
+      "intro": "Je bent uitgenodigd als verzorger. Kies een wachtwoord om mee te doen.",
+      "loading": "Laden…",
+      "displayName": "Roepnaam (optioneel)",
+      "displayNameHint": "Laat leeg om de naam uit de uitnodiging te houden.",
+      "password": "Wachtwoord",
+      "passwordHint": "Minstens 8 tekens.",
+      "submit": "Uitnodiging accepteren",
+      "submitting": "Bezig…",
+      "missingToken": "Deze link mist een uitnodiging. Vraag de andere ouder om een nieuwe uitnodiging te sturen.",
+      "loginLink": "Naar inloggen",
+      "errors": {
+        "INVALID_INVITE": "Deze uitnodiging is verlopen of al gebruikt — vraag de andere ouder om een nieuwe.",
+        "VALIDATION_FAILED": "Controleer je wachtwoord (minstens 8 tekens) en probeer het opnieuw.",
+        "generic": "Er ging iets mis. Probeer het straks nog eens."
+      }
     }
+  },
+  "guards": {
+    "forbidden": "Deze pagina is alleen voor ouders met volledig beheer.",
+    "backToToday": "Terug naar Vandaag"
   },
   "nav": {
     "vandaag": "Vandaag",
@@ -205,10 +226,57 @@
     },
     "parents": {
       "title": "Ouders & verzorgers",
+      "empty": "Nog geen verzorgers geladen.",
       "permissions": {
         "full": "volledig beheer",
         "approve_only": "alleen goedkeuren"
       }
+    },
+    "inviteParent": {
+      "title": "Tweede ouder uitnodigen",
+      "hint": "Stuur een uitnodiging per e-mail. Deel de link hieronder als de mail niet aankomt.",
+      "email": "E-mailadres",
+      "permissionsLabel": "Rechten",
+      "permissions": {
+        "approve_only": "Alleen goedkeuren",
+        "approve_onlyHint": "Ziet Vandaag en Goedkeuren.",
+        "full": "Volledig beheer",
+        "fullHint": "Kan ook Taken, Winkel en Gezin beheren."
+      },
+      "submit": "Uitnodiging sturen",
+      "submitting": "Bezig…",
+      "success": "Uitnodiging klaar voor {name}.",
+      "shareHint": "Deel deze link als de mail niet aankomt:",
+      "copy": "Link kopiëren",
+      "copied": "Gekopieerd",
+      "errors": {
+        "EMAIL_IN_USE": "Dit e-mailadres is al in gebruik in TaakHelden.",
+        "VALIDATION_FAILED": "Vul een geldig e-mailadres in.",
+        "FORBIDDEN": "Alleen ouders met volledig beheer kunnen uitnodigen.",
+        "generic": "Uitnodigen lukte niet. Probeer het nog eens."
+      }
+    },
+    "settings": {
+      "title": "Gezinsinstellingen",
+      "hint": "Naam, tijdzone, stille uren, bonussen en vakantiemodus.",
+      "name": "Gezinsnaam",
+      "timezone": "Tijdzone",
+      "timezoneFilter": "Zoek tijdzone…",
+      "quietStart": "Stille uren vanaf",
+      "quietEnd": "Stille uren tot",
+      "quietHint": "In deze periode sturen we geen pushmeldingen.",
+      "dayBonus": "Dagbonus (punten)",
+      "weekBonus": "Weekbonus (punten)",
+      "weekThreshold": "Weekdrempel (%)",
+      "bonusHint": "Drempel is het aandeel voltooide taken voor de weekbonus (50–100%).",
+      "vacation": "Vakantiemodus",
+      "vacationHint": "Pauzeert streaks en bonussen zolang dit aan staat.",
+      "save": "Instellingen opslaan",
+      "saving": "Bezig met opslaan…",
+      "saved": "Instellingen opgeslagen.",
+      "errorValidation": "Controleer de velden en probeer het opnieuw.",
+      "errorSave": "Kon niet opslaan. Probeer het nog eens.",
+      "errorForbidden": "Alleen volledig beheer mag instellingen wijzigen."
     },
     "form": {
       "createTitle": "Kind toevoegen",

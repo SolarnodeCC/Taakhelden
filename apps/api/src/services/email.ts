@@ -12,8 +12,10 @@ export async function sendParentInvite(
 ): Promise<void> {
   if (!env.EMAIL_API_KEY || !env.EMAIL_FROM) return; // geen mail-infra: no-op
 
+  // Locale path so next-intl serves the accept page without a middleware hop.
+  // Hardcoded `nl` for Batch 8; invitee locale / Accept-Language can follow later.
   const link = env.APP_BASE_URL
-    ? `${env.APP_BASE_URL}/uitnodiging?token=${inviteToken}`
+    ? `${env.APP_BASE_URL}/nl/uitnodiging?token=${inviteToken}`
     : null;
   const text = link
     ? `Je bent uitgenodigd als medeverzorger in TaakHelden. Accepteer je uitnodiging via: ${link}`

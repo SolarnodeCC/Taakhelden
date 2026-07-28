@@ -21,6 +21,18 @@ export const FamilyView = z
     name: z.string(),
     timezone: z.string().optional(),
     inviteCode: z.string().length(6).optional(),
+    quietStart: z
+      .string()
+      .regex(/^\d{2}:\d{2}$/)
+      .optional(),
+    quietEnd: z
+      .string()
+      .regex(/^\d{2}:\d{2}$/)
+      .optional(),
+    dayBonusPoints: z.number().int().min(0).optional(),
+    weekBonusPoints: z.number().int().min(0).optional(),
+    weekBonusThreshold: z.number().min(0.5).max(1).optional(),
+    vacationMode: z.boolean().optional(),
   })
   .passthrough();
 export type FamilyView = z.infer<typeof FamilyView>;
@@ -29,6 +41,15 @@ export const InviteCodeResult = z.object({
   inviteCode: z.string().length(6),
 });
 export type InviteCodeResult = z.infer<typeof InviteCodeResult>;
+
+/** POST /families/me/parents — pending co-parent + shareable invite token. */
+export const InviteParentResult = z.object({
+  userId: z.string(),
+  email: z.string().email(),
+  permissions: z.enum(["full", "approve_only"]),
+  inviteToken: z.string().min(1),
+});
+export type InviteParentResult = z.infer<typeof InviteParentResult>;
 
 export const AgeMode = z.enum(["young", "mid", "teen"]);
 export type AgeMode = z.infer<typeof AgeMode>;

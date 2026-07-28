@@ -9,12 +9,17 @@ import {
   InviteCodeResult,
   MemberList,
   MemberView,
-  SessionInfo,
 } from "../../../../lib/api/types";
 import { avatarEmoji } from "../../../../lib/avatars";
-import { Link, useRouter } from "../../../../i18n/navigation";
+import {
+  FullParentForbidden,
+  useRequireFullParent,
+} from "../../../../lib/auth/RequireFullParent";
+import { useRouter } from "../../../../i18n/navigation";
 import { Alert, Button } from "../../../../components/ui";
 import InviteCodeCard from "./InviteCodeCard";
+import InviteParentForm from "./InviteParentForm";
+import FamilySettingsForm from "./FamilySettingsForm";
 import {
   ChildCreateForm,
   ChildEditForm,
@@ -34,12 +39,12 @@ export default function GezinClient() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const onboarding = searchParams.get("onboarding") === "1";
+  const gate = useRequireFullParent();
 
   const [family, setFamily] = useState<FamilyView | null>(null);
   const [children, setChildren] = useState<MemberView[]>([]);
   const [parents, setParents] = useState<MemberView[]>([]);
   const [failed, setFailed] = useState(false);
-  const [forbidden, setForbidden] = useState(false);
   const [panel, setPanel] = useState<Panel>(null);
   const [busy, setBusy] = useState(false);
   const [regenerating, setRegenerating] = useState(false);
@@ -49,16 +54,10 @@ export default function GezinClient() {
 
   const load = useCallback(async () => {
     try {
-      const [sessionRaw, familyRaw, membersRaw] = await Promise.all([
-        apiClient.get("/api/session"),
+      const [familyRaw, membersRaw] = await Promise.all([
         apiClient.get("/api/v1/families/me"),
         apiClient.get("/api/v1/members"),
       ]);
-      const session = SessionInfo.parse(sessionRaw);
-      if (session.permissions !== "full") {
-        setForbidden(true);
-        return;
-      }
       const fam = FamilyView.parse(familyRaw);
       const members = MemberList.parse(membersRaw);
       setFamily(fam);
@@ -71,7 +70,7 @@ export default function GezinClient() {
         return;
       }
       if (err instanceof ApiClientError && err.status === 403) {
-        setForbidden(true);
+        setFailed(true);
         return;
       }
       setFailed(true);
@@ -79,14 +78,14 @@ export default function GezinClient() {
   }, [router]);
 
   useEffect(() => {
+    if (gate !== "ok") return;
     void load();
-  }, [load]);
+  }, [gate, load]);
 
   useEffect(() => {
     if (!onboarding) return;
     if (children.length > 0) {
       setOnboardingStep(3);
-      // Focus the invite-code card after first child exists.
       window.setTimeout(() => codeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     } else {
       setOnboardingStep(2);
@@ -155,25 +154,16 @@ export default function GezinClient() {
     router.replace("/gezin");
   }
 
-  if (forbidden) {
-    return (
-      <div className="mx-auto max-w-lg">
-        <Alert tone="danger">{t("forbidden")}</Alert>
-        <p className="mt-4">
-          <Link href="/vandaag" className="font-medium text-accent hover:underline">
-            {t("backToToday")}
-          </Link>
-        </p>
-      </div>
-    );
+  if (gate === "forbidden") {
+    return <FullParentForbidden />;
   }
 
-  if (failed) {
-    return <p className="text-sm text-muted">{t("loadError")}</p>;
-  }
-
-  if (!family) {
+  if (gate === "loading" || (!family && !failed)) {
     return <p className="text-sm text-muted">{t("loading")}</p>;
+  }
+
+  if (failed || !family) {
+    return <p className="text-sm text-muted">{t("loadError")}</p>;
   }
 
   return (
@@ -213,6 +203,8 @@ export default function GezinClient() {
           }}
         />
       )}
+
+      <FamilySettingsForm family={family} onSaved={setFamily} />
 
       <section aria-labelledby="children-heading">
         <div className="flex items-center justify-between gap-3">
@@ -310,11 +302,13 @@ export default function GezinClient() {
         )}
       </section>
 
-      {parents.length > 0 && (
-        <section aria-labelledby="parents-heading">
-          <h2 id="parents-heading" className="text-base font-semibold text-text">
-            {t("parents.title")}
-          </h2>
+      <section aria-labelledby="parents-heading">
+        <h2 id="parents-heading" className="text-base font-semibold text-text">
+          {t("parents.title")}
+        </h2>
+        {parents.length === 0 ? (
+          <p className="mt-2 text-sm text-muted">{t("parents.empty")}</p>
+        ) : (
           <ul className="mt-2 flex flex-col gap-1">
             {parents.map((p) => (
               <li key={p.id} className="text-sm text-muted">
@@ -327,8 +321,9 @@ export default function GezinClient() {
               </li>
             ))}
           </ul>
-        </section>
-      )}
+        )}
+        <InviteParentForm onInvited={load} />
+      </section>
     </div>
   );
 }

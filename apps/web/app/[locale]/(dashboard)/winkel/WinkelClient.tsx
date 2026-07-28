@@ -13,6 +13,10 @@ import {
   type RedemptionView,
 } from "../../../../lib/api/types";
 import { useRouter } from "../../../../i18n/navigation";
+import {
+  FullParentForbidden,
+  useRequireFullParent,
+} from "../../../../lib/auth/RequireFullParent";
 import { Button } from "../../../../components/ui";
 import RewardForm from "./RewardForm";
 
@@ -119,6 +123,7 @@ function RewardRow({
 export default function WinkelClient() {
   const t = useTranslations("winkel");
   const router = useRouter();
+  const gate = useRequireFullParent();
   const [rewards, setRewards] = useState<RewardView[] | null>(null);
   const [requests, setRequests] = useState<RedemptionView[]>([]);
   const [children, setChildren] = useState<MemberView[]>([]);
@@ -145,13 +150,22 @@ export default function WinkelClient() {
   }, [router]);
 
   useEffect(() => {
+    if (gate !== "ok") return;
     void load();
-  }, [load]);
+  }, [gate, load]);
 
   const childName = useCallback(
     (id: string) => children.find((c) => c.id === id)?.displayName ?? "—",
     [children],
   );
+
+  if (gate === "forbidden") {
+    return <FullParentForbidden />;
+  }
+
+  if (gate === "loading") {
+    return <p className="text-sm text-muted">{t("loading")}</p>;
+  }
 
   async function submit(payload: RewardFormPayload) {
     if (form?.mode === "edit") {
