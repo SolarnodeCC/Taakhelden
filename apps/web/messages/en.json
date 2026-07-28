@@ -14,6 +14,7 @@
       "VALIDATION_FAILED": "Please enter a valid email address and password.",
       "generic": "Something went wrong while signing in. Please try again in a bit."
     },
+    "deletedFamily": "Your family is marked for deletion. Everything will be permanently removed around {purgeAfter}.",
     "register": {
       "intro": "Create an account and start your family on TaakHelden.",
       "displayName": "Your first name",
@@ -59,6 +60,7 @@
     "taken": "Tasks",
     "winkel": "Shop",
     "gezin": "Family",
+    "instellingen": "Settings",
     "inzichten": "Insights"
   },
   "shell": {
@@ -264,6 +266,9 @@
       "empty": "No children yet — add the first one.",
       "edit": "Edit",
       "resetPin": "Reset PIN",
+      "points": "Points",
+      "delete": "Remove",
+      "balance": "{points} points",
       "born": "Born in {year}",
       "ageMode": {
         "young": "Young",
@@ -345,6 +350,98 @@
       "save": "Save",
       "saving": "Saving…",
       "cancel": "Cancel"
+    },
+    "deleteChild": {
+      "title": "Remove {name}",
+      "hint": "The profile will be deactivated. After the deletion window, tasks, points, and history are permanently removed.",
+      "confirm": "I understand that {name}'s profile will be removed.",
+      "confirmRequired": "Please confirm you want to remove this profile.",
+      "submit": "Remove profile",
+      "deleting": "Removing…",
+      "cancel": "Cancel",
+      "errorDelete": "Couldn't remove the profile. Please try again.",
+      "errorForbidden": "Only full access can remove child profiles."
+    }
+  },
+  "instellingen": {
+    "title": "Settings",
+    "subtitle": "Notifications and privacy for your family.",
+    "loading": "Loading…",
+    "loadError": "Couldn't load settings.",
+    "notifications": {
+      "title": "Notifications per child",
+      "hint": "Manage push notifications to the child app. Without a custom bedtime, the family quiet hours on Family apply.",
+      "noChildren": "Add a child first to configure notifications.",
+      "enabled": "Push notifications on",
+      "enabledHint": "Off means no push to this child.",
+      "customQuiet": "Custom quiet hours",
+      "customQuietOn": "We only send push to this child during this window.",
+      "customQuietOff": "Uses family quiet hours ({start}–{end}).",
+      "quietStart": "From",
+      "quietEnd": "Until",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Notification settings saved.",
+      "loadError": "Couldn't load notification settings.",
+      "errorValidation": "Please check the times and try again.",
+      "errorSave": "Couldn't save. Please try again.",
+      "errorForbidden": "Only full access can change notifications."
+    },
+    "privacy": {
+      "title": "Privacy & account",
+      "hint": "Download your data or delete the entire family.",
+      "exportTitle": "Export data",
+      "exportHint": "You'll receive a ZIP with JSON and photos (GDPR art. 20).",
+      "exportStart": "Start export",
+      "exportWorking": "Preparing export…",
+      "exportDownload": "Download ZIP",
+      "exportLinkExpiry": "The download link expires shortly. Save the file locally.",
+      "exportFailed": "Export failed. Please try again later.",
+      "deleteTitle": "Delete family",
+      "deleteHint": "After 7 days all data is permanently deleted. This cannot be undone.",
+      "deleteConfirm": "I understand everything will be permanently deleted after 7 days.",
+      "confirmRequired": "Please confirm you want to delete the family.",
+      "password": "Current password",
+      "passwordRequired": "Enter your password to confirm.",
+      "wrongPassword": "Password is incorrect.",
+      "deleteSubmit": "Delete family",
+      "deleteWorking": "Working…",
+      "deleteFailed": "Couldn't delete. Please try again.",
+      "errorForbidden": "Only full access can delete the family."
+    }
+  },
+  "punten": {
+    "title": "Points — {name}",
+    "balance": "{points} points",
+    "streak": "{days}-day streak",
+    "close": "Close",
+    "loadError": "Couldn't load points.",
+    "ledgerTitle": "Ledger",
+    "ledgerEmpty": "No points in the ledger yet.",
+    "loadMore": "Load more",
+    "loadingMore": "Loading…",
+    "ledgerType": {
+      "task": "Task",
+      "photo_bonus": "Photo bonus",
+      "day_bonus": "Day bonus",
+      "week_bonus": "Week bonus",
+      "redemption": "Reward",
+      "redemption_cancel": "Reward cancelled",
+      "adjustment": "Manual credit",
+      "badge": "Badge"
+    },
+    "adjust": {
+      "title": "Add points",
+      "hint": "Positive credits only — for example help outside the app.",
+      "amount": "Points",
+      "note": "Reason",
+      "notePlaceholder": "E.g. extra help in the garden",
+      "submit": "Add points",
+      "saving": "Saving…",
+      "success": "Points added.",
+      "errorValidation": "Enter a valid amount (1–1000) and a reason.",
+      "errorSave": "Couldn't add points. Please try again.",
+      "errorForbidden": "Only full access can add points."
     }
   },
   "sections": {

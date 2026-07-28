@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { LoginBody, ErrorCodes, type ErrorCode } from "@taakhelden/shared";
 import { apiClient, ApiClientError } from "../../../lib/api/client";
@@ -18,6 +19,13 @@ const KNOWN_ERRORS: ErrorCode[] = [
 export default function LoginForm() {
   const t = useTranslations("auth");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const deletedNotice =
+    searchParams.get("deleted") === "1"
+      ? t("deletedFamily", {
+          purgeAfter: decodeURIComponent(searchParams.get("purgeAfter") ?? ""),
+        })
+      : null;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -69,6 +77,7 @@ export default function LoginForm() {
         />
       </Field>
 
+      {deletedNotice && <Alert tone="success">{deletedNotice}</Alert>}
       {error && <Alert tone="danger">{error}</Alert>}
 
       <Button type="submit" disabled={busy} className="mt-1">

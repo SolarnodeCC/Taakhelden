@@ -1,10 +1,14 @@
 import { z } from "zod";
-import { InstanceView } from "@taakhelden/shared";
+import { Balance, InstanceView, LedgerType } from "@taakhelden/shared";
 export {
+  Balance,
   ChildToday,
   ChildTodayView,
+  ExportJobView,
   InstanceStatus,
   InstanceView,
+  LedgerType,
+  NotificationSettingsResponse,
   ParentTodayView,
   TodayBalance,
 } from "@taakhelden/shared";
@@ -227,3 +231,32 @@ export const RedemptionView = z
 export type RedemptionView = z.infer<typeof RedemptionView>;
 
 export const RedemptionList = z.array(RedemptionView);
+
+// --- Batch 10: notifications, points/ledger, privacy export ---
+
+export const LedgerEntryView = z.object({
+  id: z.string(),
+  type: LedgerType,
+  amount: z.number().int(),
+  ref: z.string().nullable(),
+  note: z.string().nullable(),
+  at: z.string(),
+});
+export type LedgerEntryView = z.infer<typeof LedgerEntryView>;
+
+export const LedgerPage = z.object({
+  entries: z.array(LedgerEntryView),
+  nextCursor: z.string().nullable(),
+});
+export type LedgerPage = z.infer<typeof LedgerPage>;
+
+/** GET /points/balance for parents — v1 `{ children }` or v2 `{ viewer, children }`. */
+export const ParentBalancesResponse = z.union([
+  z.object({ viewer: z.literal("parent"), children: z.array(Balance) }),
+  z.object({ children: z.array(Balance) }),
+]);
+export type ParentBalancesResponse = z.infer<typeof ParentBalancesResponse>;
+
+export function parentBalancesChildren(data: ParentBalancesResponse): z.infer<typeof Balance>[] {
+  return data.children;
+}
