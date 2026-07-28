@@ -27,9 +27,10 @@ de onderstaande voorbeeldwaarden als het gezin al is ingericht):
 3. Vul gezinscode **482916** (of actuele staging-code) en kind-PIN **4242** in.
 4. Kies profiel **DemoKind** en voltooi koppeling.
 5. In kindmodus: taak afvinken op **Mijn Dag** (haptic + confetti of reduce-motion glow).
-6. Open de verborgen ouderpoort via **lang indrukken** op de avatar in **Mijn Held**
-   (alternatief: vijf keer tikken op het scherm).
-7. Bevestig dat ouderacties achter device-owner auth zitten; kind-PIN opent die poort niet.
+6. Open de verborgen ouderpoort via **lang indrukken** op **Mijn Held**
+   (alternatief: vijf keer tikken).
+7. Bevestig dat Face ID / toestelcode **eerst** vereist is; pas daarna verschijnen
+   ouderinstellingen. Kind-PIN opent die poort niet.
 
 ## Compliance notes
 

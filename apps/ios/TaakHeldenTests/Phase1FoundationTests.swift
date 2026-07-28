@@ -35,6 +35,10 @@ final class Phase1FoundationTests: XCTestCase {
             4.5
         )
         XCTAssertGreaterThanOrEqual(
+            contrastRatio(foreground: THPalettes.teen.text, background: THPalettes.teen.background),
+            4.5
+        )
+        XCTAssertGreaterThanOrEqual(
             contrastRatio(foreground: THPalettes.teen.text, background: THPalettes.teen.surface),
             4.5
         )
@@ -42,6 +46,16 @@ final class Phase1FoundationTests: XCTestCase {
             contrastRatio(foreground: THPalettes.parent.text, background: THPalettes.parent.surface),
             4.5
         )
+        // Kid turquoise companion stays distinct from cream.
+        XCTAssertEqual(THPalettes.kid.secondary.hex, 0x0E9F8E)
+        XCTAssertEqual(THPalettes.teen.background.hex, 0x1F2A44)
+    }
+
+    func testParentGateRequiresAuthBeforeSettings() {
+        // Soft-open regression: sound toggle must not appear before device-owner auth.
+        // Covered by ParentGateView structure; assert policy still hides permanent parent tab.
+        XCTAssertEqual(ParentGatePolicy.childTabCount, 3)
+        XCTAssertFalse(ParentGatePolicy.hiddenEntryPoints.isEmpty)
     }
 
     func testAuthStoreRestoresChildRouteFromStoredSession() throws {

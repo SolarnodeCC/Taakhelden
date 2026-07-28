@@ -17,23 +17,26 @@ struct ChildShellView: View {
     var body: some View {
         @Bindable var appState = appState
         let session = appState.authStore.childSession
-        let palette = session?.ageBand == .teen ? THPalettes.teen : THPalettes.kid
+        let isTeen = session?.ageBand == .teen
+        let palette = isTeen ? THPalettes.teen : THPalettes.kid
 
         TabView(selection: $appState.selectedChildTab) {
             MijnDagTabView(
                 palette: palette,
+                isTeen: isTeen,
                 reduceMotion: reduceMotion,
                 viewModel: dayViewModel
             )
             .tabItem { Label("Mijn Dag", systemImage: "checklist") }
             .tag(ChildTab.mijnDag)
 
-            WinkelTabView(palette: palette, viewModel: shopViewModel)
+            WinkelTabView(palette: palette, isTeen: isTeen, viewModel: shopViewModel)
                 .tabItem { Label("Winkel", systemImage: "gift.fill") }
                 .tag(ChildTab.winkel)
 
             MijnHeldTabView(
                 palette: palette,
+                isTeen: isTeen,
                 displayName: session?.displayName ?? "Held",
                 avatar: session?.avatar ?? "🦊",
                 balance: dayViewModel?.state
@@ -96,6 +99,7 @@ private struct MijnDagTabView: View {
     @Environment(AppState.self) private var appState
 
     let palette: THPalette
+    let isTeen: Bool
     let reduceMotion: Bool
     let viewModel: ChildDayViewModel?
 
@@ -116,7 +120,9 @@ private struct MijnDagTabView: View {
                     case .emptyAllDone(let balance):
                         header(balance: balance)
                         THCard(palette: palette) {
-                            Text("Alles gedaan — je bent vandaag al een TaakHeld! 🌟")
+                            Text(isTeen
+                                  ? "Alles gedaan — nette dag."
+                                  : "Alles gedaan — je bent vandaag al een TaakHeld! 🌟")
                                 .font(.headline)
                                 .foregroundStyle(palette.text.color)
                             Text("Morgen staan er weer nieuwe missies klaar.")
@@ -168,7 +174,12 @@ private struct MijnDagTabView: View {
                 Spacer()
                 THBadge(text: "\(balance.balance) punten", palette: palette)
             }
-            THBadge(text: "🔥 \(balance.streakDays) dagen streak", palette: palette)
+            THBadge(
+                text: isTeen
+                    ? "\(balance.streakDays) dagen streak"
+                    : "🔥 \(balance.streakDays) dagen streak",
+                palette: palette
+            )
         }
     }
 
@@ -220,6 +231,7 @@ private struct MijnDagTabView: View {
 
 private struct WinkelTabView: View {
     let palette: THPalette
+    let isTeen: Bool
     let viewModel: ChildShopViewModel?
 
     var body: some View {
@@ -246,13 +258,19 @@ private struct WinkelTabView: View {
                             ForEach(rewards.rewards) { reward in
                                 THCard(palette: palette) {
                                     HStack {
-                                        Text(reward.icon ?? "🎁")
-                                            .font(.system(size: 28))
+                                        if isTeen {
+                                            Image(systemName: "gift")
+                                                .font(.system(size: 24, weight: .semibold))
+                                                .foregroundStyle(palette.accent.color)
+                                        } else {
+                                            Text(reward.icon ?? "🎁")
+                                                .font(.system(size: 28))
+                                        }
                                         VStack(alignment: .leading) {
                                             Text(reward.title)
                                                 .foregroundStyle(palette.text.color)
                                             if reward.affordable {
-                                                Text("Je kunt deze kiezen!")
+                                                Text(isTeen ? "Past bij je saldo" : "Je kunt deze kiezen!")
                                                     .font(.footnote)
                                                     .foregroundStyle(palette.mutedText.color)
                                             } else {
@@ -287,6 +305,7 @@ private struct MijnHeldTabView: View {
     @Environment(AppState.self) private var appState
 
     let palette: THPalette
+    let isTeen: Bool
     let displayName: String
     let avatar: String
     let balance: ChildDayLoadState?
@@ -312,11 +331,11 @@ private struct MijnHeldTabView: View {
                             if let heroBalance {
                                 Text("Level \(max(1, heroBalance.lifetimeEarned / 100))")
                                     .foregroundStyle(palette.mutedText.color)
-                                Text("Lifetime: \(heroBalance.lifetimeEarned) punten · streak \(heroBalance.streakDays)")
+                                Text("Alles bij elkaar: \(heroBalance.lifetimeEarned) punten · streak \(heroBalance.streakDays)")
                                     .font(.footnote)
                                     .foregroundStyle(palette.mutedText.color)
                             } else {
-                                Text("Level komt uit lifetimeEarned, nooit uit je huidige saldo.")
+                                Text("Je level groeit mee met alle punten die je ooit hebt verdiend — niet met je huidige saldo.")
                                     .foregroundStyle(palette.mutedText.color)
                             }
                         }
@@ -331,6 +350,7 @@ private struct MijnHeldTabView: View {
             .onTapGesture(count: 5) {
                 appState.parentGate.openGate()
             }
+            .accessibilityHint("Houd lang vast om de ouderpoort te openen")
         }
     }
 }

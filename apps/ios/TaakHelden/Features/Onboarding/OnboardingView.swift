@@ -4,7 +4,9 @@ struct WelcomeHubView: View {
     @Environment(AppState.self) private var appState
 
     var body: some View {
-        let palette = THPalettes.kid
+        // Family-app entry uses the parent (dashboard) register — calm teal on white.
+        // Child pairing keeps a warm secondary CTA without flipping the whole hub to kid-coral.
+        let palette = THPalettes.parent
 
         NavigationStack {
             VStack(spacing: THSpacing.xl) {
@@ -12,27 +14,32 @@ struct WelcomeHubView: View {
 
                 Text("TaakHelden")
                     .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundStyle(palette.text.color)
+                    .foregroundStyle(palette.accent.color)
+                    .accessibilityAddTraits(.isHeader)
 
-                THCard(palette: palette) {
-                    Text("Samen klussen klaren voelt fijner als iedereen kan groeien in zijn eigen tempo.")
-                        .font(.system(size: 20, weight: .semibold, design: .rounded))
+                VStack(alignment: .leading, spacing: THSpacing.md) {
+                    Text("Samen taken en huiswerk bijhouden — voor het hele gezin.")
+                        .font(.system(size: 20, weight: .semibold))
                         .foregroundStyle(palette.text.color)
 
-                    Text("Kies of je eerst een gezin wilt starten of een kindertoestel wilt koppelen.")
+                    Text("Start als ouder een gezin, of koppel een kindertoestel met een gezinscode.")
                         .foregroundStyle(palette.mutedText.color)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 Button("Ik ben een ouder") {
                     appState.openParentOnboarding()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(palette.accent.color)
+                .controlSize(.large)
 
                 Button("Ik heb al een gezinscode") {
                     appState.openChildPairing()
                 }
                 .buttonStyle(.bordered)
+                .tint(palette.accent.color)
+                .controlSize(.large)
 
                 Spacer()
             }
@@ -97,7 +104,7 @@ struct ChildPairingFlowView: View {
                                         Spacer()
                                         if selectedChildID == child.id {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .foregroundStyle(palette.accent.color)
+                                                .foregroundStyle(palette.secondary.color)
                                         }
                                     }
                                     .padding(THSpacing.md)

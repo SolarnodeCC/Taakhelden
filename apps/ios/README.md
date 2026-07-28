@@ -63,7 +63,9 @@ Handmatige JSON-DTO's toevoegen is niet toegestaan — wijzig het gedeelde contr
 
 - Keychain-sessies (ouder + kind) met device refresh
 - Child unlock: zichtbare PIN voor onder 13 + optionele Face ID
-- Parental gate: verborgen gebaar + LocalAuthentication
+- Parental gate: verborgen gebaar + LocalAuthentication **vóór** settings
+- Welcome hub in parent-register (familie-app); kind-koppelen in kid-register
+- Paletten gespiegeld aan `apps/web/app/globals.css` (incl. teen-navy + kid-turquoise)
 - Ouder-onboarding: Sign in with Apple → kind + gezinscode
 - Kind-tabs: Mijn Dag / Winkel / Mijn Held (live API + empty/loading/error)
 - MutationQueue + SyncEngine (offline afvinken)
