@@ -134,6 +134,9 @@ Deze kit voegt `.mcp.json` toe met de gedeelde **Cloudflare MCP-servers** (via
 - **`cloudflare-observability`** — Worker-logs en analytics opvragen tijdens debugging.
 - **`cloudflare-bindings`** — bindings inspecteren en D1 queryen zonder de
   dashboard-context te verliezen.
+- **`cloudflare-docs`** — up-to-date Cloudflare-documentatie doorzoeken
+  (Workers, D1, R2, Durable Objects, …).
+- **`cloudflare-builds`** — Workers Builds-inzichten en build-historie.
 
 Bij het eerste gebruik opent `mcp-remote` een OAuth-login in de browser; het token wordt
 lokaal opgeslagen, niet in git. Zie `developers.cloudflare.com/agents/model-context-protocol`.
