@@ -55,8 +55,9 @@ die elders (iOS of handmatig) zijn aangemaakt. Dit volgt productvoorstel §3.1
 - **Batch 10+**: notificatie-instellingen, ledger/punten-aanpassing, AVG-export,
   realtime, Inzichten (Fase 2).
 - **Niet in deze batch**: Sign in with Apple op web, wachtwoord-vergeten,
-  kind-profielfoto-upload (presigned), soft-delete kindprofiel UI,
-  device-sessions revoke, kind-login op web, marketing-landing.
+  kind-profielfoto-upload (presigned), soft-delete kindprofiel UI
+  (**besloten: out of scope** — privacy/AVG-batch), device-sessions revoke,
+  kind-login op web, marketing-landing.
 
 ## Wat we bouwen
 
@@ -77,9 +78,8 @@ Nieuwe publieke pagina naast `/login`.
   3. Parse `ParentSessionResult` / `TokenPair`.
   4. `setTokens(...)` → httpOnly cookies.
   5. Antwoord `{ ok: true }`.
-- **Na succes**: redirect naar onboarding-stap **Kind toevoegen**
-  (`/gezin?onboarding=1` of `/onboarding/kind`) — niet rechtstreeks naar
-  `/vandaag` (dat is leeg zonder kinderen).
+- **Na succes**: redirect naar `/gezin?onboarding=1` (kind toevoegen) —
+  niet rechtstreeks naar `/vandaag` (dat is leeg zonder kinderen).
 - **Foutcodes** (i18n): `EMAIL_IN_USE`, `VALIDATION_FAILED`, `RATE_LIMITED`,
   generic. Positieve, behulpzame toon (geen schuldtaal).
 - **Login-pagina**: link “Nog geen account? Start je gezin” → `/register`.
