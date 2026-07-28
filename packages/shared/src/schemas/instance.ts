@@ -61,6 +61,13 @@ export const ParentTodayView = z.object({
 });
 export type ParentTodayView = z.infer<typeof ParentTodayView>;
 
+/** Opaque pagination cursor for GET /instances (history). */
+export const HistoryCursor = z.object({
+  date: z.string(),
+  id: z.string(),
+});
+export type HistoryCursor = z.infer<typeof HistoryCursor>;
+
 export const RedoBody = z.object({
   note: z.string().min(1).max(200), // vriendelijke toelichting, verplicht
 });
