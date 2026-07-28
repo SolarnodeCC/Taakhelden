@@ -5,6 +5,13 @@ export const LedgerType = z.enum([
   "redemption", "redemption_cancel", "adjustment", "badge",
 ]);
 
+/** Opaque pagination cursor for GET /points/ledger. */
+export const LedgerCursor = z.object({
+  createdAt: z.string(),
+  id: z.string(),
+});
+export type LedgerCursor = z.infer<typeof LedgerCursor>;
+
 export const AdjustBody = z.object({
   childId: z.string(),
   amount: z.number().int().min(1).max(1000), // alleen positief — architectuurregel

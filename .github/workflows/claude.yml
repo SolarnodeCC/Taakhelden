@@ -12,6 +12,10 @@ on:
   issues:
     types: [opened, assigned]
 
+concurrency:
+  group: claude-${{ github.event.issue.number || github.event.pull_request.number }}
+  cancel-in-progress: true
+
 jobs:
   claude:
     # Alleen draaien als een vertrouwde gebruiker (OWNER/MEMBER/COLLABORATOR) @claude
@@ -28,6 +32,7 @@ jobs:
         contains(github.event.comment.body, '@claude') &&
         contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'), github.event.comment.author_association))
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
       pull-requests: write

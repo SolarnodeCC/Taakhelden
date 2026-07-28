@@ -4,11 +4,15 @@ on:
     branches: [main]   # elke merge naar main deployt naar production
   workflow_dispatch:   # ook handmatig te starten
 
+permissions:
+  contents: read
+
 concurrency: deploy-prod
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     environment: production
     steps:
       - uses: actions/checkout@v7
