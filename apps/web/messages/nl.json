@@ -172,6 +172,11 @@
       "allChildren": "Hele gezin",
       "loadError": "Kon het weekoverzicht niet laden.",
       "empty": "Geen taken gepland in deze week.",
+      "dragHint": "Sleep een open taak naar een andere dag of een ander kind.",
+      "moveError": "Verplaatsen lukte niet. Probeer het nog eens.",
+      "slotTaken": "Hier staat al een taak voor dit kind op deze dag.",
+      "notMovable": "Deze taak kun je niet meer verplaatsen.",
+      "moving": "Bezig met verplaatsen…",
       "status": {
         "open": "open",
         "completed": "af",

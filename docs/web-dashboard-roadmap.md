@@ -4,15 +4,13 @@ Centraal overzicht van onderdelen die in het product staan maar nog niet (volled
 in `apps/web` zijn gebouwd. Implementatieplannen per batch:
 `docs/web-batch-*-plan.md`.
 
-**Laatst bijgewerkt:** na Batch 11 (realtime); Batch 12-plan (weekplanner
-drag-drop) staat klaar, implementatie volgt.
+**Laatst bijgewerkt:** na Batch 12 (weekplanner drag-drop); Inzichten blijft Fase 2.
 
 ## Openstaande onderdelen
 
 | Onderwerp | Waar gepland | Notitie |
 | --- | --- | --- |
 | **Inzichten** (statistieken/trends) | Batch 6 / Fase 2 | Nog `SectionStub` op `/inzichten` |
-| **Drag-drop weekplanner** | [Batch 12](./web-batch-12-plan.md) | Read-only weekgrid (Batch 9) bestaat; instance-move API + DnD UI nog niet |
 | SIWA op web, wachtwoord-vergeten, marketing-landing, profielfoto-upload | Diverse batches / post-MVP | Bewust buiten scope gebleven (zie hieronder) |
 
 ## Bewust buiten web-MVP (niet in batches 1–12)
@@ -42,4 +40,4 @@ nog geen apart batch-nummer voor:
 | 9 | Taken-verdieping (templates, weekoverzicht read-only) | Done |
 | 10 | Notificaties + punten + privacy/AVG | Done |
 | 11 | Realtime WebSocket (Vandaag, Goedkeuren, Winkel) | Done — [web-batch-11-plan.md](./web-batch-11-plan.md) |
-| 12 | Weekplanner drag-drop (instance-move) | Plan — [web-batch-12-plan.md](./web-batch-12-plan.md) |
+| 12 | Weekplanner drag-drop (instance-move) | Done — [web-batch-12-plan.md](./web-batch-12-plan.md) |

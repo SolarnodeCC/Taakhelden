@@ -17,11 +17,13 @@ export async function callFamilyRoom(
     | "/redeem"
     | "/redemption-fulfill"
     | "/redemption-cancel"
-    | "/attach-photo",
+    | "/attach-photo"
+    | "/move",
   payload: {
     instanceId?: string;
     note?: string;
     childId?: string;
+    date?: string;
     amount?: number;
     rewardId?: string;
     redemptionId?: string;
