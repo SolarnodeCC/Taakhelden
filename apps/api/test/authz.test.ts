@@ -55,6 +55,43 @@ describe("authz-fundament", () => {
     expect(list.status).toBe(200);
     const tasks = (await list.json()) as Array<{ id: string }>;
     expect(tasks.some((t) => t.id === taskB)).toBe(false);
+
+    // Ook het gegroepeerde vandaag-overzicht blijft strikt binnen gezin A.
+    const today = await api("/instances/today", { token: tokenA });
+    expect(today.status).toBe(200);
+    const overview = (await today.json()) as {
+      children: Array<{ childId: string; instances: Array<{ id: string }> }>;
+    };
+    expect(overview.children.map((child) => child.childId).sort()).toEqual(
+      [famA.childA, famA.childB].sort(),
+    );
+    expect(
+      overview.children.flatMap((child) => child.instances).some((instance) => instance.id === instanceB),
+    ).toBe(false);
+  });
+
+  it("kind ziet in /instances/today alleen de eigen taken en balans", async () => {
+    const fam = await seedFamily("today");
+    const ownTask = await seedTask(fam.familyId, fam.childA);
+    const siblingTask = await seedTask(fam.familyId, fam.childB);
+    const ownInstance = await seedInstance(fam.familyId, ownTask, fam.childA, todayAmsterdam());
+    const siblingInstance = await seedInstance(fam.familyId, siblingTask, fam.childB, todayAmsterdam());
+
+    const today = await api("/instances/today", {
+      token: await childToken(fam.childA, fam.familyId),
+    });
+    expect(today.status).toBe(200);
+    const body = (await today.json()) as {
+      children?: unknown;
+      instances: Array<{ id: string; childId: string }>;
+      balance: { childId: string; balance: number };
+    };
+    expect(body.children).toBeUndefined();
+    expect(body.instances).toEqual([
+      expect.objectContaining({ id: ownInstance, childId: fam.childA }),
+    ]);
+    expect(body.instances.some((instance) => instance.id === siblingInstance)).toBe(false);
+    expect(body.balance).toMatchObject({ childId: fam.childA, balance: 0 });
   });
 
   it("approve_only-ouder kan geen instellingen wijzigen (403)", async () => {

@@ -1,0 +1,2 @@
+# Local development only. Copy this file to `.dev.vars`; never use this value in production.
+JWT_SECRET=local-dev-secret-change-me

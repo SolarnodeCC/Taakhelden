@@ -28,7 +28,7 @@ async function proxy(req: Request, path: string[]): Promise<Response> {
   const send = (token: string) =>
     fetch(url, { method: req.method, headers: buildHeaders(token), body, cache: "no-store" });
 
-  let token = (await getAccessToken()) ?? (await refreshTokens());
+  const token = (await getAccessToken()) ?? (await refreshTokens());
   if (!token) {
     return NextResponse.json(
       { error: { code: ErrorCodes.UNAUTHORIZED, message: "Inloggen vereist." } },

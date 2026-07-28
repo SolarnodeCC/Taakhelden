@@ -150,14 +150,41 @@ describe("kernlus: afvinken → punten → idempotent", () => {
     expect(complete.status).toBe(200);
     expect(((await complete.json()) as { pointsEarned: number }).pointsEarned).toBe(0); // wacht op ouder
 
+    const approvalKey = crypto.randomUUID();
+    const parentTok = await parentToken(fam.parentId, fam.familyId, { perm: "approve_only" });
     const approve = await api(`/instances/${instanceId}/approve`, {
       method: "POST",
-      token: await parentToken(fam.parentId, fam.familyId, { perm: "approve_only" }),
+      token: parentTok,
+      idempotencyKey: approvalKey,
     });
     expect(approve.status).toBe(200);
     const approved = (await approve.json()) as { pointsEarned: number; newBalance: number };
     expect(approved.pointsEarned).toBe(10);
     expect(approved.newBalance).toBe(30); // 10 + dagbonus 20
+
+    const today = await api("/instances/today", { token: parentTok });
+    const overview = (await today.json()) as {
+      children: Array<{ childId: string; balance: { balance: number; todayCompleted: number } }>;
+    };
+    expect(overview.children.find((child) => child.childId === fam.childA)?.balance).toMatchObject({
+      balance: 30,
+      todayCompleted: 1,
+    });
+
+    const replay = await api(`/instances/${instanceId}/approve`, {
+      method: "POST",
+      token: parentTok,
+      idempotencyKey: approvalKey,
+    });
+    expect(replay.status).toBe(200);
+    expect(replay.headers.get("Idempotent-Replay")).toBe("true");
+    expect(((await replay.json()) as { newBalance: number }).newBalance).toBe(30);
+
+    const ledger = await env.DB
+      .prepare("SELECT COALESCE(SUM(amount),0) AS balance FROM points_ledger WHERE family_id = ? AND child_id = ?")
+      .bind(fam.familyId, fam.childA)
+      .first<{ balance: number }>();
+    expect(ledger?.balance).toBe(30);
   });
 
   it("redo geeft GEEN puntenaftrek en zet status op open_redo", async () => {
