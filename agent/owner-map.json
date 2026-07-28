@@ -1,0 +1,24 @@
+{
+  "workspace": "taakhelden",
+  "owners": {
+    "AGENTS.md": "agent",
+    "CLAUDE.md": "agent",
+    "README.md": "workspace",
+    "package.json": "workspace",
+    "package-lock.json": "workspace",
+    ".gitignore": "workspace",
+    ".mcp.json": "ops",
+    "apps/api/": "api",
+    "apps/api/migrations/": "api",
+    "apps/api/src/middleware/": "api",
+    "apps/api/src/routes/auth.ts": "api",
+    "apps/web/": "web",
+    "apps/ios/": "ios",
+    "packages/shared/": "shared",
+    "Design System/": "design-system",
+    "docs/": "docs",
+    ".github/": "ops",
+    ".claude/": "agent",
+    "agent/": "agent"
+  }
+}

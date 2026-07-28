@@ -1,0 +1,26 @@
+# jankurai scan policy — see docs/audit-rubric.md.
+minimum_score = 85
+fail_on = ["critical", "high"]
+advisory_on = ["medium", "low"]
+
+[history]
+max_rows = 500
+max_bytes = 1048576
+dedupe = "consecutive-equivalent"
+mirror_env = "JANKURAI_HISTORY_MIRROR"
+mirror_required = false
+mirror_max_rows = 5000
+
+[scan]
+# Design System/ is a standalone JS/JSX prototype + component-preview surface
+# (readme.md, _ds_manifest.json, ui_kits/, component .card.html previews) that
+# documents the token/component contract for apps/web and apps/ios. It is never
+# built or shipped — see CLAUDE.md's "UI & Design" section. Excluding it keeps
+# the audit's product-code heuristics (dead-marker/vibe-language, code-shape,
+# duplication) scoped to what actually ships; it does not exempt apps/web or
+# apps/api from any check.
+excluded_paths = ["Design System/"]
+
+[smart_scan]
+full_scan_interval_secs = 3600
+roulette_rate = 0.10
