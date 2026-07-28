@@ -164,8 +164,13 @@ describe("fotoflow: upload → strip → ready", () => {
     // via GET /photos/{id} kan tonen in de goedkeuringswachtrij.
     const today = await api("/instances/today", { token: await parentToken(fam.parentId, fam.familyId) });
     const body = (await today.json()) as {
-      children: { childId: string; instances: { id: string; status: string; photoId: string | null }[] }[];
+      children: {
+        childId: string;
+        balance: { childId: string; balance: number };
+        instances: { id: string; status: string; photoId: string | null }[];
+      }[];
     };
+    expect(body.children[0]?.balance).toMatchObject({ childId: fam.childA, balance: 0 });
     const inst = body.children
       .flatMap((c) => c.instances)
       .find((i) => i.id === instanceId);

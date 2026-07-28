@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { ParentTodayView, type ChildToday, type InstanceView } from "../../../../lib/api/types";
 import { useRouter } from "../../../../i18n/navigation";
+import { Card } from "../../../../components/ui";
 
 type Bucket = "open" | "awaiting" | "done";
 
@@ -31,42 +32,44 @@ function ChildCard({ child }: { child: ChildToday }) {
   const hasAny = child.instances.length > 0;
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4">
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-base font-semibold text-text">{child.displayName}</h2>
-        <span className="rounded-full bg-accent/10 px-3 py-1 text-sm font-semibold text-accent">
-          {t("balance", { points: child.balance })}
-        </span>
-      </div>
-
-      {!hasAny ? (
-        <p className="mt-3 text-sm text-muted">{t("childEmpty")}</p>
-      ) : (
-        <div className="mt-3 grid gap-4 sm:grid-cols-3">
-          {order.map((bucket) => (
-            <div key={bucket}>
-              <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
-                {t(`bucket.${bucket}`)}
-              </h3>
-              <ul className="mt-2 flex flex-col gap-1.5">
-                {buckets[bucket].length === 0 ? (
-                  <li className="text-sm text-muted/70">—</li>
-                ) : (
-                  buckets[bucket].map((inst) => (
-                    <li
-                      key={inst.id}
-                      className="flex items-center gap-2 rounded bg-bg px-2 py-1.5 text-sm text-text"
-                    >
-                      {inst.icon && <span aria-hidden>{inst.icon}</span>}
-                      <span className="min-w-0 truncate">{inst.title}</span>
-                    </li>
-                  ))
-                )}
-              </ul>
-            </div>
-          ))}
+    <section>
+      <Card padded={false} className="p-4">
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="text-base font-semibold text-text">{child.displayName}</h2>
+          <span className="rounded-full bg-accent/10 px-3 py-1 text-sm font-semibold text-accent">
+            {t("balance", { points: child.balance.balance })}
+          </span>
         </div>
-      )}
+
+        {!hasAny ? (
+          <p className="mt-3 text-sm text-muted">{t("childEmpty")}</p>
+        ) : (
+          <div className="mt-3 grid gap-4 sm:grid-cols-3">
+            {order.map((bucket) => (
+              <div key={bucket}>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-muted">
+                  {t(`bucket.${bucket}`)}
+                </h3>
+                <ul className="mt-2 flex flex-col gap-2">
+                  {buckets[bucket].length === 0 ? (
+                    <li className="text-sm text-muted/70">—</li>
+                  ) : (
+                    buckets[bucket].map((inst) => (
+                      <li
+                        key={inst.id}
+                        className="flex items-center gap-2 rounded bg-bg px-2 py-2 text-sm text-text"
+                      >
+                        {inst.icon && <span aria-hidden>{inst.icon}</span>}
+                        <span className="min-w-0 truncate">{inst.title}</span>
+                      </li>
+                    ))
+                  )}
+                </ul>
+              </div>
+            ))}
+          </div>
+        )}
+      </Card>
     </section>
   );
 }
