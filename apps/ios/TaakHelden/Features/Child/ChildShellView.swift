@@ -15,6 +15,7 @@ struct ChildShellView: View {
     @State private var shopViewModel: ChildShopViewModel?
 
     var body: some View {
+        @Bindable var appState = appState
         let session = appState.authStore.childSession
         let palette = session?.ageBand == .teen ? THPalettes.teen : THPalettes.kid
 

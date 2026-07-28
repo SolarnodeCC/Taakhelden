@@ -1,5 +1,6 @@
 import SwiftUI
 import PhotosUI
+import UIKit
 
 struct PhotoBonusActionsView: View {
     let palette: THPalette

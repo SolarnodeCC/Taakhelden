@@ -1,3 +1,4 @@
+import AudioToolbox
 import AVFoundation
 import Foundation
 
@@ -25,8 +26,6 @@ final class SoundEffectService {
         AudioServicesPlaySystemSound(1057) // short positive system tone
     }
 }
-
-import AudioToolbox
 
 enum AppSettings {
     private static let soundsKey = "taakhelden.childSoundsEnabled"

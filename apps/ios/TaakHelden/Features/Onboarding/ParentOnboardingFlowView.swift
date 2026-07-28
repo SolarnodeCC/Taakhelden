@@ -56,11 +56,12 @@ struct ParentOnboardingFlowView: View {
 
     @ViewBuilder
     private func signInStep(viewModel: ParentOnboardingViewModel, palette: THPalette) -> some View {
+        @Bindable var viewModel = viewModel
         THCard(palette: palette) {
             Text("Log in met Apple om je gezin te starten.")
                 .foregroundStyle(palette.mutedText.color)
 
-            TextField("Gezinsnaam (optioneel)", text: Bindable(viewModel).familyName)
+            TextField("Gezinsnaam (optioneel)", text: $viewModel.familyName)
                 .textFieldStyle(.roundedBorder)
 
             SignInWithAppleButtonView(
@@ -82,14 +83,15 @@ struct ParentOnboardingFlowView: View {
 
     @ViewBuilder
     private func createChildStep(viewModel: ParentOnboardingViewModel, palette: THPalette) -> some View {
+        @Bindable var viewModel = viewModel
         THCard(palette: palette) {
             Text("Eerste kind")
                 .font(.headline)
 
-            TextField("Roepnaam", text: Bindable(viewModel).childName)
+            TextField("Roepnaam", text: $viewModel.childName)
                 .textFieldStyle(.roundedBorder)
 
-            TextField("Geboortejaar", text: Bindable(viewModel).birthYear)
+            TextField("Geboortejaar", text: $viewModel.birthYear)
                 .keyboardType(.numberPad)
                 .textFieldStyle(.roundedBorder)
 
@@ -114,7 +116,7 @@ struct ParentOnboardingFlowView: View {
 
             Text("Kind-pincode")
                 .font(.headline)
-            SecureField("4 cijfers", text: Bindable(viewModel).pin)
+            SecureField("4 cijfers", text: $viewModel.pin)
                 .keyboardType(.numberPad)
                 .textFieldStyle(.roundedBorder)
 
