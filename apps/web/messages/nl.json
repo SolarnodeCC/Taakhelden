@@ -14,6 +14,7 @@
       "VALIDATION_FAILED": "Vul een geldig e-mailadres en wachtwoord in.",
       "generic": "Er ging iets mis bij het inloggen. Probeer het straks nog eens."
     },
+    "deletedFamily": "Je gezin is gemarkeerd voor verwijdering. Alles wordt definitief verwijderd rond {purgeAfter}.",
     "register": {
       "intro": "Maak een account aan en start je gezin op TaakHelden.",
       "displayName": "Jouw roepnaam",
@@ -59,6 +60,7 @@
     "taken": "Taken",
     "winkel": "Winkel",
     "gezin": "Gezin",
+    "instellingen": "Instellingen",
     "inzichten": "Inzichten"
   },
   "shell": {
@@ -264,6 +266,9 @@
       "empty": "Nog geen kinderen — voeg het eerste kind toe.",
       "edit": "Bewerken",
       "resetPin": "Pincode resetten",
+      "points": "Punten",
+      "delete": "Verwijderen",
+      "balance": "{points} punten",
       "born": "Geboren in {year}",
       "ageMode": {
         "young": "Jong",
@@ -345,6 +350,98 @@
       "save": "Opslaan",
       "saving": "Bezig met opslaan…",
       "cancel": "Annuleren"
+    },
+    "deleteChild": {
+      "title": "{name} verwijderen",
+      "hint": "Het profiel wordt gedeactiveerd. Na het verwijderingsvenster verdwijnen taken, punten en historie definitief.",
+      "confirm": "Ik begrijp dat het profiel van {name} wordt verwijderd.",
+      "confirmRequired": "Bevestig eerst dat je dit profiel wilt verwijderen.",
+      "submit": "Profiel verwijderen",
+      "deleting": "Bezig met verwijderen…",
+      "cancel": "Annuleren",
+      "errorDelete": "Kon het profiel niet verwijderen. Probeer het nog eens.",
+      "errorForbidden": "Alleen volledig beheer mag kindprofielen verwijderen."
+    }
+  },
+  "instellingen": {
+    "title": "Instellingen",
+    "subtitle": "Notificaties en privacy voor je gezin.",
+    "loading": "Laden…",
+    "loadError": "Kon instellingen niet laden.",
+    "notifications": {
+      "title": "Notificaties per kind",
+      "hint": "Beheer pushmeldingen naar de kind-app. Zonder eigen bedtijd geldt het gezinsvenster op Gezin.",
+      "noChildren": "Voeg eerst een kind toe om notificaties in te stellen.",
+      "enabled": "Pushmeldingen aan",
+      "enabledHint": "Uitgeschakeld betekent geen push naar dit kind.",
+      "customQuiet": "Eigen bedtijdvenster",
+      "customQuietOn": "Alleen in dit venster sturen we push naar dit kind.",
+      "customQuietOff": "Gebruikt gezinsvenster ({start}–{end}).",
+      "quietStart": "Vanaf",
+      "quietEnd": "Tot",
+      "save": "Opslaan",
+      "saving": "Bezig…",
+      "saved": "Notificatie-instellingen opgeslagen.",
+      "loadError": "Kon notificatie-instellingen niet laden.",
+      "errorValidation": "Controleer de tijden en probeer het opnieuw.",
+      "errorSave": "Kon niet opslaan. Probeer het nog eens.",
+      "errorForbidden": "Alleen volledig beheer mag notificaties wijzigen."
+    },
+    "privacy": {
+      "title": "Privacy & account",
+      "hint": "Download je gegevens of verwijder het hele gezin.",
+      "exportTitle": "Gegevens exporteren",
+      "exportHint": "Je ontvangt een ZIP met JSON en foto's (AVG art. 20).",
+      "exportStart": "Export starten",
+      "exportWorking": "Export wordt klaargezet…",
+      "exportDownload": "Download ZIP",
+      "exportLinkExpiry": "De downloadlink verloopt na korte tijd. Sla het bestand lokaal op.",
+      "exportFailed": "Export lukte niet. Probeer het later nog eens.",
+      "deleteTitle": "Gezin verwijderen",
+      "deleteHint": "Na 7 dagen worden alle gegevens definitief verwijderd. Dit kan niet ongedaan worden gemaakt.",
+      "deleteConfirm": "Ik begrijp dat alles na 7 dagen definitief wordt verwijderd.",
+      "confirmRequired": "Bevestig eerst dat je het gezin wilt verwijderen.",
+      "password": "Huidig wachtwoord",
+      "passwordRequired": "Vul je wachtwoord in om te bevestigen.",
+      "wrongPassword": "Wachtwoord klopt niet.",
+      "deleteSubmit": "Gezin verwijderen",
+      "deleteWorking": "Bezig…",
+      "deleteFailed": "Verwijderen lukte niet. Probeer het nog eens.",
+      "errorForbidden": "Alleen volledig beheer mag het gezin verwijderen."
+    }
+  },
+  "punten": {
+    "title": "Punten — {name}",
+    "balance": "{points} punten",
+    "streak": "{days} dagen streak",
+    "close": "Sluiten",
+    "loadError": "Kon punten niet laden.",
+    "ledgerTitle": "Grootboek",
+    "ledgerEmpty": "Nog geen punten in het grootboek.",
+    "loadMore": "Meer laden",
+    "loadingMore": "Laden…",
+    "ledgerType": {
+      "task": "Taak",
+      "photo_bonus": "Foto-bonus",
+      "day_bonus": "Dagbonus",
+      "week_bonus": "Weekbonus",
+      "redemption": "Beloning",
+      "redemption_cancel": "Beloning geannuleerd",
+      "adjustment": "Handmatige bijboeking",
+      "badge": "Badge"
+    },
+    "adjust": {
+      "title": "Punten toevoegen",
+      "hint": "Alleen positieve bijboekingen — bijvoorbeeld voor hulp buiten de app om.",
+      "amount": "Aantal punten",
+      "note": "Reden",
+      "notePlaceholder": "Bijv. extra hulp in de tuin",
+      "submit": "Punten toevoegen",
+      "saving": "Bezig…",
+      "success": "Punten toegevoegd.",
+      "errorValidation": "Vul een geldig aantal (1–1000) en een reden in.",
+      "errorSave": "Kon punten niet toevoegen. Probeer het nog eens.",
+      "errorForbidden": "Alleen volledig beheer mag punten bijboeken."
     }
   },
   "sections": {

@@ -7,11 +7,20 @@ import {
   RegisterBody,
 } from "@taakhelden/shared";
 import {
+  AdjustBody,
+  ExportJobView,
+  NotificationSettingsResponse,
+} from "@taakhelden/shared";
+import {
   FamilyView,
   InviteCodeResult,
   InviteParentResult,
   InstanceHistoryResponse,
+  LedgerEntryView,
+  LedgerPage,
   MemberList,
+  ParentBalancesResponse,
+  parentBalancesChildren,
   ParentTodayView,
   TaskTemplatesResponse,
   TaskView,
@@ -273,5 +282,69 @@ describe("Batch 9 schemas", () => {
       nextCursor: null,
     });
     expect(parsed.instances).toHaveLength(1);
+  });
+});
+
+describe("Batch 10 schemas", () => {
+  it("parses notification settings response", () => {
+    const parsed = NotificationSettingsResponse.parse({
+      settings: [
+        { childId: "ch_1", enabled: true, quietStart: null, quietEnd: null },
+        { childId: "ch_2", enabled: false, quietStart: "20:00", quietEnd: "07:30" },
+      ],
+    });
+    expect(parsed.settings).toHaveLength(2);
+  });
+
+  it("parses parent balances response (v1 and v2)", () => {
+    const balance = {
+      childId: "ch_1",
+      balance: 42,
+      todayCompleted: 1,
+      todayTotal: 2,
+      weekProgress: 0.5,
+      streakDays: 3,
+      lifetimeEarned: 100,
+    };
+    const v1 = ParentBalancesResponse.parse({ children: [balance] });
+    const v2 = ParentBalancesResponse.parse({ viewer: "parent", children: [balance] });
+    expect(parentBalancesChildren(v1)[0]?.balance).toBe(42);
+    expect(parentBalancesChildren(v2)[0]?.balance).toBe(42);
+  });
+
+  it("parses ledger page", () => {
+    const parsed = LedgerPage.parse({
+      entries: [
+        {
+          id: "pl_1",
+          type: "adjustment",
+          amount: 10,
+          ref: null,
+          note: "Extra hulp",
+          at: "2026-07-28T10:00:00.000Z",
+        },
+      ],
+      nextCursor: "abc",
+    });
+    expect(LedgerEntryView.parse(parsed.entries[0]).type).toBe("adjustment");
+  });
+
+  it("parses AdjustBody and ExportJobView", () => {
+    expect(
+      AdjustBody.parse({ childId: "ch_1", amount: 5, note: "Goed gedaan" }).amount,
+    ).toBe(5);
+    expect(
+      ExportJobView.parse({
+        exportId: "exp_1",
+        status: "ready",
+        downloadUrl: "https://example.test/file",
+      }).status,
+    ).toBe("ready");
+  });
+
+  it("rejects negative adjust amounts", () => {
+    expect(() =>
+      AdjustBody.parse({ childId: "ch_1", amount: -1, note: "x" }),
+    ).toThrow();
   });
 });

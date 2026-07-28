@@ -27,11 +27,20 @@ import {
   type ChildCreatePayload,
   type ChildEditPayload,
 } from "./ChildForms";
+import PointsPanel from "./PointsPanel";
+import DeleteChildForm from "./DeleteChildForm";
+import {
+  ParentBalancesResponse,
+  parentBalancesChildren,
+  type Balance,
+} from "../../../../lib/api/types";
 
 type Panel =
   | { kind: "create" }
   | { kind: "edit"; child: MemberView }
   | { kind: "pin"; child: MemberView }
+  | { kind: "points"; child: MemberView }
+  | { kind: "delete"; child: MemberView }
   | null;
 
 export default function GezinClient() {
@@ -50,19 +59,29 @@ export default function GezinClient() {
   const [regenerating, setRegenerating] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [onboardingStep, setOnboardingStep] = useState<2 | 3>(2);
+  const [balances, setBalances] = useState<Record<string, Balance>>({});
   const codeRef = useRef<HTMLElement | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const [familyRaw, membersRaw] = await Promise.all([
+      const [familyRaw, membersRaw, balanceRaw] = await Promise.all([
         apiClient.get("/api/v1/families/me"),
         apiClient.get("/api/v1/members"),
+        apiClient.get("/api/v1/points/balance").catch(() => null),
       ]);
       const fam = FamilyView.parse(familyRaw);
       const members = MemberList.parse(membersRaw);
       setFamily(fam);
       setChildren(members.filter((m) => m.role === "child"));
       setParents(members.filter((m) => m.role === "parent"));
+      if (balanceRaw) {
+        const parsed = ParentBalancesResponse.parse(balanceRaw);
+        const map: Record<string, Balance> = {};
+        for (const b of parentBalancesChildren(parsed)) {
+          map[b.childId] = b;
+        }
+        setBalances(map);
+      }
       setFailed(false);
     } catch (err) {
       if (err instanceof ApiClientError && err.status === 401) {
@@ -255,46 +274,89 @@ export default function GezinClient() {
           <ul className="mt-3 flex flex-col gap-2">
             {children.map((child) => {
               const emoji = avatarEmoji(child.avatarId);
+              const childBalance = balances[child.id];
+              const isActivePanel =
+                panel?.kind === "points" || panel?.kind === "delete"
+                  ? panel.child.id === child.id
+                  : false;
               return (
                 <li
                   key={child.id}
-                  className="flex items-start justify-between gap-3 rounded-lg border border-border bg-surface p-4"
+                  className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4"
                 >
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      {emoji && (
-                        <span className="text-xl" aria-hidden>
-                          {emoji}
-                        </span>
-                      )}
-                      <h3 className="truncate text-base font-semibold text-text">
-                        {child.displayName}
-                      </h3>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        {emoji && (
+                          <span className="text-xl" aria-hidden>
+                            {emoji}
+                          </span>
+                        )}
+                        <h3 className="truncate text-base font-semibold text-text">
+                          {child.displayName}
+                        </h3>
+                      </div>
+                      <p className="mt-0.5 text-sm text-muted">
+                        {child.birthYear != null && t("children.born", { year: child.birthYear })}
+                        {child.birthYear != null && child.ageMode ? " · " : ""}
+                        {child.ageMode && t(`children.ageMode.${child.ageMode}`)}
+                        {childBalance != null && (
+                          <>
+                            {" · "}
+                            {t("children.balance", { points: childBalance.balance })}
+                          </>
+                        )}
+                      </p>
                     </div>
-                    <p className="mt-0.5 text-sm text-muted">
-                      {child.birthYear != null && t("children.born", { year: child.birthYear })}
-                      {child.birthYear != null && child.ageMode ? " · " : ""}
-                      {child.ageMode && t(`children.ageMode.${child.ageMode}`)}
-                    </p>
+                    <div className="flex shrink-0 flex-wrap justify-end gap-2">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setPanel({ kind: "points", child })}
+                      >
+                        {t("children.points")}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setPanel({ kind: "edit", child })}
+                      >
+                        {t("children.edit")}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => setPanel({ kind: "pin", child })}
+                      >
+                        {t("children.resetPin")}
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setPanel({ kind: "delete", child })}
+                      >
+                        {t("children.delete")}
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex shrink-0 flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setPanel({ kind: "edit", child })}
-                    >
-                      {t("children.edit")}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setPanel({ kind: "pin", child })}
-                    >
-                      {t("children.resetPin")}
-                    </Button>
-                  </div>
+                  {isActivePanel && panel?.kind === "points" && (
+                    <PointsPanel child={child} onClose={() => setPanel(null)} />
+                  )}
+                  {isActivePanel && panel?.kind === "delete" && (
+                    <DeleteChildForm
+                      child={child}
+                      busy={busy}
+                      onCancel={() => setPanel(null)}
+                      onDeleted={async () => {
+                        setPanel(null);
+                        await load();
+                      }}
+                    />
+                  )}
                 </li>
               );
             })}

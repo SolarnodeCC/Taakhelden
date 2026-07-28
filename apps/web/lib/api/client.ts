@@ -68,6 +68,6 @@ export const apiClient = {
     request<T>("POST", path, body, opts),
   patch: <T>(path: string, body?: unknown, opts?: { idempotencyKey?: string }) =>
     request<T>("PATCH", path, body, opts),
-  delete: <T>(path: string, opts?: { idempotencyKey?: string }) =>
-    request<T>("DELETE", path, undefined, opts),
+  delete: <T>(path: string, body?: unknown, opts?: { idempotencyKey?: string }) =>
+    request<T>("DELETE", path, body, opts),
 };
