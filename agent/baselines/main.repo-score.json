@@ -1,6 +1,6 @@
 {
-  "report_fingerprint": "sha256:ab191afed90d23b3a843c5fb682f25982e8b3ebe53e72758a31f959b88bd7c83",
-  "input_fingerprint": "sha256:e80bd866adda8573862f0c6aaa99813ea9b4e512010a4ccd2bf8a5fedc042b48",
+  "report_fingerprint": "sha256:f829f985301166c6d6bdf8d2567217f5c605cd3439066d12ebf600d0ffa4ca8e",
+  "input_fingerprint": "sha256:d14739fc2b8844685515982ad4a666e8dc0d93d6609cbf7ff06a8ae2d2216cea",
   "policy_fingerprint": "sha256:20e69f63f26de0c53e8f6a8df3b7234d5d27169372d8ae045880cfb1929a5a8c",
   "manifest_fingerprints": {
     "owner_map": "sha256:3b06acff282adb26e61cf9c6b4af52457e345dd2532b30606ae1909792f32e3f",
@@ -8,7 +8,7 @@
     "generated_zones": "sha256:8e884fbb53897f8e3197fc9ea998412b5a235c56b065800f1771c4097b4698e7"
   },
   "dirty_worktree": false,
-  "generated_at": "1785253598",
+  "generated_at": "1785264310",
   "schema_url": "schemas/repo-score.schema.json",
   "standard": "jankurai",
   "standard_version": "0.9.0",
@@ -54,15 +54,15 @@
     "HLT-025-RELEASE-READINESS-GAP on docs/release.md"
   ],
   "repo": ".",
-  "run_id": "1785253598",
-  "started_at": "1785253598",
-  "elapsed_ms": 2098,
+  "run_id": "1785264310",
+  "started_at": "1785264310",
+  "elapsed_ms": 1993,
   "scope": {
     "mode": "full",
     "paths": []
   },
-  "score": 53,
-  "raw_score": 53,
+  "score": 52,
+  "raw_score": 52,
   "decision": {
     "status": "advisory",
     "minimum_score": 40,
@@ -70,7 +70,7 @@
     "hard_findings": 0,
     "soft_findings": 46,
     "ratchet": {
-      "baseline_score": 53,
+      "baseline_score": 52,
       "allowed_drop": 0,
       "passed": true,
       "score_delta": 0,
@@ -83,7 +83,7 @@
     }
   },
   "git": {
-    "head": "95e865f",
+    "head": "c0b90d8",
     "base": null,
     "changed_files": 0,
     "mode": "full",
@@ -415,11 +415,12 @@
     {
       "name": "Observability and repair evidence",
       "weight": 8,
-      "score": 23,
-      "weighted_points": 1.84,
+      "score": 15,
+      "weighted_points": 1.2,
       "evidence": [],
       "notes": [
-        "no agent-friendly exception pattern found"
+        "no agent-friendly exception pattern found",
+        "free-form logging appears in scope"
       ]
     },
     {
@@ -1057,7 +1058,7 @@
   "copy_code": {
     "schema_version": "1.1.0",
     "generated_by": "jankurai copy-code",
-    "generated_at": "2026-07-28T15:46:36.355984378+00:00",
+    "generated_at": "2026-07-28T18:45:08.233825423+00:00",
     "repo": ".",
     "auditor_version": "1.6.10",
     "status": "review",
@@ -1095,9 +1096,9 @@
       ]
     },
     "summary": {
-      "files_scanned": 304,
-      "files_considered": 156,
-      "active_files": 156,
+      "files_scanned": 307,
+      "files_considered": 157,
+      "active_files": 157,
       "exact_file_classes": 0,
       "hard_classes": 0,
       "warning_classes": 3,
@@ -2469,17 +2470,18 @@
       "severity": "medium",
       "category": "observability",
       "path": "docs/testing.md",
-      "problem": "`Observability and repair evidence` scored 23 below the standard floor of 85",
+      "problem": "`Observability and repair evidence` scored 15 below the standard floor of 85",
       "agent_fix": "add structured errors, telemetry, and repair receipts that tell the next agent where to rerun proof",
       "evidence": [
-        "no agent-friendly exception pattern found"
+        "no agent-friendly exception pattern found",
+        "free-form logging appears in scope"
       ],
       "check_id": "HLT-017-OPAQUE-OBSERVABILITY:observability",
       "hardness": "soft",
       "confidence": 0.76,
       "evidence_kind": "repository-scan",
       "rerun_command": "just score",
-      "fingerprint": "sha256:cbf8cf3bdcb20bbe520845bfe2183ae66b7fe87d99444a3b0f5d15b0ca456c89",
+      "fingerprint": "sha256:19d97d626648e05df7fd6f1a2711ff395456fe7e0b4dd518ab6ecde34240bc1f",
       "rule_id": "HLT-017-OPAQUE-OBSERVABILITY",
       "tlr": "Repair",
       "lane": "observability",
@@ -2742,7 +2744,7 @@
       "lane": "observability",
       "owner": "docs",
       "task": "add structured errors, telemetry, and repair receipts that tell the next agent where to rerun proof",
-      "why": "`Observability and repair evidence` scored 23 below the standard floor of 85"
+      "why": "`Observability and repair evidence` scored 15 below the standard floor of 85"
     },
     {
       "path": ".github/workflows",

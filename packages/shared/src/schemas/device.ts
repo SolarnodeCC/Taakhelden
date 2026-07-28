@@ -8,3 +8,8 @@ export const DeviceBody = z.object({
   userId: z.string().optional(),
 });
 export type DeviceBody = z.infer<typeof DeviceBody>;
+
+export const DeviceOkResponse = z.object({
+  ok: z.literal(true),
+});
+export type DeviceOkResponse = z.infer<typeof DeviceOkResponse>;

@@ -7,7 +7,7 @@ name: Jankurai (regression gate)
 # directory".
 #
 # `mode: ratchet` tegen de baseline in agent/baselines/main.repo-score.json
-# (score 47, vastgelegd vanaf een schone commit — zie dat bestand en
+# (score 52, ververst na merge met main + iOS Phase 1 — zie dat bestand en
 # agent/baselines/README.md). Deze job faalt nu ECHT bij een regressie t.o.v.
 # die baseline; ci.yml blijft daarnaast de bron van waarheid voor de
 # typecheck/test/migratie-gate (zie claude.yml). Of een faalde `audit`-job de

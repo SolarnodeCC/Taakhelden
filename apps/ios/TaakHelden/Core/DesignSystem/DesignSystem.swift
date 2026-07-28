@@ -37,31 +37,36 @@ struct THPalette {
     let mutedText: THColorToken
     let accent: THColorToken
     let accentSoft: THColorToken
+    /// Companion accent (kid turquoise / teen mint soft companion).
+    let secondary: THColorToken
     let highlight: THColorToken
     let shadow: THColorToken
 }
 
 enum THPalettes {
+    // Mirrors apps/web/app/globals.css — kid/teen remain brand-placeholders.
     static let kid = THPalette(
-        background: THColorToken(hex: 0xFFF8EC),
+        background: THColorToken(hex: 0xFFF8EC), // --kid-cream
         surface: THColorToken(hex: 0xFFFFFF),
-        text: THColorToken(hex: 0x2B2116),
+        text: THColorToken(hex: 0x2B2116), // --kid-text
         mutedText: THColorToken(hex: 0x6B5D4C),
-        accent: THColorToken(hex: 0xFF6F59),
-        accentSoft: THColorToken(hex: 0xFFE1DA),
-        highlight: THColorToken(hex: 0xFFC93C),
-        shadow: THColorToken(hex: 0xFF6F59, alpha: 0.24)
+        accent: THColorToken(hex: 0xFF6F59), // --kid-coral
+        accentSoft: THColorToken(hex: 0xFFE1DA), // --kid-coral-soft
+        secondary: THColorToken(hex: 0x0E9F8E), // --kid-turquoise
+        highlight: THColorToken(hex: 0xFFC93C), // --kid-yellow
+        shadow: THColorToken(hex: 0xFF6F59, alpha: 0.28) // --shadow-kid
     )
 
     static let teen = THPalette(
-        background: THColorToken(hex: 0xEEF1F7),
-        surface: THColorToken(hex: 0x26314D),
-        text: THColorToken(hex: 0xFFFFFF),
-        mutedText: THColorToken(hex: 0xC4CEE0),
-        accent: THColorToken(hex: 0x7FD8C4),
+        background: THColorToken(hex: 0x1F2A44), // --teen-navy
+        surface: THColorToken(hex: 0x26314D), // --teen-navy-surface
+        text: THColorToken(hex: 0xE9EDF5), // --teen-text
+        mutedText: THColorToken(hex: 0x9AA6C3), // --teen-muted
+        accent: THColorToken(hex: 0x7FD8C4), // --teen-mint
         accentSoft: THColorToken(hex: 0x364260),
+        secondary: THColorToken(hex: 0x7FD8C4),
         highlight: THColorToken(hex: 0x7FD8C4),
-        shadow: THColorToken(hex: 0x1F2A44, alpha: 0.18)
+        shadow: THColorToken(hex: 0x1F2A44, alpha: 0.35)
     )
 
     static let parent = THPalette(
@@ -71,6 +76,7 @@ enum THPalettes {
         mutedText: THColorToken(hex: 0x5A6470),
         accent: THColorToken(hex: 0x0E9F8E),
         accentSoft: THColorToken(hex: 0xD9F2EF),
+        secondary: THColorToken(hex: 0x0E9F8E),
         highlight: THColorToken(hex: 0x0E9F8E),
         shadow: THColorToken(hex: 0x000000, alpha: 0.08)
     )

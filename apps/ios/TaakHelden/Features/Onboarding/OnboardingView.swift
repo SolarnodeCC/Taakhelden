@@ -4,7 +4,9 @@ struct WelcomeHubView: View {
     @Environment(AppState.self) private var appState
 
     var body: some View {
-        let palette = THPalettes.kid
+        // Family-app entry uses the parent (dashboard) register — calm teal on white.
+        // Child pairing keeps a warm secondary CTA without flipping the whole hub to kid-coral.
+        let palette = THPalettes.parent
 
         NavigationStack {
             VStack(spacing: THSpacing.xl) {
@@ -12,125 +14,37 @@ struct WelcomeHubView: View {
 
                 Text("TaakHelden")
                     .font(.system(size: 34, weight: .bold, design: .rounded))
-                    .foregroundStyle(palette.text.color)
+                    .foregroundStyle(palette.accent.color)
+                    .accessibilityAddTraits(.isHeader)
 
-                THCard(palette: palette) {
-                    Text("Samen klussen klaren voelt fijner als iedereen kan groeien in zijn eigen tempo.")
-                        .font(.system(size: 20, weight: .semibold, design: .rounded))
+                VStack(alignment: .leading, spacing: THSpacing.md) {
+                    Text("Samen taken en huiswerk bijhouden — voor het hele gezin.")
+                        .font(.system(size: 20, weight: .semibold))
                         .foregroundStyle(palette.text.color)
 
-                    Text("Kies of je eerst een gezin wilt starten of een kindertoestel wilt koppelen.")
+                    Text("Start als ouder een gezin, of koppel een kindertoestel met een gezinscode.")
                         .foregroundStyle(palette.mutedText.color)
                 }
+                .frame(maxWidth: .infinity, alignment: .leading)
 
                 Button("Ik ben een ouder") {
                     appState.openParentOnboarding()
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(palette.accent.color)
+                .controlSize(.large)
 
                 Button("Ik heb al een gezinscode") {
                     appState.openChildPairing()
                 }
                 .buttonStyle(.bordered)
+                .tint(palette.accent.color)
+                .controlSize(.large)
 
                 Spacer()
             }
             .padding(THSpacing.xl)
             .background(palette.background.color.ignoresSafeArea())
-        }
-    }
-}
-
-struct ParentOnboardingFlowView: View {
-    @Environment(AppState.self) private var appState
-    @State private var familyName = ""
-    @State private var childName = ""
-    @State private var birthYear = "2018"
-    @State private var pin = ""
-    @State private var selectedAvatar = "🦊"
-
-    private let avatars = ["🦊", "🐼", "🦁", "🐙", "🦄", "🐯"]
-
-    var body: some View {
-        let palette = THPalettes.parent
-
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: THSpacing.lg) {
-                    Text("Gezin starten")
-                        .font(.system(size: 30, weight: .bold, design: .rounded))
-
-                    THCard(palette: palette) {
-                        Label("Sign in with Apple wordt hier de primaire native route.", systemImage: "applelogo")
-                        Text("De entitlement en live auth-koppeling volgen nog, maar de flowvolgorde staat vast voor Phase 1.")
-                            .foregroundStyle(palette.mutedText.color)
-                    }
-
-                    THCard(palette: palette) {
-                        Text("Gezinsnaam")
-                            .font(.headline)
-                        TextField("Bijvoorbeeld Familie Jansen", text: $familyName)
-                            .textFieldStyle(.roundedBorder)
-
-                        Text("Eerste kind")
-                            .font(.headline)
-                        TextField("Roepnaam", text: $childName)
-                            .textFieldStyle(.roundedBorder)
-
-                        TextField("Geboortejaar", text: $birthYear)
-                            .keyboardType(.numberPad)
-                            .textFieldStyle(.roundedBorder)
-
-                        Text("Kies een avatar")
-                            .font(.headline)
-
-                        LazyVGrid(columns: Array(repeating: GridItem(.flexible()), count: 3), spacing: THSpacing.md) {
-                            ForEach(avatars, id: \.self) { avatar in
-                                Button {
-                                    selectedAvatar = avatar
-                                } label: {
-                                    Text(avatar)
-                                        .font(.system(size: 40))
-                                        .frame(maxWidth: .infinity)
-                                        .padding(.vertical, THSpacing.md)
-                                        .background(selectedAvatar == avatar ? palette.accentSoft.color : palette.surface.color)
-                                        .clipShape(RoundedRectangle(cornerRadius: THRadius.large, style: .continuous))
-                                }
-                                .buttonStyle(.plain)
-                            }
-                        }
-
-                        Text("Kind-pincode")
-                            .font(.headline)
-                        SecureField("4 cijfers", text: $pin)
-                            .keyboardType(.numberPad)
-                            .textFieldStyle(.roundedBorder)
-                    }
-
-                    THCard(palette: palette) {
-                        Text("Demo voor App Review")
-                            .font(.headline)
-                        Text("Review-notes moeten een vooringestelde gezinscode en kind-pincode bevatten zodat Apple de flow op een device kan doorlopen.")
-                            .foregroundStyle(palette.mutedText.color)
-                    }
-
-                    Button("Verder met gezin instellen") {
-                        appState.openChildPairing()
-                    }
-                    .buttonStyle(.borderedProminent)
-                    .tint(palette.accent.color)
-                }
-                .padding(THSpacing.xl)
-            }
-            .background(palette.background.color.ignoresSafeArea())
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Terug") {
-                        appState.returnToWelcome()
-                    }
-                }
-            }
         }
     }
 }
@@ -190,7 +104,7 @@ struct ChildPairingFlowView: View {
                                         Spacer()
                                         if selectedChildID == child.id {
                                             Image(systemName: "checkmark.circle.fill")
-                                                .foregroundStyle(palette.accent.color)
+                                                .foregroundStyle(palette.secondary.color)
                                         }
                                     }
                                     .padding(THSpacing.md)
@@ -255,16 +169,22 @@ struct ChildPairingFlowView: View {
     @MainActor
     private func finishPairing() async {
         guard let selectedChildID else { return }
+        let selectedChild = resolvedFamily?.children.first { $0.id == selectedChildID }
 
         do {
             let session = try await appState.apiClient.pairChild(
                 request: ChildPairingRequest(
                     familyCode: familyCode,
                     childID: selectedChildID,
-                    pin: pin
+                    pin: pin,
+                    ageBand: selectedChild?.ageBand ?? .mid
                 )
             )
-            appState.authStore.storeChildSession(session, biometricsEnabled: biometricsEnabled)
+            appState.authStore.storeChildSession(
+                session,
+                biometricsEnabled: biometricsEnabled,
+                pin: pin
+            )
             appState.finishChildPairing()
             errorMessage = nil
         } catch {

@@ -18,7 +18,8 @@ concurrency:
 jobs:
   contract-and-ios:
     runs-on: macos-latest
-    timeout-minutes: 15
+    # xcodebuild + SPM resolve needs more than the thin scaffold timeout on main.
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
@@ -34,6 +35,46 @@ jobs:
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
           fi
+      - name: Generate Swift OpenAPI client (optional)
+        if: steps.detect.outputs.present == 'true'
+        run: |
+          brew install swift-openapi-generator 2>/dev/null || true
+          bash apps/ios/Scripts/generate-openapi-client.sh
+      - name: Install XcodeGen
+        if: steps.detect.outputs.present == 'true'
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        if: steps.detect.outputs.present == 'true'
+        run: cd apps/ios && xcodegen generate
+      - name: Build and test iOS target
+        if: steps.detect.outputs.present == 'true'
+        run: |
+          set -euo pipefail
+          cd apps/ios
+
+          # macos-latest simulator names drift (iPhone 16 → 17 → …). Pick the
+          # newest available iPhone UDID instead of hardcoding a device name.
+          UDID="$(
+            xcrun simctl list devices available \
+              | grep -E 'iPhone .+\([0-9A-Fa-f-]{36}\)' \
+              | grep -v unavailable \
+              | tail -1 \
+              | grep -oE '[0-9A-Fa-f-]{36}' \
+              | tail -1
+          )"
+          if [[ -z "${UDID}" ]]; then
+            echo "No available iPhone simulator found" >&2
+            xcrun simctl list devices available >&2
+            exit 1
+          fi
+
+          echo "Using iPhone simulator: ${UDID}"
+          xcodebuild test \
+            -scheme TaakHelden \
+            -destination "platform=iOS Simulator,id=${UDID}" \
+            CODE_SIGN_IDENTITY=- \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=YES
       - name: Placeholder until iOS source lands
         if: steps.detect.outputs.present == 'false'
         run: echo "No Xcode project yet; workflow currently enforces the shared contract snapshot only."

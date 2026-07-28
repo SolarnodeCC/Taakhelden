@@ -1,8 +1,10 @@
 import SwiftUI
+import UIKit
 
 @main
 struct TaakHeldenApp: App {
-    @State private var appState = AppState()
+    @UIApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
+    @State private var appState = AppState(usePreviewData: false)
 
     var body: some Scene {
         WindowGroup {
@@ -14,6 +16,7 @@ struct TaakHeldenApp: App {
 
 struct RootView: View {
     @Environment(AppState.self) private var appState
+    @Environment(\.scenePhase) private var scenePhase
 
     var body: some View {
         Group {
@@ -24,6 +27,8 @@ struct RootView: View {
                 ParentOnboardingFlowView()
             case .childPairing:
                 ChildPairingFlowView()
+            case .childUnlock:
+                ChildUnlockView()
             case .childHome:
                 ChildShellView()
                     .preferredColorScheme(.light)
@@ -32,5 +37,36 @@ struct RootView: View {
         .task {
             await appState.restoreSessionIfAvailable()
         }
+        .onChange(of: scenePhase) { _, phase in
+            if phase == .background {
+                appState.authStore.lockChildSession()
+                if appState.route == .childHome {
+                    appState.route = .childUnlock
+                }
+            }
+            if phase == .active {
+                if appState.route == .childHome {
+                    Task { _ = await appState.syncEngine.syncNow() }
+                }
+                Task {
+                    await UIApplication.shared.registerForRemoteNotifications()
+                    await appState.pushService.registerIfNeeded(tokenProvider: APNSTokenStore.shared)
+                }
+            }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .pushDeepLinkReceived)) { _ in
+            if appState.route == .childHome {
+                appState.parentGate.openGate()
+            }
+        }
     }
 }
+
+#if DEBUG
+struct RootView_Previews: PreviewProvider {
+    static var previews: some View {
+        RootView()
+            .environment(AppState(usePreviewData: true))
+    }
+}
+#endif

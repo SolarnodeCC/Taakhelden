@@ -20,3 +20,22 @@ export type UploadIntentBody = z.infer<typeof UploadIntentBody>;
 
 export const PhotoStatus = z.enum(["intent", "uploaded", "processing", "ready", "failed"]);
 export type PhotoStatus = z.infer<typeof PhotoStatus>;
+
+export const UploadIntentResponse = z.object({
+  photoId: z.string(),
+  uploadUrl: z.string().url(),
+});
+export type UploadIntentResponse = z.infer<typeof UploadIntentResponse>;
+
+export const PhotoStatusResponse = z.object({
+  photoId: z.string(),
+  status: PhotoStatus,
+  url: z.string().url().nullable(),
+});
+export type PhotoStatusResponse = z.infer<typeof PhotoStatusResponse>;
+
+export const PhotoConfirmResponse = z.object({
+  photoId: z.string(),
+  status: PhotoStatus,
+});
+export type PhotoConfirmResponse = z.infer<typeof PhotoConfirmResponse>;

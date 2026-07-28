@@ -57,6 +57,16 @@ export const CreateChildBody = z.object({
 });
 export type CreateChildBody = z.infer<typeof CreateChildBody>;
 
+export const MemberView = z.object({
+  id: z.string(),
+  role: Role,
+  displayName: z.string(),
+  avatarId: z.string().nullable(),
+  ageMode: AgeMode,
+  birthYear: z.number().int().optional(),
+});
+export type MemberView = z.infer<typeof MemberView>;
+
 /** PATCH /members/{id} — kind mag alleen eigen avatarId wijzigen. */
 export const UpdateMemberBody = z.object({
   displayName: z.string().min(1).max(30).optional(),
