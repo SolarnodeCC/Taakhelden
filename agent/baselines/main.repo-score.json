@@ -1,0 +1,4537 @@
+{
+  "report_fingerprint": "sha256:9b07a72e75ee650c37e66e8f24ecf38fbdd3c3008d94a2ffab874e3598ccb54c",
+  "input_fingerprint": "sha256:860e7b3b4b1820e13b6df385e97b0a4c1ee661ffd7ea4113c5feb2a5f0a98a33",
+  "policy_fingerprint": "sha256:69fc587b9e72384839427d87b76e61970cca59d412d83bc7117b372f4d1718d7",
+  "manifest_fingerprints": {
+    "owner_map": "sha256:336ce59a274fa841747f8111ec896512a66f3f8152ba9aaf0a3a3c40e72c2ac8",
+    "test_map": "sha256:b4dfceccd0b8d87446132a282d38079acea31cd19fa19e5dea56e6f7c33ac869",
+    "generated_zones": "sha256:8e884fbb53897f8e3197fc9ea998412b5a235c56b065800f1771c4097b4698e7"
+  },
+  "dirty_worktree": true,
+  "generated_at": "1785219497",
+  "schema_url": "schemas/repo-score.schema.json",
+  "standard": "jankurai",
+  "standard_version": "0.9.0",
+  "auditor_version": "1.5.1",
+  "schema_version": "1.9.0",
+  "paper_edition": "2026.05-ed8",
+  "target_stack_id": "rust-ts-vite-react-postgres-bounded-python",
+  "target_stack": "Rust core + TypeScript/React/Vite + PostgreSQL + generated contracts + exception-only Python AI/data service",
+  "claimed_conformance_level": "HL3",
+  "observed_conformance_level": "HL3",
+  "conformance_decision": "pass",
+  "conformance_blockers": [
+    "HLT-000-SCORE-DIMENSION:proof on .",
+    "HLT-000-SCORE-DIMENSION:audit on .github/workflows",
+    "HLT-009-GENERATED-SECURITY on .github/workflows",
+    "HLT-016-SUPPLY-CHAIN-DRIFT on .github/workflows",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/ci.yml",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/ci.yml",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/ci.yml",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/ci.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ci.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ci.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ci.yml",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/ci.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ci.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/ci.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/claude.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/claude.yml",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/claude.yml",
+    "HLT-024-AGENT-TOOL-SUPPLY-GAP on .github/workflows/claude.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/claude.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-prod.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-prod.yml",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/deploy-prod.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-prod.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-prod.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-prod.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-prod.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-prod.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-prod.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-web.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-web.yml",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/deploy-web.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-web.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/deploy-web.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
+    "HLT-042-CI-LOCAL-PARITY on .github/workflows/jankurai.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
+    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
+    "HLT-002-GENERATED-MUTATION on Design System/_ds_bundle.js",
+    "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
+    "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
+    "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
+    "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
+    "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
+    "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
+    "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
+    "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
+    "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
+    "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/repo/account.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/repo/account.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/repo/account.ts",
+    "HLT-001-DEAD-MARKER on apps/api/src/repo/auth.ts",
+    "HLT-023-INPUT-BOUNDARY-GAP on apps/api/src/repo/badges.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/repo/families.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/repo/families.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/routes/families.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/routes/instances.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/routes/points.ts",
+    "HLT-001-DEAD-MARKER on apps/api/src/routes/sync.ts",
+    "HLT-001-DEAD-MARKER on apps/api/src/routes/sync.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/routes/tasks.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/routes/tasks.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/routes/tasks.ts",
+    "HLT-001-DEAD-MARKER on apps/api/src/routes/ws.ts",
+    "HLT-001-DEAD-MARKER on apps/api/src/services/familyRoom.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/services/syncService.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/services/taskEngine.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/services/taskEngine.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/services/taskEngine.ts",
+    "HLT-010-SECRET-SPRAWL on apps/api/test/account.test.ts",
+    "HLT-013-RENDERED-UX-GAP on apps/web",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/web/app/[locale]/(dashboard)/goedkeuren/GoedkeurenClient.tsx",
+    "HLT-006-DIRECT-DB-WRONG-LAYER on apps/web/app/api/v1/[...path]/route.ts",
+    "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/web/lib/auth/jwt.ts",
+    "HLT-017-OPAQUE-OBSERVABILITY on crates/domain",
+    "HLT-025-RELEASE-READINESS-GAP on docs/release.md"
+  ],
+  "repo": ".",
+  "run_id": "1785219497",
+  "started_at": "1785219497",
+  "elapsed_ms": 2846,
+  "scope": {
+    "mode": "full",
+    "paths": []
+  },
+  "score": 46,
+  "raw_score": 46,
+  "decision": {
+    "status": "advisory",
+    "minimum_score": 40,
+    "passed": true,
+    "hard_findings": 0,
+    "soft_findings": 93,
+    "ratchet": {
+      "baseline_score": 46,
+      "allowed_drop": 0,
+      "passed": true,
+      "score_delta": 0,
+      "baseline_report_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "baseline_input_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "baseline_policy_fingerprint": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "new_caps": [],
+      "new_hard_findings": [],
+      "policy_changed": false
+    }
+  },
+  "git": {
+    "head": "5f48ea1",
+    "base": null,
+    "changed_files": 0,
+    "mode": "full",
+    "dirty_worktree": true
+  },
+  "policy": {
+    "path": "./agent/audit-policy.toml",
+    "minimum_score": 40,
+    "fail_on": [],
+    "advisory_on": [
+      "medium",
+      "low"
+    ],
+    "mode": "advisory",
+    "standard_version": "0.9.0",
+    "auditor_version": "1.5.1",
+    "schema_version": "1.9.0",
+    "paper_edition": "2026.05-ed8",
+    "target_stack": "rust-ts-vite-react-postgres-bounded-python"
+  },
+  "caps_applied": [
+    "no-one-command-setup-or-validation",
+    "no-security-lane-on-high-risk-repo",
+    "no-secret-or-dependency-scanning-in-ci",
+    "no-jankurai-audit-lane-in-ci",
+    "vibe-placeholders-in-product-code",
+    "fallback-soup-in-product-code",
+    "future-hostile-dead-language-in-product-code",
+    "direct-db-access-from-wrong-layer",
+    "missing-rendered-ux-qa-lane",
+    "secret-like-content-detected",
+    "input-boundary-gap",
+    "agent-tool-supply-chain-gap",
+    "release-readiness-gap",
+    "no-agent-friendly-exception-pattern",
+    "missing-agent-readable-docs",
+    "typescript-bad-behavior",
+    "ci-bad-behavior",
+    "ci-local-parity"
+  ],
+  "hard_rules": [
+    {
+      "id": "no-root-agent-instructions",
+      "max_score": 75
+    },
+    {
+      "id": "no-one-command-setup-or-validation",
+      "max_score": 70
+    },
+    {
+      "id": "no-deterministic-fast-lane",
+      "max_score": 65
+    },
+    {
+      "id": "no-security-lane-on-high-risk-repo",
+      "max_score": 60
+    },
+    {
+      "id": "generated-contracts-or-public-api-drift-untested",
+      "max_score": 80
+    },
+    {
+      "id": "python-direct-product-truth-or-db-ownership",
+      "max_score": 72
+    },
+    {
+      "id": "no-secret-or-dependency-scanning-in-ci",
+      "max_score": 78
+    },
+    {
+      "id": "no-jankurai-audit-lane-in-ci",
+      "max_score": 82
+    },
+    {
+      "id": "jankurai-required-tool-ci-evidence-gap",
+      "max_score": 88
+    },
+    {
+      "id": "non-optimal-product-language-found",
+      "max_score": 74
+    },
+    {
+      "id": "too-much-python-in-product-surface",
+      "max_score": 72
+    },
+    {
+      "id": "boundary-reclassification-evidence-gap",
+      "max_score": 72
+    },
+    {
+      "id": "vibe-placeholders-in-product-code",
+      "max_score": 68
+    },
+    {
+      "id": "fallback-soup-in-product-code",
+      "max_score": 70
+    },
+    {
+      "id": "future-hostile-dead-language-in-product-code",
+      "max_score": 64
+    },
+    {
+      "id": "severe-duplication-in-product-code",
+      "max_score": 70
+    },
+    {
+      "id": "generated-zone-mutation-risk",
+      "max_score": 76
+    },
+    {
+      "id": "direct-db-access-from-wrong-layer",
+      "max_score": 66
+    },
+    {
+      "id": "missing-web-e2e-lane",
+      "max_score": 82
+    },
+    {
+      "id": "missing-rendered-ux-qa-lane",
+      "max_score": 84
+    },
+    {
+      "id": "prompt-injection-risk",
+      "max_score": 78
+    },
+    {
+      "id": "overbroad-agent-agency",
+      "max_score": 65
+    },
+    {
+      "id": "secret-like-content-detected",
+      "max_score": 60
+    },
+    {
+      "id": "false-green-test-risk",
+      "max_score": 76
+    },
+    {
+      "id": "destructive-migration-risk",
+      "max_score": 70
+    },
+    {
+      "id": "authz-or-data-isolation-gap",
+      "max_score": 78
+    },
+    {
+      "id": "input-boundary-gap",
+      "max_score": 78
+    },
+    {
+      "id": "agent-tool-supply-chain-gap",
+      "max_score": 78
+    },
+    {
+      "id": "release-readiness-gap",
+      "max_score": 80
+    },
+    {
+      "id": "missing-rust-property-or-integration-tests",
+      "max_score": 82
+    },
+    {
+      "id": "no-agent-friendly-exception-pattern",
+      "max_score": 76
+    },
+    {
+      "id": "missing-agent-readable-docs",
+      "max_score": 80
+    },
+    {
+      "id": "streaming-runtime-drift",
+      "max_score": 78
+    },
+    {
+      "id": "rust-bad-behavior",
+      "max_score": 72
+    },
+    {
+      "id": "sql-bad-behavior",
+      "max_score": 72
+    },
+    {
+      "id": "typescript-bad-behavior",
+      "max_score": 72
+    },
+    {
+      "id": "docker-bad-behavior",
+      "max_score": 72
+    },
+    {
+      "id": "python-bad-behavior",
+      "max_score": 72
+    },
+    {
+      "id": "ci-bad-behavior",
+      "max_score": 70
+    },
+    {
+      "id": "git-bad-behavior",
+      "max_score": 70
+    },
+    {
+      "id": "gittools-bad-behavior",
+      "max_score": 70
+    },
+    {
+      "id": "release-bad-behavior",
+      "max_score": 70
+    },
+    {
+      "id": "web-security-bad-behavior",
+      "max_score": 68
+    },
+    {
+      "id": "repo-rot-bad-behavior",
+      "max_score": 88
+    },
+    {
+      "id": "comment-hygiene-dangerous-residue",
+      "max_score": 72
+    },
+    {
+      "id": "ci-local-parity",
+      "max_score": 70
+    }
+  ],
+  "dimensions": [
+    {
+      "name": "Ownership and navigation surface",
+      "weight": 13,
+      "score": 83,
+      "weighted_points": 10.79,
+      "evidence": [
+        "root `AGENTS.md` present",
+        "`CODEOWNERS` present",
+        "owner map present",
+        "test/proof routing map present",
+        "reference-profile cell `web` is canonical",
+        "reference-profile cell `api` is canonical",
+        "root `README.md` routes to workspace layout",
+        "owner map covers audited paths",
+        "authored code file exceeds 500 LOC"
+      ],
+      "notes": [
+        "reference-profile cell `web` lacks local AGENTS.md guidance",
+        "reference-profile cell `api` lacks local AGENTS.md guidance",
+        "reference-profile cell `ops` is detected outside its canonical folder",
+        "reference-profile cell `ops` lacks local AGENTS.md guidance"
+      ]
+    },
+    {
+      "name": "Contract and boundary integrity",
+      "weight": 13,
+      "score": 55,
+      "weighted_points": 7.15,
+      "evidence": [
+        "contract surface found",
+        "generated contract artifacts found",
+        "polyglot boundary layout present",
+        "handwritten web DTO/API marker found",
+        "all contract sources have generated zone entries",
+        "DB access found in likely wrong layer"
+      ],
+      "notes": []
+    },
+    {
+      "name": "Proof lanes and test routing",
+      "weight": 12,
+      "score": 63,
+      "weighted_points": 7.56,
+      "evidence": [
+        "deterministic fast lane found",
+        "test runner present in automation surface",
+        "GitHub workflow files present",
+        "test/proof routing map present",
+        "web e2e lane present or no web surface",
+        "Rust property/integration tests present or no Rust surface"
+      ],
+      "notes": [
+        "no one-command setup/validation lane",
+        "no jankurai audit lane in CI",
+        "web surface lacks layered rendered UX QA"
+      ]
+    },
+    {
+      "name": "Security and supply-chain posture",
+      "weight": 12,
+      "score": 26,
+      "weighted_points": 3.12,
+      "evidence": [
+        "lockfile present",
+        "sql bad-behavior advisory signals: 8",
+        "typescript bad-behavior hard findings: 17",
+        "ci bad-behavior hard findings: 25",
+        "gittools bad-behavior advisory signals: 1",
+        "web security bad-behavior advisory signals: 3"
+      ],
+      "notes": [
+        "no explicit security lane found",
+        "CI does not run the jankurai audit"
+      ]
+    },
+    {
+      "name": "Code shape and semantic surface",
+      "weight": 12,
+      "score": 0,
+      "weighted_points": 0.0,
+      "evidence": [
+        "largest authored code file: apps/api/src/services/pointsEngine.ts (532 LOC)",
+        "code file exceeds 500 LOC",
+        "most code files stay under 300 LOC",
+        "copy-code advisory classes found: 3 (advisory only, no score impact)",
+        "TODO/stub marker found",
+        "fallback soup marker found",
+        "future-hostile/dead-language marker found",
+        "sql bad-behavior advisory signals: 8",
+        "typescript bad-behavior hard findings: 17",
+        "ci bad-behavior hard findings: 25",
+        "gittools bad-behavior advisory signals: 1"
+      ],
+      "notes": [
+        "product/runtime code contains future-hostile or dead-language terms"
+      ]
+    },
+    {
+      "name": "Data truth and workflow safety",
+      "weight": 8,
+      "score": 45,
+      "weighted_points": 3.6,
+      "evidence": [
+        "database surface present",
+        "strict DB boundary violation: apps/web/app/api/v1/[...path]/route.ts"
+      ],
+      "notes": [
+        "direct DB access leaks out of the data boundary"
+      ]
+    },
+    {
+      "name": "Observability and repair evidence",
+      "weight": 8,
+      "score": 23,
+      "weighted_points": 1.84,
+      "evidence": [],
+      "notes": [
+        "no agent-friendly exception pattern found"
+      ]
+    },
+    {
+      "name": "Context economy and agent instructions",
+      "weight": 7,
+      "score": 71,
+      "weighted_points": 4.97,
+      "evidence": [
+        "root `AGENTS.md` present",
+        "root `AGENTS.md` stays short",
+        "machine-readable routing artifacts present",
+        "thin IDE/agent adapters are present",
+        "root README routes to the right docs"
+      ],
+      "notes": [
+        "missing agent-readable docs: docs/architecture.md or docs/boundaries.md, docs/testing.md"
+      ]
+    },
+    {
+      "name": "Jankurai tool adoption and CI replacement",
+      "weight": 7,
+      "score": 10,
+      "weighted_points": 0.7,
+      "evidence": [
+        "control-plane files present",
+        "applicable=15",
+        "configured=0",
+        "ci_evidence=0",
+        "artifact_verified=0"
+      ],
+      "notes": [
+        "some applicable tools are not configured",
+        "some applicable tools lack CI evidence",
+        "missing CI evidence for `audit-ci`",
+        "missing CI evidence for `proof-routing`",
+        "missing CI evidence for `proofbind`",
+        "missing CI evidence for `copy-code`"
+      ]
+    },
+    {
+      "name": "Python containment and polyglot hygiene",
+      "weight": 4,
+      "score": 100,
+      "weighted_points": 4.0,
+      "evidence": [
+        "no Python files in scope"
+      ],
+      "notes": []
+    },
+    {
+      "name": "Build speed signals",
+      "weight": 4,
+      "score": 60,
+      "weighted_points": 2.4,
+      "evidence": [
+        "build acceleration markers found",
+        "targeted test/build commands found",
+        "locked dependency graph present",
+        "CI cache hint found"
+      ],
+      "notes": [
+        "missing one-command setup/validation"
+      ]
+    }
+  ],
+  "ux_qa": {
+    "web_surface": true,
+    "has_rendered_ux_lane": false,
+    "missing_categories": [
+      "Playwright screenshot capture",
+      "visual review or geometry runtime",
+      "generated API mocks"
+    ],
+    "evidence": {
+      "accessibility": [
+        ".claude/agents/e2e-tester-agent.md",
+        ".claude/agents/frontend-agent.md",
+        ".claude/skills/HANDOFFS.md",
+        ".claude/skills/e2e-tester.md",
+        ".claude/skills/frontend-dev.md"
+      ],
+      "api_mocks": [],
+      "artifact_backed_proof": [
+        ".claude/agents/cso-agent.md",
+        ".claude/agents/knowledge-agent.md",
+        ".claude/skills/backend-dev.md",
+        ".claude/skills/backend-integrations.md",
+        ".claude/skills/cso.md"
+      ],
+      "design_tokens": [
+        ".claude/skills/frontend-dev.md",
+        "apps/web/app/globals.css"
+      ],
+      "geometry_runtime": [],
+      "layout_stability": [
+        "package-lock.json"
+      ],
+      "playwright_visual": [],
+      "storybook": [
+        "agent/baselines/main.repo-score.json"
+      ],
+      "visual_review": []
+    }
+  },
+  "tool_adoption": {
+    "control_plane_present": true,
+    "applicable_count": 15,
+    "configured_count": 0,
+    "ci_evidence_count": 0,
+    "artifact_verified_count": 0,
+    "replaced_count": 0,
+    "items": [
+      {
+        "id": "audit-ci",
+        "category": "audit",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "manual repo scoring",
+          "ad hoc score gates"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+        "artifact_paths": [
+          "agent/repo-score.json",
+          "agent/repo-score.md"
+        ]
+      },
+      {
+        "id": "proof-routing",
+        "category": "proof",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "ad hoc proof lane selection",
+          "manual proof receipts"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai proof . --changed-from origin/main --out target/jankurai/proof-plan.json --md target/jankurai/proof-plan.md",
+        "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+        "artifact_paths": [
+          "agent/repo-score.json",
+          "agent/repo-score.md",
+          "target/jankurai/repair-queue.jsonl"
+        ]
+      },
+      {
+        "id": "proofbind",
+        "category": "proof",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "manual changed-surface routing",
+          "ad hoc proof obligation lists"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai proofbind verify . --changed-from origin/main",
+        "ci_command": "jankurai proofbind verify . --changed-from origin/main",
+        "artifact_paths": [
+          "target/jankurai/proofbind/surface-witness.json",
+          "target/jankurai/proofbind/obligations.json"
+        ]
+      },
+      {
+        "id": "proofmark-rust",
+        "category": "proof",
+        "mode": "auto",
+        "applicable": false,
+        "status": "not_applicable",
+        "replaced_tools": [
+          "line-only coverage review",
+          "manual in-diff mutation review"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [],
+        "local_command": "jankurai proofmark rust . --obligations target/jankurai/proofbind/obligations.json",
+        "ci_command": "jankurai proofmark rust . --obligations target/jankurai/proofbind/obligations.json",
+        "artifact_paths": [
+          "target/jankurai/proofmark/proofmark-receipt.json",
+          "target/jankurai/proofmark/proof-receipt.json"
+        ]
+      },
+      {
+        "id": "copy-code",
+        "category": "audit",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "ad hoc copy-code review",
+          "manual duplication triage"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "cargo run -p jankurai -- copy-code . --json target/jankurai/copy-code.json --md target/jankurai/copy-code.md",
+        "ci_command": "cargo run -p jankurai -- copy-code . --json target/jankurai/copy-code.json --md target/jankurai/copy-code.md",
+        "artifact_paths": [
+          "target/jankurai/copy-code.json",
+          "target/jankurai/copy-code.md"
+        ]
+      },
+      {
+        "id": "security",
+        "category": "security",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "gitleaks",
+          "dependency review",
+          "SBOM/provenance"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai security run . --out target/jankurai/security/evidence.json",
+        "ci_command": "jankurai security run . --out target/jankurai/security/evidence.json",
+        "artifact_paths": [
+          "target/jankurai/security/evidence.json"
+        ]
+      },
+      {
+        "id": "ci-bad-behavior",
+        "category": "security",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "mutable workflow refs",
+          "secret echo/debug workflow checks",
+          "non-blocking security scans"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "cargo test -p jankurai --test language_bad_behavior",
+        "ci_command": "cargo test -p jankurai --test language_bad_behavior",
+        "artifact_paths": [
+          "target/jankurai/language-bad-behavior.log"
+        ]
+      },
+      {
+        "id": "git-bad-behavior",
+        "category": "audit",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "destructive git automation",
+          "force-push release scripts",
+          "hidden stash-based state"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "cargo test -p jankurai --test language_bad_behavior",
+        "ci_command": "cargo test -p jankurai --test language_bad_behavior",
+        "artifact_paths": [
+          "target/jankurai/language-bad-behavior.log"
+        ]
+      },
+      {
+        "id": "release-bad-behavior",
+        "category": "release",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "manual release checklist",
+          "ad hoc tag and artifact review",
+          "manual provenance review"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "cargo test -p jankurai --test language_bad_behavior",
+        "ci_command": "cargo test -p jankurai --test language_bad_behavior",
+        "artifact_paths": [
+          "target/jankurai/language-bad-behavior.log"
+        ]
+      },
+      {
+        "id": "ux-qa",
+        "category": "ux",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "playwright",
+          "axe-core",
+          "visual baselines"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai ux audit --config agent/ux-qa.toml --out target/jankurai/ux-qa.json",
+        "ci_command": "jankurai ux audit --config agent/ux-qa.toml --out target/jankurai/ux-qa.json",
+        "artifact_paths": [
+          "target/jankurai/ux-qa.json"
+        ]
+      },
+      {
+        "id": "db-migration-analyze",
+        "category": "db",
+        "mode": "auto",
+        "applicable": false,
+        "status": "not_applicable",
+        "replaced_tools": [
+          "manual migration review"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [],
+        "local_command": "jankurai migrate . --analyze --json target/jankurai/migration-report.json",
+        "ci_command": "jankurai migrate . --analyze --json target/jankurai/migration-report.json",
+        "artifact_paths": [
+          "target/jankurai/migration-report.json"
+        ]
+      },
+      {
+        "id": "contract-drift",
+        "category": "contract",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "handwritten contract drift checks",
+          "openapi diff"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+        "artifact_paths": [
+          "agent/repo-score.json",
+          "agent/repo-score.md"
+        ]
+      },
+      {
+        "id": "rust-witness",
+        "category": "rust",
+        "mode": "auto",
+        "applicable": false,
+        "status": "not_applicable",
+        "replaced_tools": [
+          "manual witness graphing"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [],
+        "local_command": "jankurai rust witness build .",
+        "ci_command": "jankurai rust witness build .",
+        "artifact_paths": [
+          "target/jankurai/rust/witness-graph.json"
+        ]
+      },
+      {
+        "id": "vibe-coverage",
+        "category": "audit",
+        "mode": "auto",
+        "applicable": false,
+        "status": "not_applicable",
+        "replaced_tools": [
+          "manual vibe-coding coverage spreadsheet"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [],
+        "local_command": "jankurai vibe coverage --source agent/vibe-coverage.toml --tips tips/vibe_coding --json target/jankurai/vibe-coverage.json --md target/jankurai/vibe-coverage.md",
+        "ci_command": "jankurai vibe coverage --source agent/vibe-coverage.toml --tips tips/vibe_coding --json target/jankurai/vibe-coverage.json --md target/jankurai/vibe-coverage.md",
+        "artifact_paths": [
+          "target/jankurai/vibe-coverage.json",
+          "target/jankurai/vibe-coverage.md"
+        ]
+      },
+      {
+        "id": "coverage-evidence",
+        "category": "proof",
+        "mode": "auto",
+        "applicable": false,
+        "status": "not_applicable",
+        "replaced_tools": [
+          "manual coverage report review",
+          "ad hoc mutation survivor review"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [],
+        "local_command": "jankurai coverage audit . --config agent/coverage-sources.toml --json target/jankurai/coverage/coverage-audit.json --md target/jankurai/coverage/coverage-audit.md",
+        "ci_command": "jankurai coverage audit . --config agent/coverage-sources.toml --json target/jankurai/coverage/coverage-audit.json --md target/jankurai/coverage/coverage-audit.md",
+        "artifact_paths": [
+          "target/jankurai/coverage/coverage-audit.json",
+          "target/jankurai/coverage/coverage-audit.md"
+        ]
+      },
+      {
+        "id": "authz-matrix",
+        "category": "security",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "manual authz matrix review"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+        "artifact_paths": [
+          "agent/repo-score.json",
+          "agent/repo-score.md"
+        ]
+      },
+      {
+        "id": "input-boundary",
+        "category": "security",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "manual unsafe sink review"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+        "artifact_paths": [
+          "agent/repo-score.json",
+          "agent/repo-score.md"
+        ]
+      },
+      {
+        "id": "agent-tool-supply",
+        "category": "security",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "manual MCP/tool trust review"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+        "artifact_paths": [
+          "agent/repo-score.json",
+          "agent/repo-score.md"
+        ]
+      },
+      {
+        "id": "release-readiness",
+        "category": "release",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "manual launch checklist"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+        "artifact_paths": [
+          "agent/repo-score.json",
+          "agent/repo-score.md"
+        ]
+      },
+      {
+        "id": "cost-budget",
+        "category": "release",
+        "mode": "auto",
+        "applicable": true,
+        "status": "missing",
+        "replaced_tools": [
+          "manual spend review"
+        ],
+        "evidence": [
+          "mode=auto"
+        ],
+        "missing": [
+          "agent/tool-adoption.toml entry",
+          "CI command evidence"
+        ],
+        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
+        "artifact_paths": [
+          "agent/repo-score.json",
+          "agent/repo-score.md"
+        ]
+      }
+    ],
+    "evidence": {
+      "applicable_count": 15,
+      "applicable_tools": [
+        "audit-ci",
+        "proof-routing",
+        "proofbind",
+        "copy-code",
+        "security",
+        "ci-bad-behavior",
+        "git-bad-behavior",
+        "release-bad-behavior",
+        "ux-qa",
+        "contract-drift",
+        "authz-matrix",
+        "input-boundary",
+        "agent-tool-supply",
+        "release-readiness",
+        "cost-budget"
+      ],
+      "artifact_verified_count": 0,
+      "artifact_verified_tools": [],
+      "ci_evidence_count": 0,
+      "ci_evidence_tools": [],
+      "config_present": false,
+      "configured_count": 0,
+      "configured_tools": [],
+      "control_plane_present": true
+    },
+    "missing": [
+      "audit-ci",
+      "proof-routing",
+      "proofbind",
+      "copy-code",
+      "security",
+      "ci-bad-behavior",
+      "git-bad-behavior",
+      "release-bad-behavior",
+      "ux-qa",
+      "contract-drift",
+      "authz-matrix",
+      "input-boundary",
+      "agent-tool-supply",
+      "release-readiness",
+      "cost-budget"
+    ]
+  },
+  "security_evidence": {},
+  "boundaries": {
+    "reclassifications": []
+  },
+  "copy_code": {
+    "schema_version": "1.1.0",
+    "generated_by": "jankurai copy-code",
+    "generated_at": "2026-07-28T06:18:14.897728485+00:00",
+    "repo": ".",
+    "auditor_version": "1.5.1",
+    "status": "review",
+    "policy": {
+      "active_source_only": true,
+      "include_tests": false,
+      "min_lines": 10,
+      "min_tokens": 100,
+      "max_findings": 50,
+      "strict": false,
+      "excluded_roots": [
+        "build/",
+        "cache/",
+        "dist/",
+        "docs/",
+        "generated/",
+        "node_modules/",
+        "paper/",
+        "reference/",
+        "target/",
+        "tips/",
+        "vendor/"
+      ],
+      "warning_only_roots": [
+        "config/",
+        "docker/",
+        "fixtures/",
+        "migrations/",
+        "ops/scripts/",
+        "python_runtime/",
+        "stories/",
+        "runtime_payload/",
+        "seed_data/",
+        "tests/"
+      ]
+    },
+    "summary": {
+      "files_scanned": 244,
+      "files_considered": 122,
+      "active_files": 122,
+      "exact_file_classes": 0,
+      "hard_classes": 0,
+      "warning_classes": 3,
+      "hard_instances": 0,
+      "warning_instances": 6,
+      "duplicate_lines": 16,
+      "duplicate_tokens": 66,
+      "duplicate_bytes": 523,
+      "total_redundant_lines": 16,
+      "total_redundant_tokens": 66,
+      "total_redundant_bytes": 523
+    },
+    "classes": [
+      {
+        "id": "copy-code-unit-typescript-2ae018e49b96f16e",
+        "kind": "exact_unit_same_name",
+        "severity": "warning",
+        "confidence": "high",
+        "language": "typescript",
+        "unit_name": "hmacHex",
+        "duplicate_lines": 10,
+        "duplicate_tokens": 41,
+        "duplicate_bytes": 312,
+        "instance_count": 2,
+        "total_redundant_lines": 10,
+        "total_redundant_tokens": 41,
+        "total_redundant_bytes": 312,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "b60a3326a9dfba4e",
+        "reason": "same-name semantic unit copied across multiple files",
+        "recommended_action": "keep the named unit in one owner and call it from the other sites",
+        "instances": [
+          {
+            "path": "apps/api/src/services/exportService.ts",
+            "language": "typescript",
+            "start_line": 12,
+            "end_line": 22,
+            "unit_name": "hmacHex"
+          },
+          {
+            "path": "apps/api/src/services/photoService.ts",
+            "language": "typescript",
+            "start_line": 14,
+            "end_line": 24,
+            "unit_name": "hmacHex"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-body-typescript-1d134ee8a877ebf0",
+        "kind": "exact_unit_different_name",
+        "severity": "warning",
+        "confidence": "medium",
+        "language": "typescript",
+        "duplicate_lines": 3,
+        "duplicate_tokens": 18,
+        "duplicate_bytes": 135,
+        "instance_count": 2,
+        "total_redundant_lines": 3,
+        "total_redundant_tokens": 18,
+        "total_redundant_bytes": 135,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "6d01c068a1b5c34a",
+        "reason": "same body appears under different names across files",
+        "recommended_action": "choose one owner for the shared body or intentionally differentiate the behavior",
+        "instances": [
+          {
+            "path": "apps/api/src/services/ids.ts",
+            "language": "typescript",
+            "start_line": 11,
+            "end_line": 14,
+            "unit_name": "newToken"
+          },
+          {
+            "path": "apps/api/src/services/session.ts",
+            "language": "typescript",
+            "start_line": 13,
+            "end_line": 16,
+            "unit_name": "randomToken"
+          }
+        ]
+      },
+      {
+        "id": "copy-code-body-typescript-4a73c29a7ec7c658",
+        "kind": "exact_unit_different_name",
+        "severity": "warning",
+        "confidence": "medium",
+        "language": "typescript",
+        "duplicate_lines": 3,
+        "duplicate_tokens": 7,
+        "duplicate_bytes": 76,
+        "instance_count": 2,
+        "total_redundant_lines": 3,
+        "total_redundant_tokens": 7,
+        "total_redundant_bytes": 76,
+        "effective_severity": "warning",
+        "hard_fail": false,
+        "fingerprint": "b3a376b3879904ce",
+        "reason": "same body appears under different names across files",
+        "recommended_action": "choose one owner for the shared body or intentionally differentiate the behavior",
+        "instances": [
+          {
+            "path": "apps/api/src/services/taskEngine.ts",
+            "language": "typescript",
+            "start_line": 38,
+            "end_line": 41,
+            "unit_name": "generateInstancesForFamily"
+          },
+          {
+            "path": "apps/api/src/services/taskEngine.ts",
+            "language": "typescript",
+            "start_line": 67,
+            "end_line": 70,
+            "unit_name": "generateWeekAheadForFamily"
+          }
+        ]
+      }
+    ],
+    "notes": [
+      "hard classes are limited to exact active-source file matches and substantial exact same-name units",
+      "warning classes include same-body different-name units and token/block duplication",
+      "tests, fixtures, stories, config, Docker, and migrations are omitted unless --include-tests is set"
+    ]
+  },
+  "profile_structure": {
+    "applicable_count": 3,
+    "canonical_count": 2,
+    "noncanonical_count": 1,
+    "guidance_missing_count": 3,
+    "cells": [
+      {
+        "id": "web",
+        "applicable": true,
+        "status": "canonical",
+        "canonical_path": "apps/web/",
+        "detected_paths": [
+          "apps/web"
+        ],
+        "aliases": [
+          "frontend/",
+          "ui/",
+          "packages/web/",
+          "packages/ui/"
+        ],
+        "guidance_status": "missing",
+        "owner": "apps/web",
+        "proof_lane": "rendered UX / Playwright",
+        "agent_fix": "add `apps/web/AGENTS.md` with owns / forbidden / proof lane guidance"
+      },
+      {
+        "id": "api",
+        "applicable": true,
+        "status": "canonical",
+        "canonical_path": "apps/api/",
+        "detected_paths": [
+          "apps/api"
+        ],
+        "aliases": [
+          "api/",
+          "server/",
+          "backend/"
+        ],
+        "guidance_status": "missing",
+        "owner": "apps/api",
+        "proof_lane": "edge handler / contract tests",
+        "agent_fix": "add `apps/api/AGENTS.md` with owns / forbidden / proof lane guidance"
+      },
+      {
+        "id": "domain",
+        "applicable": false,
+        "status": "not_applicable",
+        "canonical_path": "crates/domain/",
+        "detected_paths": [],
+        "aliases": [
+          "domain/",
+          "core/"
+        ],
+        "guidance_status": "not_required",
+        "owner": "crates/domain",
+        "proof_lane": "unit / property tests",
+        "agent_fix": "no action"
+      },
+      {
+        "id": "application",
+        "applicable": false,
+        "status": "not_applicable",
+        "canonical_path": "crates/application/",
+        "detected_paths": [],
+        "aliases": [
+          "application/",
+          "usecases/",
+          "use-cases/"
+        ],
+        "guidance_status": "not_required",
+        "owner": "crates/application",
+        "proof_lane": "use-case / authz tests",
+        "agent_fix": "no action"
+      },
+      {
+        "id": "adapters",
+        "applicable": false,
+        "status": "not_applicable",
+        "canonical_path": "crates/adapters/",
+        "detected_paths": [],
+        "aliases": [
+          "adapters/",
+          "infra/",
+          "integrations/"
+        ],
+        "guidance_status": "not_required",
+        "owner": "crates/adapters",
+        "proof_lane": "adapter integration tests",
+        "agent_fix": "no action"
+      },
+      {
+        "id": "workers",
+        "applicable": false,
+        "status": "not_applicable",
+        "canonical_path": "crates/workers/",
+        "detected_paths": [],
+        "aliases": [
+          "workers/",
+          "jobs/",
+          "scheduler/",
+          "queue/"
+        ],
+        "guidance_status": "not_required",
+        "owner": "crates/workers",
+        "proof_lane": "workflow / replay tests",
+        "agent_fix": "no action"
+      },
+      {
+        "id": "contracts",
+        "applicable": false,
+        "status": "not_applicable",
+        "canonical_path": "contracts/",
+        "detected_paths": [],
+        "aliases": [
+          "openapi/",
+          "protobuf/",
+          "json-schema/",
+          "generated/"
+        ],
+        "guidance_status": "not_required",
+        "owner": "contracts",
+        "proof_lane": "generation / drift checks",
+        "agent_fix": "no action"
+      },
+      {
+        "id": "db",
+        "applicable": false,
+        "status": "not_applicable",
+        "canonical_path": "db/",
+        "detected_paths": [],
+        "aliases": [
+          "migrations/",
+          "constraints/",
+          "sql/"
+        ],
+        "guidance_status": "not_required",
+        "owner": "db",
+        "proof_lane": "migration / constraint tests",
+        "agent_fix": "no action"
+      },
+      {
+        "id": "python-ai",
+        "applicable": false,
+        "status": "not_applicable",
+        "canonical_path": "python/ai-service/",
+        "detected_paths": [],
+        "aliases": [
+          "python/",
+          "ai-service/",
+          "evals/",
+          "embeddings/",
+          "model/"
+        ],
+        "guidance_status": "not_required",
+        "owner": "python/ai-service",
+        "proof_lane": "eval / contract tests",
+        "agent_fix": "no action"
+      },
+      {
+        "id": "ops",
+        "applicable": true,
+        "status": "noncanonical",
+        "canonical_path": "ops/",
+        "detected_paths": [
+          ".github",
+          ".github/workflows"
+        ],
+        "aliases": [
+          ".github/",
+          ".github/workflows/",
+          "ci/",
+          "release/",
+          "observability/",
+          "security/"
+        ],
+        "guidance_status": "missing",
+        "owner": "ops",
+        "proof_lane": "security lane / workflow lint",
+        "agent_fix": "migrate the detected ops surface to `ops/` or document an alternate profile with owner, proof lane, expiry, and migration plan"
+      }
+    ],
+    "evidence": {
+      "applicable_count": 3,
+      "canonical_count": 2,
+      "detected_cells": [
+        {
+          "canonical_path": "apps/web/",
+          "detected_paths": [
+            "apps/web"
+          ],
+          "guidance_status": "missing",
+          "id": "web",
+          "status": "canonical"
+        },
+        {
+          "canonical_path": "apps/api/",
+          "detected_paths": [
+            "apps/api"
+          ],
+          "guidance_status": "missing",
+          "id": "api",
+          "status": "canonical"
+        },
+        {
+          "canonical_path": "ops/",
+          "detected_paths": [
+            ".github",
+            ".github/workflows"
+          ],
+          "guidance_status": "missing",
+          "id": "ops",
+          "status": "noncanonical"
+        }
+      ],
+      "guidance_missing_count": 3,
+      "noncanonical_count": 1
+    }
+  },
+  "findings": [
+    {
+      "severity": "medium",
+      "category": "shape",
+      "path": ".",
+      "problem": "`Code shape and semantic surface` scored 0 below the standard floor of 85",
+      "agent_fix": "split large or ambiguous authored code into smaller semantic modules with focused tests",
+      "evidence": [
+        "largest authored code file: apps/api/src/services/pointsEngine.ts (532 LOC)",
+        "code file exceeds 500 LOC",
+        "most code files stay under 300 LOC",
+        "copy-code advisory classes found: 3 (advisory only, no score impact)"
+      ],
+      "check_id": "HLT-001-DEAD-MARKER:shape",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:a0ab800fd6710fe475af9876d5120fd14c807fddabc8372f48467a2151aa641a",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#future-hostile-language-rule",
+      "owner": "tools"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": ".",
+      "problem": "no one-command setup or validation lane was detected",
+      "agent_fix": "add a canonical `setup`, `check`, `test`, or `verify` lane in one root command file",
+      "evidence": [
+        "no root setup/check/test/verify target surfaced"
+      ],
+      "check_id": "HLT-000-SCORE-DIMENSION:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:7010147691f443ae19d3d8603c11ec84958d455885b09e09eca0b9fa91933bde",
+      "tlr": "Verification",
+      "lane": "fast"
+    },
+    {
+      "severity": "medium",
+      "category": "context",
+      "path": ".github",
+      "problem": "reference-profile cell `ops` is detected at a noncanonical path",
+      "agent_fix": "migrate the detected ops surface to `ops/` or document an alternate profile with owner, proof lane, expiry, and migration plan",
+      "evidence": [
+        "canonical_path=ops/",
+        "detected_paths=.github, .github/workflows",
+        "aliases=.github/, .github/workflows/, ci/, release/, observability/, security/",
+        "guidance_status=missing",
+        "owner=ops",
+        "proof_lane=security lane / workflow lint"
+      ],
+      "check_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP:context",
+      "hardness": "soft",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:12a7cb3de44727e5607afe0a2df603f1f07be2916aa0ede17340426bdc33d1f7",
+      "rule_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#required-shape",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "audit",
+      "path": ".github/workflows",
+      "problem": "CI does not run the jankurai audit lane",
+      "agent_fix": "add a CI job that runs `jankurai . --json agent/repo-score.json --md agent/repo-score.md` and uploads both artifacts",
+      "evidence": [
+        "audit output must stay JSON plus Markdown for agent repair routing"
+      ],
+      "check_id": "HLT-000-SCORE-DIMENSION:audit",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just score",
+      "fingerprint": "sha256:dcdd57510181477041c184ca8e3087ad93965fd92fe3357b1be5d73986e805ae",
+      "tlr": "Context/setup",
+      "lane": "audit",
+      "owner": "ops"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows",
+      "problem": "high-risk repo has no explicit security lane",
+      "agent_fix": "add a dedicated security lane with secret scanning, dependency review, and workflow linting",
+      "evidence": [
+        "no security lane markers found"
+      ],
+      "check_id": "HLT-009-GENERATED-SECURITY:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:c249be982d975721833fe396cdfff422f53a2d61819df881968fba63fdd6b9bf",
+      "rule_id": "HLT-009-GENERATED-SECURITY",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/audit-rubric.md#top-level-risk-mapping",
+      "owner": "ops"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows",
+      "problem": "no secret or dependency scanning was found in CI",
+      "agent_fix": "add secret scanning, dependency review, and SBOM or provenance checks to CI",
+      "evidence": [
+        "no CI scan markers found"
+      ],
+      "check_id": "HLT-016-SUPPLY-CHAIN-DRIFT:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:2e22551cbdbd8da1f6fedd2d509dba064990dc4b1505df71609f431d11901099",
+      "rule_id": "HLT-016-SUPPLY-CHAIN-DRIFT",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/audit-rubric.md#top-level-risk-mapping",
+      "owner": "ops"
+    },
+    {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/ci.yml",
+      "problem": "ops/ci/lib.sh is missing",
+      "agent_fix": "add ops/ci/lib.sh defining shared helpers and tool version pins",
+      "evidence": [
+        "detector=ci.local-parity.lib-missing",
+        "path=.github/workflows/ci.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: CI"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:38cd57e124975896acaa3c97eaebf6c8c77ac0c1d103843fa60229d824f3e113",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.local-parity.lib-missing",
+      "reason": "ops/ci/lib.sh is the shared helper module (artifact assertions, tool pins) every lane sources"
+    },
+    {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/ci.yml",
+      "problem": "ops/git-hooks/pre-push is missing",
+      "agent_fix": "add ops/git-hooks/pre-push that runs `bash ops/ci/quality-gates.sh` and wire it via `git config core.hooksPath ops/git-hooks`",
+      "evidence": [
+        "detector=ci.local-parity.pre-push-hook-missing",
+        "path=.github/workflows/ci.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: CI"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:44b0ca530d403faafd63cc38b0e0059e85c4b267d711333d57ed266284246e40",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.local-parity.pre-push-hook-missing",
+      "reason": "without a mandatory pre-push gate, broken code can be pushed and CI is the first place a failure shows up"
+    },
+    {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/ci.yml",
+      "problem": "scripts/ci-doctor.sh is missing",
+      "agent_fix": "add scripts/ci-doctor.sh listing every tool the ops/ci scripts depend on",
+      "evidence": [
+        "detector=ci.local-parity.doctor-missing",
+        "path=.github/workflows/ci.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: CI"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:7cbe75916abd49f057b204b2bbb5cfef78e3c478d80c0547f609172fa43bf362",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.local-parity.doctor-missing",
+      "reason": "without a doctor script, developers cannot confirm their local environment matches CI"
+    },
+    {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/ci.yml",
+      "problem": "scripts/ci-local.sh is missing",
+      "agent_fix": "add scripts/ci-local.sh exposing each CI lane locally",
+      "evidence": [
+        "detector=ci.local-parity.runner-missing",
+        "path=.github/workflows/ci.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: CI"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:80d149032d1421dbf91f24eadfb4ba7db3801f4655e708a96c60f9494160cd0c",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.local-parity.runner-missing",
+      "reason": "scripts/ci-local.sh is the local entry point that delegates to the same ops/ci scripts the workflows call"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ci.yml",
+      "problem": "workflow is missing concurrency control",
+      "agent_fix": "add workflow-level concurrency with cancel-in-progress",
+      "evidence": [
+        "detector=ci.concurrency.missing",
+        "path=.github/workflows/ci.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: CI"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:578b7dcb2e1cc38dbf49fe4d5ebf21bcf14f9e674ad6d989ad8647df13985625",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.concurrency.missing",
+      "reason": "workflow can run duplicate stale audits for the same ref"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ci.yml",
+      "problem": "workflow is missing explicit top-level permissions",
+      "agent_fix": "add top-level `permissions: contents: read` and job-specific write scopes only where needed",
+      "evidence": [
+        "detector=ci.permissions.missing",
+        "path=.github/workflows/ci.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: CI"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:8813223ed4661db73301e1d79153e370aaeb9ffa142c6a91d6e295e00d3d9e7c",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.permissions.missing",
+      "reason": "workflow permissions default is not pinned in source"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ci.yml",
+      "problem": "workflow job is missing timeout-minutes",
+      "agent_fix": "set an explicit timeout-minutes on each job",
+      "evidence": [
+        "detector=ci.timeout.missing",
+        "path=.github/workflows/ci.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: CI"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:7ea6c860e8108e86a949d9865404de91fa8a338ca31eb89476e9d27af342e9b5",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.timeout.missing",
+      "reason": "workflow can run without a checked time bound"
+    },
+    {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/ci.yml",
+      "problem": "workflow inlines CI commands instead of delegating to ops/ci/*.sh",
+      "agent_fix": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "evidence": [
+        "detector=ci.local-parity.workflow-not-thin",
+        "path=.github/workflows/ci.yml",
+        "line=7",
+        "proof_window=None",
+        "snippet=jobs:"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:49e176525f223f5e9ccb332ea735304d5b478a21d2cec65d219da414d193ebab",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 7,
+      "matched_term": "ci.local-parity.workflow-not-thin",
+      "reason": "without a single source of truth, local runs drift from CI and breakage is only visible after push"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ci.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/ci.yml",
+        "line=11",
+        "proof_window=None",
+        "snippet=- uses: actions/checkout@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:02aadcfbe9a39273c368b95ba00d2d9229af8d02cda66674619885debea930de",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 11,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/ci.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/ci.yml",
+        "line=12",
+        "proof_window=None",
+        "snippet=- uses: actions/setup-node@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:86a03340c29bb71a661a341756906cf195d2a6ebdce18f1f11d1aa217ca170a7",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 12,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/claude.yml",
+      "problem": "workflow is missing concurrency control",
+      "agent_fix": "add workflow-level concurrency with cancel-in-progress",
+      "evidence": [
+        "detector=ci.concurrency.missing",
+        "path=.github/workflows/claude.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: Claude Code"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:b0f0144d310945cbd82bafa5573e975b9cc4110fc3a0573d514b71d55f11d8c9",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.concurrency.missing",
+      "reason": "workflow can run duplicate stale audits for the same ref"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/claude.yml",
+      "problem": "workflow job is missing timeout-minutes",
+      "agent_fix": "set an explicit timeout-minutes on each job",
+      "evidence": [
+        "detector=ci.timeout.missing",
+        "path=.github/workflows/claude.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: Claude Code"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:8488043592ffc9c9d4438e5c53ce80e192cc95d335912102e165c880d0677240",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.timeout.missing",
+      "reason": "workflow can run without a checked time bound"
+    },
+    {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/claude.yml",
+      "problem": "workflow inlines CI commands instead of delegating to ops/ci/*.sh",
+      "agent_fix": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "evidence": [
+        "detector=ci.local-parity.workflow-not-thin",
+        "path=.github/workflows/claude.yml",
+        "line=15",
+        "proof_window=None",
+        "snippet=jobs:"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:792375a194dedbe1e0063379c80182ac29a20b9725ab70c5d2f54dc218c6583c",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 15,
+      "matched_term": "ci.local-parity.workflow-not-thin",
+      "reason": "without a single source of truth, local runs drift from CI and breakage is only visible after push"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/claude.yml",
+      "problem": "agent tool or configuration trust surface requires supply-chain evidence",
+      "agent_fix": "pin and review agent tools, MCP servers, hooks, and rule files; keep untrusted tool output separate from trusted policy",
+      "evidence": [
+        "runs-on: ubuntu-latest"
+      ],
+      "check_id": "HLT-024-AGENT-TOOL-SUPPLY-GAP:security",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:3f7ac4631d7c88f7976de2f14c8de7808255d70cc31bbe53110efb9ff994b4e9",
+      "rule_id": "HLT-024-AGENT-TOOL-SUPPLY-GAP",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/audit-rubric.md#top-level-risk-mapping",
+      "owner": "ops",
+      "line": 30,
+      "matched_term": "agent tool supply",
+      "reason": "agent tool supply-chain changes alter execution authority"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/claude.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/claude.yml",
+        "line=37",
+        "proof_window=None",
+        "snippet=- uses: actions/checkout@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:969378303d3ade218763638f3191a6498aa3cd0cc3a903325a33f33c7b438416",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 37,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-prod.yml",
+      "problem": "workflow is missing explicit top-level permissions",
+      "agent_fix": "add top-level `permissions: contents: read` and job-specific write scopes only where needed",
+      "evidence": [
+        "detector=ci.permissions.missing",
+        "path=.github/workflows/deploy-prod.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: Deploy production"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:88feab7aabc7a1d54347ffc16dfd567e7839389fb3bcfe05eb3adea30860d97f",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.permissions.missing",
+      "reason": "workflow permissions default is not pinned in source"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-prod.yml",
+      "problem": "workflow job is missing timeout-minutes",
+      "agent_fix": "set an explicit timeout-minutes on each job",
+      "evidence": [
+        "detector=ci.timeout.missing",
+        "path=.github/workflows/deploy-prod.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: Deploy production"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:71a9acfa5237ebf66ee6e4b48fa22d7594be36150a3bbdc76ba537e1c6863479",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.timeout.missing",
+      "reason": "workflow can run without a checked time bound"
+    },
+    {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/deploy-prod.yml",
+      "problem": "workflow inlines CI commands instead of delegating to ops/ci/*.sh",
+      "agent_fix": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "evidence": [
+        "detector=ci.local-parity.workflow-not-thin",
+        "path=.github/workflows/deploy-prod.yml",
+        "line=9",
+        "proof_window=None",
+        "snippet=jobs:"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:5bea2d2ede6072e0800f1b07c3874dc08fc77e242c4b8dc6f83ddd8ede08f95f",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 9,
+      "matched_term": "ci.local-parity.workflow-not-thin",
+      "reason": "without a single source of truth, local runs drift from CI and breakage is only visible after push"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-prod.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/deploy-prod.yml",
+        "line=14",
+        "proof_window=None",
+        "snippet=- uses: actions/checkout@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:45acd932b7aaf960fae7ca37b9722e65e2694ab050a702f8131c17b661ecbc44",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 14,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-prod.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/deploy-prod.yml",
+        "line=15",
+        "proof_window=None",
+        "snippet=- uses: actions/setup-node@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:fa262d37e78b293af4c3de0c13a913bd62ff5579893140e7fa7fe93ce70872a4",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 15,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-prod.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/deploy-prod.yml",
+        "line=23",
+        "proof_window=None",
+        "snippet=uses: cloudflare/wrangler-action@v4"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:1ae6e4d2d4096704bd572a931790e4f8fd360bacc34a5e1738e619df148b2939",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 23,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-prod.yml",
+      "problem": "security-related job is configured to continue on error",
+      "agent_fix": "remove the non-blocking override so scan failures stop the pipeline",
+      "evidence": [
+        "detector=ci.security-scan.nonblocking",
+        "path=.github/workflows/deploy-prod.yml",
+        "line=39",
+        "proof_window=None",
+        "snippet=npx wrangler queues create photo-processing || true"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:29b905ad54d73229cff210912f03a7f2663bbf7eeb61f9391831a65e7a4d6b4a",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 39,
+      "matched_term": "ci.security-scan.nonblocking",
+      "reason": "security or proof job is explicitly non-blocking"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-prod.yml",
+      "problem": "security-related job is configured to continue on error",
+      "agent_fix": "remove the non-blocking override so scan failures stop the pipeline",
+      "evidence": [
+        "detector=ci.security-scan.nonblocking",
+        "path=.github/workflows/deploy-prod.yml",
+        "line=48",
+        "proof_window=None",
+        "snippet=run: npx wrangler r2 bucket create taakhelden-photos --jurisdiction eu || true"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:59914eacfa25e03b6f5c4b060b91b03e371f7b6af020cca73b6612e25691a5c2",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 48,
+      "matched_term": "ci.security-scan.nonblocking",
+      "reason": "security or proof job is explicitly non-blocking"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-prod.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/deploy-prod.yml",
+        "line=50",
+        "proof_window=None",
+        "snippet=uses: cloudflare/wrangler-action@v4"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:61cd134118179cd79fdd96e6bc19a839439d71f6b435ce6a71cb97c42a4c9b20",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 50,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-web.yml",
+      "problem": "workflow is missing explicit top-level permissions",
+      "agent_fix": "add top-level `permissions: contents: read` and job-specific write scopes only where needed",
+      "evidence": [
+        "detector=ci.permissions.missing",
+        "path=.github/workflows/deploy-web.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: Deploy web"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:81b998db120b7b2b4790cf386ccb3dd6e942f25780002dc31b2e2cf28e52d7cd",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.permissions.missing",
+      "reason": "workflow permissions default is not pinned in source"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-web.yml",
+      "problem": "workflow job is missing timeout-minutes",
+      "agent_fix": "set an explicit timeout-minutes on each job",
+      "evidence": [
+        "detector=ci.timeout.missing",
+        "path=.github/workflows/deploy-web.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: Deploy web"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:e3f1e91c03cb9df99f4c636538dee870d776a55015357c3afcb0aff786ad7dbe",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.timeout.missing",
+      "reason": "workflow can run without a checked time bound"
+    },
+    {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/deploy-web.yml",
+      "problem": "workflow inlines CI commands instead of delegating to ops/ci/*.sh",
+      "agent_fix": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "evidence": [
+        "detector=ci.local-parity.workflow-not-thin",
+        "path=.github/workflows/deploy-web.yml",
+        "line=9",
+        "proof_window=None",
+        "snippet=jobs:"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:583e24d54c30065b8a0a168d2773430fa604ba398432a02e4a554ebfa4450055",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 9,
+      "matched_term": "ci.local-parity.workflow-not-thin",
+      "reason": "without a single source of truth, local runs drift from CI and breakage is only visible after push"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-web.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/deploy-web.yml",
+        "line=14",
+        "proof_window=None",
+        "snippet=- uses: actions/checkout@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:97f7848a2207dbc5ea2406b4b9c2bf5e1c9571230a26ef449ee17f2bcba007d1",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 14,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/deploy-web.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/deploy-web.yml",
+        "line=15",
+        "proof_window=None",
+        "snippet=- uses: actions/setup-node@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:b52c3643ce0e1a4f41c4a9881ff0b380e225b8a7d07692bfaf2ff919b5bc8ce8",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 15,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "medium",
+      "category": "security",
+      "path": ".github/workflows/jankurai.yml",
+      "problem": "`Security and supply-chain posture` scored 26 below the standard floor of 85",
+      "agent_fix": "wire secret, dependency, provenance, and workflow scans into an operational CI lane",
+      "evidence": [
+        "lockfile present",
+        "sql bad-behavior advisory signals: 8",
+        "typescript bad-behavior hard findings: 17",
+        "ci bad-behavior hard findings: 25"
+      ],
+      "check_id": "HLT-016-SUPPLY-CHAIN-DRIFT:security",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:d0aa1055a4c44d82af090df480d94c70b28da58f87ef5a838130c65874b88b25",
+      "rule_id": "HLT-016-SUPPLY-CHAIN-DRIFT",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/audit-rubric.md#top-level-risk-mapping",
+      "owner": "ops"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/jankurai.yml",
+      "problem": "workflow is missing concurrency control",
+      "agent_fix": "add workflow-level concurrency with cancel-in-progress",
+      "evidence": [
+        "detector=ci.concurrency.missing",
+        "path=.github/workflows/jankurai.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: Jankurai (regression gate)"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:79720071e093992b25cb7c6eee8216387bfe2dbebaa9ebdbe46ccb74019f7898",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.concurrency.missing",
+      "reason": "workflow can run duplicate stale audits for the same ref"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/jankurai.yml",
+      "problem": "workflow job is missing timeout-minutes",
+      "agent_fix": "set an explicit timeout-minutes on each job",
+      "evidence": [
+        "detector=ci.timeout.missing",
+        "path=.github/workflows/jankurai.yml",
+        "line=1",
+        "proof_window=None",
+        "snippet=name: Jankurai (regression gate)"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:0a99a86286c43f2b5e54ecd5e5dc8108a5c19bcea12f739b6b1f3d2ca848e8f8",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 1,
+      "matched_term": "ci.timeout.missing",
+      "reason": "workflow can run without a checked time bound"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/jankurai.yml",
+      "problem": "protected workflow lacks strict CI security evidence before final audit",
+      "agent_fix": "run `jankurai security run . --strict --profile ci --out target/jankurai/security/evidence.json` before the final audit",
+      "evidence": [
+        "detector=ci.security.strict-missing",
+        "path=.github/workflows/jankurai.yml",
+        "line=6",
+        "proof_window=None",
+        "snippet=# `jankurai audit` eerder faalde met \"repo-score.schema.json: No such file or"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:0cdd01a8a6baa88bbc97b251b32845964221aa7dcdb2af9c4d869289e1ce1ddd",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 6,
+      "matched_term": "ci.security.strict-missing",
+      "reason": "final ratchet or release audit is not bound to strict security evidence"
+    },
+    {
+      "severity": "high",
+      "category": "ci",
+      "path": ".github/workflows/jankurai.yml",
+      "problem": "workflow inlines CI commands instead of delegating to ops/ci/*.sh",
+      "agent_fix": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "evidence": [
+        "detector=ci.local-parity.workflow-not-thin",
+        "path=.github/workflows/jankurai.yml",
+        "line=36",
+        "proof_window=None",
+        "snippet=jobs:"
+      ],
+      "check_id": "HLT-042-CI-LOCAL-PARITY:ci",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:7f57c0be14f04f070be0d9a2b453de07586825976a017b35085891cd2478a04c",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/ci-local.md",
+      "owner": "ops",
+      "line": 36,
+      "matched_term": "ci.local-parity.workflow-not-thin",
+      "reason": "without a single source of truth, local runs drift from CI and breakage is only visible after push"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/jankurai.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/jankurai.yml",
+        "line=40",
+        "proof_window=None",
+        "snippet=- uses: actions/checkout@v7"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:7aa6ddc321a9c85aec4516af5552cb9779a10f4c019bc5b7ac529e08f3f250a2",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 40,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": ".github/workflows/jankurai.yml",
+      "problem": "workflow uses an external action not pinned to a full commit SHA",
+      "agent_fix": "pin every external action to a 40-character commit SHA",
+      "evidence": [
+        "detector=ci.action.not-full-sha",
+        "path=.github/workflows/jankurai.yml",
+        "line=58",
+        "proof_window=None",
+        "snippet=uses: actions/upload-artifact@v4"
+      ],
+      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:baa35d0b12273b386d3122b02b8b13c10843c1047c588075f5ca6b36d498cffc",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/testing.md",
+      "owner": "ops",
+      "line": 58,
+      "matched_term": "ci.action.not-full-sha",
+      "reason": "tag or branch refs can change without review"
+    },
+    {
+      "severity": "medium",
+      "category": "context",
+      "path": "AGENTS.md",
+      "problem": "`Context economy and agent instructions` scored 71 below the standard floor of 85",
+      "agent_fix": "keep root guidance short and route durable detail through agent-readable manifests and docs",
+      "evidence": [
+        "root `AGENTS.md` present",
+        "root `AGENTS.md` stays short",
+        "machine-readable routing artifacts present",
+        "thin IDE/agent adapters are present"
+      ],
+      "check_id": "HLT-015-CONTEXT-SETUP-GAP:context",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:7871aad486ed815c8f56845e244c2cfc73025a990af53b510881c2c6b474c9cd",
+      "rule_id": "HLT-015-CONTEXT-SETUP-GAP",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "docs_url": "docs/agent-native-standard.md",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "generated",
+      "path": "Design System/_ds_bundle.js",
+      "problem": "generated zone file `Design System/_ds_bundle.js` missing generated header",
+      "agent_fix": "add a `Generated by: <tool>` / `DO NOT EDIT BY HAND` header block with source and regeneration command",
+      "evidence": [
+        "generated zone integrity violation"
+      ],
+      "check_id": "HLT-002-GENERATED-MUTATION:generated",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:10ff9c4fb8d545f5c090dfa8340672d0a5e38f25cc23a1995ab48367bc1db416",
+      "rule_id": "HLT-002-GENERATED-MUTATION",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "agent/JANKURAI_STANDARD.md#generated-zones",
+      "owner": "design-system",
+      "line": 1
+    },
+    {
+      "severity": "medium",
+      "category": "proof",
+      "path": "Justfile",
+      "problem": "`Build speed signals` scored 60 below the standard floor of 85",
+      "agent_fix": "add fast deterministic build/test targets, caches, and narrow proof lanes for agent iteration",
+      "evidence": [
+        "build acceleration markers found",
+        "targeted test/build commands found",
+        "locked dependency graph present",
+        "CI cache hint found"
+      ],
+      "check_id": "HLT-018-PERF-CONCURRENCY-DRIFT:proof",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:938f4ac0d852cab12cdb5c2c7cdac775db884de8ede5176d149a8b50d60d45ae",
+      "rule_id": "HLT-018-PERF-CONCURRENCY-DRIFT",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "workspace"
+    },
+    {
+      "severity": "medium",
+      "category": "boundary",
+      "path": "agent/boundaries.toml",
+      "problem": "`Contract and boundary integrity` scored 55 below the standard floor of 85",
+      "agent_fix": "add generated contracts and boundary checks for public APIs, data access, and cross-runtime seams",
+      "evidence": [
+        "contract surface found",
+        "generated contract artifacts found",
+        "polyglot boundary layout present",
+        "handwritten web DTO/API marker found"
+      ],
+      "check_id": "HLT-007-HANDWRITTEN-CONTRACT:boundary",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "contract-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:625a1b79f8b0cc7b419184b0f3272180f3a707eb1558ffbd101f84a62dda517e",
+      "rule_id": "HLT-007-HANDWRITTEN-CONTRACT",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "docs_url": "docs/audit-rubric.md#known-vibe-coding-insults",
+      "owner": "agent"
+    },
+    {
+      "severity": "medium",
+      "category": "context",
+      "path": "agent/owner-map.json",
+      "problem": "`Ownership and navigation surface` scored 83 below the standard floor of 85",
+      "agent_fix": "tighten owner/test maps and root routing until agents can localize ownership without inference",
+      "evidence": [
+        "root `AGENTS.md` present",
+        "`CODEOWNERS` present",
+        "owner map present",
+        "test/proof routing map present"
+      ],
+      "check_id": "HLT-003-OWNERLESS-PATH:context",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:052e5dfa17a89c1ed7f14872b4ebbed7fc78e74575c44a162fe013ae0482671f",
+      "rule_id": "HLT-003-OWNERLESS-PATH",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#ownership-boundaries",
+      "owner": "agent"
+    },
+    {
+      "severity": "medium",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "`Proof lanes and test routing` scored 63 below the standard floor of 85",
+      "agent_fix": "route each owned path to a deterministic proof command and make the lane executable in CI",
+      "evidence": [
+        "deterministic fast lane found",
+        "test runner present in automation surface",
+        "GitHub workflow files present",
+        "test/proof routing map present"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:e9d971427e8ad4c1b11e75b69af4b0f7288a68f1d4e826f550ce23138e5a92e1",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "path `AGENTS.md` has no test-map proof route",
+      "agent_fix": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "evidence": [
+        "AGENTS.md"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:947c3263d744faf8e9142f2db681aede57e43b234496ca8e5289f284d56e506a",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "path `CLAUDE.md` has no test-map proof route",
+      "agent_fix": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "evidence": [
+        "CLAUDE.md"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:318b8eb21fed9d46edbf2800961aa36db1656010a2819173f10183f12d1ce4c3",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "path `README.md` has no test-map proof route",
+      "agent_fix": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "evidence": [
+        "README.md"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:c4a25759c16b05da63ece6c953b801c311e0df2a29f91df6cc92c21e69fa6cc7",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "path `agent/audit-policy.toml` has no test-map proof route",
+      "agent_fix": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "evidence": [
+        "agent/audit-policy.toml"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:6417f06393cd7d782a70750ce7150e28ea8f61edb53d4a483d5e6b093c9f1295",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "path `agent/baselines/README.md` has no test-map proof route",
+      "agent_fix": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "evidence": [
+        "agent/baselines/README.md"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:5a12cd6ef0d91845b0663e07cedfe636f4865aac5df6908637a6da6b3d267f59",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "path `agent/baselines/main.repo-score.json` has no test-map proof route",
+      "agent_fix": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "evidence": [
+        "agent/baselines/main.repo-score.json"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:35f61866a5a4eef59ed08a25cc9658758c983cfcc2fde31e869fe37af3c72d4c",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "path `agent/generated-zones.toml` has no test-map proof route",
+      "agent_fix": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "evidence": [
+        "agent/generated-zones.toml"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:66d05f5e7975cb20f6e4abff2a09fba01b36e43a7ae55e1b50f2fa66e465fd4d",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "path `agent/owner-map.json` has no test-map proof route",
+      "agent_fix": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "evidence": [
+        "agent/owner-map.json"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:d3017639c78471770ba4d3f22a19aaa0140c59c7d3ffc4d018d552da13da9370",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "path `agent/test-map.json` has no test-map proof route",
+      "agent_fix": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "evidence": [
+        "agent/test-map.json"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:9f49c937c706ca11813de5133c8ba8c10a39a23b93348544e4f80b48738509fa",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "high",
+      "category": "proof",
+      "path": "agent/test-map.json",
+      "problem": "path `apps/ios/README.md` has no test-map proof route",
+      "agent_fix": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "evidence": [
+        "apps/ios/README.md"
+      ],
+      "check_id": "HLT-004-UNMAPPED-PROOF:proof",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:73fee243873f4ad7b95caa229aacff15c75eb27cd5a99eed10007c2773af6365",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "docs_url": "agent/JANKURAI_STANDARD.md#proof-lanes",
+      "owner": "agent"
+    },
+    {
+      "severity": "medium",
+      "category": "context",
+      "path": "apps/api/",
+      "problem": "reference-profile cell `api` lacks local AGENTS.md guidance",
+      "agent_fix": "add `apps/api/AGENTS.md` with owns / forbidden / proof lane guidance",
+      "evidence": [
+        "canonical_path=apps/api/",
+        "detected_paths=apps/api",
+        "guidance_status=missing",
+        "owner=apps/api",
+        "proof_lane=edge handler / contract tests"
+      ],
+      "check_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP:context",
+      "hardness": "soft",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:2bef1ea7638a1be4c61e1e6ef7d29005cb87ed42d35445e203bb31e6ecbd4e31",
+      "rule_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#required-shape",
+      "owner": "api"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/repo/account.ts",
+      "problem": "raw shell or SQL text is built from untrusted TypeScript input",
+      "agent_fix": "use argv arrays, prepared statements, or a safe allowlisted command path",
+      "evidence": [
+        "detector=typescript.security.raw-command-sql",
+        "path=apps/api/src/repo/account.ts",
+        "line=153",
+        "snippet=scoped(`DELETE FROM refresh_tokens WHERE ${userScope}`),"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:989601a36f9d98ca8ef60aeed0c01943c5bcbd5e9b00242384a92f3ef13ac6b8",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 153,
+      "matched_term": "typescript.security.raw-command-sql",
+      "reason": "trusted input proof is missing"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/repo/account.ts",
+      "problem": "raw shell or SQL text is built from untrusted TypeScript input",
+      "agent_fix": "use argv arrays, prepared statements, or a safe allowlisted command path",
+      "evidence": [
+        "detector=typescript.security.raw-command-sql",
+        "path=apps/api/src/repo/account.ts",
+        "line=154",
+        "snippet=scoped(`DELETE FROM devices WHERE ${userScope}`),"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:c674bd5ed3251f039e77ac9634cc99c5c1117931fc58d21c3b5669fab43f752f",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 154,
+      "matched_term": "typescript.security.raw-command-sql",
+      "reason": "trusted input proof is missing"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/repo/account.ts",
+      "problem": "raw shell or SQL text is built from untrusted TypeScript input",
+      "agent_fix": "use argv arrays, prepared statements, or a safe allowlisted command path",
+      "evidence": [
+        "detector=typescript.security.raw-command-sql",
+        "path=apps/api/src/repo/account.ts",
+        "line=155",
+        "snippet=scoped(`DELETE FROM idempotency_keys WHERE ${userScope}`),"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:edddb46e88538389dd62ba1ad4b930b678ed19475bef1eb9f01be76cbb534b2a",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 155,
+      "matched_term": "typescript.security.raw-command-sql",
+      "reason": "trusted input proof is missing"
+    },
+    {
+      "severity": "high",
+      "category": "vibe",
+      "path": "apps/api/src/repo/auth.ts",
+      "problem": "fallback soup detected in product code",
+      "agent_fix": "collapse fallback chains into explicit typed states with bounded retry policy, telemetry, and documented repair guidance",
+      "evidence": [
+        "apps/api/src/repo/auth.ts:108 if (!res.meta.changes) return null;"
+      ],
+      "check_id": "HLT-001-DEAD-MARKER:vibe",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:b1040fcd51fc85ea5723c266ab5ffa8c10175bb528be2ab2e4eba5108525ea45",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#future-hostile-language-rule",
+      "owner": "api",
+      "line": 108
+    },
+    {
+      "severity": "high",
+      "category": "security",
+      "path": "apps/api/src/repo/badges.ts",
+      "problem": "unsafe or unvalidated input boundary marker appears in product code",
+      "agent_fix": "replace unsafe sinks with typed schemas, parameterized APIs, allowlists, or sandboxed execution plus negative tests",
+      "evidence": [
+        ".prepare(`SELECT id, title, description, icon FROM badges WHERE id IN (${placeholders})`)"
+      ],
+      "check_id": "HLT-023-INPUT-BOUNDARY-GAP:security",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:24f0c55df0c041f7fc692a7f34db872e1f5b7c4016ddd7ecb27731f45cce30b5",
+      "rule_id": "HLT-023-INPUT-BOUNDARY-GAP",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/audit-rubric.md#top-level-risk-mapping",
+      "owner": "api",
+      "line": 27,
+      "matched_term": "string sql",
+      "reason": "input handling risk needs deterministic negative tests"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/repo/families.ts",
+      "problem": "raw shell or SQL text is built from untrusted TypeScript input",
+      "agent_fix": "use argv arrays, prepared statements, or a safe allowlisted command path",
+      "evidence": [
+        "detector=typescript.security.raw-command-sql",
+        "path=apps/api/src/repo/families.ts",
+        "line=147",
+        "snippet=`UPDATE users SET ${sets.join(\", \")}"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:f06c3041fd7c1f548754eeb01a98ea874fefed86897c0cdd8171cdaf61f6a004",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 147,
+      "matched_term": "typescript.security.raw-command-sql",
+      "reason": "trusted input proof is missing"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/repo/families.ts",
+      "problem": "raw shell or SQL text is built from untrusted TypeScript input",
+      "agent_fix": "use argv arrays, prepared statements, or a safe allowlisted command path",
+      "evidence": [
+        "detector=typescript.security.raw-command-sql",
+        "path=apps/api/src/repo/families.ts",
+        "line=170",
+        "snippet=.prepare(`UPDATE users SET ${sets.join(\", \")} WHERE family_id = ? AND id = ? AND deleted_at IS NULL`)"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:f3e6331d7cb0510798741bf5daa2404dd226ca772626c16c9be1d046e115b562",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 170,
+      "matched_term": "typescript.security.raw-command-sql",
+      "reason": "trusted input proof is missing"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/routes/families.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/api/src/routes/families.ts",
+        "line=116",
+        "snippet=const { familyId, userId } = JSON.parse(raw) as { familyId: string; userId: string };"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:d4fa8dfdae10299541f07cb85bbc21421d0ac5ee6fc88e16d214671c31221286",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 116,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/routes/instances.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/api/src/routes/instances.ts",
+        "line=81",
+        "snippet=? (JSON.parse(atob(rawCursor)) as { date: string; id: string })"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:2ef33aef901d76a2793562003a32b1f40e5339331912e7c3ec1f8c0588112df5",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 81,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/routes/points.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/api/src/routes/points.ts",
+        "line=24",
+        "snippet=const decoded = JSON.parse(atob(raw)) as unknown;"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:b879a06c9561de7047d0a356310d5a502f66c999f252695bf6d5395b8b57f116",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 24,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "high",
+      "category": "vibe",
+      "path": "apps/api/src/routes/sync.ts",
+      "problem": "future-hostile/dead-language term `stub` appears in product/runtime code",
+      "agent_fix": "remove or rename the marker, implement the intended behavior, model a typed unsupported state, or move docs/generated/vendor/product-copy text into an allowlisted context",
+      "evidence": [
+        "apps/api/src/routes/sync.ts:21",
+        "future-hostile/dead-language term `stub` appears"
+      ],
+      "check_id": "HLT-001-DEAD-MARKER:vibe",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:a801c9fa75863526a4f15e4c05390257bc927a92f867b620b2704897e38cb3f9",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#future-hostile-language-rule",
+      "owner": "api",
+      "line": 21
+    },
+    {
+      "severity": "high",
+      "category": "vibe",
+      "path": "apps/api/src/routes/sync.ts",
+      "problem": "product code contains TODO/stub/unimplemented/unreachable placeholder markers",
+      "agent_fix": "replace placeholders with implemented behavior, typed unsupported-state errors, or a tracked exception record with docs",
+      "evidence": [
+        "apps/api/src/routes/sync.ts:21 const res = await stub.fetch(\"https://family-room.internal/sync\", {"
+      ],
+      "check_id": "HLT-001-DEAD-MARKER:vibe",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:03e7b1a86285b813c2669bb2e482253d6939fb061e15459feee4075b2fc99018",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#future-hostile-language-rule",
+      "owner": "api",
+      "line": 21
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/routes/tasks.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/api/src/routes/tasks.ts",
+        "line=23",
+        "snippet=assignees: JSON.parse((row.assignees as string) ?? \"[]\"),"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:d04dfa08dcd0ad4737f4ab268d64bb724ccf6b597893893f78a3e836bec4d8ea",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 23,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/routes/tasks.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/api/src/routes/tasks.ts",
+        "line=24",
+        "snippet=rotation: row.rotation ? JSON.parse(row.rotation as string) : null,"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:0aba208294ee8ceb15f541a9c8ef592df8e24a408ceba7eed9324a37aae33447",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 24,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/routes/tasks.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/api/src/routes/tasks.ts",
+        "line=25",
+        "snippet=recurrence: row.recurrence ? JSON.parse(row.recurrence as string) : null,"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:1f066b845c67d3cc5b19df87d3882c9c27ad7df2670be496e384ba2aca078ba3",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 25,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "high",
+      "category": "vibe",
+      "path": "apps/api/src/routes/ws.ts",
+      "problem": "future-hostile/dead-language term `stub` appears in product/runtime code",
+      "agent_fix": "remove or rename the marker, implement the intended behavior, model a typed unsupported state, or move docs/generated/vendor/product-copy text into an allowlisted context",
+      "evidence": [
+        "apps/api/src/routes/ws.ts:56",
+        "future-hostile/dead-language term `stub` appears"
+      ],
+      "check_id": "HLT-001-DEAD-MARKER:vibe",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:e1d76c830f330c4140b10477b2899a416bd99553f9b682be53719568088bcd2b",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#future-hostile-language-rule",
+      "owner": "api",
+      "line": 56
+    },
+    {
+      "severity": "high",
+      "category": "vibe",
+      "path": "apps/api/src/services/familyRoom.ts",
+      "problem": "future-hostile/dead-language term `stub` appears in product/runtime code",
+      "agent_fix": "remove or rename the marker, implement the intended behavior, model a typed unsupported state, or move docs/generated/vendor/product-copy text into an allowlisted context",
+      "evidence": [
+        "apps/api/src/services/familyRoom.ts:38",
+        "future-hostile/dead-language term `stub` appears"
+      ],
+      "check_id": "HLT-001-DEAD-MARKER:vibe",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:b5b6a7ea8106d69d25d2d19e56dd172e4635d7f1b108c69fe7ea3f58fae7086f",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#future-hostile-language-rule",
+      "owner": "api",
+      "line": 38
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/services/syncService.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/api/src/services/syncService.ts",
+        "line=88",
+        "snippet=results.push(JSON.parse(cached) as SyncResult); // idempotent: exact hetzelfde resultaat"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:8a3dac591565247a93566e3f9f821cba9c21021ab7b254f3b428b08129af2f13",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 88,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/services/taskEngine.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/api/src/services/taskEngine.ts",
+        "line=22",
+        "snippet=const rule = JSON.parse(raw) as RecurrenceRule;"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:87a1fc512c5eb983ee767d637c4263d279b2032b381945c397291bcfae0b3374",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 22,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/services/taskEngine.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/api/src/services/taskEngine.ts",
+        "line=28",
+        "snippet=const rotation = task.rotation ? (JSON.parse(task.rotation as string) as string[]) : null;"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:6b38971781855dab53dbee867bdb43a0fb170fe623a009b9ff75c00c0b7b2464",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 28,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/api/src/services/taskEngine.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/api/src/services/taskEngine.ts",
+        "line=34",
+        "snippet=return JSON.parse((task.assignees as string) ?? \"[]\") as string[];"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:ef8375ec8d35f39f9f6c632844bcb44a5673f4731580ae05b0c0e57771627e4e",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "api",
+      "line": 34,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "path": "apps/api/test/account.test.ts",
+      "problem": "secret-like value or credential material appears in repository text",
+      "agent_fix": "remove and rotate the credential, add local and CI secret scanning, and scan transcripts/artifacts/MCP config for related exposure",
+      "evidence": [
+        "async function registerFamily(password = \"superveilig123\") {"
+      ],
+      "check_id": "HLT-010-SECRET-SPRAWL:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:e17a885118e8eabafb9acd02e4db92c4055d6858c905e3cebd824fc2846ad389",
+      "rule_id": "HLT-010-SECRET-SPRAWL",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/audit-rubric.md#top-level-risk-mapping",
+      "owner": "api",
+      "line": 21
+    },
+    {
+      "severity": "high",
+      "category": "ux-qa",
+      "path": "apps/web",
+      "problem": "web surface lacks layered rendered UX QA evidence",
+      "agent_fix": "add Storybook state coverage, Playwright screenshots, visual review or `@jankurai/ux-qa`, accessibility scans, CLS checks, generated mocks, and design tokens",
+      "evidence": [
+        "rendered UX QA lane missing"
+      ],
+      "check_id": "HLT-013-RENDERED-UX-GAP:ux-qa",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "ux-proof",
+      "rerun_command": "just ux-qa",
+      "fingerprint": "sha256:571d35c2e730a393b782bac14825b197c0543920bb21967079d264ac602ea5b1",
+      "rule_id": "HLT-013-RENDERED-UX-GAP",
+      "tlr": "Verification and rendered UX",
+      "lane": "web",
+      "docs_url": "docs/testing.md",
+      "owner": "tools"
+    },
+    {
+      "severity": "medium",
+      "category": "context",
+      "path": "apps/web/",
+      "problem": "reference-profile cell `web` lacks local AGENTS.md guidance",
+      "agent_fix": "add `apps/web/AGENTS.md` with owns / forbidden / proof lane guidance",
+      "evidence": [
+        "canonical_path=apps/web/",
+        "detected_paths=apps/web",
+        "guidance_status=missing",
+        "owner=apps/web",
+        "proof_lane=rendered UX / Playwright"
+      ],
+      "check_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP:context",
+      "hardness": "soft",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:d25bbb2ed52bd978d09e2cb72e0905931869fea71a657d7788171bfb520f4b00",
+      "rule_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#required-shape",
+      "owner": "web"
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/web/app/[locale]/(dashboard)/goedkeuren/GoedkeurenClient.tsx",
+      "problem": "TypeScript suppression comment hides type checking or lint evidence",
+      "agent_fix": "remove the broad suppression or scope it to a single justified line",
+      "evidence": [
+        "detector=typescript.suppress.ts-nocheck",
+        "path=apps/web/app/[locale]/(dashboard)/goedkeuren/GoedkeurenClient.tsx",
+        "line=51",
+        "snippet=// eslint-disable-next-line @next/next/no-img-element -- signed, short-lived R2 URL; not a static asset"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:6655b28af6ac50579df30b9fc6bd28016b980fc57a24a714a604ecb8ebb6f46b",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "web",
+      "line": 51,
+      "matched_term": "typescript.suppress.ts-nocheck",
+      "reason": "broad suppression is hard to audit"
+    },
+    {
+      "severity": "high",
+      "category": "data",
+      "path": "apps/web/app/api/v1/[...path]/route.ts",
+      "problem": "direct database access appears in a wrong layer",
+      "agent_fix": "move SQL and DB clients to `crates/adapters` or `db/`; expose typed application/domain APIs upward",
+      "evidence": [
+        "DB marker in non-adapter layer"
+      ],
+      "check_id": "HLT-006-DIRECT-DB-WRONG-LAYER:data",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "sql",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:b3fe8562e7911417c71aae3071f6b2749cf4be66ac5f023cd0f2d2fc1902661e",
+      "rule_id": "HLT-006-DIRECT-DB-WRONG-LAYER",
+      "tlr": "Contracts/data",
+      "lane": "db",
+      "docs_url": "docs/audit-rubric.md#required-shape",
+      "owner": "web",
+      "line": 1
+    },
+    {
+      "severity": "high",
+      "category": "boundary",
+      "path": "apps/web/lib/auth/jwt.ts",
+      "problem": "unchecked boundary cast or parse result crosses a trust boundary",
+      "agent_fix": "validate the value first, then narrow it with a proof-aware decoder",
+      "evidence": [
+        "detector=typescript.types.any-boundary",
+        "path=apps/web/lib/auth/jwt.ts",
+        "line=19",
+        "snippet=const claims = JSON.parse(json) as Partial<JwtClaims>;"
+      ],
+      "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:1ed4a94d0ed8d15d424590094b6e23982b4d26cc076bf2c8a89ece36924263ab",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "docs_url": "docs/testing.md",
+      "owner": "web",
+      "line": 19,
+      "matched_term": "typescript.types.any-boundary",
+      "reason": "value shape is not proven before the cast"
+    },
+    {
+      "severity": "high",
+      "category": "exceptions",
+      "path": "crates/domain",
+      "problem": "no agent-friendly exception/error pattern was detected",
+      "agent_fix": "define a typed exception surface with purpose, reason, common fixes, docs_url, and repair_hint so the next rerun is local",
+      "evidence": [
+        "route repair work to the next agent",
+        "opaque failures slow local debugging and reruns",
+        "add a typed repair hint; name the common fixes; point at the local docs URL",
+        "docs/testing.md"
+      ],
+      "check_id": "HLT-017-OPAQUE-OBSERVABILITY:exceptions",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just score",
+      "fingerprint": "sha256:538667a01e35d8e91eae100627364816dd225911862fa2fa1578642af63d4af8",
+      "rule_id": "HLT-017-OPAQUE-OBSERVABILITY",
+      "tlr": "Repair",
+      "lane": "observability",
+      "docs_url": "agent/JANKURAI_STANDARD.md#repair-receipts",
+      "owner": "tools"
+    },
+    {
+      "severity": "medium",
+      "category": "data",
+      "path": "db/",
+      "problem": "`Data truth and workflow safety` scored 45 below the standard floor of 85",
+      "agent_fix": "move durable truth into migrations, constraints, adapters, and application-owned transactions",
+      "evidence": [
+        "database surface present",
+        "strict DB boundary violation: apps/web/app/api/v1/[...path]/route.ts",
+        "direct DB access leaks out of the data boundary"
+      ],
+      "check_id": "HLT-006-DIRECT-DB-WRONG-LAYER:data",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "sql",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:7946105ef656d17c7aa8cb8befa5bb4551ea7f67ca8ff197264ea85aada7ef6b",
+      "rule_id": "HLT-006-DIRECT-DB-WRONG-LAYER",
+      "tlr": "Contracts/data",
+      "lane": "db",
+      "docs_url": "docs/audit-rubric.md#required-shape",
+      "owner": "tools"
+    },
+    {
+      "severity": "medium",
+      "category": "docs",
+      "path": "docs/",
+      "problem": "agent-readable documentation is incomplete",
+      "agent_fix": "add concise docs for architecture, boundaries, tests, generated zones, and audit rules; route them from root `AGENTS.md`",
+      "evidence": [
+        "docs/architecture.md or docs/boundaries.md",
+        "docs/testing.md"
+      ],
+      "check_id": "HLT-000-SCORE-DIMENSION:docs",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "documentation",
+      "rerun_command": "just score",
+      "fingerprint": "sha256:517269e227b26a69e8747d0d8cdb8a8d03582550b0de9e4c7c2b9287d8cee256",
+      "tlr": "Context/setup",
+      "lane": "audit",
+      "owner": "docs"
+    },
+    {
+      "severity": "high",
+      "category": "release",
+      "path": "docs/release.md",
+      "problem": "release management structure is incomplete",
+      "agent_fix": "add a release control surface with version source, changelog, release process docs, CI or script evidence, integrity/provenance evidence, and rollback guidance",
+      "evidence": [
+        "release structure missing: version source, release process doc"
+      ],
+      "check_id": "HLT-025-RELEASE-READINESS-GAP:release",
+      "hardness": "hard",
+      "confidence": 0.88,
+      "evidence_kind": "workflow-command",
+      "rerun_command": "just check",
+      "fingerprint": "sha256:ddec681dd586d13a99304e7686e7b85b072b1f91458a0cb3d744fa1df2e5ed02",
+      "rule_id": "HLT-025-RELEASE-READINESS-GAP",
+      "tlr": "Verification",
+      "lane": "release",
+      "docs_url": "docs/testing.md",
+      "owner": "docs",
+      "matched_term": "release structure",
+      "reason": "launch gates need artifact-backed release evidence"
+    },
+    {
+      "severity": "medium",
+      "category": "observability",
+      "path": "docs/testing.md",
+      "problem": "`Observability and repair evidence` scored 23 below the standard floor of 85",
+      "agent_fix": "add structured errors, telemetry, and repair receipts that tell the next agent where to rerun proof",
+      "evidence": [
+        "no agent-friendly exception pattern found"
+      ],
+      "check_id": "HLT-017-OPAQUE-OBSERVABILITY:observability",
+      "hardness": "soft",
+      "confidence": 0.76,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just score",
+      "fingerprint": "sha256:cbf8cf3bdcb20bbe520845bfe2183ae66b7fe87d99444a3b0f5d15b0ca456c89",
+      "rule_id": "HLT-017-OPAQUE-OBSERVABILITY",
+      "tlr": "Repair",
+      "lane": "observability",
+      "docs_url": "agent/JANKURAI_STANDARD.md#repair-receipts",
+      "owner": "docs"
+    },
+    {
+      "severity": "medium",
+      "category": "release",
+      "path": "docs/testing.md",
+      "problem": "cost or spend-risk surface lacks budget proof",
+      "agent_fix": "add explicit budgets, quotas, stop conditions, and kill-switch evidence for paid or unbounded operations",
+      "evidence": [
+        "cost surface found without budget/stop-condition policy"
+      ],
+      "check_id": "HLT-026-COST-BUDGET-GAP:release",
+      "hardness": "soft",
+      "confidence": 0.88,
+      "evidence_kind": "policy-manifest",
+      "rerun_command": "just check",
+      "fingerprint": "sha256:edd248b7afc24b644107205fa5b84a88103ac4b622009ff9f19b779de8798f59",
+      "rule_id": "HLT-026-COST-BUDGET-GAP",
+      "tlr": "Verification",
+      "lane": "release",
+      "docs_url": "docs/testing.md",
+      "owner": "docs",
+      "matched_term": "budget",
+      "reason": "unbounded paid work needs budgets and stop conditions"
+    },
+    {
+      "severity": "medium",
+      "category": "context",
+      "path": "ops/",
+      "problem": "reference-profile cell `ops` lacks local AGENTS.md guidance",
+      "agent_fix": "add `ops/AGENTS.md` with owns / forbidden / proof lane guidance",
+      "evidence": [
+        "canonical_path=ops/",
+        "detected_paths=.github, .github/workflows",
+        "guidance_status=missing",
+        "owner=ops",
+        "proof_lane=security lane / workflow lint"
+      ],
+      "check_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP:context",
+      "hardness": "soft",
+      "confidence": 0.88,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just fast",
+      "fingerprint": "sha256:afd6d62dcc0304f7e4872a9edce56c957a74d6c2101cdf6218dce16b4297ba55",
+      "rule_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "docs_url": "docs/audit-rubric.md#required-shape",
+      "owner": "agent"
+    }
+  ],
+  "agent_fix_queue": [
+    {
+      "path": "Design System/_ds_bundle.js",
+      "priority": "high",
+      "rule_id": "HLT-002-GENERATED-MUTATION",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "design-system",
+      "task": "add a `Generated by: <tool>` / `DO NOT EDIT BY HAND` header block with source and regeneration command",
+      "why": "generated zone file `Design System/_ds_bundle.js` missing generated header"
+    },
+    {
+      "path": "apps/api/src/repo/account.ts",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "api",
+      "task": "use argv arrays, prepared statements, or a safe allowlisted command path",
+      "why": "raw shell or SQL text is built from untrusted TypeScript input"
+    },
+    {
+      "path": "apps/api/src/repo/families.ts",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "api",
+      "task": "use argv arrays, prepared statements, or a safe allowlisted command path",
+      "why": "raw shell or SQL text is built from untrusted TypeScript input"
+    },
+    {
+      "path": "apps/api/src/routes/families.ts",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "api",
+      "task": "validate the value first, then narrow it with a proof-aware decoder",
+      "why": "unchecked boundary cast or parse result crosses a trust boundary"
+    },
+    {
+      "path": "apps/api/src/routes/instances.ts",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "api",
+      "task": "validate the value first, then narrow it with a proof-aware decoder",
+      "why": "unchecked boundary cast or parse result crosses a trust boundary"
+    },
+    {
+      "path": "apps/api/src/routes/points.ts",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "api",
+      "task": "validate the value first, then narrow it with a proof-aware decoder",
+      "why": "unchecked boundary cast or parse result crosses a trust boundary"
+    },
+    {
+      "path": "apps/api/src/routes/tasks.ts",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "api",
+      "task": "validate the value first, then narrow it with a proof-aware decoder",
+      "why": "unchecked boundary cast or parse result crosses a trust boundary"
+    },
+    {
+      "path": "apps/api/src/services/syncService.ts",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "api",
+      "task": "validate the value first, then narrow it with a proof-aware decoder",
+      "why": "unchecked boundary cast or parse result crosses a trust boundary"
+    },
+    {
+      "path": "apps/api/src/services/taskEngine.ts",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "api",
+      "task": "validate the value first, then narrow it with a proof-aware decoder",
+      "why": "unchecked boundary cast or parse result crosses a trust boundary"
+    },
+    {
+      "path": "apps/web/app/[locale]/(dashboard)/goedkeuren/GoedkeurenClient.tsx",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "web",
+      "task": "remove the broad suppression or scope it to a single justified line",
+      "why": "TypeScript suppression comment hides type checking or lint evidence"
+    },
+    {
+      "path": "apps/web/app/api/v1/[...path]/route.ts",
+      "priority": "high",
+      "rule_id": "HLT-006-DIRECT-DB-WRONG-LAYER",
+      "tlr": "Contracts/data",
+      "lane": "db",
+      "owner": "web",
+      "task": "move SQL and DB clients to `crates/adapters` or `db/`; expose typed application/domain APIs upward",
+      "why": "direct database access appears in a wrong layer"
+    },
+    {
+      "path": "apps/web/lib/auth/jwt.ts",
+      "priority": "high",
+      "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
+      "tlr": "Contracts/data",
+      "lane": "fast",
+      "owner": "web",
+      "task": "validate the value first, then narrow it with a proof-aware decoder",
+      "why": "unchecked boundary cast or parse result crosses a trust boundary"
+    },
+    {
+      "path": "agent/boundaries.toml",
+      "priority": "medium",
+      "rule_id": "HLT-007-HANDWRITTEN-CONTRACT",
+      "tlr": "Contracts/data",
+      "lane": "contract",
+      "owner": "agent",
+      "task": "add generated contracts and boundary checks for public APIs, data access, and cross-runtime seams",
+      "why": "`Contract and boundary integrity` scored 55 below the standard floor of 85"
+    },
+    {
+      "path": "db/",
+      "priority": "medium",
+      "rule_id": "HLT-006-DIRECT-DB-WRONG-LAYER",
+      "tlr": "Contracts/data",
+      "lane": "db",
+      "owner": "tools",
+      "task": "move durable truth into migrations, constraints, adapters, and application-owned transactions",
+      "why": "`Data truth and workflow safety` scored 45 below the standard floor of 85"
+    },
+    {
+      "path": ".",
+      "priority": "high",
+      "tlr": "Verification",
+      "lane": "fast",
+      "task": "add a canonical `setup`, `check`, `test`, or `verify` lane in one root command file",
+      "why": "no one-command setup or validation lane was detected"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "add ops/ci/lib.sh defining shared helpers and tool version pins",
+      "why": "ops/ci/lib.sh is missing"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "add ops/git-hooks/pre-push that runs `bash ops/ci/quality-gates.sh` and wire it via `git config core.hooksPath ops/git-hooks`",
+      "why": "ops/git-hooks/pre-push is missing"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "add scripts/ci-doctor.sh listing every tool the ops/ci scripts depend on",
+      "why": "scripts/ci-doctor.sh is missing"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "add scripts/ci-local.sh exposing each CI lane locally",
+      "why": "scripts/ci-local.sh is missing"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "why": "workflow inlines CI commands instead of delegating to ops/ci/*.sh"
+    },
+    {
+      "path": ".github/workflows/claude.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "why": "workflow inlines CI commands instead of delegating to ops/ci/*.sh"
+    },
+    {
+      "path": ".github/workflows/deploy-prod.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "why": "workflow inlines CI commands instead of delegating to ops/ci/*.sh"
+    },
+    {
+      "path": ".github/workflows/deploy-web.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "why": "workflow inlines CI commands instead of delegating to ops/ci/*.sh"
+    },
+    {
+      "path": ".github/workflows/jankurai.yml",
+      "priority": "high",
+      "rule_id": "HLT-042-CI-LOCAL-PARITY",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "ops",
+      "task": "extract the workflow steps into ops/ci/<lane>.sh and call them with `bash ops/ci/<lane>.sh`",
+      "why": "workflow inlines CI commands instead of delegating to ops/ci/*.sh"
+    },
+    {
+      "path": "agent/test-map.json",
+      "priority": "high",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "agent",
+      "task": "add the narrowest stable prefix and runnable proof command to `agent/test-map.json`",
+      "why": "path `AGENTS.md` has no test-map proof route"
+    },
+    {
+      "path": "docs/release.md",
+      "priority": "high",
+      "rule_id": "HLT-025-RELEASE-READINESS-GAP",
+      "tlr": "Verification",
+      "lane": "release",
+      "owner": "docs",
+      "task": "add a release control surface with version source, changelog, release process docs, CI or script evidence, integrity/provenance evidence, and rollback guidance",
+      "why": "release management structure is incomplete"
+    },
+    {
+      "path": "Justfile",
+      "priority": "medium",
+      "rule_id": "HLT-018-PERF-CONCURRENCY-DRIFT",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "workspace",
+      "task": "add fast deterministic build/test targets, caches, and narrow proof lanes for agent iteration",
+      "why": "`Build speed signals` scored 60 below the standard floor of 85"
+    },
+    {
+      "path": "agent/test-map.json",
+      "priority": "medium",
+      "rule_id": "HLT-004-UNMAPPED-PROOF",
+      "tlr": "Verification",
+      "lane": "fast",
+      "owner": "agent",
+      "task": "route each owned path to a deterministic proof command and make the lane executable in CI",
+      "why": "`Proof lanes and test routing` scored 63 below the standard floor of 85"
+    },
+    {
+      "path": "docs/testing.md",
+      "priority": "medium",
+      "rule_id": "HLT-026-COST-BUDGET-GAP",
+      "tlr": "Verification",
+      "lane": "release",
+      "owner": "docs",
+      "task": "add explicit budgets, quotas, stop conditions, and kill-switch evidence for paid or unbounded operations",
+      "why": "cost or spend-risk surface lacks budget proof"
+    },
+    {
+      "path": "crates/domain",
+      "priority": "high",
+      "rule_id": "HLT-017-OPAQUE-OBSERVABILITY",
+      "tlr": "Repair",
+      "lane": "observability",
+      "owner": "tools",
+      "task": "define a typed exception surface with purpose, reason, common fixes, docs_url, and repair_hint so the next rerun is local",
+      "why": "no agent-friendly exception/error pattern was detected"
+    },
+    {
+      "path": "docs/testing.md",
+      "priority": "medium",
+      "rule_id": "HLT-017-OPAQUE-OBSERVABILITY",
+      "tlr": "Repair",
+      "lane": "observability",
+      "owner": "docs",
+      "task": "add structured errors, telemetry, and repair receipts that tell the next agent where to rerun proof",
+      "why": "`Observability and repair evidence` scored 23 below the standard floor of 85"
+    },
+    {
+      "path": ".github/workflows",
+      "priority": "high",
+      "tlr": "Context/setup",
+      "lane": "audit",
+      "owner": "ops",
+      "task": "add a CI job that runs `jankurai . --json agent/repo-score.json --md agent/repo-score.md` and uploads both artifacts",
+      "why": "CI does not run the jankurai audit lane"
+    },
+    {
+      "path": ".github",
+      "priority": "medium",
+      "rule_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "owner": "agent",
+      "task": "migrate the detected ops surface to `ops/` or document an alternate profile with owner, proof lane, expiry, and migration plan",
+      "why": "reference-profile cell `ops` is detected at a noncanonical path"
+    },
+    {
+      "path": "AGENTS.md",
+      "priority": "medium",
+      "rule_id": "HLT-015-CONTEXT-SETUP-GAP",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "owner": "agent",
+      "task": "keep root guidance short and route durable detail through agent-readable manifests and docs",
+      "why": "`Context economy and agent instructions` scored 71 below the standard floor of 85"
+    },
+    {
+      "path": "agent/owner-map.json",
+      "priority": "medium",
+      "rule_id": "HLT-003-OWNERLESS-PATH",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "owner": "agent",
+      "task": "tighten owner/test maps and root routing until agents can localize ownership without inference",
+      "why": "`Ownership and navigation surface` scored 83 below the standard floor of 85"
+    },
+    {
+      "path": "apps/api/",
+      "priority": "medium",
+      "rule_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "owner": "api",
+      "task": "add `apps/api/AGENTS.md` with owns / forbidden / proof lane guidance",
+      "why": "reference-profile cell `api` lacks local AGENTS.md guidance"
+    },
+    {
+      "path": "apps/web/",
+      "priority": "medium",
+      "rule_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "owner": "web",
+      "task": "add `apps/web/AGENTS.md` with owns / forbidden / proof lane guidance",
+      "why": "reference-profile cell `web` lacks local AGENTS.md guidance"
+    },
+    {
+      "path": "docs/",
+      "priority": "medium",
+      "tlr": "Context/setup",
+      "lane": "audit",
+      "owner": "docs",
+      "task": "add concise docs for architecture, boundaries, tests, generated zones, and audit rules; route them from root `AGENTS.md`",
+      "why": "agent-readable documentation is incomplete"
+    },
+    {
+      "path": "ops/",
+      "priority": "medium",
+      "rule_id": "HLT-038-REFERENCE-PROFILE-STRUCTURE-GAP",
+      "tlr": "Context/setup",
+      "lane": "fast",
+      "owner": "agent",
+      "task": "add `ops/AGENTS.md` with owns / forbidden / proof lane guidance",
+      "why": "reference-profile cell `ops` lacks local AGENTS.md guidance"
+    },
+    {
+      "path": "apps/api/test/account.test.ts",
+      "priority": "critical",
+      "rule_id": "HLT-010-SECRET-SPRAWL",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "api",
+      "task": "remove and rotate the credential, add local and CI secret scanning, and scan transcripts/artifacts/MCP config for related exposure",
+      "why": "secret-like value or credential material appears in repository text"
+    },
+    {
+      "path": ".github/workflows",
+      "priority": "high",
+      "rule_id": "HLT-009-GENERATED-SECURITY",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "add a dedicated security lane with secret scanning, dependency review, and workflow linting",
+      "why": "high-risk repo has no explicit security lane"
+    },
+    {
+      "path": ".github/workflows",
+      "priority": "high",
+      "rule_id": "HLT-016-SUPPLY-CHAIN-DRIFT",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "add secret scanning, dependency review, and SBOM or provenance checks to CI",
+      "why": "no secret or dependency scanning was found in CI"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "add workflow-level concurrency with cancel-in-progress",
+      "why": "workflow is missing concurrency control"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "add top-level `permissions: contents: read` and job-specific write scopes only where needed",
+      "why": "workflow is missing explicit top-level permissions"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "set an explicit timeout-minutes on each job",
+      "why": "workflow job is missing timeout-minutes"
+    },
+    {
+      "path": ".github/workflows/ci.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "pin every external action to a 40-character commit SHA",
+      "why": "workflow uses an external action not pinned to a full commit SHA"
+    },
+    {
+      "path": ".github/workflows/claude.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "add workflow-level concurrency with cancel-in-progress",
+      "why": "workflow is missing concurrency control"
+    },
+    {
+      "path": ".github/workflows/claude.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "set an explicit timeout-minutes on each job",
+      "why": "workflow job is missing timeout-minutes"
+    },
+    {
+      "path": ".github/workflows/claude.yml",
+      "priority": "high",
+      "rule_id": "HLT-024-AGENT-TOOL-SUPPLY-GAP",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "pin and review agent tools, MCP servers, hooks, and rule files; keep untrusted tool output separate from trusted policy",
+      "why": "agent tool or configuration trust surface requires supply-chain evidence"
+    },
+    {
+      "path": ".github/workflows/claude.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "pin every external action to a 40-character commit SHA",
+      "why": "workflow uses an external action not pinned to a full commit SHA"
+    },
+    {
+      "path": ".github/workflows/deploy-prod.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "add top-level `permissions: contents: read` and job-specific write scopes only where needed",
+      "why": "workflow is missing explicit top-level permissions"
+    },
+    {
+      "path": ".github/workflows/deploy-prod.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "set an explicit timeout-minutes on each job",
+      "why": "workflow job is missing timeout-minutes"
+    },
+    {
+      "path": ".github/workflows/deploy-prod.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "pin every external action to a 40-character commit SHA",
+      "why": "workflow uses an external action not pinned to a full commit SHA"
+    },
+    {
+      "path": ".github/workflows/deploy-prod.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "remove the non-blocking override so scan failures stop the pipeline",
+      "why": "security-related job is configured to continue on error"
+    },
+    {
+      "path": ".github/workflows/deploy-web.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "add top-level `permissions: contents: read` and job-specific write scopes only where needed",
+      "why": "workflow is missing explicit top-level permissions"
+    },
+    {
+      "path": ".github/workflows/deploy-web.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "set an explicit timeout-minutes on each job",
+      "why": "workflow job is missing timeout-minutes"
+    },
+    {
+      "path": ".github/workflows/deploy-web.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "pin every external action to a 40-character commit SHA",
+      "why": "workflow uses an external action not pinned to a full commit SHA"
+    },
+    {
+      "path": ".github/workflows/jankurai.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "add workflow-level concurrency with cancel-in-progress",
+      "why": "workflow is missing concurrency control"
+    },
+    {
+      "path": ".github/workflows/jankurai.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "set an explicit timeout-minutes on each job",
+      "why": "workflow job is missing timeout-minutes"
+    },
+    {
+      "path": ".github/workflows/jankurai.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "run `jankurai security run . --strict --profile ci --out target/jankurai/security/evidence.json` before the final audit",
+      "why": "protected workflow lacks strict CI security evidence before final audit"
+    },
+    {
+      "path": ".github/workflows/jankurai.yml",
+      "priority": "high",
+      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "pin every external action to a 40-character commit SHA",
+      "why": "workflow uses an external action not pinned to a full commit SHA"
+    },
+    {
+      "path": "apps/api/src/repo/auth.ts",
+      "priority": "high",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "owner": "api",
+      "task": "collapse fallback chains into explicit typed states with bounded retry policy, telemetry, and documented repair guidance",
+      "why": "fallback soup detected in product code"
+    },
+    {
+      "path": "apps/api/src/repo/badges.ts",
+      "priority": "high",
+      "rule_id": "HLT-023-INPUT-BOUNDARY-GAP",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "api",
+      "task": "replace unsafe sinks with typed schemas, parameterized APIs, allowlists, or sandboxed execution plus negative tests",
+      "why": "unsafe or unvalidated input boundary marker appears in product code"
+    },
+    {
+      "path": "apps/api/src/routes/sync.ts",
+      "priority": "high",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "owner": "api",
+      "task": "remove or rename the marker, implement the intended behavior, model a typed unsupported state, or move docs/generated/vendor/product-copy text into an allowlisted context",
+      "why": "future-hostile/dead-language term `stub` appears in product/runtime code"
+    },
+    {
+      "path": "apps/api/src/routes/sync.ts",
+      "priority": "high",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "owner": "api",
+      "task": "replace placeholders with implemented behavior, typed unsupported-state errors, or a tracked exception record with docs",
+      "why": "product code contains TODO/stub/unimplemented/unreachable placeholder markers"
+    },
+    {
+      "path": "apps/api/src/routes/ws.ts",
+      "priority": "high",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "owner": "api",
+      "task": "remove or rename the marker, implement the intended behavior, model a typed unsupported state, or move docs/generated/vendor/product-copy text into an allowlisted context",
+      "why": "future-hostile/dead-language term `stub` appears in product/runtime code"
+    },
+    {
+      "path": "apps/api/src/services/familyRoom.ts",
+      "priority": "high",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "owner": "api",
+      "task": "remove or rename the marker, implement the intended behavior, model a typed unsupported state, or move docs/generated/vendor/product-copy text into an allowlisted context",
+      "why": "future-hostile/dead-language term `stub` appears in product/runtime code"
+    },
+    {
+      "path": "apps/web",
+      "priority": "high",
+      "rule_id": "HLT-013-RENDERED-UX-GAP",
+      "tlr": "Verification and rendered UX",
+      "lane": "web",
+      "owner": "tools",
+      "task": "add Storybook state coverage, Playwright screenshots, visual review or `@jankurai/ux-qa`, accessibility scans, CLS checks, generated mocks, and design tokens",
+      "why": "web surface lacks layered rendered UX QA evidence"
+    },
+    {
+      "path": ".",
+      "priority": "medium",
+      "rule_id": "HLT-001-DEAD-MARKER",
+      "tlr": "Entropy",
+      "lane": "fast",
+      "owner": "tools",
+      "task": "split large or ambiguous authored code into smaller semantic modules with focused tests",
+      "why": "`Code shape and semantic surface` scored 0 below the standard floor of 85"
+    },
+    {
+      "path": ".github/workflows/jankurai.yml",
+      "priority": "medium",
+      "rule_id": "HLT-016-SUPPLY-CHAIN-DRIFT",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "ops",
+      "task": "wire secret, dependency, provenance, and workflow scans into an operational CI lane",
+      "why": "`Security and supply-chain posture` scored 26 below the standard floor of 85"
+    }
+  ]
+}

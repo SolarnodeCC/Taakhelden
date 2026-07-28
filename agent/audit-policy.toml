@@ -1,0 +1,41 @@
+# jankurai scan policy — see docs/audit-rubric.md.
+#
+# Tuned down from the tool's own defaults (minimum_score=85,
+# fail_on=["critical","high"]) because this repo's *current* baseline score is
+# 46 with 78 critical/high findings — a mix of real, low-severity nudges (see
+# .github/workflows/jankurai.yml's comment: unvalidated JSON.parse-as-cast in
+# several apps/api files) and confirmed heuristic false positives (Durable
+# Object `.stub` calls read as "vibe-coding stub" markers; whitelisted-column
+# dynamic SQL read as injection risk). At the tool's defaults, `mode: ratchet`
+# would fail on every PR from day one regardless of what the PR changes, since
+# there's no per-finding suppression mechanism to silence the false positives.
+# fail_on=[] does not hide any finding — they still lower the score and show
+# in the repair queue; it only stops them from being an absolute pass/fail
+# gate. See agent/baselines/README.md for what ratchet mode actually enforces
+# (score must not regress, no *new* hard findings — existing ones don't block).
+# Raise minimum_score / restore fail_on as real findings get fixed.
+minimum_score = 40
+fail_on = []
+advisory_on = ["medium", "low"]
+
+[history]
+max_rows = 500
+max_bytes = 1048576
+dedupe = "consecutive-equivalent"
+mirror_env = "JANKURAI_HISTORY_MIRROR"
+mirror_required = false
+mirror_max_rows = 5000
+
+[scan]
+# Design System/ is a standalone JS/JSX prototype + component-preview surface
+# (readme.md, _ds_manifest.json, ui_kits/, component .card.html previews) that
+# documents the token/component contract for apps/web and apps/ios. It is never
+# built or shipped — see CLAUDE.md's "UI & Design" section. Excluding it keeps
+# the audit's product-code heuristics (dead-marker/vibe-language, code-shape,
+# duplication) scoped to what actually ships; it does not exempt apps/web or
+# apps/api from any check.
+excluded_paths = ["Design System/"]
+
+[smart_scan]
+full_scan_interval_secs = 3600
+roulette_rate = 0.10

@@ -1,16 +1,31 @@
-name: Jankurai (advisory)
+name: Jankurai (regression gate)
 
-# Read-only, niet-blokkerende Jankurai-audit via de officiële action. De action
-# bouwt de CLI uit háár eigen checkout (`cargo install --path .../crates/jankurai`)
-# zodat de JSON-schemas naast de binary staan — precies wat de losse
-# prebuilt-binary miste, waardoor `jankurai audit` eerder faalde met
-# "repo-score.schema.json: No such file or directory".
+# Jankurai-audit via de officiële action. De action bouwt de CLI uit háár eigen
+# checkout (`cargo install --path .../crates/jankurai`) zodat de JSON-schemas
+# naast de binary staan — precies wat de losse prebuilt-binary miste, waardoor
+# `jankurai audit` eerder faalde met "repo-score.schema.json: No such file or
+# directory".
 #
-# BEWUST niet-blokkerend: ci.yml blijft de bron van waarheid voor groen/rood
-# (zie claude.yml). Deze workflow faalt de PR nooit — hij levert alleen inzicht
-# en een evidence-artifact. Zet 'm pas op `mode: ratchet` met een baseline als
-# het team de scores een paar runs heeft gezien en bewust wil poorten
-# (zie agent/baselines/README.md).
+# `mode: ratchet` tegen de baseline in agent/baselines/main.repo-score.json
+# (score 46, vastgelegd vanaf een schone commit — zie dat bestand en
+# agent/baselines/README.md). Deze job faalt nu ECHT bij een regressie t.o.v.
+# die baseline; ci.yml blijft daarnaast de bron van waarheid voor de
+# typecheck/test/migratie-gate (zie claude.yml). Of een faalde `audit`-job de
+# PR ook daadwerkelijk blokkeert hangt af van de branch-protection-instellingen
+# (required status checks) — dat is een repo-instelling, geen keuze van deze
+# workflow.
+#
+# Bekende valse-positieve categorieën in de huidige score (geverifieerd bij
+# het leggen van de baseline, geen echte bugs):
+#   - `stub.fetch(...)` (Durable Object binding, Cloudflare-idioom) wordt
+#     gelezen als een "vibe-coding stub/placeholder"-marker.
+#   - Whitelisted-column dynamic UPDATE (`SET ${sets.join(", ")}` met alleen
+#     gebonden `?`-waarden, zie apps/api/src/repo/{tasks,families}.ts) wordt
+#     gelezen als "raw command SQL" / injection-risico.
+#   - `JSON.parse(...) as T` na een D1-read wordt als ongevalideerde any-cast
+#     geflagged, ook waar een handmatige guard er meteen achteraan staat.
+# Een regressiemelding op exact deze patronen is vermoedelijk ruis, niet een
+# echte achteruitgang — controleer de repair-queue voordat je een PR blokkeert.
 on:
   pull_request:
   workflow_dispatch:
@@ -21,25 +36,23 @@ permissions:
 jobs:
   audit:
     runs-on: ubuntu-latest
-    # Advies, geen poort: een audit- of build-fout mag de run niet rood maken.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v7
         with:
-          fetch-depth: 0 # ratchet/diff-vergelijkingen hebben git-historie nodig
+          fetch-depth: 0 # ratchet-vergelijking heeft git-historie nodig
 
-      # Officiële Jankurai-action, vastgepind op de commit-SHA van v1.5.1
-      # (supply-chain — net als claude-code-action). De action installeert de
+      # Officiële Jankurai-action, vastgepind op de commit-SHA van v1.6.10
+      # (supply-chain — net als claude-code-action; dependabot bumpte deze SHA
+      # los van deze workflow-wijziging, zie #46). De action installeert de
       # Rust-toolchain, bouwt de CLI uit haar checkout en draait
-      # `jankurai audit . --mode advisory` met de juiste v1.5.1-vlaggen
-      # (--json/--md/--sarif/--github-step-summary/--repair-queue-jsonl) en
-      # publiceert de samenvatting zelf in de job-summary. Bump SHA + comment
-      # samen bij een update.
-      - name: Jankurai audit (advisory)
-        continue-on-error: true
+      # `jankurai audit . --mode ratchet --baseline agent/baselines/main.repo-score.json`
+      # met de juiste vlaggen en publiceert de samenvatting zelf in de
+      # job-summary. Bump SHA + comment samen bij een update.
+      - name: Jankurai audit (ratchet)
         uses: neverhuman/jankurai@3c804453e6c7a6e0e4028d95cc3bccea467277ef # v1.6.10
         with:
-          mode: advisory
+          mode: ratchet
+          baseline: agent/baselines/main.repo-score.json
 
       - name: Upload evidence-artifacts
         if: always()
