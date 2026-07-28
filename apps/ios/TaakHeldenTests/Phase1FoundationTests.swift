@@ -59,8 +59,12 @@ final class Phase1FoundationTests: XCTestCase {
         keychain.saveValue(try encoder.encode(session), for: .childSession)
 
         let store = AuthStore(previewKeychain: keychain)
-        XCTAssertEqual(store.restoredRoute, .childHome)
+        // Cold start with a stored child session still requires daily unlock.
+        XCTAssertEqual(store.restoredRoute, .childUnlock)
         XCTAssertEqual(store.childSession?.displayName, "Sam")
+
+        store.unlockChildSession()
+        XCTAssertEqual(store.restoredRoute, .childHome)
     }
 
     private func contrastRatio(foreground: THColorToken, background: THColorToken) -> Double {
