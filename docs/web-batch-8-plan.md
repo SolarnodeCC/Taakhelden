@@ -95,15 +95,18 @@ Onder de bestaande sectie **Ouders & verzorgers** (Batch 7: read-only lijst):
 
 Publieke pagina (niet in dashboard-layout), parallel aan `/login` / `/register`.
 
-- **URL**: `/uitnodiging?token=…` — moet matchen met
-  `sendParentInvite` → `${APP_BASE_URL}/uitnodiging?token=…`.
-  Let op: web heeft locale-prefix (`/nl/uitnodiging` of `/en/…`). Opties:
-  1. **Aanbevolen**: e-mail-link wijst naar `APP_BASE_URL` **zonder** locale;
-     middleware/`next-intl` redirect `/uitnodiging` → `/nl/uitnodiging` (of
-     Accept-Language). Controleer of huidige middleware dat al doet voor
-     onbekende paths; zo niet: rewrite/redirect toevoegen.
-  2. Alternatief: `APP_BASE_URL` in de API zetten op `https://…/nl` — breekbaar.
-  3. Alternatief: API-mail aanpassen naar `…/nl/uitnodiging` — vereist API-PR.
+- **URL**: `/[locale]/uitnodiging?token=…`.
+  - **Besloten (via Resend):** de accept-link in de uitnodigingsmail
+    (`sendParentInvite` → Resend) bevat het **locale-pad**, bijv.
+    `{APP_BASE_URL}/nl/uitnodiging?token=…`. Default locale `nl` tenzij we de
+    locale van de uitnodigende ouder kunnen meenemen (Batch 8: hardcode `nl`
+    in de mail-URL is ok; EN-ouders krijgen dezelfde NL-link of we lezen
+    `Accept-Language`/ouder-voorkeur later).
+  - Dit is een **kleine API-aanpassing** in `apps/api/src/services/email.ts`
+    (Resend `text`/`html` link) — geen Next.js middleware-redirect als
+    primaire oplossing.
+  - UI toont na invite alsnog een kopieerbare link met het actieve locale van
+    het dashboard (`/{locale}/uitnodiging?token=…`), voor dev zonder mail.
 - **Velden** (`ParentAcceptBody`):
   - `token` — uit query (hidden/read-only in form)
   - `password` (min. **8** — let op: register vereist 10)
@@ -119,8 +122,8 @@ Publieke pagina (niet in dashboard-layout), parallel aan `/login` / `/register`.
 - **Foutcodes**: `INVALID_INVITE`, `VALIDATION_FAILED`, generic. Copy: “Deze
   uitnodiging is verlopen of al gebruikt — vraag de andere ouder om een nieuwe.”
 - **Lege/ontbrekende token**: vriendelijke fout + link naar login.
-- **Al ingelogd**: uitloggen of waarschuwen? Voorstel: sessie overschrijven met
-  de nieuwe tokens (simpelst); open vraag hieronder.
+- **Al ingelogd**: **sessie overschrijven** met de nieuwe tokens (besloten) —
+  geen aparte uitlog-stap.
 
 ### 3. Gezinsinstellingen (sectie op `/gezin`)
 
@@ -136,8 +139,9 @@ onder kinderen — voorstel: na gezinscode, vóór kinderen).
 - **Formulier** → `PATCH /api/v1/families/me` (`FamilyPatchBody`, partial ok;
   stuur gewijzigde of alle zichtbare velden).
 - **UI-notities**:
-  - Timezone: select met gangbare IANA-zones (minimaal `Europe/Amsterdam` +
-    een korte allowlist NL/BE/DE/…); geen vrije tekst zonder validatie.
+  - Timezone: **volledige IANA-lijst** via `Intl.supportedValuesOf("timeZone")`
+    (browser); default/huidige waarde `Europe/Amsterdam`. Zoekbaar/filterbaar
+    select (lange lijst).
   - Quiet hours: twee `type="time"` inputs → `HH:MM`.
   - Bonussen: number inputs (≥0); threshold als percentage 50–100% in UI,
     opslaan als 0.5–1.
@@ -180,8 +184,8 @@ zoals Gezin is voldoende voor deze batch als consistent.
   `console` (architectuurregel 5).
 - **Design**: ouder-register; primitives `Field`/`Input`/`Button`/`Card`/`Alert`.
   Geen kid-chrome. Tokens, geen ruwe hex.
-- **E-mail / locale**: zie open vraag 2 — middleware-redirect is de voorkeur
-  zodat de API-mail-URL (`/uitnodiging?token=`) blijft werken.
+- **E-mail / locale**: Resend-mail krijgt locale in het pad (`/nl/uitnodiging`);
+  dashboard-UI toont locale van de huidige sessie in de kopieer-link.
 
 ## Tests & kwaliteit
 
@@ -202,9 +206,9 @@ zoals Gezin is voldoende voor deze batch als consistent.
 
 ## Definition of done
 
-- [ ] Full parent kan co-ouder uitnodigen (e-mail + rol); token/link zichtbaar.
-- [ ] Publieke `/uitnodiging` accepteert token + wachtwoord; cookies gezet;
-      redirect Vandaag.
+- [ ] Resend-uitnodigingsmail linkt naar `/{locale}/uitnodiging?token=…`
+      (API `email.ts`); UI toont token/link altijd na create.
+- [ ] Accept overschrijft bestaande sessie-cookies.
 - [ ] Gezinsinstellingen (naam, timezone, quiet hours, bonussen, vakantie)
       lezen en opslaan via `PATCH /families/me`.
 - [ ] `approve_only` geblocked op `/taken`, `/winkel`, `/gezin` (niet alleen nav).
@@ -221,23 +225,21 @@ zoals Gezin is voldoende voor deze batch als consistent.
 | 2 | Opa opent link, kiest wachtwoord | Ingelogd; ziet Vandaag + Goedkeuren; geen Taken/Winkel/Gezin |
 | 3 | Verlopen/ongeldige token | Duidelijke `INVALID_INVITE`-melding |
 | 4 | Invite met bestaand e-mailadres | `EMAIL_IN_USE` |
-| 5 | Quiet hours + vakantie opslaan | Waarden blijven na refresh |
+| 5 | Quiet hours + vakantie + IANA-timezone opslaan | Waarden blijven na refresh |
 | 6 | `approve_only` opent `/taken` | Guard-melding, geen CRUD |
 | 7 | Locale EN | Alle nieuwe copy in het Engels |
+| 8 | Resend-mail (met secrets) | Link opent `/nl/uitnodiging?token=…` |
+| 9 | Al ingelogd + accept-link | Nieuwe sessie actief; oude cookies overschreven |
 
-## Open vragen voor review
+## Beslissingen (review vastgelegd)
 
-1. **Akkoord met scope** Co-ouder + gezinsinstellingen + route-guards op
-   `/gezin` / `/uitnodiging`, zonder aparte `/instellingen`-nav?
-2. **Locale in uitnodigingsmail**: middleware-redirect `/uitnodiging` →
-   `/nl/uitnodiging` (voorstel) vs. API-mail aanpassen naar locale-pad?
-3. **Pending invite opnieuw tonen**: alleen direct na create (token eenmalig in
-   UI), of token nergens bewaren en alleen “mail verstuurd” tonen? Voorstel:
-   **toon token/link altijd na create** (dev + prod zonder mail).
-4. **Al ingelogd op `/uitnodiging`**: sessie overschrijven (voorstel) vs.
-   eerst uitloggen eisen?
-5. **Timezone-lijst**: korte allowlist (NL-focus) of volledige IANA? Voorstel:
-   korte allowlist + default `Europe/Amsterdam`.
+| # | Vraag | Besluit |
+| --- | --- | --- |
+| 1 | Scope | **Akkoord** — co-ouder + gezinsinstellingen + guards op `/gezin` / `/uitnodiging`; geen aparte `/instellingen`-nav. |
+| 2 | Locale in mail-URL | **Via Resend** — API `sendParentInvite` zet locale in de link (`/nl/uitnodiging?token=…`). Geen middleware-redirect als primaire oplossing. |
+| 3 | Token na create | **Altijd tonen** met kopieerbare link (ook als mail no-op is). |
+| 4 | Al ingelogd op accept | **Sessie overschrijven** met nieuwe tokens. |
+| 5 | Timezone | **Volledige IANA-lijst** (`Intl.supportedValuesOf("timeZone")`), default `Europe/Amsterdam`. |
 
 ## Agents / skills bij implementatie
 
