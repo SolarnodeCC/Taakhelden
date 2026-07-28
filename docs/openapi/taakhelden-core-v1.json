@@ -3,7 +3,7 @@
   "info": {
     "title": "TaakHelden core API",
     "version": "0.1.0",
-    "description": "Generated core contract snapshot from packages/shared. Focused on the endpoints the web dashboard and iOS phase-0 foundation depend on."
+    "description": "Generated core contract snapshot from packages/shared. Covers web dashboard and iOS Phase 1 endpoints."
   },
   "servers": [
     {
@@ -55,6 +55,85 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/LoginBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentSessionResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/apple": {
+      "post": {
+        "summary": "Sign in with Apple",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppleAuthBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentSessionResult"
+                }
+              }
+            }
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentSessionResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "summary": "Rotate a parent refresh token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshBody"
               }
             }
           }
@@ -186,6 +265,41 @@
         }
       }
     },
+    "/members/children": {
+      "post": {
+        "summary": "Create a child profile",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberView"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChildBody"
+              }
+            }
+          }
+        }
+      }
+    },
     "/families/me": {
       "get": {
         "summary": "Read the current family",
@@ -225,6 +339,121 @@
             }
           },
           "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instances/{id}/complete": {
+      "post": {
+        "summary": "Complete a task instance",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompleteResult"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instances/{id}/undo": {
+      "post": {
+        "summary": "Undo a recent completion",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstanceView"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instances/{id}/photo": {
+      "post": {
+        "summary": "Attach a ready photo to an instance",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AttachPhotoBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CompleteResult"
+                }
+              }
+            }
+          },
+          "409": {
             "content": {
               "application/json": {
                 "schema": {
@@ -286,6 +515,41 @@
         }
       }
     },
+    "/rewards/{id}/redeem": {
+      "post": {
+        "summary": "Redeem a reward",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedeemResult"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/redemptions": {
       "get": {
         "summary": "Read redemptions for the current viewer",
@@ -295,6 +559,181 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RedemptionsViewerResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/sync": {
+      "post": {
+        "summary": "Batch offline sync",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SyncBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SyncResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/photos/upload-intent": {
+      "post": {
+        "summary": "Create a photo upload intent",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadIntentBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadIntentResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/photos/{id}/confirm": {
+      "post": {
+        "summary": "Confirm an uploaded photo",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhotoConfirmResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/photos/{id}": {
+      "get": {
+        "summary": "Read photo status",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PhotoStatusResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/devices": {
+      "post": {
+        "summary": "Register an APNs device token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeviceBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeviceOkResponse"
                 }
               }
             }
@@ -521,6 +960,34 @@
           }
         }
       },
+      "AppleAuthBody": {
+        "$ref": "#/definitions/AppleAuthBody",
+        "definitions": {
+          "AppleAuthBody": {
+            "type": "object",
+            "properties": {
+              "identityToken": {
+                "type": "string",
+                "minLength": 1
+              },
+              "familyName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 50
+              },
+              "displayName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 30
+              }
+            },
+            "required": [
+              "identityToken"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
       "FamilyCodeBody": {
         "$ref": "#/definitions/FamilyCodeBody",
         "definitions": {
@@ -726,6 +1193,85 @@
           }
         }
       },
+      "CreateChildBody": {
+        "$ref": "#/definitions/CreateChildBody",
+        "definitions": {
+          "CreateChildBody": {
+            "type": "object",
+            "properties": {
+              "displayName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 30
+              },
+              "birthYear": {
+                "type": "integer",
+                "minimum": 2005,
+                "maximum": 2023
+              },
+              "avatarId": {
+                "type": "string"
+              },
+              "pincode": {
+                "type": "string",
+                "pattern": "^\\d{4}$"
+              }
+            },
+            "required": [
+              "displayName",
+              "birthYear",
+              "pincode"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "MemberView": {
+        "$ref": "#/definitions/MemberView",
+        "definitions": {
+          "MemberView": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "parent",
+                  "child"
+                ]
+              },
+              "displayName": {
+                "type": "string"
+              },
+              "avatarId": {
+                "type": "string",
+                "nullable": true
+              },
+              "ageMode": {
+                "type": "string",
+                "enum": [
+                  "young",
+                  "mid",
+                  "teen"
+                ]
+              },
+              "birthYear": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "role",
+              "displayName",
+              "avatarId",
+              "ageMode"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
       "AccountDeleteBody": {
         "$ref": "#/definitions/AccountDeleteBody",
         "definitions": {
@@ -862,6 +1408,110 @@
                 "additionalProperties": false
               }
             ]
+          }
+        }
+      },
+      "InstanceView": {
+        "$ref": "#/definitions/InstanceView",
+        "definitions": {
+          "InstanceView": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "taskId": {
+                "type": "string"
+              },
+              "childId": {
+                "type": "string"
+              },
+              "date": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "open",
+                  "completed",
+                  "submitted",
+                  "open_redo",
+                  "approved"
+                ]
+              },
+              "title": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string",
+                "nullable": true
+              },
+              "category": {
+                "type": "string"
+              },
+              "points": {
+                "type": "integer"
+              },
+              "photoBonusPoints": {
+                "type": "integer"
+              },
+              "approvalRequired": {
+                "type": "boolean"
+              },
+              "daypart": {
+                "type": "string",
+                "nullable": true
+              },
+              "photoId": {
+                "type": "string",
+                "nullable": true
+              },
+              "photoStatus": {
+                "type": "string",
+                "enum": [
+                  "processing",
+                  "ready"
+                ],
+                "nullable": true
+              },
+              "pointsEarned": {
+                "type": "integer",
+                "nullable": true
+              },
+              "redoNote": {
+                "type": "string",
+                "nullable": true
+              },
+              "completedAt": {
+                "type": "string",
+                "nullable": true
+              },
+              "approvedAt": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "taskId",
+              "childId",
+              "date",
+              "status",
+              "title",
+              "icon",
+              "category",
+              "points",
+              "photoBonusPoints",
+              "approvalRequired",
+              "daypart",
+              "photoId",
+              "photoStatus",
+              "pointsEarned",
+              "redoNote",
+              "completedAt",
+              "approvedAt"
+            ],
+            "additionalProperties": false
           }
         }
       },
@@ -1580,6 +2230,80 @@
           }
         }
       },
+      "CompleteResult": {
+        "$ref": "#/definitions/CompleteResult",
+        "definitions": {
+          "CompleteResult": {
+            "type": "object",
+            "properties": {
+              "pointsEarned": {
+                "type": "integer"
+              },
+              "photoBonusPoints": {
+                "type": "integer"
+              },
+              "dayBonusEarned": {
+                "type": "boolean"
+              },
+              "weekBonusEarned": {
+                "type": "boolean"
+              },
+              "newBadges": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "icon": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "icon"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "newBalance": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "pointsEarned",
+              "photoBonusPoints",
+              "dayBonusEarned",
+              "weekBonusEarned",
+              "newBadges",
+              "newBalance"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "AttachPhotoBody": {
+        "$ref": "#/definitions/AttachPhotoBody",
+        "definitions": {
+          "AttachPhotoBody": {
+            "type": "object",
+            "properties": {
+              "photoId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "photoId"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
       "Balance": {
         "$ref": "#/definitions/Balance",
         "definitions": {
@@ -1883,6 +2607,42 @@
           }
         }
       },
+      "RedeemResult": {
+        "$ref": "#/definitions/RedeemResult",
+        "definitions": {
+          "RedeemResult": {
+            "type": "object",
+            "properties": {
+              "redemptionId": {
+                "type": "string"
+              },
+              "rewardId": {
+                "type": "string"
+              },
+              "price": {
+                "type": "integer"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending"
+                ]
+              },
+              "newBalance": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "redemptionId",
+              "rewardId",
+              "price",
+              "status",
+              "newBalance"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
       "RedemptionsViewerResponse": {
         "$ref": "#/definitions/RedemptionsViewerResponse",
         "definitions": {
@@ -2029,6 +2789,525 @@
                 "additionalProperties": false
               }
             ]
+          }
+        }
+      },
+      "SyncBody": {
+        "$ref": "#/definitions/SyncBody",
+        "definitions": {
+          "SyncBody": {
+            "type": "object",
+            "properties": {
+              "since": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "mutations": {
+                "type": "array",
+                "items": {
+                  "anyOf": [
+                    {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "complete"
+                          ]
+                        },
+                        "instanceId": {
+                          "type": "string"
+                        },
+                        "at": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "op",
+                        "instanceId"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "undo"
+                          ]
+                        },
+                        "instanceId": {
+                          "type": "string"
+                        },
+                        "at": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "op",
+                        "instanceId"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "redeem"
+                          ]
+                        },
+                        "rewardId": {
+                          "type": "string"
+                        },
+                        "at": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "op",
+                        "rewardId"
+                      ],
+                      "additionalProperties": false
+                    },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "key": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "op": {
+                          "type": "string",
+                          "enum": [
+                            "attach_photo"
+                          ]
+                        },
+                        "instanceId": {
+                          "type": "string"
+                        },
+                        "photoId": {
+                          "type": "string"
+                        },
+                        "at": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "key",
+                        "op",
+                        "instanceId",
+                        "photoId"
+                      ],
+                      "additionalProperties": false
+                    }
+                  ]
+                },
+                "maxItems": 200
+              }
+            },
+            "required": [
+              "mutations"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "SyncResponse": {
+        "$ref": "#/definitions/SyncResponse",
+        "definitions": {
+          "SyncResponse": {
+            "type": "object",
+            "properties": {
+              "results": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "applied",
+                        "rejected"
+                      ]
+                    },
+                    "points": {
+                      "type": "integer"
+                    },
+                    "newBalance": {
+                      "type": "integer"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "status"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "changes": {
+                "type": "object",
+                "properties": {
+                  "ledger": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": {}
+                    }
+                  },
+                  "instances": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "taskId": {
+                          "type": "string"
+                        },
+                        "childId": {
+                          "type": "string"
+                        },
+                        "date": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "open",
+                            "completed",
+                            "submitted",
+                            "open_redo",
+                            "approved"
+                          ]
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "category": {
+                          "type": "string"
+                        },
+                        "points": {
+                          "type": "integer"
+                        },
+                        "photoBonusPoints": {
+                          "type": "integer"
+                        },
+                        "approvalRequired": {
+                          "type": "boolean"
+                        },
+                        "daypart": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "photoId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "photoStatus": {
+                          "type": "string",
+                          "enum": [
+                            "processing",
+                            "ready"
+                          ],
+                          "nullable": true
+                        },
+                        "pointsEarned": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "redoNote": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "completedAt": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "approvedAt": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "taskId",
+                        "childId",
+                        "date",
+                        "status",
+                        "title",
+                        "icon",
+                        "category",
+                        "points",
+                        "photoBonusPoints",
+                        "approvalRequired",
+                        "daypart",
+                        "photoId",
+                        "photoStatus",
+                        "pointsEarned",
+                        "redoNote",
+                        "completedAt",
+                        "approvedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "rewards": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "price": {
+                          "type": "integer"
+                        },
+                        "limitPerWeek": {
+                          "type": "integer",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "icon",
+                        "price",
+                        "limitPerWeek"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "ledger",
+                  "instances"
+                ],
+                "additionalProperties": false
+              },
+              "serverTime": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "results",
+              "changes",
+              "serverTime"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "UploadIntentBody": {
+        "$ref": "#/definitions/UploadIntentBody",
+        "definitions": {
+          "UploadIntentBody": {
+            "type": "object",
+            "properties": {
+              "purpose": {
+                "type": "string",
+                "enum": [
+                  "task",
+                  "profile"
+                ]
+              },
+              "instanceId": {
+                "type": "string"
+              },
+              "memberId": {
+                "type": "string"
+              },
+              "contentType": {
+                "type": "string",
+                "enum": [
+                  "image/jpeg",
+                  "image/heic",
+                  "image/png"
+                ]
+              },
+              "bytes": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10485760
+              }
+            },
+            "required": [
+              "purpose",
+              "contentType",
+              "bytes"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "UploadIntentResponse": {
+        "$ref": "#/definitions/UploadIntentResponse",
+        "definitions": {
+          "UploadIntentResponse": {
+            "type": "object",
+            "properties": {
+              "photoId": {
+                "type": "string"
+              },
+              "uploadUrl": {
+                "type": "string",
+                "format": "uri"
+              }
+            },
+            "required": [
+              "photoId",
+              "uploadUrl"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "PhotoStatusResponse": {
+        "$ref": "#/definitions/PhotoStatusResponse",
+        "definitions": {
+          "PhotoStatusResponse": {
+            "type": "object",
+            "properties": {
+              "photoId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "intent",
+                  "uploaded",
+                  "processing",
+                  "ready",
+                  "failed"
+                ]
+              },
+              "url": {
+                "type": "string",
+                "format": "uri",
+                "nullable": true
+              }
+            },
+            "required": [
+              "photoId",
+              "status",
+              "url"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "PhotoConfirmResponse": {
+        "$ref": "#/definitions/PhotoConfirmResponse",
+        "definitions": {
+          "PhotoConfirmResponse": {
+            "type": "object",
+            "properties": {
+              "photoId": {
+                "type": "string"
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "intent",
+                  "uploaded",
+                  "processing",
+                  "ready",
+                  "failed"
+                ]
+              }
+            },
+            "required": [
+              "photoId",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "DeviceBody": {
+        "$ref": "#/definitions/DeviceBody",
+        "definitions": {
+          "DeviceBody": {
+            "type": "object",
+            "properties": {
+              "apnsToken": {
+                "type": "string",
+                "minLength": 16,
+                "maxLength": 200
+              },
+              "platform": {
+                "type": "string",
+                "enum": [
+                  "ios"
+                ],
+                "default": "ios"
+              },
+              "userId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "apnsToken"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "DeviceOkResponse": {
+        "$ref": "#/definitions/DeviceOkResponse",
+        "definitions": {
+          "DeviceOkResponse": {
+            "type": "object",
+            "properties": {
+              "ok": {
+                "type": "boolean",
+                "enum": [
+                  true
+                ]
+              }
+            },
+            "required": [
+              "ok"
+            ],
+            "additionalProperties": false
           }
         }
       },

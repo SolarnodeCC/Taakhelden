@@ -26,6 +26,20 @@ jobs:
           else
             echo "present=false" >> "$GITHUB_OUTPUT"
           fi
+      - name: Install XcodeGen
+        if: steps.detect.outputs.present == 'true'
+        run: brew install xcodegen
+      - name: Generate Xcode project
+        if: steps.detect.outputs.present == 'true'
+        run: cd apps/ios && xcodegen generate
+      - name: Build and test iOS target
+        if: steps.detect.outputs.present == 'true'
+        run: |
+          cd apps/ios
+          xcodebuild test \
+            -scheme TaakHelden \
+            -destination 'platform=iOS Simulator,name=iPhone 16' \
+            -quiet
       - name: Placeholder until iOS source lands
         if: steps.detect.outputs.present == 'false'
         run: echo "No Xcode project yet; workflow currently enforces the shared contract snapshot only."

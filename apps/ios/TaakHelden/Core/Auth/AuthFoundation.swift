@@ -4,6 +4,7 @@ import Observation
 enum AppRestoreRoute {
     case welcome
     case parentOnboarding
+    case childUnlock
     case childHome
 }
 
@@ -23,8 +24,8 @@ enum ChildAgeBand: String, Codable, Equatable {
 }
 
 struct ParentSession: Codable, Equatable {
-    let accessToken: String
-    let refreshToken: String
+    var accessToken: String
+    var refreshToken: String
     let familyID: String
     let userID: String
 }
@@ -34,19 +35,25 @@ struct StoredChildSession: Codable, Equatable {
     let displayName: String
     let avatar: String
     let ageBand: ChildAgeBand
-    let accessToken: String
-    let refreshToken: String
-    let biometricsEnabled: Bool
+    var accessToken: String
+    var refreshToken: String
+    var biometricsEnabled: Bool
 }
 
 enum KeychainKey: String {
     case parentSession
     case childSession
+    case childPIN
 }
 
 protocol KeychainStore {
     func loadValue(for key: KeychainKey) -> Data?
     func saveValue(_ value: Data, for key: KeychainKey)
+    func deleteValue(for key: KeychainKey)
+}
+
+extension KeychainStore {
+    func deleteValue(for key: KeychainKey) {}
 }
 
 final class InMemoryKeychainStore: KeychainStore {
@@ -59,14 +66,10 @@ final class InMemoryKeychainStore: KeychainStore {
     func saveValue(_ value: Data, for key: KeychainKey) {
         storage[key] = value
     }
-}
 
-protocol LocalAuthenticationClient {
-    func canEvaluateBiometrics() -> Bool
-}
-
-struct PreviewLocalAuthenticationClient: LocalAuthenticationClient {
-    func canEvaluateBiometrics() -> Bool { true }
+    func deleteValue(for key: KeychainKey) {
+        storage[key] = nil
+    }
 }
 
 @Observable
@@ -77,15 +80,21 @@ final class AuthStore {
 
     var parentSession: ParentSession?
     var childSession: StoredChildSession?
+    var isChildUnlocked = false
 
-    init(keychain: KeychainStore = InMemoryKeychainStore()) {
+    init(keychain: KeychainStore = SystemKeychainStore()) {
         self.keychain = keychain
+        restoreSessions()
+    }
+
+    init(previewKeychain: KeychainStore) {
+        self.keychain = previewKeychain
         restoreSessions()
     }
 
     var restoredRoute: AppRestoreRoute {
         if childSession != nil {
-            return .childHome
+            return isChildUnlocked ? .childHome : .childUnlock
         }
 
         if parentSession != nil {
@@ -97,12 +106,18 @@ final class AuthStore {
 
     func storeParentSession(_ session: ParentSession) {
         parentSession = session
-        if let data = try? encoder.encode(session) {
-            keychain.saveValue(data, for: .parentSession)
-        }
+        persistParent()
     }
 
-    func storeChildSession(_ session: ChildSession, biometricsEnabled: Bool = false) {
+    func updateParentTokens(accessToken: String, refreshToken: String) {
+        guard var session = parentSession else { return }
+        session.accessToken = accessToken
+        session.refreshToken = refreshToken
+        parentSession = session
+        persistParent()
+    }
+
+    func storeChildSession(_ session: ChildSession, biometricsEnabled: Bool = false, pin: String) {
         let stored = StoredChildSession(
             childID: session.childID,
             displayName: session.displayName,
@@ -113,8 +128,51 @@ final class AuthStore {
             biometricsEnabled: biometricsEnabled
         )
         childSession = stored
+        isChildUnlocked = true
         if let data = try? encoder.encode(stored) {
             keychain.saveValue(data, for: .childSession)
+        }
+        if let pinData = pin.data(using: .utf8) {
+            keychain.saveValue(pinData, for: .childPIN)
+        }
+    }
+
+    func updateChildTokens(accessToken: String, refreshToken: String) {
+        guard var session = childSession else { return }
+        session.accessToken = accessToken
+        session.refreshToken = refreshToken
+        childSession = session
+        if let data = try? encoder.encode(session) {
+            keychain.saveValue(data, for: .childSession)
+        }
+    }
+
+    func verifyPIN(_ pin: String) -> Bool {
+        guard let stored = keychain.loadValue(for: .childPIN),
+              let storedPIN = String(data: stored, encoding: .utf8) else {
+            return false
+        }
+        return storedPIN == pin
+    }
+
+    func lockChildSession() {
+        isChildUnlocked = false
+    }
+
+    func unlockChildSession() {
+        isChildUnlocked = true
+    }
+
+    func clearChildSession() {
+        childSession = nil
+        isChildUnlocked = false
+        keychain.deleteValue(for: .childSession)
+        keychain.deleteValue(for: .childPIN)
+    }
+
+    private func persistParent() {
+        if let session = parentSession, let data = try? encoder.encode(session) {
+            keychain.saveValue(data, for: .parentSession)
         }
     }
 
@@ -127,6 +185,7 @@ final class AuthStore {
         if let childData = keychain.loadValue(for: .childSession),
            let restoredChild = try? decoder.decode(StoredChildSession.self, from: childData) {
             childSession = restoredChild
+            isChildUnlocked = false
         }
     }
 }

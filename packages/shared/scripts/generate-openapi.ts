@@ -5,27 +5,42 @@ import {
   AccountDeleteBody,
   AccountDeleteResult,
   ApiErrorSchema,
+  AppleAuthBody,
+  AttachPhotoBody,
   Balance,
   BalanceViewerResponse,
   ChildSessionBody,
   ChildSessionRefreshBody,
   ChildSessionResult,
   ChildTodayView,
+  CompleteResult,
+  CreateChildBody,
+  MemberView,
+  DeviceBody,
+  DeviceOkResponse,
   FamilyCodeResult,
   FamilyCodeBody,
   FamilyViewerResponse,
+  InstanceView,
   LoginBody,
   NotificationSetting,
   NotificationSettingsPatch,
   NotificationSettingsResponse,
   ParentSessionResult,
   ParentTodayView,
+  PhotoConfirmResponse,
+  PhotoStatusResponse,
   PushPayload,
+  RedeemResult,
   RedemptionsViewerResponse,
   RefreshBody,
   RegisterBody,
   RewardsViewerResponse,
+  SyncBody,
+  SyncResponse,
   TodayViewerResponse,
+  UploadIntentBody,
+  UploadIntentResponse,
 } from "../src/index";
 
 type JsonSchema = Record<string, unknown>;
@@ -42,6 +57,7 @@ const schemas: Record<string, JsonSchema> = {
   ApiError: schemaFor("ApiError", ApiErrorSchema),
   RegisterBody: schemaFor("RegisterBody", RegisterBody),
   LoginBody: schemaFor("LoginBody", LoginBody),
+  AppleAuthBody: schemaFor("AppleAuthBody", AppleAuthBody),
   FamilyCodeBody: schemaFor("FamilyCodeBody", FamilyCodeBody),
   ChildSessionBody: schemaFor("ChildSessionBody", ChildSessionBody),
   ChildSessionRefreshBody: schemaFor("ChildSessionRefreshBody", ChildSessionRefreshBody),
@@ -49,16 +65,30 @@ const schemas: Record<string, JsonSchema> = {
   FamilyCodeResult: schemaFor("FamilyCodeResult", FamilyCodeResult),
   ParentSessionResult: schemaFor("ParentSessionResult", ParentSessionResult),
   RefreshBody: schemaFor("RefreshBody", RefreshBody),
+  CreateChildBody: schemaFor("CreateChildBody", CreateChildBody),
+  MemberView: schemaFor("MemberView", MemberView),
   AccountDeleteBody: schemaFor("AccountDeleteBody", AccountDeleteBody),
   AccountDeleteResult: schemaFor("AccountDeleteResult", AccountDeleteResult),
   FamilyViewerResponse: schemaFor("FamilyViewerResponse", FamilyViewerResponse),
+  InstanceView: schemaFor("InstanceView", InstanceView),
   ChildTodayView: schemaFor("ChildTodayView", ChildTodayView),
   ParentTodayView: schemaFor("ParentTodayView", ParentTodayView),
   TodayViewerResponse: schemaFor("TodayViewerResponse", TodayViewerResponse),
+  CompleteResult: schemaFor("CompleteResult", CompleteResult),
+  AttachPhotoBody: schemaFor("AttachPhotoBody", AttachPhotoBody),
   Balance: schemaFor("Balance", Balance),
   BalanceViewerResponse: schemaFor("BalanceViewerResponse", BalanceViewerResponse),
   RewardsViewerResponse: schemaFor("RewardsViewerResponse", RewardsViewerResponse),
+  RedeemResult: schemaFor("RedeemResult", RedeemResult),
   RedemptionsViewerResponse: schemaFor("RedemptionsViewerResponse", RedemptionsViewerResponse),
+  SyncBody: schemaFor("SyncBody", SyncBody),
+  SyncResponse: schemaFor("SyncResponse", SyncResponse),
+  UploadIntentBody: schemaFor("UploadIntentBody", UploadIntentBody),
+  UploadIntentResponse: schemaFor("UploadIntentResponse", UploadIntentResponse),
+  PhotoStatusResponse: schemaFor("PhotoStatusResponse", PhotoStatusResponse),
+  PhotoConfirmResponse: schemaFor("PhotoConfirmResponse", PhotoConfirmResponse),
+  DeviceBody: schemaFor("DeviceBody", DeviceBody),
+  DeviceOkResponse: schemaFor("DeviceOkResponse", DeviceOkResponse),
   NotificationSettingsResponse: schemaFor("NotificationSettingsResponse", NotificationSettingsResponse),
   NotificationSetting: schemaFor("NotificationSetting", NotificationSetting),
   NotificationSettingsPatch: schemaFor("NotificationSettingsPatch", NotificationSettingsPatch),
@@ -83,7 +113,7 @@ const spec = {
     title: "TaakHelden core API",
     version: "0.1.0",
     description:
-      "Generated core contract snapshot from packages/shared. Focused on the endpoints the web dashboard and iOS phase-0 foundation depend on.",
+      "Generated core contract snapshot from packages/shared. Covers web dashboard and iOS Phase 1 endpoints.",
   },
   servers: [{ url: "/v1" }],
   paths: {
@@ -98,6 +128,20 @@ const spec = {
       post: {
         summary: "Log in a parent account",
         requestBody: { required: true, ...json("LoginBody") },
+        responses: { "200": json("ParentSessionResult"), "401": json("ApiError") },
+      },
+    },
+    "/auth/apple": {
+      post: {
+        summary: "Sign in with Apple",
+        requestBody: { required: true, ...json("AppleAuthBody") },
+        responses: { "200": json("ParentSessionResult"), "201": json("ParentSessionResult"), "401": json("ApiError") },
+      },
+    },
+    "/auth/refresh": {
+      post: {
+        summary: "Rotate a parent refresh token",
+        requestBody: { required: true, ...json("RefreshBody") },
         responses: { "200": json("ParentSessionResult"), "401": json("ApiError") },
       },
     },
@@ -122,6 +166,13 @@ const spec = {
         responses: { "200": json("ChildSessionResult"), "401": json("ApiError") },
       },
     },
+    "/members/children": {
+      post: {
+        summary: "Create a child profile",
+        responses: { "201": json("MemberView"), "403": json("ApiError") },
+        requestBody: { required: true, ...json("CreateChildBody") },
+      },
+    },
     "/families/me": {
       get: {
         summary: "Read the current family",
@@ -132,6 +183,28 @@ const spec = {
       get: {
         summary: "Read today's instances",
         responses: { "200": json("TodayViewerResponse"), "404": json("ApiError") },
+      },
+    },
+    "/instances/{id}/complete": {
+      post: {
+        summary: "Complete a task instance",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": json("CompleteResult"), "409": json("ApiError") },
+      },
+    },
+    "/instances/{id}/undo": {
+      post: {
+        summary: "Undo a recent completion",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": json("InstanceView"), "409": json("ApiError") },
+      },
+    },
+    "/instances/{id}/photo": {
+      post: {
+        summary: "Attach a ready photo to an instance",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        requestBody: { required: true, ...json("AttachPhotoBody") },
+        responses: { "200": json("CompleteResult"), "409": json("ApiError") },
       },
     },
     "/points/balance": {
@@ -146,10 +219,52 @@ const spec = {
         responses: { "200": json("RewardsViewerResponse"), "404": json("ApiError") },
       },
     },
+    "/rewards/{id}/redeem": {
+      post: {
+        summary: "Redeem a reward",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": json("RedeemResult"), "409": json("ApiError") },
+      },
+    },
     "/redemptions": {
       get: {
         summary: "Read redemptions for the current viewer",
         responses: { "200": json("RedemptionsViewerResponse"), "403": json("ApiError") },
+      },
+    },
+    "/sync": {
+      post: {
+        summary: "Batch offline sync",
+        requestBody: { required: true, ...json("SyncBody") },
+        responses: { "200": json("SyncResponse"), "400": json("ApiError") },
+      },
+    },
+    "/photos/upload-intent": {
+      post: {
+        summary: "Create a photo upload intent",
+        requestBody: { required: true, ...json("UploadIntentBody") },
+        responses: { "201": json("UploadIntentResponse"), "403": json("ApiError") },
+      },
+    },
+    "/photos/{id}/confirm": {
+      post: {
+        summary: "Confirm an uploaded photo",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": json("PhotoConfirmResponse"), "409": json("ApiError") },
+      },
+    },
+    "/photos/{id}": {
+      get: {
+        summary: "Read photo status",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": json("PhotoStatusResponse"), "404": json("ApiError") },
+      },
+    },
+    "/devices": {
+      post: {
+        summary: "Register an APNs device token",
+        requestBody: { required: true, ...json("DeviceBody") },
+        responses: { "201": json("DeviceOkResponse"), "403": json("ApiError") },
       },
     },
     "/notification-settings": {

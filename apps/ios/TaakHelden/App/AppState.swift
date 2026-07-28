@@ -7,23 +7,23 @@ final class AppState {
         case welcome
         case parentOnboarding
         case childPairing
+        case childUnlock
         case childHome
     }
 
     var route: Route = .welcome
     var selectedChildTab: ChildTab = .mijnDag
-    var authStore: AuthStore
-    var apiClient: APIClient
-    var parentGate: ParentGateCoordinator
+    let environment: AppEnvironment
 
-    init(
-        authStore: AuthStore = AuthStore(),
-        apiClient: APIClient = PreviewAPIClient(),
-        parentGate: ParentGateCoordinator = ParentGateCoordinator()
-    ) {
-        self.authStore = authStore
-        self.apiClient = apiClient
-        self.parentGate = parentGate
+    var authStore: AuthStore { environment.authStore }
+    var apiClient: TaakHeldenAPIClient { environment.apiClient }
+    var mutationQueue: MutationQueue { environment.mutationQueue }
+    var syncEngine: SyncEngine { environment.syncEngine }
+    var parentGate: ParentGateCoordinator { environment.parentGate }
+    var localAuth: LocalAuthenticationClient { environment.localAuth }
+
+    init(usePreviewData: Bool = false) {
+        environment = AppEnvironment(usePreviewData: usePreviewData)
     }
 
     @MainActor
@@ -31,6 +31,8 @@ final class AppState {
         switch authStore.restoredRoute {
         case .childHome:
             route = .childHome
+        case .childUnlock:
+            route = .childUnlock
         case .parentOnboarding:
             route = .parentOnboarding
         case .welcome:
@@ -47,6 +49,11 @@ final class AppState {
     }
 
     func finishChildPairing() {
+        route = .childHome
+    }
+
+    func unlockChildHome() {
+        authStore.unlockChildSession()
         route = .childHome
     }
 

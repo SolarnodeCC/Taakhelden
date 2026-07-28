@@ -58,7 +58,7 @@ final class Phase1FoundationTests: XCTestCase {
         )
         keychain.saveValue(try encoder.encode(session), for: .childSession)
 
-        let store = AuthStore(keychain: keychain)
+        let store = AuthStore(previewKeychain: keychain)
         XCTAssertEqual(store.restoredRoute, .childHome)
         XCTAssertEqual(store.childSession?.displayName, "Sam")
     }

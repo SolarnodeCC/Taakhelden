@@ -4,12 +4,24 @@ generate:
 accessModifier: internal
 filter:
   paths:
+    - /auth/apple
     - /auth/family-code
     - /auth/child-session
     - /auth/child-session/refresh
+    - /auth/refresh
+    - /members/children
     - /families/me
     - /instances/today
+    - /instances/{id}/complete
+    - /instances/{id}/undo
+    - /instances/{id}/photo
     - /points/balance
     - /rewards
+    - /rewards/{id}/redeem
     - /redemptions
+    - /sync
+    - /photos/upload-intent
+    - /photos/{id}
+    - /photos/{id}/confirm
+    - /devices
 namingStrategy: idiomatic

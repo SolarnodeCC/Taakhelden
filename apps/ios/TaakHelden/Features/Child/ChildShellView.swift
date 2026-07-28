@@ -9,27 +9,55 @@ enum ChildTab: Hashable {
 struct ChildShellView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var dayViewModel: ChildDayViewModel?
+    @State private var shopViewModel: ChildShopViewModel?
 
     var body: some View {
         let session = appState.authStore.childSession
         let palette = session?.ageBand == .teen ? THPalettes.teen : THPalettes.kid
 
         TabView(selection: $appState.selectedChildTab) {
-            MijnDagTabView(palette: palette, reduceMotion: reduceMotion)
-                .tabItem { Label("Mijn Dag", systemImage: "checklist") }
-                .tag(ChildTab.mijnDag)
+            MijnDagTabView(
+                palette: palette,
+                reduceMotion: reduceMotion,
+                viewModel: dayViewModel
+            )
+            .tabItem { Label("Mijn Dag", systemImage: "checklist") }
+            .tag(ChildTab.mijnDag)
 
-            WinkelTabView(palette: palette)
+            WinkelTabView(palette: palette, viewModel: shopViewModel)
                 .tabItem { Label("Winkel", systemImage: "gift.fill") }
                 .tag(ChildTab.winkel)
 
             MijnHeldTabView(
                 palette: palette,
                 displayName: session?.displayName ?? "Held",
-                avatar: session?.avatar ?? "🦊"
+                avatar: session?.avatar ?? "🦊",
+                balance: dayViewModel?.state
             )
             .tabItem { Label("Mijn Held", systemImage: "sparkles") }
             .tag(ChildTab.mijnHeld)
+        }
+        .task {
+            if dayViewModel == nil {
+                dayViewModel = ChildDayViewModel(
+                    apiClient: appState.apiClient,
+                    mutationQueue: appState.mutationQueue,
+                    syncEngine: appState.syncEngine,
+                    celebrationService: appState.environment.celebrationService
+                )
+            }
+            if shopViewModel == nil {
+                shopViewModel = ChildShopViewModel(apiClient: appState.apiClient)
+            }
+            await dayViewModel?.load()
+            await shopViewModel?.load()
+        }
+        .overlay(alignment: .top) {
+            if appState.mutationQueue.hasPendingWork || appState.syncEngine.isSyncing {
+                THBadge(text: "Wordt bewaard — sturen we zo", palette: palette)
+                    .padding(.top, THSpacing.sm)
+            }
         }
         .sheet(isPresented: Binding(
             get: { appState.parentGate.isParentSheetPresented },
@@ -39,96 +67,189 @@ struct ChildShellView: View {
                 }
             }
         )) {
-            ParentGateSheet()
+            ParentGateView()
                 .presentationDetents([.medium])
         }
     }
 }
 
 private struct MijnDagTabView: View {
+    @Environment(AppState.self) private var appState
+
     let palette: THPalette
     let reduceMotion: Bool
+    let viewModel: ChildDayViewModel?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: THSpacing.lg) {
-                    THCard(palette: palette) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: THSpacing.sm) {
-                                Text("Vandaag lukt al mooi")
-                                    .font(.system(size: 28, weight: .bold, design: .rounded))
-                                    .foregroundStyle(palette.text.color)
-                                Text("Je eerste verticale slice staat klaar: tabs, positieve states en ruimte voor echte sync-data.")
-                                    .foregroundStyle(palette.mutedText.color)
-                            }
-                            Spacer()
-                            THBadge(text: "12 punten", palette: palette)
+                    switch viewModel?.state {
+                    case .loading, .none:
+                        ProgressView("Even je heldendag laden…")
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, THSpacing.xxl)
+                    case .ready(let today):
+                        header(balance: today.balance)
+                        ForEach(today.instances) { instance in
+                            taskCard(instance)
                         }
-
-                        THBadge(text: "Wordt bewaard - sturen we zo", palette: palette)
-                    }
-
-                    THCard(palette: palette) {
-                        Label("Kamer netjes maken", systemImage: "sparkles")
-                            .font(.headline)
-                            .foregroundStyle(palette.text.color)
-                        Text("Klaar voor een vrolijk afvinkmoment.")
-                            .foregroundStyle(palette.mutedText.color)
-                        Text(reduceMotion ? "Bij succes tonen we een rustige glow + haptic." : "Bij succes is er ruimte voor confetti + haptic.")
-                            .font(.footnote)
-                            .foregroundStyle(palette.mutedText.color)
-                    }
-
-                    THCard(palette: palette) {
-                        Text("Alles gedaan - je bent vandaag al een TaakHeld! 🌟")
-                            .font(.headline)
-                            .foregroundStyle(palette.text.color)
-                        Text("Deze state is alvast ingebouwd zodat de kindervaring positief blijft, ook als de lijst leeg is.")
-                            .foregroundStyle(palette.mutedText.color)
+                    case .emptyAllDone(let balance):
+                        header(balance: balance)
+                        THCard(palette: palette) {
+                            Text("Alles gedaan — je bent vandaag al een TaakHeld! 🌟")
+                                .font(.headline)
+                                .foregroundStyle(palette.text.color)
+                            Text("Morgen staan er weer nieuwe missies klaar.")
+                                .foregroundStyle(palette.mutedText.color)
+                        }
+                    case .emptyNoTasks:
+                        THCard(palette: palette) {
+                            Text("Nog geen missies")
+                                .font(.headline)
+                                .foregroundStyle(palette.text.color)
+                            Text("Vraag papa of mama even om er eentje klaar te zetten.")
+                                .foregroundStyle(palette.mutedText.color)
+                        }
+                    case .offline:
+                        THCard(palette: palette) {
+                            Text("We kunnen even geen verbinding maken — je afgevinkte taken zijn veilig.")
+                                .foregroundStyle(palette.text.color)
+                        }
+                    case .error(let message):
+                        THCard(palette: palette) {
+                            Text(message)
+                                .foregroundStyle(palette.text.color)
+                            Button("Opnieuw proberen") {
+                                Task { await viewModel?.load() }
+                            }
+                        }
                     }
                 }
                 .padding(THSpacing.xl)
             }
             .background(palette.background.color.ignoresSafeArea())
+            .refreshable {
+                await viewModel?.load()
+            }
         }
+    }
+
+    @ViewBuilder
+    private func header(balance: TodayBalanceDTO) -> some View {
+        THCard(palette: palette) {
+            HStack {
+                VStack(alignment: .leading) {
+                    Text("Vandaag")
+                        .font(.system(size: 28, weight: .bold, design: .rounded))
+                        .foregroundStyle(palette.text.color)
+                    Text("\(balance.todayCompleted) van \(balance.todayTotal) klaar")
+                        .foregroundStyle(palette.mutedText.color)
+                }
+                Spacer()
+                THBadge(text: "\(balance.balance) punten", palette: palette)
+            }
+            THBadge(text: "🔥 \(balance.streakDays) dagen streak", palette: palette)
+        }
+    }
+
+    @ViewBuilder
+    private func taskCard(_ instance: InstanceViewDTO) -> some View {
+        let isDone = instance.status != "open" && instance.status != "open_redo"
+        THCard(palette: palette) {
+            HStack {
+                VStack(alignment: .leading, spacing: THSpacing.sm) {
+                    Label(instance.title, systemImage: "sparkles")
+                        .font(.headline)
+                        .foregroundStyle(palette.text.color)
+                    Text("+\(instance.points) punten")
+                        .foregroundStyle(palette.mutedText.color)
+                    if let photoStatus = instance.photoStatus {
+                        Text(photoStatus == "ready" ? "Foto wordt nagekeken…" : "Foto wordt nagekeken…")
+                            .font(.footnote)
+                            .foregroundStyle(palette.mutedText.color)
+                    }
+                }
+                Spacer()
+                if isDone {
+                    Image(systemName: "checkmark.circle.fill")
+                        .font(.title)
+                        .foregroundStyle(palette.accent.color)
+                        .accessibilityLabel("Afgevinkt")
+                } else {
+                    Button("Klaar!") {
+                        Task { await viewModel?.complete(instanceID: instance.id, reduceMotion: reduceMotion) }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(palette.accent.color)
+                }
+            }
+        }
+        .opacity(isDone ? 0.85 : 1)
     }
 }
 
 private struct WinkelTabView: View {
     let palette: THPalette
+    let viewModel: ChildShopViewModel?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: THSpacing.lg) {
-                    THCard(palette: palette) {
-                        Text("Winkel")
-                            .font(.system(size: 28, weight: .bold, design: .rounded))
-                            .foregroundStyle(palette.text.color)
-                        Text("Beloningen blijven vriendelijk leesbaar: niet 'te duur', maar 'nog 8 punten tot filmavond'.")
-                            .foregroundStyle(palette.mutedText.color)
-                    }
+                    if viewModel?.isLoading == true {
+                        ProgressView("Winkel laden…")
+                    } else if let rewards = viewModel?.rewards {
+                        THCard(palette: palette) {
+                            Text("Winkel")
+                                .font(.system(size: 28, weight: .bold, design: .rounded))
+                                .foregroundStyle(palette.text.color)
+                            Text("Je hebt \(rewards.balance) punten")
+                                .foregroundStyle(palette.mutedText.color)
+                        }
 
-                    THCard(palette: palette) {
-                        HStack {
-                            Text("🎬")
-                                .font(.system(size: 28))
-                            VStack(alignment: .leading) {
-                                Text("Filmavond kiezen")
+                        if rewards.rewards.isEmpty {
+                            THCard(palette: palette) {
+                                Text("Straks staan hier beloningen klaar — pap of mam vult de winkel.")
                                     .foregroundStyle(palette.text.color)
-                                Text("Nog 8 punten te gaan")
-                                    .font(.footnote)
-                                    .foregroundStyle(palette.mutedText.color)
                             }
-                            Spacer()
-                            THBadge(text: "18 punten", palette: palette)
+                        } else {
+                            ForEach(rewards.rewards) { reward in
+                                THCard(palette: palette) {
+                                    HStack {
+                                        Text(reward.icon ?? "🎁")
+                                            .font(.system(size: 28))
+                                        VStack(alignment: .leading) {
+                                            Text(reward.title)
+                                                .foregroundStyle(palette.text.color)
+                                            if reward.affordable {
+                                                Text("Je kunt deze kiezen!")
+                                                    .font(.footnote)
+                                                    .foregroundStyle(palette.mutedText.color)
+                                            } else {
+                                                Text("Nog \(max(0, reward.price - rewards.balance)) punten tot \(reward.title)")
+                                                    .font(.footnote)
+                                                    .foregroundStyle(palette.mutedText.color)
+                                            }
+                                        }
+                                        Spacer()
+                                        THBadge(text: "\(reward.price) punten", palette: palette)
+                                    }
+                                }
+                                .opacity(reward.affordable ? 1 : 0.75)
+                            }
+                        }
+                    } else if let error = viewModel?.errorMessage {
+                        THCard(palette: palette) {
+                            Text(error)
+                                .foregroundStyle(palette.text.color)
                         }
                     }
                 }
                 .padding(THSpacing.xl)
             }
             .background(palette.background.color.ignoresSafeArea())
+            .refreshable { await viewModel?.load() }
         }
     }
 }
@@ -139,8 +260,15 @@ private struct MijnHeldTabView: View {
     let palette: THPalette
     let displayName: String
     let avatar: String
+    let balance: ChildDayLoadState?
 
     var body: some View {
+        let heroBalance: TodayBalanceDTO? = {
+            if case .ready(let today) = balance { return today.balance }
+            if case .emptyAllDone(let b) = balance { return b }
+            return nil
+        }()
+
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: THSpacing.lg) {
@@ -148,11 +276,20 @@ private struct MijnHeldTabView: View {
                         VStack(alignment: .leading, spacing: THSpacing.md) {
                             Text(avatar)
                                 .font(.system(size: 56))
+                                .accessibilityLabel("Avatar")
                             Text(displayName)
                                 .font(.system(size: 28, weight: .bold, design: .rounded))
                                 .foregroundStyle(palette.text.color)
-                            Text("Level komt later uit lifetimeEarned, nooit uit het huidige saldo.")
-                                .foregroundStyle(palette.mutedText.color)
+                            if let heroBalance {
+                                Text("Level \(max(1, heroBalance.lifetimeEarned / 100))")
+                                    .foregroundStyle(palette.mutedText.color)
+                                Text("Lifetime: \(heroBalance.lifetimeEarned) punten · streak \(heroBalance.streakDays)")
+                                    .font(.footnote)
+                                    .foregroundStyle(palette.mutedText.color)
+                            } else {
+                                Text("Level komt uit lifetimeEarned, nooit uit je huidige saldo.")
+                                    .foregroundStyle(palette.mutedText.color)
+                            }
                         }
                     }
                 }
@@ -162,19 +299,9 @@ private struct MijnHeldTabView: View {
             .onLongPressGesture(minimumDuration: 1.5) {
                 appState.parentGate.openGate()
             }
+            .onTapGesture(count: 5) {
+                appState.parentGate.openGate()
+            }
         }
-    }
-}
-
-private struct ParentGateSheet: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: THSpacing.lg) {
-            Text("Ouderpoort")
-                .font(.title2.bold())
-            Text("Hier komt de combinatie van LocalAuthentication en ouder-login. Kind-pincode opent dit scherm bewust niet.")
-            Text("Push-links naar ouderacties landen ook eerst hier.")
-                .foregroundStyle(.secondary)
-        }
-        .padding(THSpacing.xl)
     }
 }

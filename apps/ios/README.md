@@ -60,20 +60,24 @@ toevoegen**. Netwerkimplementaties horen bovenop generatoroutput te landen.
 
 - Keychain-gebaseerde sessieopslag voor ouder- en kindsessies
 - child unlock policy met blijvend zichtbare PIN-optie voor onder 13
-- parental gate policy met verborgen ingang
-- onboarding foundations voor ouder en kind
-- kind-shell met tabs voor Mijn Dag, Winkel en Mijn Held
-- design tokens vertaald naar SwiftUI paletten/components
+- dagelijks ontgrendel-scherm met Face ID + zichtbare pincode
+- parental gate policy met verborgen ingang + LocalAuthentication
+- onboarding foundations voor ouder en kind (incl. SIWA-hook + kind aanmaken)
+- kind-shell met tabs voor Mijn Dag, Winkel en Mijn Held (live API + states)
+- MutationQueue + SyncEngine voor offline afvinken
+- foto-bonus via out-of-process PhotosPicker (geen full library access)
+- push-registratie foundation (optioneel, app werkt zonder)
+- gegenereerde contractmodellen uit `packages/shared`
 - review-notes template voor App Review op een device
 
 ## Nog open binnen Phase 1
 
-- echte Swift OpenAPI-generator output
-- SIWA entitlement/configuratie
-- offline MutationQueue + `/sync`
-- foto bonus-flow
-- pushregistratie/deep links
-- ouder approvals-queue uit fase 2
+- Swift OpenAPI Generator client (naast gegenereerde ContractModels)
+- SIWA entitlement + productie-identiteit in Xcode
+- camera-pad naast PhotosPicker
+- beloningsmoment visueel (confetti-component) en geluid achter ouder-instelling
+- echte E2E-validatie op 2 fysieke devices tegen staging
+- DPIA-documentatie (product, niet alleen code)
 
 ## Design System
 

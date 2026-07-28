@@ -1,4 +1,6 @@
 import { z } from "zod";
+import { InstanceView } from "./instance";
+import { RewardView } from "./reward";
 
 /**
  * Offline-first batch-sync (§3.11). Mutaties worden in volgorde toegepast in de
@@ -26,3 +28,27 @@ export const SyncBody = z.object({
 export type SyncBody = z.infer<typeof SyncBody>;
 
 export const SyncResultStatus = z.enum(["applied", "rejected"]);
+
+export const SyncResult = z.object({
+  key: z.string(),
+  status: SyncResultStatus,
+  points: z.number().int().optional(),
+  newBalance: z.number().int().optional(),
+  code: z.string().optional(),
+  message: z.string().optional(),
+});
+export type SyncResult = z.infer<typeof SyncResult>;
+
+export const SyncChanges = z.object({
+  ledger: z.array(z.record(z.unknown())),
+  instances: z.array(InstanceView),
+  rewards: z.array(RewardView).optional(),
+});
+export type SyncChanges = z.infer<typeof SyncChanges>;
+
+export const SyncResponse = z.object({
+  results: z.array(SyncResult),
+  changes: SyncChanges,
+  serverTime: z.string(),
+});
+export type SyncResponse = z.infer<typeof SyncResponse>;

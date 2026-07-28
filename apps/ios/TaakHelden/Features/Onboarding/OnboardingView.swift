@@ -255,16 +255,22 @@ struct ChildPairingFlowView: View {
     @MainActor
     private func finishPairing() async {
         guard let selectedChildID else { return }
+        let selectedChild = resolvedFamily?.children.first { $0.id == selectedChildID }
 
         do {
             let session = try await appState.apiClient.pairChild(
                 request: ChildPairingRequest(
                     familyCode: familyCode,
                     childID: selectedChildID,
-                    pin: pin
+                    pin: pin,
+                    ageBand: selectedChild?.ageBand ?? .mid
                 )
             )
-            appState.authStore.storeChildSession(session, biometricsEnabled: biometricsEnabled)
+            appState.authStore.storeChildSession(
+                session,
+                biometricsEnabled: biometricsEnabled,
+                pin: pin
+            )
             appState.finishChildPairing()
             errorMessage = nil
         } catch {
