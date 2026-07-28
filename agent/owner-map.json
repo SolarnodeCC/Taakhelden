@@ -20,6 +20,7 @@
     "docs/": "docs",
     ".github/": "ops",
     ".claude/": "agent",
+    ".claude/rules/": "agent",
     "agent/": "agent"
   }
 }

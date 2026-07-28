@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import {
@@ -12,7 +12,13 @@ import {
   type RewardFormPayload,
   type RedemptionView,
 } from "../../../../lib/api/types";
+import { useRealtimeRefetch } from "../../../../lib/realtime/FamilyRealtimeContext";
+import { SHOP_REALTIME_EVENTS } from "../../../../lib/realtime/events";
 import { useRouter } from "../../../../i18n/navigation";
+import {
+  FullParentForbidden,
+  useRequireFullParent,
+} from "../../../../lib/auth/RequireFullParent";
 import { Button } from "../../../../components/ui";
 import RewardForm from "./RewardForm";
 
@@ -119,11 +125,13 @@ function RewardRow({
 export default function WinkelClient() {
   const t = useTranslations("winkel");
   const router = useRouter();
+  const gate = useRequireFullParent();
   const [rewards, setRewards] = useState<RewardView[] | null>(null);
   const [requests, setRequests] = useState<RedemptionView[]>([]);
   const [children, setChildren] = useState<MemberView[]>([]);
   const [failed, setFailed] = useState(false);
   const [form, setForm] = useState<FormState>(null);
+  const hadDataRef = useRef(false);
 
   const load = useCallback(async () => {
     try {
@@ -135,23 +143,40 @@ export default function WinkelClient() {
       setRewards(RewardList.parse(rewardsRaw));
       setRequests(RedemptionList.parse(redemptionsRaw));
       setChildren(MemberList.parse(membersRaw).filter((m) => m.role === "child"));
+      hadDataRef.current = true;
+      setFailed(false);
     } catch (err) {
       if (err instanceof ApiClientError && err.status === 401) {
         router.push("/login");
         return;
       }
-      setFailed(true);
+      if (!hadDataRef.current) setFailed(true);
     }
   }, [router]);
 
   useEffect(() => {
+    if (gate !== "ok") return;
     void load();
-  }, [load]);
+  }, [gate, load]);
+
+  const loadWhenAllowed = useCallback(() => {
+    if (gate === "ok") void load();
+  }, [gate, load]);
+
+  useRealtimeRefetch(SHOP_REALTIME_EVENTS, loadWhenAllowed);
 
   const childName = useCallback(
     (id: string) => children.find((c) => c.id === id)?.displayName ?? "—",
     [children],
   );
+
+  if (gate === "forbidden") {
+    return <FullParentForbidden />;
+  }
+
+  if (gate === "loading") {
+    return <p className="text-sm text-muted">{t("loading")}</p>;
+  }
 
   async function submit(payload: RewardFormPayload) {
     if (form?.mode === "edit") {

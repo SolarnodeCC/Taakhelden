@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import {
   RedoBody,
   AttachPhotoBody,
+  MoveInstanceBody,
   ChildTodayView,
   ErrorCodes,
   HistoryCursor,
@@ -168,6 +169,16 @@ instances.post("/:id/photo", idempotency, validate("json", AttachPhotoBody), asy
   return callFamilyRoom(c, "/attach-photo", {
     instanceId: c.req.param("id"),
     photoId: c.req.valid("json").photoId,
+  });
+});
+
+instances.post("/:id/move", requireIdempotencyKey, idempotency, validate("json", MoveInstanceBody), async (c) => {
+  requireParent(c, { full: true });
+  const body = c.req.valid("json");
+  return callFamilyRoom(c, "/move", {
+    instanceId: c.req.param("id"),
+    date: body.date,
+    childId: body.childId,
   });
 });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname, useRouter } from "../../../i18n/navigation";
 import { apiClient, ApiClientError } from "../../../lib/api/client";
@@ -10,6 +10,11 @@ import {
   SessionInfo,
   type MemberView,
 } from "../../../lib/api/types";
+import {
+  FamilyRealtimeProvider,
+  useFamilyRealtime,
+} from "../../../lib/realtime/FamilyRealtimeContext";
+import { FAMILY_UPDATED_EVENT } from "./gezin/FamilySettingsForm";
 import { NAV_ITEMS } from "./nav";
 import LanguageSwitcher from "../LanguageSwitcher";
 import LogoutButton from "./LogoutButton";
@@ -21,7 +26,20 @@ interface ShellData {
   children: MemberView[];
 }
 
-export default function AppShell({ children }: { children: React.ReactNode }) {
+function ShellRealtimeStatus() {
+  const t = useTranslations("shell.realtime");
+  const { status } = useFamilyRealtime();
+
+  if (status === "connected") return null;
+
+  return (
+    <p className="text-xs text-muted" role="status">
+      {status === "connecting" ? t("connecting") : t("offline")}
+    </p>
+  );
+}
+
+function AppShellInner({ children }: { children: React.ReactNode }) {
   const t = useTranslations("shell");
   const tNav = useTranslations("nav");
   const pathname = usePathname();
@@ -30,41 +48,46 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<ShellData | null>(null);
   const [failed, setFailed] = useState(false);
 
-  useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const [sessionRaw, familyRaw, membersRaw] = await Promise.all([
-          apiClient.get("/api/session"),
-          apiClient.get("/api/v1/families/me"),
-          apiClient.get("/api/v1/members"),
-        ]);
-        const session = SessionInfo.parse(sessionRaw);
-        const family = FamilyView.parse(familyRaw);
-        const members = MemberList.parse(membersRaw);
-        const me = members.find((m) => m.id === session.userId);
-        if (!active) return;
-        setData({
-          familyName: family.name,
-          userName: me?.displayName ?? "",
-          permissions: session.permissions,
-          children: members.filter((m) => m.role === "child"),
-        });
-      } catch (err) {
-        if (!active) return;
-        // An expired/revoked session can't be recovered here — send the parent to
-        // login rather than leaving them on a shell that only shows an error.
-        if (err instanceof ApiClientError && err.status === 401) {
-          router.push("/login");
-          return;
-        }
-        setFailed(true);
+  const loadShell = useCallback(async () => {
+    try {
+      const [sessionRaw, familyRaw, membersRaw] = await Promise.all([
+        apiClient.get("/api/session"),
+        apiClient.get("/api/v1/families/me"),
+        apiClient.get("/api/v1/members"),
+      ]);
+      const session = SessionInfo.parse(sessionRaw);
+      const family = FamilyView.parse(familyRaw);
+      const members = MemberList.parse(membersRaw);
+      const me = members.find((m) => m.id === session.userId);
+      setData({
+        familyName: family.name,
+        userName: me?.displayName ?? "",
+        permissions: session.permissions,
+        children: members.filter((m) => m.role === "child"),
+      });
+      setFailed(false);
+    } catch (err) {
+      // An expired/revoked session can't be recovered here — send the parent to
+      // login rather than leaving them on a shell that only shows an error.
+      if (err instanceof ApiClientError && err.status === 401) {
+        router.push("/login");
+        return;
       }
-    })();
-    return () => {
-      active = false;
-    };
+      setFailed(true);
+    }
   }, [router]);
+
+  useEffect(() => {
+    void loadShell();
+  }, [loadShell]);
+
+  useEffect(() => {
+    function onFamilyUpdated() {
+      void loadShell();
+    }
+    window.addEventListener(FAMILY_UPDATED_EVENT, onFamilyUpdated);
+    return () => window.removeEventListener(FAMILY_UPDATED_EVENT, onFamilyUpdated);
+  }, [loadShell]);
 
   // Until permissions are known, show only the ungated items so we never flash
   // management sections to an approve_only parent.
@@ -109,6 +132,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
                 {t("greeting", { name: data.userName })}
               </p>
             )}
+            <ShellRealtimeStatus />
           </div>
           <div className="flex items-center gap-3">
             <LanguageSwitcher />
@@ -119,5 +143,13 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
         <main className="flex-1 px-6 py-8">{children}</main>
       </div>
     </div>
+  );
+}
+
+export default function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <FamilyRealtimeProvider>
+      <AppShellInner>{children}</AppShellInner>
+    </FamilyRealtimeProvider>
   );
 }

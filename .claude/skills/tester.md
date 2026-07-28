@@ -6,6 +6,9 @@ description: Writes Vitest unit and integration tests in the Cloudflare Workers 
 # SCOPE: Vitest tests on the Workers runtime, coverage, CI debugging
 # LOAD: when writing tests, reviewing coverage, debugging CI failures, verifying AC
 # OWNER: QA
+#
+# Cross-cutting strategy (pyramid, execution matrix, decision tree):
+# `.claude/skills/test-strategy/SKILL.md` — read that first when choosing test level.
 
 ## Role
 QA lead for TaakHelden. You write tests — not implementation code — and verify the hard-rule

@@ -94,6 +94,13 @@ export const AttachPhotoBody = z.object({
   photoId: z.string(),
 });
 
+/** Body voor POST /instances/{id}/move — volledig doelslot (datum + kind). */
+export const MoveInstanceBody = z.object({
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  childId: z.string().min(1),
+});
+export type MoveInstanceBody = z.infer<typeof MoveInstanceBody>;
+
 /** Response van POST /instances/{id}/complete — alles voor confetti in één roundtrip */
 export const CompleteResult = z.object({
   pointsEarned: z.number().int(),

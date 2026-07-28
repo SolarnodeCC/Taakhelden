@@ -6,24 +6,71 @@
     "submit": "Sign in",
     "submitting": "Signing in…",
     "logout": "Sign out",
+    "noAccount": "Don't have an account yet?",
+    "registerLink": "Start your family",
     "errors": {
       "INVALID_CREDENTIALS": "That email and password don't match just yet. Feel free to try again.",
       "RATE_LIMITED": "Just a moment — please try again in a minute.",
       "VALIDATION_FAILED": "Please enter a valid email address and password.",
       "generic": "Something went wrong while signing in. Please try again in a bit."
+    },
+    "deletedFamily": "Your family is marked for deletion. Everything will be permanently removed around {purgeAfter}.",
+    "register": {
+      "intro": "Create an account and start your family on TaakHelden.",
+      "displayName": "Your first name",
+      "familyName": "Family name",
+      "passwordHint": "At least 10 characters.",
+      "submit": "Start family",
+      "submitting": "Creating…",
+      "hasAccount": "Already have an account?",
+      "loginLink": "Sign in",
+      "turnstileError": "The security check didn't work. Please try again.",
+      "errors": {
+        "EMAIL_IN_USE": "This email is already in use. Feel free to sign in or choose another address.",
+        "RATE_LIMITED": "Just a moment — please try again in a minute.",
+        "VALIDATION_FAILED": "Please check that all fields look right (password at least 10 characters).",
+        "generic": "Something went wrong while creating your account. Please try again in a bit."
+      }
+    },
+    "accept": {
+      "intro": "You've been invited as a caregiver. Choose a password to join.",
+      "loading": "Loading…",
+      "displayName": "First name (optional)",
+      "displayNameHint": "Leave blank to keep the name from the invite.",
+      "password": "Password",
+      "passwordHint": "At least 8 characters.",
+      "submit": "Accept invitation",
+      "submitting": "Working…",
+      "missingToken": "This link is missing an invitation. Ask the other parent to send a new one.",
+      "loginLink": "Go to sign in",
+      "errors": {
+        "INVALID_INVITE": "This invitation has expired or already been used — ask the other parent for a new one.",
+        "VALIDATION_FAILED": "Check your password (at least 8 characters) and try again.",
+        "generic": "Something went wrong. Please try again in a bit."
+      }
     }
+  },
+  "guards": {
+    "forbidden": "This page is only for parents with full access.",
+    "backToToday": "Back to Today"
   },
   "nav": {
     "vandaag": "Today",
     "goedkeuren": "Approvals",
     "taken": "Tasks",
     "winkel": "Shop",
+    "gezin": "Family",
+    "instellingen": "Settings",
     "inzichten": "Insights"
   },
   "shell": {
     "loading": "Loading…",
     "loadError": "Couldn't load family details.",
-    "greeting": "Hi {name}"
+    "greeting": "Hi {name}",
+    "realtime": {
+      "connecting": "Connecting live updates…",
+      "offline": "Live connection lost — data may be out of date"
+    }
   },
   "vandaag": {
     "title": "Today",
@@ -93,7 +140,50 @@
     },
     "badge": {
       "approval": "Approval",
-      "photoBonus": "+{points} photo"
+      "photoBonus": "+{points} photo",
+      "rotation": "Rotating: {names}",
+      "dateRange": "{from} – {until}",
+      "fromDate": "from {from}",
+      "untilDate": "until {until}"
+    },
+    "tab": {
+      "list": "Overview",
+      "week": "Week"
+    },
+    "fromTemplate": "From template",
+    "templates": {
+      "title": "Age-based suggestions",
+      "hint": "Pick a child and add a task in one tap. You can still adjust everything.",
+      "fldChild": "Child",
+      "fldAge": "Age",
+      "ageYears": "age {age}",
+      "ageFilter": "Suggestions for age {age}",
+      "use": "Use",
+      "cancel": "Close",
+      "empty": "No suggestions for this age.",
+      "loadError": "Couldn't load suggestions.",
+      "noChildren": "Add a child on Family first."
+    },
+    "week": {
+      "prevWeek": "Previous week",
+      "nextWeek": "Next week",
+      "thisWeek": "This week",
+      "filterChild": "Child",
+      "allChildren": "Whole family",
+      "loadError": "Couldn't load the week overview.",
+      "empty": "Nothing planned this week.",
+      "dragHint": "Drag an open task to another day or another child.",
+      "moveError": "Couldn't move the task. Please try again.",
+      "slotTaken": "This child already has that task on this day.",
+      "notMovable": "This task can no longer be moved.",
+      "moving": "Moving…",
+      "status": {
+        "open": "open",
+        "completed": "done",
+        "submitted": "awaiting approval",
+        "open_redo": "try again",
+        "approved": "approved"
+      }
     },
     "form": {
       "createTitle": "New task",
@@ -108,6 +198,15 @@
       "fldDaypart": "Time of day",
       "fldRecurrence": "Repeat",
       "fldDays": "Days",
+      "fldRotation": "Rotate between children",
+      "rotationHint": "A different child each week (order below).",
+      "fldActiveFrom": "Start date (optional)",
+      "fldActiveUntil": "End date (optional)",
+      "rotationRequired": "Pick at least two children to rotate.",
+      "dateRangeInvalid": "End date must be on or after the start date.",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "removeFromRotation": "Remove from rotation",
       "assigneesRequired": "Pick at least one child.",
       "errorSave": "Couldn't save the task.",
       "save": "Save",
@@ -144,6 +243,214 @@
       "save": "Save",
       "saving": "Saving…",
       "cancel": "Cancel"
+    }
+  },
+  "gezin": {
+    "title": "Family",
+    "subtitle": "{name}",
+    "loading": "Loading…",
+    "loadError": "Couldn't load family details.",
+    "actionError": "Something went wrong. Please try again.",
+    "forbidden": "This page is only for parents with full access.",
+    "backToToday": "Back to Today",
+    "onboarding": {
+      "step2": "Step 2 — Add your first child",
+      "step3": "Step 3 — Share the family code with the child's device",
+      "goToday": "Go to today",
+      "dismiss": "Done"
+    },
+    "invite": {
+      "title": "Family code",
+      "hint": "Open the TaakHelden app on the child's device and enter this code.",
+      "copy": "Copy",
+      "copied": "Copied",
+      "regenerate": "Create new code",
+      "regenerating": "Working…",
+      "regenerateConfirm": "The old code stops working immediately. Continue?",
+      "codeAria": "Family code {code}"
+    },
+    "children": {
+      "title": "Children",
+      "add": "Add child",
+      "empty": "No children yet — add the first one.",
+      "edit": "Edit",
+      "resetPin": "Reset PIN",
+      "points": "Points",
+      "delete": "Remove",
+      "balance": "{points} points",
+      "born": "Born in {year}",
+      "ageMode": {
+        "young": "Young",
+        "mid": "Middle",
+        "teen": "Teen"
+      }
+    },
+    "parents": {
+      "title": "Parents & caregivers",
+      "empty": "No caregivers loaded yet.",
+      "permissions": {
+        "full": "full access",
+        "approve_only": "approvals only"
+      }
+    },
+    "inviteParent": {
+      "title": "Invite a co-parent",
+      "hint": "Send an invitation by email. Share the link below if the email doesn't arrive.",
+      "email": "Email address",
+      "permissionsLabel": "Permissions",
+      "permissions": {
+        "approve_only": "Approvals only",
+        "approve_onlyHint": "Sees Today and Approvals.",
+        "full": "Full access",
+        "fullHint": "Can also manage Tasks, Shop, and Family."
+      },
+      "submit": "Send invitation",
+      "submitting": "Working…",
+      "success": "Invitation ready for {name}.",
+      "shareHint": "Share this link if the email doesn't arrive:",
+      "copy": "Copy link",
+      "copied": "Copied",
+      "errors": {
+        "EMAIL_IN_USE": "This email is already in use on TaakHelden.",
+        "VALIDATION_FAILED": "Please enter a valid email address.",
+        "FORBIDDEN": "Only parents with full access can invite.",
+        "generic": "Couldn't send the invitation. Please try again."
+      }
+    },
+    "settings": {
+      "title": "Family settings",
+      "hint": "Name, timezone, quiet hours, bonuses, and vacation mode.",
+      "name": "Family name",
+      "timezone": "Timezone",
+      "timezoneFilter": "Search timezone…",
+      "quietStart": "Quiet hours from",
+      "quietEnd": "Quiet hours until",
+      "quietHint": "We won't send push notifications during this period.",
+      "dayBonus": "Day bonus (points)",
+      "weekBonus": "Week bonus (points)",
+      "weekThreshold": "Week threshold (%)",
+      "bonusHint": "Threshold is the share of completed tasks for the week bonus (50–100%).",
+      "vacation": "Vacation mode",
+      "vacationHint": "Pauses streaks and bonuses while this is on.",
+      "save": "Save settings",
+      "saving": "Saving…",
+      "saved": "Settings saved.",
+      "errorValidation": "Please check the fields and try again.",
+      "errorSave": "Couldn't save. Please try again.",
+      "errorForbidden": "Only full access can change settings."
+    },
+    "form": {
+      "createTitle": "Add child",
+      "editTitle": "Edit child",
+      "resetPinTitle": "New PIN",
+      "displayName": "First name",
+      "birthYear": "Year of birth",
+      "avatar": "Avatar",
+      "avatarOptional": "Optional — pick an icon.",
+      "avatarOption": "Avatar {id}",
+      "pincode": "PIN (4 digits)",
+      "pincodeConfirm": "Confirm PIN",
+      "consent": "I am a parent/guardian and consent to creating this child profile.",
+      "consentRequired": "Please confirm consent first.",
+      "privacyNote": "we only store first name, year of birth, and avatar",
+      "pinMismatch": "The PINs don't match yet.",
+      "errorValidation": "Please check the input and try again.",
+      "errorSave": "Couldn't save. Please try again.",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
+    },
+    "deleteChild": {
+      "title": "Remove {name}",
+      "hint": "The profile will be deactivated. After the deletion window, tasks, points, and history are permanently removed.",
+      "confirm": "I understand that {name}'s profile will be removed.",
+      "confirmRequired": "Please confirm you want to remove this profile.",
+      "submit": "Remove profile",
+      "deleting": "Removing…",
+      "cancel": "Cancel",
+      "errorDelete": "Couldn't remove the profile. Please try again.",
+      "errorForbidden": "Only full access can remove child profiles."
+    }
+  },
+  "instellingen": {
+    "title": "Settings",
+    "subtitle": "Notifications and privacy for your family.",
+    "loading": "Loading…",
+    "loadError": "Couldn't load settings.",
+    "notifications": {
+      "title": "Notifications per child",
+      "hint": "Manage push notifications to the child app. Without a custom bedtime, the family quiet hours on Family apply.",
+      "noChildren": "Add a child first to configure notifications.",
+      "enabled": "Push notifications on",
+      "enabledHint": "Off means no push to this child.",
+      "customQuiet": "Custom quiet hours",
+      "customQuietOn": "We only send push to this child during this window.",
+      "customQuietOff": "Uses family quiet hours ({start}–{end}).",
+      "quietStart": "From",
+      "quietEnd": "Until",
+      "save": "Save",
+      "saving": "Saving…",
+      "saved": "Notification settings saved.",
+      "loadError": "Couldn't load notification settings.",
+      "errorValidation": "Please check the times and try again.",
+      "errorSave": "Couldn't save. Please try again.",
+      "errorForbidden": "Only full access can change notifications."
+    },
+    "privacy": {
+      "title": "Privacy & account",
+      "hint": "Download your data or delete the entire family.",
+      "exportTitle": "Export data",
+      "exportHint": "You'll receive a ZIP with JSON and photos (GDPR art. 20).",
+      "exportStart": "Start export",
+      "exportWorking": "Preparing export…",
+      "exportDownload": "Download ZIP",
+      "exportLinkExpiry": "The download link expires shortly. Save the file locally.",
+      "exportFailed": "Export failed. Please try again later.",
+      "deleteTitle": "Delete family",
+      "deleteHint": "After 7 days all data is permanently deleted. This cannot be undone.",
+      "deleteConfirm": "I understand everything will be permanently deleted after 7 days.",
+      "confirmRequired": "Please confirm you want to delete the family.",
+      "password": "Current password",
+      "passwordRequired": "Enter your password to confirm.",
+      "wrongPassword": "Password is incorrect.",
+      "deleteSubmit": "Delete family",
+      "deleteWorking": "Working…",
+      "deleteFailed": "Couldn't delete. Please try again.",
+      "errorForbidden": "Only full access can delete the family."
+    }
+  },
+  "punten": {
+    "title": "Points — {name}",
+    "balance": "{points} points",
+    "streak": "{days}-day streak",
+    "close": "Close",
+    "loadError": "Couldn't load points.",
+    "ledgerTitle": "Ledger",
+    "ledgerEmpty": "No points in the ledger yet.",
+    "loadMore": "Load more",
+    "loadingMore": "Loading…",
+    "ledgerType": {
+      "task": "Task",
+      "photo_bonus": "Photo bonus",
+      "day_bonus": "Day bonus",
+      "week_bonus": "Week bonus",
+      "redemption": "Reward",
+      "redemption_cancel": "Reward cancelled",
+      "adjustment": "Manual credit",
+      "badge": "Badge"
+    },
+    "adjust": {
+      "title": "Add points",
+      "hint": "Positive credits only — for example help outside the app.",
+      "amount": "Points",
+      "note": "Reason",
+      "notePlaceholder": "E.g. extra help in the garden",
+      "submit": "Add points",
+      "saving": "Saving…",
+      "success": "Points added.",
+      "errorValidation": "Enter a valid amount (1–1000) and a reason.",
+      "errorSave": "Couldn't add points. Please try again.",
+      "errorForbidden": "Only full access can add points."
     }
   },
   "sections": {

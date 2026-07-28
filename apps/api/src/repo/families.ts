@@ -136,19 +136,24 @@ export async function activatePendingParent(
   userId: string,
   input: { passwordHash: string; displayName?: string },
 ): Promise<boolean> {
-  const sets = ["password_hash = ?"];
-  const values: unknown[] = [input.passwordHash];
   if (input.displayName !== undefined) {
-    sets.push("display_name = ?");
-    values.push(input.displayName);
+    const res = await db
+      .prepare(
+        `UPDATE users SET password_hash = ?, display_name = ?
+         WHERE family_id = ? AND id = ? AND role = 'parent'
+           AND password_hash IS NULL AND deleted_at IS NULL`,
+      )
+      .bind(input.passwordHash, input.displayName, familyId, userId)
+      .run();
+    return (res.meta.changes ?? 0) > 0;
   }
   const res = await db
     .prepare(
-      `UPDATE users SET ${sets.join(", ")}
+      `UPDATE users SET password_hash = ?
        WHERE family_id = ? AND id = ? AND role = 'parent'
          AND password_hash IS NULL AND deleted_at IS NULL`,
     )
-    .bind(...values, familyId, userId)
+    .bind(input.passwordHash, familyId, userId)
     .run();
   return (res.meta.changes ?? 0) > 0;
 }
@@ -159,17 +164,38 @@ export async function updateMember(
   memberId: string,
   patch: { displayName?: string; avatarId?: string; birthYear?: number; ageMode?: string },
 ) {
-  const sets: string[] = [];
-  const values: unknown[] = [];
-  if (patch.displayName !== undefined) { sets.push("display_name = ?"); values.push(patch.displayName); }
-  if (patch.avatarId !== undefined) { sets.push("avatar_id = ?"); values.push(patch.avatarId); }
-  if (patch.birthYear !== undefined) { sets.push("birth_year = ?"); values.push(patch.birthYear); }
-  if (patch.ageMode !== undefined) { sets.push("age_mode = ?"); values.push(patch.ageMode); }
-  if (sets.length === 0) return;
-  await db
-    .prepare(`UPDATE users SET ${sets.join(", ")} WHERE family_id = ? AND id = ? AND deleted_at IS NULL`)
-    .bind(...values, familyId, memberId)
-    .run();
+  if (patch.displayName !== undefined) {
+    await db
+      .prepare(
+        "UPDATE users SET display_name = ? WHERE family_id = ? AND id = ? AND deleted_at IS NULL",
+      )
+      .bind(patch.displayName, familyId, memberId)
+      .run();
+  }
+  if (patch.avatarId !== undefined) {
+    await db
+      .prepare(
+        "UPDATE users SET avatar_id = ? WHERE family_id = ? AND id = ? AND deleted_at IS NULL",
+      )
+      .bind(patch.avatarId, familyId, memberId)
+      .run();
+  }
+  if (patch.birthYear !== undefined) {
+    await db
+      .prepare(
+        "UPDATE users SET birth_year = ? WHERE family_id = ? AND id = ? AND deleted_at IS NULL",
+      )
+      .bind(patch.birthYear, familyId, memberId)
+      .run();
+  }
+  if (patch.ageMode !== undefined) {
+    await db
+      .prepare(
+        "UPDATE users SET age_mode = ? WHERE family_id = ? AND id = ? AND deleted_at IS NULL",
+      )
+      .bind(patch.ageMode, familyId, memberId)
+      .run();
+  }
 }
 
 export async function setMemberPincode(db: D1Database, familyId: string, memberId: string, pincodeHash: string) {

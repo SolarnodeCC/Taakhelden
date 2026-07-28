@@ -125,6 +125,7 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 | `POST /instances/{id}/approve` | parent | Goedkeuren → punten definitief in ledger, push naar kind. |
 | `POST /instances/{id}/redo` | parent | `{note}`: vriendelijke toelichting, terug naar `open_redo`. **Geen puntenaftrek.** |
 | `POST /instances/{id}/undo` | child (eigen, < 5 min) | Oeps-knop: afvinken ongedaan maken zolang niet goedgekeurd. |
+| `POST /instances/{id}/move` | parent (`full`) | Instance verplaatsen naar `{ date, childId }`. Alleen `open` / `open_redo`. `Idempotency-Key` verplicht. Geen ledger-wijziging. 409 `INSTANCE_SLOT_TAKEN` bij bezette doelslot. |
 
 **Statusmachine:** `open → completed | submitted → approved → (punten in ledger)` en `submitted → open_redo → submitted`. Zonder `approvalRequired` gaat `complete` direct naar `approved`.
 
@@ -204,7 +205,7 @@ Regels: mutaties worden in volgorde toegepast in de Family-DO; `key` = idempoten
 | `DELETE /account` | parent | Heel gezin: 7 d soft delete → cascade D1 + R2-prefix + KV. Bevestiging vereist (wachtwoord her-invoer). |
 
 ### 3.13 WebSocket
-`GET /ws?token=<short-lived ws-token>` → upgrade naar Family-DO. Server-events: `instance.updated`, `points.changed`, `redemption.created`, `badge.earned`. Alleen ouder-dashboards hoeven te verbinden; de kind-app werkt prima met pull + push-notificaties.
+`GET /ws?token=<short-lived ws-token>` → upgrade naar Family-DO. Server-events: `instance.updated`, `points.changed`, `redemption.created`, `redemption.updated`, `badge.earned`. Alleen ouder-dashboards hoeven te verbinden; de kind-app werkt prima met pull + push-notificaties.
 
 ---
 

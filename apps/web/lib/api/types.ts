@@ -1,9 +1,14 @@
 import { z } from "zod";
+import { Balance, InstanceView, LedgerType } from "@taakhelden/shared";
 export {
+  Balance,
   ChildToday,
   ChildTodayView,
+  ExportJobView,
   InstanceStatus,
   InstanceView,
+  LedgerType,
+  NotificationSettingsResponse,
   ParentTodayView,
   TodayBalance,
 } from "@taakhelden/shared";
@@ -20,9 +25,39 @@ export const FamilyView = z
     id: z.string(),
     name: z.string(),
     timezone: z.string().optional(),
+    inviteCode: z.string().length(6).optional(),
+    quietStart: z
+      .string()
+      .regex(/^\d{2}:\d{2}$/)
+      .optional(),
+    quietEnd: z
+      .string()
+      .regex(/^\d{2}:\d{2}$/)
+      .optional(),
+    dayBonusPoints: z.number().int().min(0).optional(),
+    weekBonusPoints: z.number().int().min(0).optional(),
+    weekBonusThreshold: z.number().min(0.5).max(1).optional(),
+    vacationMode: z.boolean().optional(),
   })
   .passthrough();
 export type FamilyView = z.infer<typeof FamilyView>;
+
+export const InviteCodeResult = z.object({
+  inviteCode: z.string().length(6),
+});
+export type InviteCodeResult = z.infer<typeof InviteCodeResult>;
+
+/** POST /families/me/parents — pending co-parent + shareable invite token. */
+export const InviteParentResult = z.object({
+  userId: z.string(),
+  email: z.string().email(),
+  permissions: z.enum(["full", "approve_only"]),
+  inviteToken: z.string().min(1),
+});
+export type InviteParentResult = z.infer<typeof InviteParentResult>;
+
+export const AgeMode = z.enum(["young", "mid", "teen"]);
+export type AgeMode = z.infer<typeof AgeMode>;
 
 export const MemberView = z
   .object({
@@ -31,6 +66,9 @@ export const MemberView = z
     displayName: z.string(),
     avatarId: z.string().nullable().optional(),
     permissions: z.enum(["full", "approve_only"]).optional(),
+    birthYear: z.number().int().nullable().optional(),
+    ageMode: AgeMode.nullable().optional(),
+    email: z.string().nullable().optional(),
   })
   .passthrough();
 export type MemberView = z.infer<typeof MemberView>;
@@ -90,6 +128,33 @@ export type TaskView = z.infer<typeof TaskView>;
 
 export const TaskList = z.array(TaskView);
 
+/** Partial task fields returned by GET /tasks/templates. */
+export const TaskTemplate = z
+  .object({
+    title: z.string(),
+    category: TaskCategory.optional(),
+    icon: z.string().optional(),
+    points: z.number().optional(),
+    photoBonusPoints: z.number().optional(),
+    approvalRequired: z.boolean().optional(),
+    recurrence: Recurrence.nullable().optional(),
+    daypart: Daypart.nullable().optional(),
+  })
+  .passthrough();
+export type TaskTemplate = z.infer<typeof TaskTemplate>;
+
+export const TaskTemplatesResponse = z.object({
+  age: z.number(),
+  templates: z.array(TaskTemplate),
+});
+export type TaskTemplatesResponse = z.infer<typeof TaskTemplatesResponse>;
+
+export const InstanceHistoryResponse = z.object({
+  instances: z.array(InstanceView),
+  nextCursor: z.string().nullable(),
+});
+export type InstanceHistoryResponse = z.infer<typeof InstanceHistoryResponse>;
+
 // The payload the Taken form sends to POST/PATCH /tasks. Server applies the same
 // defaults, so PATCH can carry a subset; here we always send the full form.
 export interface TaskFormPayload {
@@ -100,9 +165,31 @@ export interface TaskFormPayload {
   photoBonusPoints: number;
   approvalRequired: boolean;
   assignees: string[];
+  rotation?: string[];
   recurrence: Recurrence | null;
   daypart: Daypart | null;
+  activeFrom?: string;
+  activeUntil?: string | null;
 }
+
+/** Prefill for TaskForm from a template or partial task. */
+export type TaskFormPrefill = Partial<
+  Pick<
+    TaskView,
+    | "title"
+    | "category"
+    | "icon"
+    | "points"
+    | "photoBonusPoints"
+    | "approvalRequired"
+    | "assignees"
+    | "recurrence"
+    | "daypart"
+    | "rotation"
+    | "activeFrom"
+    | "activeUntil"
+  >
+>;
 
 // --- Winkel (rewards + redemptions) — mirrors apps/api rewardView + redemptions. ---
 export const RewardView = z
@@ -144,3 +231,32 @@ export const RedemptionView = z
 export type RedemptionView = z.infer<typeof RedemptionView>;
 
 export const RedemptionList = z.array(RedemptionView);
+
+// --- Batch 10: notifications, points/ledger, privacy export ---
+
+export const LedgerEntryView = z.object({
+  id: z.string(),
+  type: LedgerType,
+  amount: z.number().int(),
+  ref: z.string().nullable(),
+  note: z.string().nullable(),
+  at: z.string(),
+});
+export type LedgerEntryView = z.infer<typeof LedgerEntryView>;
+
+export const LedgerPage = z.object({
+  entries: z.array(LedgerEntryView),
+  nextCursor: z.string().nullable(),
+});
+export type LedgerPage = z.infer<typeof LedgerPage>;
+
+/** GET /points/balance for parents — v1 `{ children }` or v2 `{ viewer, children }`. */
+export const ParentBalancesResponse = z.union([
+  z.object({ viewer: z.literal("parent"), children: z.array(Balance) }),
+  z.object({ children: z.array(Balance) }),
+]);
+export type ParentBalancesResponse = z.infer<typeof ParentBalancesResponse>;
+
+export function parentBalancesChildren(data: ParentBalancesResponse): z.infer<typeof Balance>[] {
+  return data.children;
+}

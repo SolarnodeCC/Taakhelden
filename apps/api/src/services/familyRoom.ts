@@ -17,11 +17,13 @@ export async function callFamilyRoom(
     | "/redeem"
     | "/redemption-fulfill"
     | "/redemption-cancel"
-    | "/attach-photo",
+    | "/attach-photo"
+    | "/move",
   payload: {
     instanceId?: string;
     note?: string;
     childId?: string;
+    date?: string;
     amount?: number;
     rewardId?: string;
     redemptionId?: string;
@@ -34,8 +36,8 @@ export async function callFamilyRoom(
   // mutatie-turn gebeurt — de KV-cache alleen dekt de race van twee gelijktijdige
   // requests niet af (die schrijven pas ná afloop, dus missen allebei de cache).
   const idempotencyKey = c.req.header("Idempotency-Key") ?? undefined;
-  const stub = c.env.FAMILY_DO.get(c.env.FAMILY_DO.idFromName(familyId));
-  const res = await stub.fetch(`https://family-room.internal${path}`, {
+  const familyRoom = c.env.FAMILY_DO.get(c.env.FAMILY_DO.idFromName(familyId));
+  const res = await familyRoom.fetch(`https://family-room.internal${path}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ familyId, actor, idempotencyKey, ...payload }),
