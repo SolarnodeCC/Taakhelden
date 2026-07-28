@@ -6,7 +6,7 @@ import { ErrorCodes } from "@taakhelden/shared";
  * Mocks upstream Worker fetch + cookie writes.
  */
 
-const setTokens = vi.fn(async (_tokens: unknown) => undefined);
+const setTokens = vi.fn(async () => undefined);
 
 vi.mock("../../../../lib/auth/session", () => ({
   setTokens: (tokens: unknown) => setTokens(tokens),
