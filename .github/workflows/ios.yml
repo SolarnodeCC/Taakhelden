@@ -71,7 +71,8 @@ jobs:
           xcodebuild test \
             -scheme TaakHelden \
             -destination "platform=iOS Simulator,id=${UDID}" \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
       - name: Placeholder until iOS source lands
         if: steps.detect.outputs.present == 'false'
         run: echo "No Xcode project yet; workflow currently enforces the shared contract snapshot only."
