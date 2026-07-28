@@ -1,5 +1,7 @@
 # Local development only. Copy this file to `.dev.vars`; never use these values in production.
-# Production secrets: `cd apps/api && npx wrangler secret put <NAME>` (see docs/cloudflare-bindings-audit.md).
+# Production: plain vars live in wrangler.toml `[vars]`; secrets are synced from the GitHub
+# Environment `production` by deploy-prod.yml (or `npx wrangler secret put <NAME>`).
+# See docs/cloudflare-bindings-audit.md.
 
 # Required for auth (token issue/verify). Without it, register/login that mint JWTs return 500.
 JWT_SECRET=local-dev-secret-change-me
@@ -7,7 +9,9 @@ JWT_SECRET=local-dev-secret-change-me
 # Turnstile — leave empty locally; verifyTurnstile skips when unset (accepts any token).
 TURNSTILE_SECRET=
 
-# Sign in with Apple / APNs (optional locally — push and Apple login no-op when empty).
+# APNs signing key material (optional locally — push is a no-op when empty).
+# APPLE_CLIENT_ID / APPLE_BUNDLE_ID / APNS_ENV come from wrangler.toml [vars] in deploy;
+# override here for local Apple Sign-in / push testing if needed.
 APPLE_CLIENT_ID=com.taakhelden.web
 APPLE_BUNDLE_ID=nl.taakhelden.app
 APNS_ENV=sandbox
@@ -19,5 +23,5 @@ APNS_TEAM_ID=
 EMAIL_API_KEY=
 EMAIL_FROM=
 
-# Base URL of the parent dashboard (invite links). Optional.
+# Base URL of the parent dashboard (invite links). Optional; production default is in wrangler [vars].
 APP_BASE_URL=http://localhost:3000

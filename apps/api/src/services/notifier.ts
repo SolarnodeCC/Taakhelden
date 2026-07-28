@@ -59,7 +59,9 @@ export function isQuietTime(quietStart: string, quietEnd: string, hhmm: string):
 // APNs-JWT (ES256) is 50 min geldig per isolate; Apple accepteert max 1 u.
 let cachedJwt: { token: string; expiresAt: number } | null = null;
 
-async function apnsJwt(env: Env): Promise<string> {
+async function apnsJwt(
+  env: Env & { APNS_KEY: string; APNS_KEY_ID: string; APNS_TEAM_ID: string },
+): Promise<string> {
   if (cachedJwt && cachedJwt.expiresAt > Date.now()) return cachedJwt.token;
   const key = await importPKCS8(env.APNS_KEY, "ES256");
   const token = await new SignJWT({ iss: env.APNS_TEAM_ID })
@@ -79,9 +81,14 @@ async function apnsSend(
   if (!env.APNS_KEY || !env.APNS_KEY_ID || !env.APNS_TEAM_ID || tokens.length === 0) {
     return 0; // geen secrets (dev/test) of geen apparaten: stille no-op
   }
-  const jwt = await apnsJwt(env);
+  const apnsEnv = env as Env & {
+    APNS_KEY: string;
+    APNS_KEY_ID: string;
+    APNS_TEAM_ID: string;
+  };
+  const jwt = await apnsJwt(apnsEnv);
   const host = env.APNS_ENV === "sandbox" ? APNS_HOSTS.sandbox : APNS_HOSTS.production;
-  const topic = env.APPLE_BUNDLE_ID ?? env.APPLE_CLIENT_ID;
+  const topic = env.APPLE_BUNDLE_ID ?? env.APPLE_CLIENT_ID ?? "nl.taakhelden.app";
   let sent = 0;
   for (const token of tokens) {
     try {
