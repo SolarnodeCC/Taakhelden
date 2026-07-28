@@ -1,18 +1,18 @@
 {
-  "report_fingerprint": "sha256:9b07a72e75ee650c37e66e8f24ecf38fbdd3c3008d94a2ffab874e3598ccb54c",
-  "input_fingerprint": "sha256:860e7b3b4b1820e13b6df385e97b0a4c1ee661ffd7ea4113c5feb2a5f0a98a33",
-  "policy_fingerprint": "sha256:69fc587b9e72384839427d87b76e61970cca59d412d83bc7117b372f4d1718d7",
+  "report_fingerprint": "sha256:b3b12534f783f209e007f970a9e70ebc14da23fa84fa2b58b2f9d9b1a0fe65e4",
+  "input_fingerprint": "sha256:9b45782b516d075e540800f5a1a13fbd1b41644a6d8b6b713ad67b9b220f643e",
+  "policy_fingerprint": "sha256:6631c4be7f31b04dbbdb36f47f2f92889bd18434d7c89d081bdf88b5dcea25e6",
   "manifest_fingerprints": {
-    "owner_map": "sha256:336ce59a274fa841747f8111ec896512a66f3f8152ba9aaf0a3a3c40e72c2ac8",
+    "owner_map": "sha256:e65154219d36ab15dbf4cbc400456fa05e716bfa1adfc3ffcb8d6032db33a180",
     "test_map": "sha256:b4dfceccd0b8d87446132a282d38079acea31cd19fa19e5dea56e6f7c33ac869",
     "generated_zones": "sha256:8e884fbb53897f8e3197fc9ea998412b5a235c56b065800f1771c4097b4698e7"
   },
-  "dirty_worktree": true,
-  "generated_at": "1785219497",
+  "dirty_worktree": false,
+  "generated_at": "1785222157",
   "schema_url": "schemas/repo-score.schema.json",
   "standard": "jankurai",
   "standard_version": "0.9.0",
-  "auditor_version": "1.5.1",
+  "auditor_version": "1.6.10",
   "schema_version": "1.9.0",
   "paper_edition": "2026.05-ed8",
   "target_stack_id": "rust-ts-vite-react-postgres-bounded-python",
@@ -59,7 +59,6 @@
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
     "HLT-042-CI-LOCAL-PARITY on .github/workflows/jankurai.yml",
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
-    "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
     "HLT-002-GENERATED-MUTATION on Design System/_ds_bundle.js",
     "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
     "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
@@ -74,7 +73,6 @@
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/repo/account.ts",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/repo/account.ts",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/repo/account.ts",
-    "HLT-001-DEAD-MARKER on apps/api/src/repo/auth.ts",
     "HLT-023-INPUT-BOUNDARY-GAP on apps/api/src/repo/badges.ts",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/repo/families.ts",
     "HLT-031-TYPESCRIPT-BAD-BEHAVIOR on apps/api/src/repo/families.ts",
@@ -101,23 +99,23 @@
     "HLT-025-RELEASE-READINESS-GAP on docs/release.md"
   ],
   "repo": ".",
-  "run_id": "1785219497",
-  "started_at": "1785219497",
-  "elapsed_ms": 2846,
+  "run_id": "1785222157",
+  "started_at": "1785222157",
+  "elapsed_ms": 2025,
   "scope": {
     "mode": "full",
     "paths": []
   },
-  "score": 46,
-  "raw_score": 46,
+  "score": 47,
+  "raw_score": 47,
   "decision": {
     "status": "advisory",
     "minimum_score": 40,
     "passed": true,
     "hard_findings": 0,
-    "soft_findings": 93,
+    "soft_findings": 91,
     "ratchet": {
-      "baseline_score": 46,
+      "baseline_score": 47,
       "allowed_drop": 0,
       "passed": true,
       "score_delta": 0,
@@ -130,11 +128,11 @@
     }
   },
   "git": {
-    "head": "5f48ea1",
+    "head": "3b8699c",
     "base": null,
     "changed_files": 0,
     "mode": "full",
-    "dirty_worktree": true
+    "dirty_worktree": false
   },
   "policy": {
     "path": "./agent/audit-policy.toml",
@@ -146,7 +144,7 @@
     ],
     "mode": "advisory",
     "standard_version": "0.9.0",
-    "auditor_version": "1.5.1",
+    "auditor_version": "1.6.10",
     "schema_version": "1.9.0",
     "paper_edition": "2026.05-ed8",
     "target_stack": "rust-ts-vite-react-postgres-bounded-python"
@@ -157,7 +155,6 @@
     "no-secret-or-dependency-scanning-in-ci",
     "no-jankurai-audit-lane-in-ci",
     "vibe-placeholders-in-product-code",
-    "fallback-soup-in-product-code",
     "future-hostile-dead-language-in-product-code",
     "direct-db-access-from-wrong-layer",
     "missing-rendered-ux-qa-lane",
@@ -424,7 +421,7 @@
         "lockfile present",
         "sql bad-behavior advisory signals: 8",
         "typescript bad-behavior hard findings: 17",
-        "ci bad-behavior hard findings: 25",
+        "ci bad-behavior hard findings: 24",
         "gittools bad-behavior advisory signals: 1",
         "web security bad-behavior advisory signals: 3"
       ],
@@ -436,19 +433,18 @@
     {
       "name": "Code shape and semantic surface",
       "weight": 12,
-      "score": 0,
-      "weighted_points": 0.0,
+      "score": 6,
+      "weighted_points": 0.72,
       "evidence": [
         "largest authored code file: apps/api/src/services/pointsEngine.ts (532 LOC)",
         "code file exceeds 500 LOC",
         "most code files stay under 300 LOC",
         "copy-code advisory classes found: 3 (advisory only, no score impact)",
         "TODO/stub marker found",
-        "fallback soup marker found",
         "future-hostile/dead-language marker found",
         "sql bad-behavior advisory signals: 8",
         "typescript bad-behavior hard findings: 17",
-        "ci bad-behavior hard findings: 25",
+        "ci bad-behavior hard findings: 24",
         "gittools bad-behavior advisory signals: 1"
       ],
       "notes": [
@@ -546,7 +542,6 @@
     "has_rendered_ux_lane": false,
     "missing_categories": [
       "Playwright screenshot capture",
-      "visual review or geometry runtime",
       "generated API mocks"
     ],
     "evidence": {
@@ -571,13 +566,16 @@
       ],
       "geometry_runtime": [],
       "layout_stability": [
+        "eslint.config.mjs",
         "package-lock.json"
       ],
       "playwright_visual": [],
       "storybook": [
         "agent/baselines/main.repo-score.json"
       ],
-      "visual_review": []
+      "visual_review": [
+        "agent/baselines/main.repo-score.json"
+      ]
     }
   },
   "tool_adoption": {
@@ -605,11 +603,11 @@
           "agent/tool-adoption.toml entry",
           "CI command evidence"
         ],
-        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "local_command": "jankurai audit . --mode advisory --json .jankurai/repo-score.json --md .jankurai/repo-score.md",
         "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
         "artifact_paths": [
-          "agent/repo-score.json",
-          "agent/repo-score.md"
+          ".jankurai/repo-score.json",
+          ".jankurai/repo-score.md"
         ]
       },
       {
@@ -632,8 +630,8 @@
         "local_command": "jankurai proof . --changed-from origin/main --out target/jankurai/proof-plan.json --md target/jankurai/proof-plan.md",
         "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
         "artifact_paths": [
-          "agent/repo-score.json",
-          "agent/repo-score.md",
+          ".jankurai/repo-score.json",
+          ".jankurai/repo-score.md",
           "target/jankurai/repair-queue.jsonl"
         ]
       },
@@ -862,11 +860,11 @@
           "agent/tool-adoption.toml entry",
           "CI command evidence"
         ],
-        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "local_command": "jankurai audit . --mode advisory --json .jankurai/repo-score.json --md .jankurai/repo-score.md",
         "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
         "artifact_paths": [
-          "agent/repo-score.json",
-          "agent/repo-score.md"
+          ".jankurai/repo-score.json",
+          ".jankurai/repo-score.md"
         ]
       },
       {
@@ -945,11 +943,11 @@
           "agent/tool-adoption.toml entry",
           "CI command evidence"
         ],
-        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "local_command": "jankurai audit . --mode advisory --json .jankurai/repo-score.json --md .jankurai/repo-score.md",
         "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
         "artifact_paths": [
-          "agent/repo-score.json",
-          "agent/repo-score.md"
+          ".jankurai/repo-score.json",
+          ".jankurai/repo-score.md"
         ]
       },
       {
@@ -968,11 +966,11 @@
           "agent/tool-adoption.toml entry",
           "CI command evidence"
         ],
-        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "local_command": "jankurai audit . --mode advisory --json .jankurai/repo-score.json --md .jankurai/repo-score.md",
         "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
         "artifact_paths": [
-          "agent/repo-score.json",
-          "agent/repo-score.md"
+          ".jankurai/repo-score.json",
+          ".jankurai/repo-score.md"
         ]
       },
       {
@@ -991,11 +989,11 @@
           "agent/tool-adoption.toml entry",
           "CI command evidence"
         ],
-        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "local_command": "jankurai audit . --mode advisory --json .jankurai/repo-score.json --md .jankurai/repo-score.md",
         "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
         "artifact_paths": [
-          "agent/repo-score.json",
-          "agent/repo-score.md"
+          ".jankurai/repo-score.json",
+          ".jankurai/repo-score.md"
         ]
       },
       {
@@ -1014,11 +1012,11 @@
           "agent/tool-adoption.toml entry",
           "CI command evidence"
         ],
-        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "local_command": "jankurai audit . --mode advisory --json .jankurai/repo-score.json --md .jankurai/repo-score.md",
         "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
         "artifact_paths": [
-          "agent/repo-score.json",
-          "agent/repo-score.md"
+          ".jankurai/repo-score.json",
+          ".jankurai/repo-score.md"
         ]
       },
       {
@@ -1037,11 +1035,11 @@
           "agent/tool-adoption.toml entry",
           "CI command evidence"
         ],
-        "local_command": "jankurai audit . --mode advisory --json agent/repo-score.json --md agent/repo-score.md",
+        "local_command": "jankurai audit . --mode advisory --json .jankurai/repo-score.json --md .jankurai/repo-score.md",
         "ci_command": "jankurai audit . --mode ratchet --baseline target/jankurai/accepted-baseline.json --json target/jankurai/repo-score.json --md target/jankurai/repo-score.md",
         "artifact_paths": [
-          "agent/repo-score.json",
-          "agent/repo-score.md"
+          ".jankurai/repo-score.json",
+          ".jankurai/repo-score.md"
         ]
       }
     ],
@@ -1098,9 +1096,9 @@
   "copy_code": {
     "schema_version": "1.1.0",
     "generated_by": "jankurai copy-code",
-    "generated_at": "2026-07-28T06:18:14.897728485+00:00",
+    "generated_at": "2026-07-28T07:02:35.870308836+00:00",
     "repo": ".",
-    "auditor_version": "1.5.1",
+    "auditor_version": "1.6.10",
     "status": "review",
     "policy": {
       "active_source_only": true,
@@ -1136,7 +1134,7 @@
       ]
     },
     "summary": {
-      "files_scanned": 244,
+      "files_scanned": 247,
       "files_considered": 122,
       "active_files": 122,
       "exact_file_classes": 0,
@@ -1488,7 +1486,7 @@
       "severity": "medium",
       "category": "shape",
       "path": ".",
-      "problem": "`Code shape and semantic surface` scored 0 below the standard floor of 85",
+      "problem": "`Code shape and semantic surface` scored 6 below the standard floor of 85",
       "agent_fix": "split large or ambiguous authored code into smaller semantic modules with focused tests",
       "evidence": [
         "largest authored code file: apps/api/src/services/pointsEngine.ts (532 LOC)",
@@ -1501,7 +1499,7 @@
       "confidence": 0.76,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:a0ab800fd6710fe475af9876d5120fd14c807fddabc8372f48467a2151aa641a",
+      "fingerprint": "sha256:002cf09afd80729a2d20a6a185760636f3f8b66799422d7ef6caff7c4ae56285",
       "rule_id": "HLT-001-DEAD-MARKER",
       "tlr": "Entropy",
       "lane": "fast",
@@ -1557,7 +1555,7 @@
       "category": "audit",
       "path": ".github/workflows",
       "problem": "CI does not run the jankurai audit lane",
-      "agent_fix": "add a CI job that runs `jankurai . --json agent/repo-score.json --md agent/repo-score.md` and uploads both artifacts",
+      "agent_fix": "add a CI job that runs `jankurai . --json .jankurai/repo-score.json --md .jankurai/repo-score.md` and uploads both artifacts",
       "evidence": [
         "audit output must stay JSON plus Markdown for agent repair routing"
       ],
@@ -2431,14 +2429,14 @@
         "lockfile present",
         "sql bad-behavior advisory signals: 8",
         "typescript bad-behavior hard findings: 17",
-        "ci bad-behavior hard findings: 25"
+        "ci bad-behavior hard findings: 24"
       ],
       "check_id": "HLT-016-SUPPLY-CHAIN-DRIFT:security",
       "hardness": "soft",
       "confidence": 0.76,
       "evidence_kind": "workflow-command",
       "rerun_command": "just security",
-      "fingerprint": "sha256:d0aa1055a4c44d82af090df480d94c70b28da58f87ef5a838130c65874b88b25",
+      "fingerprint": "sha256:052315e945eb5ea5633ed543075dec5e831361b34c42533192014387cdfd7cb4",
       "rule_id": "HLT-016-SUPPLY-CHAIN-DRIFT",
       "tlr": "Security, secrets, agency",
       "lane": "security",
@@ -2582,34 +2580,6 @@
       "docs_url": "docs/testing.md",
       "owner": "ops",
       "line": 40,
-      "matched_term": "ci.action.not-full-sha",
-      "reason": "tag or branch refs can change without review"
-    },
-    {
-      "severity": "high",
-      "category": "security",
-      "path": ".github/workflows/jankurai.yml",
-      "problem": "workflow uses an external action not pinned to a full commit SHA",
-      "agent_fix": "pin every external action to a 40-character commit SHA",
-      "evidence": [
-        "detector=ci.action.not-full-sha",
-        "path=.github/workflows/jankurai.yml",
-        "line=58",
-        "proof_window=None",
-        "snippet=uses: actions/upload-artifact@v4"
-      ],
-      "check_id": "HLT-034-CI-BAD-BEHAVIOR:security",
-      "hardness": "hard",
-      "confidence": 0.95,
-      "evidence_kind": "workflow-command",
-      "rerun_command": "just security",
-      "fingerprint": "sha256:baa35d0b12273b386d3122b02b8b13c10843c1047c588075f5ca6b36d498cffc",
-      "rule_id": "HLT-034-CI-BAD-BEHAVIOR",
-      "tlr": "Security, secrets, agency",
-      "lane": "security",
-      "docs_url": "docs/testing.md",
-      "owner": "ops",
-      "line": 58,
       "matched_term": "ci.action.not-full-sha",
       "reason": "tag or branch refs can change without review"
     },
@@ -3073,28 +3043,6 @@
     },
     {
       "severity": "high",
-      "category": "vibe",
-      "path": "apps/api/src/repo/auth.ts",
-      "problem": "fallback soup detected in product code",
-      "agent_fix": "collapse fallback chains into explicit typed states with bounded retry policy, telemetry, and documented repair guidance",
-      "evidence": [
-        "apps/api/src/repo/auth.ts:108 if (!res.meta.changes) return null;"
-      ],
-      "check_id": "HLT-001-DEAD-MARKER:vibe",
-      "hardness": "hard",
-      "confidence": 0.88,
-      "evidence_kind": "repository-scan",
-      "rerun_command": "just fast",
-      "fingerprint": "sha256:b1040fcd51fc85ea5723c266ab5ffa8c10175bb528be2ab2e4eba5108525ea45",
-      "rule_id": "HLT-001-DEAD-MARKER",
-      "tlr": "Entropy",
-      "lane": "fast",
-      "docs_url": "docs/audit-rubric.md#future-hostile-language-rule",
-      "owner": "api",
-      "line": 108
-    },
-    {
-      "severity": "high",
       "category": "security",
       "path": "apps/api/src/repo/badges.ts",
       "problem": "unsafe or unvalidated input boundary marker appears in product code",
@@ -3207,7 +3155,7 @@
       "evidence": [
         "detector=typescript.types.any-boundary",
         "path=apps/api/src/routes/instances.ts",
-        "line=81",
+        "line=87",
         "snippet=? (JSON.parse(atob(rawCursor)) as { date: string; id: string })"
       ],
       "check_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR:boundary",
@@ -3215,13 +3163,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:2ef33aef901d76a2793562003a32b1f40e5339331912e7c3ec1f8c0588112df5",
+      "fingerprint": "sha256:d7dd8ba40baec5f35569755d03addb8123d4ccdcbbde91b60066ba0ca696caa0",
       "rule_id": "HLT-031-TYPESCRIPT-BAD-BEHAVIOR",
       "tlr": "Contracts/data",
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "api",
-      "line": 81,
+      "line": 87,
       "matched_term": "typescript.types.any-boundary",
       "reason": "value shape is not proven before the cast"
     },
@@ -4151,7 +4099,7 @@
       "tlr": "Context/setup",
       "lane": "audit",
       "owner": "ops",
-      "task": "add a CI job that runs `jankurai . --json agent/repo-score.json --md agent/repo-score.md` and uploads both artifacts",
+      "task": "add a CI job that runs `jankurai . --json .jankurai/repo-score.json --md .jankurai/repo-score.md` and uploads both artifacts",
       "why": "CI does not run the jankurai audit lane"
     },
     {
@@ -4444,16 +4392,6 @@
       "why": "workflow uses an external action not pinned to a full commit SHA"
     },
     {
-      "path": "apps/api/src/repo/auth.ts",
-      "priority": "high",
-      "rule_id": "HLT-001-DEAD-MARKER",
-      "tlr": "Entropy",
-      "lane": "fast",
-      "owner": "api",
-      "task": "collapse fallback chains into explicit typed states with bounded retry policy, telemetry, and documented repair guidance",
-      "why": "fallback soup detected in product code"
-    },
-    {
       "path": "apps/api/src/repo/badges.ts",
       "priority": "high",
       "rule_id": "HLT-023-INPUT-BOUNDARY-GAP",
@@ -4521,7 +4459,7 @@
       "lane": "fast",
       "owner": "tools",
       "task": "split large or ambiguous authored code into smaller semantic modules with focused tests",
-      "why": "`Code shape and semantic surface` scored 0 below the standard floor of 85"
+      "why": "`Code shape and semantic surface` scored 6 below the standard floor of 85"
     },
     {
       "path": ".github/workflows/jankurai.yml",
