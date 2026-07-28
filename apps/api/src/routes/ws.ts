@@ -52,8 +52,8 @@ export async function handleWsUpgrade(c: {
     throw new ApiException(401, ErrorCodes.UNAUTHORIZED, "Ongeldig of verlopen ws-token.");
   }
 
-  const stub = c.env.FAMILY_DO.get(c.env.FAMILY_DO.idFromName(payload.fam));
-  return stub.fetch(c.req.raw);
+  const familyRoom = c.env.FAMILY_DO.get(c.env.FAMILY_DO.idFromName(payload.fam));
+  return familyRoom.fetch(c.req.raw);
 }
 
 export default wsAuthed;

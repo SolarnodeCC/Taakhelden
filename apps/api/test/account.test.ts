@@ -18,7 +18,7 @@ function fakeExportBatch(exportId: string, familyId: string): MessageBatch {
 }
 
 let regCounter = 0;
-async function registerFamily(password = "superveilig123") {
+async function registerFamily(password = "TestPassword_NotASecret_123") {
   regCounter++;
   const res = await api("/auth/register", {
     body: {
@@ -120,7 +120,7 @@ describe("DELETE /account", () => {
     const del = await api("/account", {
       method: "DELETE",
       token: reg.accessToken,
-      body: { password: "superveilig123" },
+      body: { password: "TestPassword_NotASecret_123" },
     });
     expect(del.status).toBe(200);
     const body = (await del.json()) as { deletedAt: string; purgeAfter: string };
@@ -171,7 +171,7 @@ describe("DELETE /account", () => {
     const del = await api("/account", {
       method: "DELETE",
       token: await parentToken(parentId, familyId),
-      body: { password: "superveilig123" },
+      body: { password: "TestPassword_NotASecret_123" },
     });
     expect(del.status).toBe(401);
     const body = (await del.json()) as { error: { message: string } };

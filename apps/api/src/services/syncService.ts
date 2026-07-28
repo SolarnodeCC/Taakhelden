@@ -4,8 +4,8 @@
  * client-`key`: replay geeft exact hetzelfde resultaat terug (nooit dubbele
  * punten). Afgewezen mutaties krijgen een foutcode; de app toont die vriendelijk.
  */
-import type { SyncMutation } from "@taakhelden/shared";
-import { ErrorCodes } from "@taakhelden/shared";
+import type { SyncMutation, SyncResult } from "@taakhelden/shared";
+import { ErrorCodes, SyncResult as SyncResultSchema } from "@taakhelden/shared";
 import type { Env } from "../types";
 import { ApiException } from "../middleware/error";
 import { applyComplete, applyUndo, applyRedeem, applyAttachPhoto, type Actor } from "./pointsEngine";
@@ -14,15 +14,9 @@ import { listForDate, type InstanceRow } from "../repo/instances";
 import { entriesSince } from "../repo/ledger";
 import { listRewards } from "../repo/rewards";
 import { localDate } from "./time";
+import { parseJsonOrThrow } from "./jsonParse";
 
-export interface SyncResult {
-  key: string;
-  status: "applied" | "rejected";
-  points?: number;
-  newBalance?: number;
-  code?: string;
-  message?: string;
-}
+export type { SyncResult };
 
 type Broadcast = (event: string, data: unknown) => void;
 
@@ -85,7 +79,11 @@ export async function processSyncBatch(
     const kvKey = `sync:${actor.userId}:${m.key}`;
     const cached = await env.KV.get(kvKey);
     if (cached) {
-      results.push(JSON.parse(cached) as SyncResult); // idempotent: exact hetzelfde resultaat
+      results.push(
+        parseJsonOrThrow(cached, SyncResultSchema, () => {
+          throw new ApiException(500, ErrorCodes.UPSTREAM_UNAVAILABLE, "Corrupt sync-cache.");
+        }),
+      );
       continue;
     }
     let result: SyncResult;

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import QRCode from "qrcode";
 import { Button } from "../../../../components/ui";
@@ -64,13 +65,12 @@ export default function InviteCodeCard({
 
       <div className="mt-4 flex flex-col items-start gap-4 sm:flex-row sm:items-center">
         {qrDataUrl ? (
-          // Local data-URL QR — next/image is not appropriate here.
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
+          <Image
             src={qrDataUrl}
             alt=""
             width={160}
             height={160}
+            unoptimized
             className="rounded border border-border bg-bg"
             aria-hidden
           />

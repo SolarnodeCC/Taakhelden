@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { ParentTodayView, PhotoView, type InstanceView } from "../../../../lib/api/types";
@@ -50,10 +51,12 @@ function PhotoThumb({ photoId }: { photoId: string }) {
   if (!url) return <div className="h-40 w-full animate-pulse rounded bg-border/40" />;
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element -- signed, short-lived R2 URL; not a static asset
-    <img
+    <Image
       src={url}
       alt={t("photoAlt")}
+      width={640}
+      height={256}
+      unoptimized
       className="max-h-64 w-full rounded object-cover"
     />
   );
