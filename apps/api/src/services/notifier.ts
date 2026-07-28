@@ -13,18 +13,33 @@ import { getSetting } from "../repo/notifications";
 import { localDate, localTime } from "./time";
 
 export const childCopy = {
-  taskOpen: (_title: string, _points: number) => "Er staat iets nieuws klaar in TaakHelden.",
+  taskOpen: (title: string, points: number) => {
+    void title;
+    void points;
+    return "Er staat iets nieuws klaar in TaakHelden.";
+  },
   almostDayBonus: () => "Er staat iets leuks klaar in TaakHelden.",
   weekBonus: () => "Er staat iets leuks klaar in TaakHelden.",
-  approved: (_points: number) => "Er staat iets leuks klaar in TaakHelden.",
-  redo: (_parentName: string) => "Er is iets bijgewerkt in TaakHelden.",
+  approved: (points: number) => {
+    void points;
+    return "Er staat iets leuks klaar in TaakHelden.";
+  },
+  redo: (parentName: string) => {
+    void parentName;
+    return "Er is iets bijgewerkt in TaakHelden.";
+  },
 } as const;
 
 export const parentCopy = {
-  redemption: (_childName: string, _rewardTitle: string) =>
-    "Er wacht iets op je goedkeuring in TaakHelden.",
-  pinLock: (_childName: string) =>
-    "Er is iets belangrijks in TaakHelden.",
+  redemption: (childName: string, rewardTitle: string) => {
+    void childName;
+    void rewardTitle;
+    return "Er wacht iets op je goedkeuring in TaakHelden.";
+  },
+  pinLock: (childName: string) => {
+    void childName;
+    return "Er is iets belangrijks in TaakHelden.";
+  },
 } as const;
 
 const DAILY_CHILD_PUSH_LIMIT = 2;
