@@ -23,7 +23,9 @@ in `CLAUDE.md` — use those. Notes below are the non-obvious bits for running l
   no real Cloudflare account is needed for dev/testing.
 - **Web** (`apps/web`) — Next.js parent dashboard via `next dev` on `http://localhost:3000`.
   It is a BFF proxy: the browser only calls the web app, which forwards `/api/v1/*` to the
-  API. `API_BASE_URL` defaults to `http://localhost:8787/v1`, so **start the API first**.
+  API via `apiFetch()` (local: `API_BASE_URL` → `http://localhost:8787/v1`; on Cloudflare:
+  service binding `API` → `taakhelden-api` — see `docs/cloudflare-bindings-audit.md`).
+  **Start the API first** for local web.
 - **iOS** (`apps/ios`) — README only, no Xcode project yet; not runnable here.
 
 ### Running the API locally (gotchas)

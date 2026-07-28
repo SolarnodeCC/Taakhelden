@@ -15,11 +15,13 @@ Worker (apps/api)   → Hono API on Cloudflare Workers (wrangler deploy)
 Durable Objects     → FamilyRoom (one per family; serializes ledger writes + realtime WS)
 D1 (SQLite)         → taakhelden-db (location hint weur) — families, tasks, ledger, rewards, …
 R2                  → child task photos (jurisdiction eu, 30-day lifecycle, presigned URLs)
-Web (apps/web)      → Next.js parent dashboard
+KV                  → rate limits, idempotency, pin-fail counters, invite tokens
+Web (apps/web)      → Next.js BFF Worker; service binding API → taakhelden-api
 Cron/queues         → jobs/ (photo EXIF consumer, export consumer, scheduled cron)
 ```
 
-No KV, no Vectorize, no Workers AI, no payment/SSO provider in this stack.
+No Vectorize, no Workers AI, no payment/SSO provider in this stack.
+Bindings/secrets inventory: `docs/cloudflare-bindings-audit.md`.
 
 ## Deployment
 

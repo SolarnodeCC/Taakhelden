@@ -72,7 +72,7 @@ describe("getApiBaseUrl / apiFetch", () => {
     expect(fetch).not.toHaveBeenCalled();
   });
 
-  it("falls back to global fetch when no service binding exists", async () => {
+  it("falls back to global fetch for local (non-workers.dev) URLs", async () => {
     vi.stubEnv("API_BASE_URL", "http://localhost:8787/v1");
     vi.doMock("@opennextjs/cloudflare", () => ({
       getCloudflareContext: () => {
@@ -89,5 +89,39 @@ describe("getApiBaseUrl / apiFetch", () => {
       "http://localhost:8787/v1/auth/login",
       expect.objectContaining({ method: "POST" }),
     );
+  });
+
+  it("refuses global fetch to *.workers.dev when the API binding is missing", async () => {
+    vi.stubEnv("API_BASE_URL", "https://taakhelden-api.oostelaar.workers.dev/v1");
+    vi.doMock("@opennextjs/cloudflare", () => ({
+      getCloudflareContext: () => ({
+        env: { API_BASE_URL: "https://taakhelden-api.oostelaar.workers.dev/v1" },
+        cf: undefined,
+        ctx: {} as never,
+      }),
+    }));
+    const globalFetch = vi.fn();
+    vi.stubGlobal("fetch", globalFetch);
+
+    const { apiFetch } = await import("./config");
+    await expect(apiFetch("/auth/login", { method: "POST" })).rejects.toThrow(
+      /API service binding/,
+    );
+    expect(globalFetch).not.toHaveBeenCalled();
+  });
+
+  it("refuses global fetch to *.workers.dev when CF context is unavailable", async () => {
+    vi.stubEnv("API_BASE_URL", "https://taakhelden-api.oostelaar.workers.dev/v1");
+    vi.doMock("@opennextjs/cloudflare", () => ({
+      getCloudflareContext: () => {
+        throw new Error("no context");
+      },
+    }));
+    const globalFetch = vi.fn();
+    vi.stubGlobal("fetch", globalFetch);
+
+    const { apiFetch } = await import("./config");
+    await expect(apiFetch("/auth/login")).rejects.toThrow(/API service binding/);
+    expect(globalFetch).not.toHaveBeenCalled();
   });
 });

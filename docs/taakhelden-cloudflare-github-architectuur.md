@@ -56,10 +56,10 @@ Cloudflare dekt vrijwel alles wat TaakHelden nodig heeft serverless af: API, dat
 | **Herhalende taken** | **Cron Trigger** (dagelijks 00:05 lokale tijd via tijdzone-berekening) | Genereert TaskInstances van de dag uit recurrence rules. |
 | **Notificaties** | Cron (elke 15 min) + Queue → **APNs** | Worker ondertekent APNs JWT (ES256, key als secret) en pusht via HTTP/2. Bedtijd- en max-2-per-dag-regels in de scheduler. |
 | **Sessies/cache** | **KV** | Sessietokens (kind-pincodesessies kort TTL), gezinscodes, template-cache. |
-| **Web-dashboard** | **Workers static assets** (of Pages) met Next.js | Zelfde repo, preview-deploy per PR. |
+| **Web-dashboard** | **Workers** (OpenNext) + static assets | Next.js BFF; service binding `API` → `taakhelden-api` (zelfde `*.workers.dev`-zone kan geen global `fetch` Worker→Worker). Zie `docs/cloudflare-bindings-audit.md`. |
 | **Bot/misbruikbescherming** | **Turnstile** op registratie/login | Onzichtbare captcha, privacyvriendelijk (geen tracking — belangrijk gezien doelgroep). |
 | **Rate limiting** | Workers Rate Limiting API / WAF-rules | Op login, pincode-pogingen, uploads. |
-| **Secrets** | `wrangler secret` + GitHub Environments | APNs-key, JWT-signing key, Apple Sign-in secret. Nooit in code. |
+| **Secrets** | `wrangler secret` + GitHub Environments | `JWT_SECRET`, APNs, Apple Sign-in, Turnstile, email. Never in code. Inventory: `docs/cloudflare-bindings-audit.md`. |
 | **Observability** | Workers Logs / Logpush + Sentry (EU-regio) | Foutmonitoring zonder PII in logs (log family_id, nooit namen/foto-URLs). |
 
 **Auth:** zelf beheren op de Worker (bijv. met `better-auth` of eigen JWT-implementatie op D1): Sign in with Apple + e-mail/wachtwoord voor ouders; gezinscode + pincode (Argon2-hash via wasm) voor kinderen. Geen externe auth-SaaS nodig → minder subverwerkers in je AVG-register.

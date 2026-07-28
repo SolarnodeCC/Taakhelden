@@ -6,6 +6,15 @@ function normalizeBaseUrl(url: string): string {
   return url.trim().replace(/\/$/, "");
 }
 
+/** True when `url` targets Cloudflare's shared `*.workers.dev` zone. */
+function isWorkersDevUrl(url: string): boolean {
+  try {
+    return new URL(url).hostname.endsWith(".workers.dev");
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Public/base URL of the API Worker (must include `/v1`).
  * Used for absolute URLs (e.g. browser WebSocket) and as the Request URL when
@@ -35,8 +44,8 @@ export function getApiBaseUrl(): string {
  *
  * On Cloudflare, Workers in the same `*.workers.dev` zone cannot call each
  * other with global `fetch()` — that throws and the BFF returned 502. Use the
- * `API` service binding when present; fall back to `fetch(API_BASE_URL)` for
- * local `next dev` / Vitest.
+ * `API` service binding when present; fall back to `fetch(API_BASE_URL)` only
+ * for local `next dev` / Vitest (non-workers.dev hosts).
  *
  * @param path - Path under `/v1`, e.g. `/auth/login` or `auth/login`
  */
@@ -52,7 +61,17 @@ export function apiFetch(path: string, init?: RequestInit): Promise<Response> {
       return env.API.fetch(new Request(url, init));
     }
   } catch {
-    // No CF context — use global fetch below.
+    // No CF context — may use global fetch below for local/dev.
+  }
+
+  // Same-zone workers.dev fetch always fails without a service binding.
+  // Prefer a clear error over an opaque UPSTREAM_UNAVAILABLE 502.
+  if (isWorkersDevUrl(url)) {
+    return Promise.reject(
+      new Error(
+        "API service binding (env.API) is required to call the API Worker on *.workers.dev",
+      ),
+    );
   }
 
   return fetch(url, init);

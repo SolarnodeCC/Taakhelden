@@ -28,19 +28,26 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: "5546763229b35df670e33d9316d7f2e0"
         run: npx wrangler deploy
-      # Retry: een verse deploy heeft enkele seconden nodig om wereldwijd te
-      # propageren, dus de eerste hit kan 404 geven.
+      # Retry: verse deploy + service-binding propagatie; BFF kan kort 502 geven.
       - name: Smoke test
         run: |
           set -e
           # Pages need a few seconds to propagate after deploy.
           curl --fail -sSL --retry 6 --retry-delay 5 --retry-all-errors \
             https://taakhelden-web.oostelaar.workers.dev/nl/login >/dev/null
-          # BFF must reach the API Worker (wrong API_BASE_URL previously yielded
-          # opaque 404s on /api/auth/*). Login with unknown credentials → 401.
-          code=$(curl -sS -o /tmp/bff-login.json -w "%{http_code}" \
-            -X POST https://taakhelden-web.oostelaar.workers.dev/api/auth/login \
-            -H "Content-Type: application/json" \
-            -d '{"email":"smoke@example.com","password":"not-a-real-password"}')
-          echo "BFF login status=$code body=$(cat /tmp/bff-login.json)"
+          # BFF must reach the API via env.API service binding (same-zone
+          # workers.dev global fetch fails). Unknown credentials → 401.
+          # Retry: binding/edge can briefly return 502 UPSTREAM_UNAVAILABLE.
+          code=""
+          for attempt in 1 2 3 4 5 6; do
+            code=$(curl -sS -o /tmp/bff-login.json -w "%{http_code}" \
+              -X POST https://taakhelden-web.oostelaar.workers.dev/api/auth/login \
+              -H "Content-Type: application/json" \
+              -d '{"email":"smoke@example.com","password":"not-a-real-password"}')
+            echo "BFF login attempt=$attempt status=$code body=$(cat /tmp/bff-login.json)"
+            if [ "$code" = "401" ]; then
+              break
+            fi
+            sleep 5
+          done
           test "$code" = "401"
