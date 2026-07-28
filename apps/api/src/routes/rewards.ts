@@ -1,16 +1,30 @@
 import { Hono } from "hono";
-import { RewardBody, RewardPatchBody, ErrorCodes } from "@taakhelden/shared";
+import { z } from "zod";
+import {
+  RewardBody,
+  RewardPatchBody,
+  RewardView,
+  RewardsViewerResponse,
+  SavingsGoalView,
+  ErrorCodes,
+} from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
 import { idempotency, requireIdempotencyKey } from "../middleware/idempotency";
+import { isContractV2 } from "../services/contract";
 import { callFamilyRoom } from "../services/familyRoom";
 import { newId } from "../services/ids";
 import * as repo from "../repo/rewards";
 import { balance } from "../repo/ledger";
 
 const rewards = new Hono<AppBindings>();
+const LegacyChildRewardsView = z.object({
+  balance: z.number().int(),
+  rewards: z.array(RewardView.extend({ affordable: z.boolean(), pinned: z.boolean() })),
+  savingsGoal: SavingsGoalView.nullable(),
+});
 
 function rewardView(row: repo.RewardRow) {
   return {
@@ -28,14 +42,18 @@ rewards.get("/", async (c) => {
   const rows = await repo.listRewards(c.env.DB, familyId);
 
   if (role === "parent") {
-    return c.json(rows.map(rewardView));
+    const rewardsView = rows.map(rewardView);
+    if (isContractV2(c)) {
+      return c.json(RewardsViewerResponse.parse({ viewer: "parent", rewards: rewardsView }));
+    }
+    return c.json(z.array(RewardView).parse(rewardsView));
   }
 
   const [saldo, pinned] = await Promise.all([
     balance(c.env.DB, familyId, userId),
     repo.getPinnedReward(c.env.DB, familyId, userId),
   ]);
-  return c.json({
+  const response = {
     balance: saldo,
     rewards: rows.map((r) => ({
       ...rewardView(r),
@@ -52,7 +70,11 @@ rewards.get("/", async (c) => {
             progress: Math.min(1, saldo / pinned.price),
           }
         : null,
-  });
+  };
+  if (isContractV2(c)) {
+    return c.json(RewardsViewerResponse.parse({ viewer: "child", ...response }));
+  }
+  return c.json(LegacyChildRewardsView.parse(response));
 });
 
 rewards.post("/", validate("json", RewardBody), async (c) => {
@@ -67,7 +89,7 @@ rewards.post("/", validate("json", RewardBody), async (c) => {
     limitPerWeek: body.limitPerWeek,
   });
   const row = await repo.getReward(c.env.DB, familyId, id);
-  return c.json(rewardView(row!), 201);
+  return c.json(RewardView.parse(rewardView(row!)), 201);
 });
 
 rewards.patch("/:id", validate("json", RewardPatchBody), async (c) => {
@@ -79,7 +101,7 @@ rewards.patch("/:id", validate("json", RewardPatchBody), async (c) => {
   }
   await repo.updateReward(c.env.DB, familyId, rewardId, c.req.valid("json"));
   const updated = await repo.getReward(c.env.DB, familyId, rewardId);
-  return c.json(rewardView(updated!));
+  return c.json(RewardView.parse(rewardView(updated!)));
 });
 
 /** Archiveren: verdwijnt uit de winkel, historie blijft intact. */

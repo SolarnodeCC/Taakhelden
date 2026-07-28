@@ -6,6 +6,7 @@ import {
   ErrorCodes,
   HistoryCursor,
   ParentTodayView,
+  TodayViewerResponse,
 } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
@@ -15,6 +16,7 @@ import { idempotency, requireIdempotencyKey } from "../middleware/idempotency";
 import { callFamilyRoom } from "../services/familyRoom";
 import { getFamily, listChildren } from "../repo/families";
 import { listForDate, listHistory } from "../repo/instances";
+import { isContractV2 } from "../services/contract";
 import { computeBalance } from "../services/pointsEngine";
 import { localDate } from "../services/time";
 
@@ -35,6 +37,7 @@ function instanceView(row: Record<string, unknown>) {
     approvalRequired: Boolean(row.approval_required),
     daypart: row.daypart ?? null,
     photoId: row.photo_id ?? null,
+    photoStatus: row.photo_status ?? null,
     pointsEarned: row.points_earned ?? null,
     redoNote: row.redo_note ?? null,
     completedAt: row.completed_at ?? null,
@@ -77,11 +80,15 @@ instances.get("/today", async (c) => {
   if (role === "child") {
     const rows = await listForDate(c.env.DB, familyId, today, userId);
     const balance = await computeBalance(c.env.DB, familyId, family, userId);
-    return c.json(ChildTodayView.parse({
+    const response = {
       date: today,
       instances: rows.map((r) => instanceView(r as Record<string, unknown>)),
       balance,
-    }));
+    };
+    if (isContractV2(c)) {
+      return c.json(TodayViewerResponse.parse({ viewer: "child", ...response }));
+    }
+    return c.json(ChildTodayView.parse(response));
   }
 
   const children = await listChildren(c.env.DB, familyId);
@@ -97,7 +104,11 @@ instances.get("/today", async (c) => {
       balance: await computeBalance(c.env.DB, familyId, family, child.id as string),
     })),
   );
-  return c.json(ParentTodayView.parse({ date: today, children: byChild }));
+  const response = { date: today, children: byChild };
+  if (isContractV2(c)) {
+    return c.json(TodayViewerResponse.parse({ viewer: "parent", ...response }));
+  }
+  return c.json(ParentTodayView.parse(response));
 });
 
 /** Historie (paginated) — alleen ouders. */

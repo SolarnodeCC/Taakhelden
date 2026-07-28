@@ -1,9 +1,10 @@
 import { Hono } from "hono";
-import { FamilyPatchBody, InviteParentBody, ParentAcceptBody, ErrorCodes } from "@taakhelden/shared";
+import { FamilyPatchBody, FamilyViewerResponse, InviteParentBody, ParentAcceptBody, ErrorCodes } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
+import { isContractV2 } from "../services/contract";
 import { newFamilyCode, newId, newToken } from "../services/ids";
 import { hashSecret } from "../services/passwords";
 import { issueParentTokens } from "../services/session";
@@ -47,7 +48,11 @@ families.get("/me", async (c) => {
   if (!family) {
     throw new ApiException(404, ErrorCodes.NOT_FOUND, "Gezin niet gevonden.");
   }
-  return c.json(familyView(family as Record<string, unknown>, role));
+  const response = familyView(family as Record<string, unknown>, role);
+  if (isContractV2(c)) {
+    return c.json(FamilyViewerResponse.parse({ viewer: role, ...response }));
+  }
+  return c.json(response);
 });
 
 families.patch("/me", validate("json", FamilyPatchBody), async (c) => {

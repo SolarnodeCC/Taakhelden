@@ -23,6 +23,7 @@ const parentTodayResponse = {
           approvalRequired: false,
           daypart: null,
           photoId: null,
+          photoStatus: null,
           pointsEarned: 25,
           redoNote: null,
           completedAt: "2026-07-26T08:00:00.000Z",
@@ -36,6 +37,7 @@ const parentTodayResponse = {
         todayTotal: 1,
         weekProgress: 1,
         streakDays: 1,
+        lifetimeEarned: 145,
       },
     },
   ],
@@ -46,6 +48,7 @@ describe("ParentTodayView", () => {
     const parsed = ParentTodayView.parse(parentTodayResponse);
 
     expect(parsed.children[0]?.balance.balance).toBe(145);
+    expect(parsed.children[0]?.balance.lifetimeEarned).toBe(145);
   });
 
   it("rejects the obsolete numeric balance shape", () => {

@@ -122,7 +122,8 @@ export class FamilyRoom implements DurableObject {
         this.broadcastBadges(childId, result.newBadges);
         await this.tryNotify(() =>
           notifyChild(this.env, familyId, childId,
-            childCopy.approved(result.pointsEarned + result.photoBonusPoints)),
+            childCopy.approved(result.pointsEarned + result.photoBonusPoints),
+            { type: "task_approved", refId: body.instanceId, childId, contentAvailable: true }),
         );
         return result;
       }
@@ -131,7 +132,8 @@ export class FamilyRoom implements DurableObject {
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
         await this.tryNotify(async () =>
           notifyChild(this.env, familyId, childId,
-            childCopy.redo(await memberName(this.env, familyId, actor.userId))),
+            childCopy.redo(await memberName(this.env, familyId, actor.userId)),
+            { type: "task_redo", refId: body.instanceId, childId, contentAvailable: true }),
         );
         return { status };
       }
@@ -163,7 +165,8 @@ export class FamilyRoom implements DurableObject {
         this.broadcast("points.changed", { childId, newBalance: result.newBalance });
         await this.tryNotify(async () =>
           notifyParents(this.env, familyId,
-            parentCopy.redemption(await memberName(this.env, familyId, childId), rewardTitle)),
+            parentCopy.redemption(await memberName(this.env, familyId, childId), rewardTitle),
+            { type: "approval_queue", refId: result.redemptionId, childId, contentAvailable: true }),
         );
         return result;
       }

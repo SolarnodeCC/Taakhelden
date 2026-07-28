@@ -11,6 +11,8 @@ export interface Env {
   APNS_KEY_ID: string;
   APNS_TEAM_ID: string;
   APPLE_CLIENT_ID: string;
+  APPLE_BUNDLE_ID?: string;
+  APNS_ENV?: "sandbox" | "production";
   // E-mail (co-ouder-uitnodiging). Zonder deze secrets is verzenden een no-op.
   EMAIL_API_KEY?: string;
   EMAIL_FROM?: string;

@@ -15,7 +15,7 @@ CLAUDE.md         projectcontext + architectuurregels (leest Claude Code automat
 
 ## Eerste keer opzetten
 ```bash
-npm install
+npm ci
 cp apps/api/.dev.vars.example apps/api/.dev.vars
 npm run db:migrate:local -w apps/api
 
@@ -32,6 +32,17 @@ optioneel voor de lokale e-mail/wachtwoord-flow.
 
 De remote Cloudflare-resources worden door de deployment-infrastructuur beheerd; maak ze
 niet aan als onderdeel van de lokale setup.
+
+## Cloud agents
+
+Cloud agents should start from a Node 22+ environment and run `npm ci` at the
+repo root before invoking workspace scripts. A correct baseline means these work
+without extra manual setup:
+
+```bash
+npm run typecheck
+npm test
+```
 
 ## Controleren
 ```bash

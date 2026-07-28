@@ -5,8 +5,10 @@ import {
   AppleAuthBody,
   FamilyCodeBody,
   ChildSessionBody,
+  ChildSessionRefreshBody,
   RefreshBody,
   LogoutBody,
+  ChildSessionResult,
   ErrorCodes,
 } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
@@ -14,8 +16,7 @@ import { ApiException } from "../middleware/error";
 import { validate } from "../middleware/validate";
 import { rateLimit } from "../middleware/ratelimit";
 import { newId, newFamilyCode } from "../services/ids";
-import { signJwt } from "../services/jwt";
-import { issueParentTokens, ACCESS_TTL_CHILD } from "../services/session";
+import { issueChildTokens, issueParentTokens } from "../services/session";
 import { hashSecret, verifySecret } from "../services/passwords";
 import { verifyTurnstile } from "../services/turnstile";
 import { verifyAppleIdentityToken } from "../services/apple";
@@ -157,7 +158,7 @@ auth.post("/family-code", validate("json", FamilyCodeBody), async (c) => {
   return c.json({ familyName: family.name, children });
 });
 
-/** Stap 2 kind-login: pincode → kind-JWT (24 u). 5 fouten → 15 min lock. */
+/** Stap 2 kind-login: pincode → kind-access + device-refresh. */
 auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
   await rateLimit(c, "child-session", 10);
   const body = c.req.valid("json");
@@ -191,6 +192,7 @@ auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
           c.env,
           family.id as string,
           parentCopy.pinLock(child.display_name as string),
+          { type: "pin_lock", childId: child.id as string },
         ).catch(() => {}),
       );
       throw new ApiException(403, ErrorCodes.PIN_LOCKED, "Even pauze! Probeer het over een kwartiertje nog eens.");
@@ -203,16 +205,30 @@ auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
   }
 
   await c.env.KV.delete(`pinfail:${child.id}`);
-  const accessToken = await signJwt(
-    { sub: child.id as string, fam: family.id as string, role: "child" },
-    c.env.JWT_SECRET,
-    ACCESS_TTL_CHILD,
-  );
-  return c.json({
-    accessToken,
-    expiresIn: ACCESS_TTL_CHILD,
-    child: { id: child.id, displayName: child.display_name, avatarId: child.avatar_id ?? null },
-  });
+  return c.json(ChildSessionResult.parse(await issueChildTokens(c.env.DB, c.env.JWT_SECRET, {
+    id: child.id as string,
+    family_id: family.id as string,
+    display_name: child.display_name as string,
+    avatar_id: (child.avatar_id as string | null) ?? null,
+  })));
+});
+
+auth.post("/child-session/refresh", validate("json", ChildSessionRefreshBody), async (c) => {
+  const consumed = await repo.consumeChildDeviceSession(c.env.DB, c.req.valid("json").refreshToken);
+  const child = consumed && (await repo.getChildForLogin(
+    c.env.DB,
+    consumed.family_id as string,
+    consumed.child_id as string,
+  ));
+  if (!child) {
+    throw new ApiException(401, ErrorCodes.UNAUTHORIZED, "Sessie verlopen, koppel het toestel opnieuw.");
+  }
+  return c.json(ChildSessionResult.parse(await issueChildTokens(c.env.DB, c.env.JWT_SECRET, {
+    id: child.id as string,
+    family_id: consumed.family_id as string,
+    display_name: child.display_name as string,
+    avatar_id: (child.avatar_id as string | null) ?? null,
+  })));
 });
 
 export default auth;

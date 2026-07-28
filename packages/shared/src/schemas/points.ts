@@ -25,5 +25,23 @@ export const Balance = z.object({
   todayTotal: z.number().int(),
   weekProgress: z.number(),      // 0..1 richting weekbonus
   streakDays: z.number().int(),
+  lifetimeEarned: z.number().int().nonnegative(),
 });
 export type Balance = z.infer<typeof Balance>;
+
+export const ChildBalanceView = Balance.extend({
+  viewer: z.literal("child"),
+});
+export type ChildBalanceView = z.infer<typeof ChildBalanceView>;
+
+export const ParentBalancesView = z.object({
+  viewer: z.literal("parent"),
+  children: z.array(Balance),
+});
+export type ParentBalancesView = z.infer<typeof ParentBalancesView>;
+
+export const BalanceViewerResponse = z.discriminatedUnion("viewer", [
+  ChildBalanceView,
+  ParentBalancesView,
+]);
+export type BalanceViewerResponse = z.infer<typeof BalanceViewerResponse>;

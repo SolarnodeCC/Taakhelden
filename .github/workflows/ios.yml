@@ -1,0 +1,31 @@
+name: iOS scaffold
+
+on:
+  pull_request:
+    paths:
+      - "apps/ios/**"
+      - "packages/shared/**"
+      - "docs/openapi/**"
+      - ".github/workflows/ios.yml"
+
+jobs:
+  contract-and-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npm run openapi:check
+      - name: Detect iOS project
+        id: detect
+        shell: bash
+        run: |
+          if compgen -G "apps/ios/*.xcodeproj" > /dev/null || [ -f apps/ios/project.yml ]; then
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Placeholder until iOS source lands
+        if: steps.detect.outputs.present == 'false'
+        run: echo "No Xcode project yet; workflow currently enforces the shared contract snapshot only."

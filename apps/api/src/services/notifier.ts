@@ -5,29 +5,48 @@
  * (lokaal/test) is verzenden een stille no-op. Log nooit namen of tokens.
  */
 import { SignJWT, importPKCS8 } from "jose";
+import { PushPayload } from "@taakhelden/shared";
 import type { Env } from "../types";
 import { getFamily, getMembers, getMember } from "../repo/families";
 import { listDeviceTokensForUsers, deleteDeadDeviceToken } from "../repo/devices";
+import { getSetting } from "../repo/notifications";
 import { localDate, localTime } from "./time";
 
 export const childCopy = {
-  taskOpen: (title: string, points: number) =>
-    `${title} wacht op je superkrachten! 💪 (+${points} punten)`,
-  almostDayBonus: () => "Nog 1 taakje en je hebt je dagbonus binnen! 🌟",
-  weekBonus: () => "WAUW! Weekbonus verdiend — je bent een echte TaakHeld! 🏆",
-  approved: (points: number) => `Goedgekeurd! +${points} punten erbij — lekker bezig! 🎉`,
-  redo: (parentName: string) => `Bijna! ${parentName} vraagt of je nog even wil kijken 😉`,
+  taskOpen: (title: string, points: number) => {
+    void title;
+    void points;
+    return "Er staat iets nieuws klaar in TaakHelden.";
+  },
+  almostDayBonus: () => "Er staat iets leuks klaar in TaakHelden.",
+  weekBonus: () => "Er staat iets leuks klaar in TaakHelden.",
+  approved: (points: number) => {
+    void points;
+    return "Er staat iets leuks klaar in TaakHelden.";
+  },
+  redo: (parentName: string) => {
+    void parentName;
+    return "Er is iets bijgewerkt in TaakHelden.";
+  },
 } as const;
 
 export const parentCopy = {
-  redemption: (childName: string, rewardTitle: string) =>
-    `${childName} wil graag inwisselen: ${rewardTitle}`,
-  pinLock: (childName: string) =>
-    `${childName} heeft 5x een verkeerde pincode geprobeerd — invoer is 15 minuten geblokkeerd.`,
+  redemption: (childName: string, rewardTitle: string) => {
+    void childName;
+    void rewardTitle;
+    return "Er wacht iets op je goedkeuring in TaakHelden.";
+  },
+  pinLock: (childName: string) => {
+    void childName;
+    return "Er is iets belangrijks in TaakHelden.";
+  },
 } as const;
 
 const DAILY_CHILD_PUSH_LIMIT = 2;
-const APNS_HOST = "https://api.push.apple.com";
+const APNS_HOSTS = {
+  production: "https://api.push.apple.com",
+  sandbox: "https://api.sandbox.push.apple.com",
+} as const;
 
 /** Valt HH:MM binnen [start, end)? Werkt ook over middernacht heen (19:30→07:00). */
 export function isQuietTime(quietStart: string, quietEnd: string, hhmm: string): boolean {
@@ -55,23 +74,34 @@ async function apnsSend(
   env: Env,
   tokens: string[],
   message: { title: string; body: string },
+  payload: PushPayload,
 ): Promise<number> {
   if (!env.APNS_KEY || !env.APNS_KEY_ID || !env.APNS_TEAM_ID || tokens.length === 0) {
     return 0; // geen secrets (dev/test) of geen apparaten: stille no-op
   }
   const jwt = await apnsJwt(env);
+  const host = env.APNS_ENV === "sandbox" ? APNS_HOSTS.sandbox : APNS_HOSTS.production;
+  const topic = env.APPLE_BUNDLE_ID ?? env.APPLE_CLIENT_ID;
   let sent = 0;
   for (const token of tokens) {
     try {
-      const res = await fetch(`${APNS_HOST}/3/device/${token}`, {
+      const parsedPayload = PushPayload.parse(payload);
+      const res = await fetch(`${host}/3/device/${token}`, {
         method: "POST",
         headers: {
           authorization: `bearer ${jwt}`,
-          "apns-topic": env.APPLE_CLIENT_ID, // bundle-id van de iOS-app
+          "apns-topic": topic,
           "apns-push-type": "alert",
           "content-type": "application/json",
         },
-        body: JSON.stringify({ aps: { alert: message, sound: "default" } }),
+        body: JSON.stringify({
+          aps: {
+            alert: message,
+            sound: "default",
+            ...(parsedPayload.contentAvailable ? { "content-available": 1 } : {}),
+          },
+          th: parsedPayload,
+        }),
       });
       if (res.ok) sent++;
       else if (res.status === 410) await deleteDeadDeviceToken(env.DB, token); // Unregistered → opruimen
@@ -88,6 +118,7 @@ export async function notifyChild(
   familyId: string,
   childId: string,
   body: string,
+  payload: PushPayload,
 ): Promise<void> {
   const family = (await getFamily(env.DB, familyId)) as {
     timezone: string;
@@ -95,25 +126,34 @@ export async function notifyChild(
     quiet_end: string;
   } | null;
   if (!family) return;
-  if (isQuietTime(family.quiet_start, family.quiet_end, localTime(family.timezone))) return;
+  const setting = await getSetting(env.DB, familyId, childId);
+  if (!setting || !setting.enabled) return;
+  const quietStart = setting.quiet_start ?? family.quiet_start;
+  const quietEnd = setting.quiet_end ?? family.quiet_end;
+  if (isQuietTime(quietStart, quietEnd, localTime(family.timezone))) return;
 
   const countKey = `pushcount:${childId}:${localDate(family.timezone)}`;
   const used = Number((await env.KV.get(countKey)) ?? "0");
   if (used >= DAILY_CHILD_PUSH_LIMIT) return;
 
   const tokens = await listDeviceTokensForUsers(env.DB, familyId, [childId]);
-  const sent = await apnsSend(env, tokens, { title: "TaakHelden", body });
+  const sent = await apnsSend(env, tokens, { title: "TaakHelden", body }, payload);
   if (sent > 0) {
     await env.KV.put(countKey, String(used + 1), { expirationTtl: 60 * 60 * 24 });
   }
 }
 
 /** Push naar alle ouders van het gezin (geen quiet hours: dit zijn hun eigen meldingen). */
-export async function notifyParents(env: Env, familyId: string, body: string): Promise<void> {
+export async function notifyParents(
+  env: Env,
+  familyId: string,
+  body: string,
+  payload: PushPayload,
+): Promise<void> {
   const { results } = await getMembers(env.DB, familyId);
   const parentIds = results.filter((m) => m.role === "parent").map((m) => m.id as string);
   const tokens = await listDeviceTokensForUsers(env.DB, familyId, parentIds);
-  await apnsSend(env, tokens, { title: "TaakHelden", body });
+  await apnsSend(env, tokens, { title: "TaakHelden", body }, payload);
 }
 
 /** Roepnaam voor in pushtekst (nooit loggen — privacyregel 5). */

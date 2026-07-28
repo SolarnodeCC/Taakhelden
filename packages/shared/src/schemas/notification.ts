@@ -25,3 +25,17 @@ export const NotificationSettingsPatch = z.object({
   quietEnd: TimeOfDay.nullable().optional(),
 });
 export type NotificationSettingsPatch = z.infer<typeof NotificationSettingsPatch>;
+
+export const PushPayload = z.object({
+  type: z.enum([
+    "task_open",
+    "task_approved",
+    "task_redo",
+    "approval_queue",
+    "pin_lock",
+  ]),
+  refId: z.string().nullable().optional(),
+  childId: z.string().nullable().optional(),
+  contentAvailable: z.boolean().optional(),
+});
+export type PushPayload = z.infer<typeof PushPayload>;

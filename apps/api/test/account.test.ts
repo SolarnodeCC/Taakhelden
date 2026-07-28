@@ -153,6 +153,31 @@ describe("DELETE /account", () => {
     expect(row?.deleted_at).toBeNull();
   });
 
+  it("apple-only ouder kan niet met alleen een wachtwoord bevestigen", async () => {
+    const familyId = `fam_apple_${crypto.randomUUID().slice(0, 8)}`;
+    const parentId = `usr_apple_${crypto.randomUUID().slice(0, 8)}`;
+    await env.DB.batch([
+      env.DB
+        .prepare("INSERT INTO families (id, name, invite_code) VALUES (?, ?, ?)")
+        .bind(familyId, "Apple-gezin", "APPLE1"),
+      env.DB
+        .prepare(
+          `INSERT INTO users (id, family_id, role, permissions, display_name, apple_sub)
+           VALUES (?, ?, 'parent', 'full', 'Apple Ouder', ?)`,
+        )
+        .bind(parentId, familyId, "apple-sub-123"),
+    ]);
+
+    const del = await api("/account", {
+      method: "DELETE",
+      token: await parentToken(parentId, familyId),
+      body: { password: "superveilig123" },
+    });
+    expect(del.status).toBe(401);
+    const body = (await del.json()) as { error: { message: string } };
+    expect(body.error.message).toContain("Apple");
+  });
+
   it("approve_only-ouder mag het gezin niet verwijderen (403)", async () => {
     const fam = await seedFamily("delp");
     const res = await api("/account", {

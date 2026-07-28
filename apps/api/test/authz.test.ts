@@ -94,6 +94,85 @@ describe("authz-fundament", () => {
     expect(body.balance).toMatchObject({ childId: fam.childA, balance: 0 });
   });
 
+  it("v2-contract voegt viewer-discriminator toe zonder sibling-data te lekken", async () => {
+    const fam = await seedFamily("todayv2");
+    const ownTask = await seedTask(fam.familyId, fam.childA);
+    await seedInstance(fam.familyId, ownTask, fam.childA, todayAmsterdam());
+
+    const today = await api("/instances/today", {
+      token: await childToken(fam.childA, fam.familyId),
+      headers: { "X-Contract-Version": "2" },
+    });
+    expect(today.status).toBe(200);
+    const body = (await today.json()) as {
+      viewer: string;
+      instances: Array<{ childId: string; photoStatus: string | null }>;
+      balance: { childId: string; lifetimeEarned: number };
+    };
+    expect(body.viewer).toBe("child");
+    expect(body.instances.every((instance) => instance.childId === fam.childA)).toBe(true);
+    expect(body.instances[0]?.photoStatus ?? null).toBeNull();
+    expect(body.balance).toMatchObject({ childId: fam.childA, lifetimeEarned: 0 });
+  });
+
+  it("v2-contract voor families/me en points/balance blijft rolbewust", async () => {
+    const fam = await seedFamily("familyv2");
+    const childTok = await childToken(fam.childA, fam.familyId);
+    const parentTok = await parentToken(fam.parentId, fam.familyId);
+
+    const familyChild = await api("/families/me", {
+      token: childTok,
+      headers: { "X-Contract-Version": "2" },
+    });
+    expect(familyChild.status).toBe(200);
+    expect(((await familyChild.json()) as { viewer: string; inviteCode?: string }).viewer).toBe("child");
+
+    const balanceParent = await api("/points/balance", {
+      token: parentTok,
+      headers: { "X-Contract-Version": "2" },
+    });
+    expect(balanceParent.status).toBe(200);
+    const parentBody = (await balanceParent.json()) as {
+      viewer: string;
+      children: Array<{ childId: string; lifetimeEarned: number }>;
+    };
+    expect(parentBody.viewer).toBe("parent");
+    expect(parentBody.children.map((child) => child.childId).sort()).toEqual(
+      [fam.childA, fam.childB].sort(),
+    );
+  });
+
+  it("kind mag alleen eigen redemptions zien en kan geen child device sessions revoken", async () => {
+    const fam = await seedFamily("rvk");
+    const ownRedemptions = await api("/redemptions", {
+      token: await childToken(fam.childA, fam.familyId),
+      headers: { "X-Contract-Version": "2" },
+    });
+    expect(ownRedemptions.status).toBe(200);
+    expect(((await ownRedemptions.json()) as { viewer: string }).viewer).toBe("child");
+
+    const siblingList = await api(`/redemptions?childId=${fam.childB}`, {
+      token: await childToken(fam.childA, fam.familyId),
+    });
+    expect(siblingList.status).toBe(403);
+
+    const revoke = await api(`/members/${fam.childA}/device-sessions/revoke`, {
+      method: "POST",
+      token: await childToken(fam.childA, fam.familyId),
+    });
+    expect(revoke.status).toBe(403);
+  });
+
+  it("ouder kan alleen device sessions van een kind uit het eigen gezin revoken", async () => {
+    const famA = await seedFamily("rvka");
+    const famB = await seedFamily("rvkb");
+    const res = await api(`/members/${famB.childA}/device-sessions/revoke`, {
+      method: "POST",
+      token: await parentToken(famA.parentId, famA.familyId),
+    });
+    expect(res.status).toBe(404);
+  });
+
   it("approve_only-ouder kan geen instellingen wijzigen (403)", async () => {
     const fam = await seedFamily("e");
     const res = await api("/families/me", {

@@ -1,16 +1,19 @@
 import { Hono } from "hono";
-import { AdjustBody, ErrorCodes, LedgerCursor } from "@taakhelden/shared";
+import { z } from "zod";
+import { AdjustBody, Balance, BalanceViewerResponse, ErrorCodes, LedgerCursor } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
 import { idempotency } from "../middleware/idempotency";
 import { callFamilyRoom } from "../services/familyRoom";
+import { isContractV2 } from "../services/contract";
 import { getFamily, getMember, listChildren } from "../repo/families";
 import { listEntries } from "../repo/ledger";
 import { computeBalance } from "../services/pointsEngine";
 
 const points = new Hono<AppBindings>();
+const ParentBalanceResponse = z.object({ children: z.array(Balance) });
 
 type FamilyRow = { timezone: string; week_bonus_threshold: number };
 
@@ -41,13 +44,20 @@ points.get("/balance", async (c) => {
     throw new ApiException(404, ErrorCodes.NOT_FOUND, "Gezin niet gevonden.");
   }
   if (role === "child") {
-    return c.json(await computeBalance(c.env.DB, familyId, family, userId));
+    const response = await computeBalance(c.env.DB, familyId, family, userId);
+    if (isContractV2(c)) {
+      return c.json(BalanceViewerResponse.parse({ viewer: "child", ...response }));
+    }
+    return c.json(Balance.parse(response));
   }
   const children = await listChildren(c.env.DB, familyId);
   const balances = await Promise.all(
     children.map((ch) => computeBalance(c.env.DB, familyId, family, ch.id as string)),
   );
-  return c.json({ children: balances });
+  if (isContractV2(c)) {
+    return c.json(BalanceViewerResponse.parse({ viewer: "parent", children: balances }));
+  }
+  return c.json(ParentBalanceResponse.parse({ children: balances }));
 });
 
 /** Paginated grootboek — "waar komen mijn punten vandaan?" Kind: alleen eigen. */

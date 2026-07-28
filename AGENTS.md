@@ -8,6 +8,15 @@ and `docs/`. Read those first. This file only adds environment/runtime notes.
 Standard commands (`dev:api`, `dev:web`, `test`, `typecheck`, migrations) are documented
 in `CLAUDE.md` — use those. Notes below are the non-obvious bits for running locally.
 
+### Cloud agent environment baseline
+- This monorepo expects **Node 22+** and a successful root-level `npm ci` before any
+  workspace scripts are used.
+- A healthy cloud-agent startup has these tools available out of the box:
+  `tsc`, `vitest`, `npm run typecheck`, and `npm test`.
+- If a fresh cloud runner is missing those binaries, the environment snapshot is
+  incomplete; run `npm ci` from the repo root or refresh the shared cloud-agent
+  environment via Cursor Web.
+
 ### Services
 - **API** (`apps/api`) — Cloudflare Worker via `wrangler dev`, serves `http://localhost:8787`
   (base path `/v1`). D1/R2/KV/Durable Object/Queues are all emulated locally by Miniflare;

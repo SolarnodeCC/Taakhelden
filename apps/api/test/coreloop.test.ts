@@ -44,12 +44,50 @@ describe("auth-flow", () => {
       body: { familyCode: inviteCode, childId: childBody.id, pincode: "1234" },
     });
     expect(session.status).toBe(200);
+    const childSession = (await session.json()) as {
+      accessToken: string;
+      refreshToken: string;
+      child: { id: string };
+    };
+    expect(childSession.accessToken).toBeTruthy();
+    expect(childSession.refreshToken).toBeTruthy();
+    expect(childSession.child.id).toBe(childBody.id);
 
     // Foute pincode is vriendelijk maar duidelijk fout
     const wrong = await api("/auth/child-session", {
       body: { familyCode: inviteCode, childId: childBody.id, pincode: "9999" },
     });
     expect(wrong.status).toBe(401);
+
+    // Kind-refresh roteert ook single-use en levert een nieuwe pair op.
+    const childRefresh1 = await api("/auth/child-session/refresh", {
+      body: { refreshToken: childSession.refreshToken },
+    });
+    expect(childRefresh1.status).toBe(200);
+    const refreshedChild = (await childRefresh1.json()) as { refreshToken: string };
+    expect(refreshedChild.refreshToken).toBeTruthy();
+
+    const childRefresh2 = await api("/auth/child-session/refresh", {
+      body: { refreshToken: childSession.refreshToken },
+    });
+    expect(childRefresh2.status).toBe(401);
+
+    const pairedAgain = await api("/auth/child-session", {
+      body: { familyCode: inviteCode, childId: childBody.id, pincode: "1234" },
+    });
+    const pairedAgainBody = (await pairedAgain.json()) as { refreshToken: string };
+
+    const revoke = await api(`/members/${childBody.id}/device-sessions/revoke`, {
+      method: "POST",
+      token: reg.accessToken,
+    });
+    expect(revoke.status).toBe(200);
+    expect(((await revoke.json()) as { revokedCount: number }).revokedCount).toBeGreaterThanOrEqual(1);
+
+    const revokedRefresh = await api("/auth/child-session/refresh", {
+      body: { refreshToken: pairedAgainBody.refreshToken },
+    });
+    expect(revokedRefresh.status).toBe(401);
 
     // Refresh-rotatie: nieuwe pair, oude refresh vervalt
     const refresh1 = await api("/auth/refresh", { body: { refreshToken: reg.refreshToken } });

@@ -15,6 +15,36 @@ export const FamilySettings = z.object({
 });
 export type FamilySettings = z.infer<typeof FamilySettings>;
 
+export const FamilySummary = z.object({
+  id: z.string(),
+  name: z.string(),
+  timezone: z.string(),
+});
+export type FamilySummary = z.infer<typeof FamilySummary>;
+
+export const ChildFamilyView = FamilySummary.extend({
+  viewer: z.literal("child"),
+});
+export type ChildFamilyView = z.infer<typeof ChildFamilyView>;
+
+export const ParentFamilyView = FamilySummary.extend({
+  viewer: z.literal("parent"),
+  inviteCode: z.string().length(6),
+  quietStart: z.string().regex(/^\d{2}:\d{2}$/),
+  quietEnd: z.string().regex(/^\d{2}:\d{2}$/),
+  dayBonusPoints: z.number().int().min(0),
+  weekBonusPoints: z.number().int().min(0),
+  weekBonusThreshold: z.number().min(0.5).max(1),
+  vacationMode: z.boolean(),
+});
+export type ParentFamilyView = z.infer<typeof ParentFamilyView>;
+
+export const FamilyViewerResponse = z.discriminatedUnion("viewer", [
+  ChildFamilyView,
+  ParentFamilyView,
+]);
+export type FamilyViewerResponse = z.infer<typeof FamilyViewerResponse>;
+
 /** PATCH /families/me — alle instellingen optioneel. */
 export const FamilyPatchBody = FamilySettings.partial();
 export type FamilyPatchBody = z.infer<typeof FamilyPatchBody>;

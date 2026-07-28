@@ -1,2 +1,8 @@
 # Local development only. Copy this file to `.dev.vars`; never use this value in production.
 JWT_SECRET=local-dev-secret-change-me
+APPLE_CLIENT_ID=com.taakhelden.web
+APPLE_BUNDLE_ID=nl.taakhelden.app
+APNS_ENV=sandbox
+APNS_KEY=
+APNS_KEY_ID=
+APNS_TEAM_ID=

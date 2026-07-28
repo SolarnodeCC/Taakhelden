@@ -1,0 +1,2180 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TaakHelden core API",
+    "version": "0.1.0",
+    "description": "Generated core contract snapshot from packages/shared. Focused on the endpoints the web dashboard and iOS phase-0 foundation depend on."
+  },
+  "servers": [
+    {
+      "url": "/v1"
+    }
+  ],
+  "paths": {
+    "/auth/register": {
+      "post": {
+        "summary": "Register a parent and family",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentSessionResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "summary": "Log in a parent account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ParentSessionResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/family-code": {
+      "post": {
+        "summary": "Resolve a family code to child profiles",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FamilyCodeBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyCodeResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/child-session": {
+      "post": {
+        "summary": "Pair a child device session",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChildSessionBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildSessionResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/child-session/refresh": {
+      "post": {
+        "summary": "Rotate a child device refresh token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChildSessionRefreshBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildSessionResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/me": {
+      "get": {
+        "summary": "Read the current family",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyViewerResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instances/today": {
+      "get": {
+        "summary": "Read today's instances",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TodayViewerResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/points/balance": {
+      "get": {
+        "summary": "Read current balance and progress",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BalanceViewerResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/rewards": {
+      "get": {
+        "summary": "Read rewards and savings goal state",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RewardsViewerResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/redemptions": {
+      "get": {
+        "summary": "Read redemptions for the current viewer",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RedemptionsViewerResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/notification-settings": {
+      "get": {
+        "summary": "List notification settings",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationSettingsResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update one child's notification settings",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotificationSettingsPatch"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotificationSetting"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/account": {
+      "delete": {
+        "summary": "Soft-delete the family account",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AccountDeleteBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AccountDeleteResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ApiError": {
+        "$ref": "#/definitions/ApiError",
+        "definitions": {
+          "ApiError": {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "string",
+                    "enum": [
+                      "VALIDATION_FAILED",
+                      "UNAUTHORIZED",
+                      "FORBIDDEN",
+                      "NOT_FOUND",
+                      "TASK_ALREADY_COMPLETED",
+                      "INVALID_STATUS",
+                      "UNDO_WINDOW_EXPIRED",
+                      "EMAIL_IN_USE",
+                      "INVALID_CREDENTIALS",
+                      "INSUFFICIENT_POINTS",
+                      "REWARD_LIMIT_REACHED",
+                      "PIN_LOCKED",
+                      "INVALID_FAMILY_CODE",
+                      "INVALID_INVITE",
+                      "IDEMPOTENCY_REPLAY",
+                      "RATE_LIMITED",
+                      "UPSTREAM_UNAVAILABLE"
+                    ]
+                  },
+                  "message": {
+                    "type": "string"
+                  },
+                  "details": {
+                    "type": "object",
+                    "additionalProperties": {}
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "error"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "RegisterBody": {
+        "$ref": "#/definitions/RegisterBody",
+        "definitions": {
+          "RegisterBody": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "password": {
+                "type": "string",
+                "minLength": 10
+              },
+              "familyName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 50
+              },
+              "displayName": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 30
+              },
+              "turnstileToken": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "email",
+              "password",
+              "familyName",
+              "displayName",
+              "turnstileToken"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "LoginBody": {
+        "$ref": "#/definitions/LoginBody",
+        "definitions": {
+          "LoginBody": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "password": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "email",
+              "password"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "FamilyCodeBody": {
+        "$ref": "#/definitions/FamilyCodeBody",
+        "definitions": {
+          "FamilyCodeBody": {
+            "type": "object",
+            "properties": {
+              "familyCode": {
+                "type": "string",
+                "minLength": 6,
+                "maxLength": 6
+              }
+            },
+            "required": [
+              "familyCode"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "ChildSessionBody": {
+        "$ref": "#/definitions/ChildSessionBody",
+        "definitions": {
+          "ChildSessionBody": {
+            "type": "object",
+            "properties": {
+              "familyCode": {
+                "type": "string",
+                "minLength": 6,
+                "maxLength": 6
+              },
+              "childId": {
+                "type": "string"
+              },
+              "pincode": {
+                "type": "string",
+                "pattern": "^\\d{4}$"
+              }
+            },
+            "required": [
+              "familyCode",
+              "childId",
+              "pincode"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "ChildSessionRefreshBody": {
+        "$ref": "#/definitions/ChildSessionRefreshBody",
+        "definitions": {
+          "ChildSessionRefreshBody": {
+            "type": "object",
+            "properties": {
+              "refreshToken": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "refreshToken"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "ChildSessionResult": {
+        "$ref": "#/definitions/ChildSessionResult",
+        "definitions": {
+          "ChildSessionResult": {
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "type": "string"
+              },
+              "refreshToken": {
+                "type": "string"
+              },
+              "expiresIn": {
+                "type": "number"
+              },
+              "child": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "displayName": {
+                    "type": "string"
+                  },
+                  "avatarId": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "id",
+                  "displayName",
+                  "avatarId"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "accessToken",
+              "refreshToken",
+              "expiresIn",
+              "child"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "FamilyCodeResult": {
+        "$ref": "#/definitions/FamilyCodeResult",
+        "definitions": {
+          "FamilyCodeResult": {
+            "type": "object",
+            "properties": {
+              "familyName": {
+                "type": "string"
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "avatarId": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "displayName",
+                    "avatarId"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "familyName",
+              "children"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "ParentSessionResult": {
+        "$ref": "#/definitions/ParentSessionResult",
+        "definitions": {
+          "ParentSessionResult": {
+            "type": "object",
+            "properties": {
+              "accessToken": {
+                "type": "string"
+              },
+              "refreshToken": {
+                "type": "string"
+              },
+              "expiresIn": {
+                "type": "number"
+              },
+              "userId": {
+                "type": "string"
+              },
+              "familyId": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "accessToken",
+              "refreshToken",
+              "expiresIn",
+              "userId",
+              "familyId"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "RefreshBody": {
+        "$ref": "#/definitions/RefreshBody",
+        "definitions": {
+          "RefreshBody": {
+            "type": "object",
+            "properties": {
+              "refreshToken": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "refreshToken"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "AccountDeleteBody": {
+        "$ref": "#/definitions/AccountDeleteBody",
+        "definitions": {
+          "AccountDeleteBody": {
+            "type": "object",
+            "properties": {
+              "password": {
+                "type": "string",
+                "minLength": 1
+              },
+              "appleIdentityToken": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "AccountDeleteResult": {
+        "$ref": "#/definitions/AccountDeleteResult",
+        "definitions": {
+          "AccountDeleteResult": {
+            "type": "object",
+            "properties": {
+              "deletedAt": {
+                "type": "string"
+              },
+              "purgeAfter": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "deletedAt",
+              "purgeAfter"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "FamilyViewerResponse": {
+        "$ref": "#/definitions/FamilyViewerResponse",
+        "definitions": {
+          "FamilyViewerResponse": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  },
+                  "viewer": {
+                    "type": "string",
+                    "enum": [
+                      "child"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "timezone",
+                  "viewer"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "type": "string"
+                  },
+                  "viewer": {
+                    "type": "string",
+                    "enum": [
+                      "parent"
+                    ]
+                  },
+                  "inviteCode": {
+                    "type": "string",
+                    "minLength": 6,
+                    "maxLength": 6
+                  },
+                  "quietStart": {
+                    "type": "string",
+                    "pattern": "^\\d{2}:\\d{2}$"
+                  },
+                  "quietEnd": {
+                    "type": "string",
+                    "pattern": "^\\d{2}:\\d{2}$"
+                  },
+                  "dayBonusPoints": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "weekBonusPoints": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "weekBonusThreshold": {
+                    "type": "number",
+                    "minimum": 0.5,
+                    "maximum": 1
+                  },
+                  "vacationMode": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "id",
+                  "name",
+                  "timezone",
+                  "viewer",
+                  "inviteCode",
+                  "quietStart",
+                  "quietEnd",
+                  "dayBonusPoints",
+                  "weekBonusPoints",
+                  "weekBonusThreshold",
+                  "vacationMode"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "ChildTodayView": {
+        "$ref": "#/definitions/ChildTodayView",
+        "definitions": {
+          "ChildTodayView": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "instances": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "taskId": {
+                      "type": "string"
+                    },
+                    "childId": {
+                      "type": "string"
+                    },
+                    "date": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "open",
+                        "completed",
+                        "submitted",
+                        "open_redo",
+                        "approved"
+                      ]
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "icon": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "points": {
+                      "type": "integer"
+                    },
+                    "photoBonusPoints": {
+                      "type": "integer"
+                    },
+                    "approvalRequired": {
+                      "type": "boolean"
+                    },
+                    "daypart": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "photoId": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "photoStatus": {
+                      "type": "string",
+                      "enum": [
+                        "processing",
+                        "ready"
+                      ],
+                      "nullable": true
+                    },
+                    "pointsEarned": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "redoNote": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "completedAt": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "approvedAt": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "taskId",
+                    "childId",
+                    "date",
+                    "status",
+                    "title",
+                    "icon",
+                    "category",
+                    "points",
+                    "photoBonusPoints",
+                    "approvalRequired",
+                    "daypart",
+                    "photoId",
+                    "photoStatus",
+                    "pointsEarned",
+                    "redoNote",
+                    "completedAt",
+                    "approvedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "balance": {
+                "type": "object",
+                "properties": {
+                  "childId": {
+                    "type": "string"
+                  },
+                  "balance": {
+                    "type": "integer"
+                  },
+                  "todayCompleted": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "todayTotal": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "weekProgress": {
+                    "type": "number",
+                    "minimum": 0,
+                    "maximum": 1
+                  },
+                  "streakDays": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "lifetimeEarned": {
+                    "type": "integer",
+                    "minimum": 0
+                  }
+                },
+                "required": [
+                  "childId",
+                  "balance",
+                  "todayCompleted",
+                  "todayTotal",
+                  "weekProgress",
+                  "streakDays",
+                  "lifetimeEarned"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "required": [
+              "date",
+              "instances",
+              "balance"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "ParentTodayView": {
+        "$ref": "#/definitions/ParentTodayView",
+        "definitions": {
+          "ParentTodayView": {
+            "type": "object",
+            "properties": {
+              "date": {
+                "type": "string"
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "childId": {
+                      "type": "string"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "avatarId": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "instances": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "taskId": {
+                            "type": "string"
+                          },
+                          "childId": {
+                            "type": "string"
+                          },
+                          "date": {
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string",
+                            "enum": [
+                              "open",
+                              "completed",
+                              "submitted",
+                              "open_redo",
+                              "approved"
+                            ]
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "icon": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "category": {
+                            "type": "string"
+                          },
+                          "points": {
+                            "type": "integer"
+                          },
+                          "photoBonusPoints": {
+                            "type": "integer"
+                          },
+                          "approvalRequired": {
+                            "type": "boolean"
+                          },
+                          "daypart": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "photoId": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "photoStatus": {
+                            "type": "string",
+                            "enum": [
+                              "processing",
+                              "ready"
+                            ],
+                            "nullable": true
+                          },
+                          "pointsEarned": {
+                            "type": "integer",
+                            "nullable": true
+                          },
+                          "redoNote": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "completedAt": {
+                            "type": "string",
+                            "nullable": true
+                          },
+                          "approvedAt": {
+                            "type": "string",
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "taskId",
+                          "childId",
+                          "date",
+                          "status",
+                          "title",
+                          "icon",
+                          "category",
+                          "points",
+                          "photoBonusPoints",
+                          "approvalRequired",
+                          "daypart",
+                          "photoId",
+                          "photoStatus",
+                          "pointsEarned",
+                          "redoNote",
+                          "completedAt",
+                          "approvedAt"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "balance": {
+                      "type": "object",
+                      "properties": {
+                        "childId": {
+                          "type": "string"
+                        },
+                        "balance": {
+                          "type": "integer"
+                        },
+                        "todayCompleted": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "todayTotal": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "weekProgress": {
+                          "type": "number",
+                          "minimum": 0,
+                          "maximum": 1
+                        },
+                        "streakDays": {
+                          "type": "integer",
+                          "minimum": 0
+                        },
+                        "lifetimeEarned": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "childId",
+                        "balance",
+                        "todayCompleted",
+                        "todayTotal",
+                        "weekProgress",
+                        "streakDays",
+                        "lifetimeEarned"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "childId",
+                    "displayName",
+                    "avatarId",
+                    "instances",
+                    "balance"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "date",
+              "children"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "TodayViewerResponse": {
+        "$ref": "#/definitions/TodayViewerResponse",
+        "definitions": {
+          "TodayViewerResponse": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "date": {
+                    "type": "string"
+                  },
+                  "instances": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "taskId": {
+                          "type": "string"
+                        },
+                        "childId": {
+                          "type": "string"
+                        },
+                        "date": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "open",
+                            "completed",
+                            "submitted",
+                            "open_redo",
+                            "approved"
+                          ]
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "category": {
+                          "type": "string"
+                        },
+                        "points": {
+                          "type": "integer"
+                        },
+                        "photoBonusPoints": {
+                          "type": "integer"
+                        },
+                        "approvalRequired": {
+                          "type": "boolean"
+                        },
+                        "daypart": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "photoId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "photoStatus": {
+                          "type": "string",
+                          "enum": [
+                            "processing",
+                            "ready"
+                          ],
+                          "nullable": true
+                        },
+                        "pointsEarned": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "redoNote": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "completedAt": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "approvedAt": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "taskId",
+                        "childId",
+                        "date",
+                        "status",
+                        "title",
+                        "icon",
+                        "category",
+                        "points",
+                        "photoBonusPoints",
+                        "approvalRequired",
+                        "daypart",
+                        "photoId",
+                        "photoStatus",
+                        "pointsEarned",
+                        "redoNote",
+                        "completedAt",
+                        "approvedAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "balance": {
+                    "type": "object",
+                    "properties": {
+                      "childId": {
+                        "type": "string"
+                      },
+                      "balance": {
+                        "type": "integer"
+                      },
+                      "todayCompleted": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "todayTotal": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "weekProgress": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      },
+                      "streakDays": {
+                        "type": "integer",
+                        "minimum": 0
+                      },
+                      "lifetimeEarned": {
+                        "type": "integer",
+                        "minimum": 0
+                      }
+                    },
+                    "required": [
+                      "childId",
+                      "balance",
+                      "todayCompleted",
+                      "todayTotal",
+                      "weekProgress",
+                      "streakDays",
+                      "lifetimeEarned"
+                    ],
+                    "additionalProperties": false
+                  },
+                  "viewer": {
+                    "type": "string",
+                    "enum": [
+                      "child"
+                    ]
+                  }
+                },
+                "required": [
+                  "date",
+                  "instances",
+                  "balance",
+                  "viewer"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "date": {
+                    "type": "string"
+                  },
+                  "children": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "childId": {
+                          "type": "string"
+                        },
+                        "displayName": {
+                          "type": "string"
+                        },
+                        "avatarId": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "instances": {
+                          "type": "array",
+                          "items": {
+                            "type": "object",
+                            "properties": {
+                              "id": {
+                                "type": "string"
+                              },
+                              "taskId": {
+                                "type": "string"
+                              },
+                              "childId": {
+                                "type": "string"
+                              },
+                              "date": {
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string",
+                                "enum": [
+                                  "open",
+                                  "completed",
+                                  "submitted",
+                                  "open_redo",
+                                  "approved"
+                                ]
+                              },
+                              "title": {
+                                "type": "string"
+                              },
+                              "icon": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "category": {
+                                "type": "string"
+                              },
+                              "points": {
+                                "type": "integer"
+                              },
+                              "photoBonusPoints": {
+                                "type": "integer"
+                              },
+                              "approvalRequired": {
+                                "type": "boolean"
+                              },
+                              "daypart": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "photoId": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "photoStatus": {
+                                "type": "string",
+                                "enum": [
+                                  "processing",
+                                  "ready"
+                                ],
+                                "nullable": true
+                              },
+                              "pointsEarned": {
+                                "type": "integer",
+                                "nullable": true
+                              },
+                              "redoNote": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "completedAt": {
+                                "type": "string",
+                                "nullable": true
+                              },
+                              "approvedAt": {
+                                "type": "string",
+                                "nullable": true
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "taskId",
+                              "childId",
+                              "date",
+                              "status",
+                              "title",
+                              "icon",
+                              "category",
+                              "points",
+                              "photoBonusPoints",
+                              "approvalRequired",
+                              "daypart",
+                              "photoId",
+                              "photoStatus",
+                              "pointsEarned",
+                              "redoNote",
+                              "completedAt",
+                              "approvedAt"
+                            ],
+                            "additionalProperties": false
+                          }
+                        },
+                        "balance": {
+                          "type": "object",
+                          "properties": {
+                            "childId": {
+                              "type": "string"
+                            },
+                            "balance": {
+                              "type": "integer"
+                            },
+                            "todayCompleted": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "todayTotal": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "weekProgress": {
+                              "type": "number",
+                              "minimum": 0,
+                              "maximum": 1
+                            },
+                            "streakDays": {
+                              "type": "integer",
+                              "minimum": 0
+                            },
+                            "lifetimeEarned": {
+                              "type": "integer",
+                              "minimum": 0
+                            }
+                          },
+                          "required": [
+                            "childId",
+                            "balance",
+                            "todayCompleted",
+                            "todayTotal",
+                            "weekProgress",
+                            "streakDays",
+                            "lifetimeEarned"
+                          ],
+                          "additionalProperties": false
+                        }
+                      },
+                      "required": [
+                        "childId",
+                        "displayName",
+                        "avatarId",
+                        "instances",
+                        "balance"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "viewer": {
+                    "type": "string",
+                    "enum": [
+                      "parent"
+                    ]
+                  }
+                },
+                "required": [
+                  "date",
+                  "children",
+                  "viewer"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "Balance": {
+        "$ref": "#/definitions/Balance",
+        "definitions": {
+          "Balance": {
+            "type": "object",
+            "properties": {
+              "childId": {
+                "type": "string"
+              },
+              "balance": {
+                "type": "integer"
+              },
+              "todayCompleted": {
+                "type": "integer"
+              },
+              "todayTotal": {
+                "type": "integer"
+              },
+              "weekProgress": {
+                "type": "number"
+              },
+              "streakDays": {
+                "type": "integer"
+              },
+              "lifetimeEarned": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "childId",
+              "balance",
+              "todayCompleted",
+              "todayTotal",
+              "weekProgress",
+              "streakDays",
+              "lifetimeEarned"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "BalanceViewerResponse": {
+        "$ref": "#/definitions/BalanceViewerResponse",
+        "definitions": {
+          "BalanceViewerResponse": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "childId": {
+                    "type": "string"
+                  },
+                  "balance": {
+                    "type": "integer"
+                  },
+                  "todayCompleted": {
+                    "type": "integer"
+                  },
+                  "todayTotal": {
+                    "type": "integer"
+                  },
+                  "weekProgress": {
+                    "type": "number"
+                  },
+                  "streakDays": {
+                    "type": "integer"
+                  },
+                  "lifetimeEarned": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "viewer": {
+                    "type": "string",
+                    "enum": [
+                      "child"
+                    ]
+                  }
+                },
+                "required": [
+                  "childId",
+                  "balance",
+                  "todayCompleted",
+                  "todayTotal",
+                  "weekProgress",
+                  "streakDays",
+                  "lifetimeEarned",
+                  "viewer"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "viewer": {
+                    "type": "string",
+                    "enum": [
+                      "parent"
+                    ]
+                  },
+                  "children": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "childId": {
+                          "type": "string"
+                        },
+                        "balance": {
+                          "type": "integer"
+                        },
+                        "todayCompleted": {
+                          "type": "integer"
+                        },
+                        "todayTotal": {
+                          "type": "integer"
+                        },
+                        "weekProgress": {
+                          "type": "number"
+                        },
+                        "streakDays": {
+                          "type": "integer"
+                        },
+                        "lifetimeEarned": {
+                          "type": "integer",
+                          "minimum": 0
+                        }
+                      },
+                      "required": [
+                        "childId",
+                        "balance",
+                        "todayCompleted",
+                        "todayTotal",
+                        "weekProgress",
+                        "streakDays",
+                        "lifetimeEarned"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "viewer",
+                  "children"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "RewardsViewerResponse": {
+        "$ref": "#/definitions/RewardsViewerResponse",
+        "definitions": {
+          "RewardsViewerResponse": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "viewer": {
+                    "type": "string",
+                    "enum": [
+                      "parent"
+                    ]
+                  },
+                  "rewards": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "price": {
+                          "type": "integer"
+                        },
+                        "limitPerWeek": {
+                          "type": "integer",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "icon",
+                        "price",
+                        "limitPerWeek"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "viewer",
+                  "rewards"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "viewer": {
+                    "type": "string",
+                    "enum": [
+                      "child"
+                    ]
+                  },
+                  "balance": {
+                    "type": "integer"
+                  },
+                  "rewards": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "price": {
+                          "type": "integer"
+                        },
+                        "limitPerWeek": {
+                          "type": "integer",
+                          "nullable": true
+                        },
+                        "affordable": {
+                          "type": "boolean"
+                        },
+                        "pinned": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "icon",
+                        "price",
+                        "limitPerWeek",
+                        "affordable",
+                        "pinned"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "savingsGoal": {
+                    "type": "object",
+                    "properties": {
+                      "rewardId": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "icon": {
+                        "type": "string",
+                        "nullable": true
+                      },
+                      "price": {
+                        "type": "integer"
+                      },
+                      "progress": {
+                        "type": "number",
+                        "minimum": 0,
+                        "maximum": 1
+                      }
+                    },
+                    "required": [
+                      "rewardId",
+                      "title",
+                      "icon",
+                      "price",
+                      "progress"
+                    ],
+                    "additionalProperties": false,
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "viewer",
+                  "balance",
+                  "rewards",
+                  "savingsGoal"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "RedemptionsViewerResponse": {
+        "$ref": "#/definitions/RedemptionsViewerResponse",
+        "definitions": {
+          "RedemptionsViewerResponse": {
+            "anyOf": [
+              {
+                "type": "object",
+                "properties": {
+                  "viewer": {
+                    "type": "string",
+                    "enum": [
+                      "parent"
+                    ]
+                  },
+                  "redemptions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "rewardId": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "price": {
+                          "type": "integer"
+                        },
+                        "childId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "pending",
+                            "fulfilled",
+                            "cancelled"
+                          ]
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "handledAt": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "rewardId",
+                        "title",
+                        "icon",
+                        "price",
+                        "childId",
+                        "status",
+                        "createdAt",
+                        "handledAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "viewer",
+                  "redemptions"
+                ],
+                "additionalProperties": false
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "viewer": {
+                    "type": "string",
+                    "enum": [
+                      "child"
+                    ]
+                  },
+                  "redemptions": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "id": {
+                          "type": "string"
+                        },
+                        "rewardId": {
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "icon": {
+                          "type": "string",
+                          "nullable": true
+                        },
+                        "price": {
+                          "type": "integer"
+                        },
+                        "childId": {
+                          "type": "string"
+                        },
+                        "status": {
+                          "type": "string",
+                          "enum": [
+                            "pending",
+                            "fulfilled",
+                            "cancelled"
+                          ]
+                        },
+                        "createdAt": {
+                          "type": "string"
+                        },
+                        "handledAt": {
+                          "type": "string",
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "rewardId",
+                        "title",
+                        "icon",
+                        "price",
+                        "childId",
+                        "status",
+                        "createdAt",
+                        "handledAt"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "viewer",
+                  "redemptions"
+                ],
+                "additionalProperties": false
+              }
+            ]
+          }
+        }
+      },
+      "NotificationSettingsResponse": {
+        "$ref": "#/definitions/NotificationSettingsResponse",
+        "definitions": {
+          "NotificationSettingsResponse": {
+            "type": "object",
+            "properties": {
+              "settings": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "childId": {
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "quietStart": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$",
+                      "nullable": true
+                    },
+                    "quietEnd": {
+                      "type": "string",
+                      "pattern": "^\\d{2}:\\d{2}$",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "childId",
+                    "enabled",
+                    "quietStart",
+                    "quietEnd"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "settings"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "NotificationSetting": {
+        "$ref": "#/definitions/NotificationSetting",
+        "definitions": {
+          "NotificationSetting": {
+            "type": "object",
+            "properties": {
+              "childId": {
+                "type": "string"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "quietStart": {
+                "type": "string",
+                "pattern": "^\\d{2}:\\d{2}$",
+                "nullable": true
+              },
+              "quietEnd": {
+                "type": "string",
+                "pattern": "^\\d{2}:\\d{2}$",
+                "nullable": true
+              }
+            },
+            "required": [
+              "childId",
+              "enabled",
+              "quietStart",
+              "quietEnd"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "NotificationSettingsPatch": {
+        "$ref": "#/definitions/NotificationSettingsPatch",
+        "definitions": {
+          "NotificationSettingsPatch": {
+            "type": "object",
+            "properties": {
+              "childId": {
+                "type": "string"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "quietStart": {
+                "type": "string",
+                "pattern": "^\\d{2}:\\d{2}$",
+                "nullable": true
+              },
+              "quietEnd": {
+                "type": "string",
+                "pattern": "^\\d{2}:\\d{2}$",
+                "nullable": true
+              }
+            },
+            "required": [
+              "childId"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "PushPayload": {
+        "$ref": "#/definitions/PushPayload",
+        "definitions": {
+          "PushPayload": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "task_open",
+                  "task_approved",
+                  "task_redo",
+                  "approval_queue",
+                  "pin_lock"
+                ]
+              },
+              "refId": {
+                "type": "string",
+                "nullable": true
+              },
+              "childId": {
+                "type": "string",
+                "nullable": true
+              },
+              "contentAvailable": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "additionalProperties": false
+          }
+        }
+      }
+    }
+  }
+}

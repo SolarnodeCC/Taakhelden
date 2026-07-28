@@ -19,6 +19,7 @@ export const InstanceView = z.object({
   approvalRequired: z.boolean(),
   daypart: z.string().nullable(),
   photoId: z.string().nullable(),
+  photoStatus: z.enum(["processing", "ready"]).nullable(),
   pointsEarned: z.number().int().nullable(),
   redoNote: z.string().nullable(),
   completedAt: z.string().nullable(),
@@ -34,6 +35,7 @@ export const TodayBalance = z.object({
   todayTotal: z.number().int().nonnegative(),
   weekProgress: z.number().min(0).max(1),
   streakDays: z.number().int().nonnegative(),
+  lifetimeEarned: z.number().int().nonnegative(),
 });
 export type TodayBalance = z.infer<typeof TodayBalance>;
 
@@ -60,6 +62,22 @@ export const ParentTodayView = z.object({
   children: z.array(ChildToday),
 });
 export type ParentTodayView = z.infer<typeof ParentTodayView>;
+
+export const ViewerChildTodayView = ChildTodayView.extend({
+  viewer: z.literal("child"),
+});
+export type ViewerChildTodayView = z.infer<typeof ViewerChildTodayView>;
+
+export const ViewerParentTodayView = ParentTodayView.extend({
+  viewer: z.literal("parent"),
+});
+export type ViewerParentTodayView = z.infer<typeof ViewerParentTodayView>;
+
+export const TodayViewerResponse = z.discriminatedUnion("viewer", [
+  ViewerChildTodayView,
+  ViewerParentTodayView,
+]);
+export type TodayViewerResponse = z.infer<typeof TodayViewerResponse>;
 
 /** Opaque pagination cursor for GET /instances (history). */
 export const HistoryCursor = z.object({
