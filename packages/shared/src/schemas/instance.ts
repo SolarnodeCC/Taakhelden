@@ -35,6 +35,7 @@ export const TodayBalance = z.object({
   todayTotal: z.number().int().nonnegative(),
   weekProgress: z.number().min(0).max(1),
   streakDays: z.number().int().nonnegative(),
+  lifetimeEarned: z.number().int().nonnegative(),
 });
 export type TodayBalance = z.infer<typeof TodayBalance>;
 
