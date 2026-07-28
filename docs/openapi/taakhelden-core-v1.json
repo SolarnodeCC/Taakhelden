@@ -433,6 +433,7 @@
                       "PIN_LOCKED",
                       "INVALID_FAMILY_CODE",
                       "INVALID_INVITE",
+                      "INSTANCE_SLOT_TAKEN",
                       "IDEMPOTENCY_REPLAY",
                       "RATE_LIMITED",
                       "UPSTREAM_UNAVAILABLE"

@@ -98,7 +98,8 @@ export function FamilyRealtimeProvider({ children }: { children: ReactNode }) {
         socket.onmessage = (ev) => {
           let raw: unknown;
           try {
-            raw = JSON.parse(ev.data as string);
+            if (typeof ev.data !== "string") return;
+            raw = JSON.parse(ev.data);
           } catch {
             return;
           }
@@ -167,7 +168,10 @@ export function useRealtimeRefetch(
 
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null;
-    const watched = new Set(events);
+    // Decode from eventKey so the effect does not depend on unstable array identity.
+    const watched = new Set(
+      eventKey.length > 0 ? (eventKey.split("\0") as RealtimeSignal[]) : [],
+    );
 
     const run = () => {
       void refetchRef.current();
@@ -190,7 +194,5 @@ export function useRealtimeRefetch(
       unsub();
       if (timer !== null) clearTimeout(timer);
     };
-    // eventKey encodes `events` without unstable array identity
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- events via eventKey
   }, [subscribe, eventKey, debounceMs]);
 }

@@ -279,5 +279,5 @@ export function useWeekMove(setInstances: Dispatch<SetStateAction<InstanceView[]
     [setInstances, tw],
   );
 
-  return { move, error, moving, isPending: () => pendingRef.current };
+  return { move, error, moving };
 }
