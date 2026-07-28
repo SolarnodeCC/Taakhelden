@@ -1,6 +1,7 @@
 # Voorstel: `.claude/rules/` met glob-patterns voor TaakHelden
 
-> **Status:** voorstel — nog geen rule-bestanden geactiveerd. Beslis per sectie hieronder.
+> **Status:** geïmplementeerd — **pakket C** (alle 15 rules + subdirs, lazy `paths`).
+> Beslisdocument; rule-bestanden zijn de actieve bron.
 >
 > **Bronnen:** `agent/baselines/main.repo-score.json` (Jankurai v1.6.10, score 47),
 > `target/jankurai/taakhelden-code-review.md` (handmatige review F1–F7),
@@ -391,4 +392,23 @@ paths: docs/**/*.md,AGENTS.md,CLAUDE.md
 | **B — Aanbevolen** | A + `services-and-do`, `api/tests`, `shared/schemas`, `web/ui`, `generated-zones` | Medium | + UX gap, secrets in tests, contracts |
 | **C — Volledig** | Alle 15 rules + subdirs | Hoger | + CI/agent, i18n, ios, docs |
 
-**Jouw keuze:** A / B / C — en per rule ✅/❌ in de tabellen hierboven.
+**Gekozen:** **C — Volledig** (alle rules, subdirectories, lazy frontmatter).
+
+| Rule | Bestand | Status |
+|------|---------|--------|
+| workflow | `always/workflow.md` | ✅ |
+| api routes | `api/routes.md` | ✅ |
+| api repo | `api/repo.md` | ✅ |
+| services/DO | `api/services-and-do.md` | ✅ |
+| middleware | `api/middleware.md` | ✅ |
+| migrations | `api/migrations.md` | ✅ |
+| api tests | `api/tests.md` | ✅ |
+| shared | `shared/schemas.md` | ✅ |
+| web ui | `web/ui.md` | ✅ |
+| web bff | `web/bff.md` | ✅ |
+| web i18n | `web/i18n.md` | ✅ |
+| ios | `ios/swift.md` | ✅ |
+| ci/agent | `ops/ci-and-agent.md` | ✅ |
+| generated | `ops/generated-zones.md` | ✅ |
+| docs | `docs/markdown.md` | ✅ |
+| index | `README.md` | ✅ |
