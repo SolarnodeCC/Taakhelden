@@ -6,11 +6,30 @@
     "submit": "Inloggen",
     "submitting": "Bezig met inloggen…",
     "logout": "Uitloggen",
+    "noAccount": "Nog geen account?",
+    "registerLink": "Start je gezin",
     "errors": {
       "INVALID_CREDENTIALS": "Dat e-mailadres en wachtwoord passen nog niet bij elkaar. Probeer het gerust opnieuw.",
       "RATE_LIMITED": "Even een momentje — probeer het over een minuutje nog eens.",
       "VALIDATION_FAILED": "Vul een geldig e-mailadres en wachtwoord in.",
       "generic": "Er ging iets mis bij het inloggen. Probeer het straks nog eens."
+    },
+    "register": {
+      "intro": "Maak een account aan en start je gezin op TaakHelden.",
+      "displayName": "Jouw roepnaam",
+      "familyName": "Naam van je gezin",
+      "passwordHint": "Minstens 10 tekens.",
+      "submit": "Gezin starten",
+      "submitting": "Bezig met aanmaken…",
+      "hasAccount": "Heb je al een account?",
+      "loginLink": "Inloggen",
+      "turnstileError": "De beveiligingscheck lukte niet. Probeer het nog eens.",
+      "errors": {
+        "EMAIL_IN_USE": "Dit e-mailadres is al in gebruik. Log gerust in of kies een ander adres.",
+        "RATE_LIMITED": "Even een momentje — probeer het over een minuutje nog eens.",
+        "VALIDATION_FAILED": "Controleer of alle velden goed zijn ingevuld (wachtwoord minstens 10 tekens).",
+        "generic": "Er ging iets mis bij het aanmaken. Probeer het straks nog eens."
+      }
     }
   },
   "nav": {
@@ -18,6 +37,7 @@
     "goedkeuren": "Goedkeuren",
     "taken": "Taken",
     "winkel": "Winkel",
+    "gezin": "Gezin",
     "inzichten": "Inzichten"
   },
   "shell": {
@@ -141,6 +161,72 @@
       "fldLimited": "Beperk hoe vaak per week",
       "fldLimitPerWeek": "Max per week",
       "errorSave": "Kon de beloning niet opslaan.",
+      "save": "Opslaan",
+      "saving": "Bezig met opslaan…",
+      "cancel": "Annuleren"
+    }
+  },
+  "gezin": {
+    "title": "Gezin",
+    "subtitle": "{name}",
+    "loading": "Laden…",
+    "loadError": "Kon gezinsgegevens niet laden.",
+    "actionError": "Er ging iets mis. Probeer het nog eens.",
+    "forbidden": "Deze pagina is alleen voor ouders met volledig beheer.",
+    "backToToday": "Terug naar Vandaag",
+    "onboarding": {
+      "step2": "Stap 2 — Voeg je eerste kind toe",
+      "step3": "Stap 3 — Deel de gezinscode met het kindertoestel",
+      "goToday": "Naar vandaag",
+      "dismiss": "Klaar"
+    },
+    "invite": {
+      "title": "Gezinscode",
+      "hint": "Open de TaakHelden-app op het kindertoestel en vul deze code in.",
+      "copy": "Kopiëren",
+      "copied": "Gekopieerd",
+      "regenerate": "Nieuwe code maken",
+      "regenerating": "Bezig…",
+      "regenerateConfirm": "De oude code werkt meteen niet meer. Doorgaan?",
+      "codeAria": "Gezinscode {code}"
+    },
+    "children": {
+      "title": "Kinderen",
+      "add": "Kind toevoegen",
+      "empty": "Nog geen kinderen — voeg het eerste kind toe.",
+      "edit": "Bewerken",
+      "resetPin": "Pincode resetten",
+      "born": "Geboren in {year}",
+      "ageMode": {
+        "young": "Jong",
+        "mid": "Midden",
+        "teen": "Tiener"
+      }
+    },
+    "parents": {
+      "title": "Ouders & verzorgers",
+      "permissions": {
+        "full": "volledig beheer",
+        "approve_only": "alleen goedkeuren"
+      }
+    },
+    "form": {
+      "createTitle": "Kind toevoegen",
+      "editTitle": "Kind bewerken",
+      "resetPinTitle": "Nieuwe pincode",
+      "displayName": "Roepnaam",
+      "birthYear": "Geboortejaar",
+      "avatar": "Avatar",
+      "avatarOptional": "Optioneel — kies een icoon.",
+      "avatarOption": "Avatar {id}",
+      "pincode": "Pincode (4 cijfers)",
+      "pincodeConfirm": "Pincode bevestigen",
+      "consent": "Ik ben ouder/verzorger en geef toestemming om dit kindprofiel aan te maken.",
+      "consentRequired": "Bevestig eerst de toestemming.",
+      "privacyNote": "we bewaren alleen roepnaam, geboortejaar en avatar",
+      "pinMismatch": "De pincodes komen nog niet overeen.",
+      "errorValidation": "Controleer de invoer en probeer het opnieuw.",
+      "errorSave": "Kon niet opslaan. Probeer het nog eens.",
       "save": "Opslaan",
       "saving": "Bezig met opslaan…",
       "cancel": "Annuleren"

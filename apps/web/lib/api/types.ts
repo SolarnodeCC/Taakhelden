@@ -20,9 +20,18 @@ export const FamilyView = z
     id: z.string(),
     name: z.string(),
     timezone: z.string().optional(),
+    inviteCode: z.string().length(6).optional(),
   })
   .passthrough();
 export type FamilyView = z.infer<typeof FamilyView>;
+
+export const InviteCodeResult = z.object({
+  inviteCode: z.string().length(6),
+});
+export type InviteCodeResult = z.infer<typeof InviteCodeResult>;
+
+export const AgeMode = z.enum(["young", "mid", "teen"]);
+export type AgeMode = z.infer<typeof AgeMode>;
 
 export const MemberView = z
   .object({
@@ -31,6 +40,9 @@ export const MemberView = z
     displayName: z.string(),
     avatarId: z.string().nullable().optional(),
     permissions: z.enum(["full", "approve_only"]).optional(),
+    birthYear: z.number().int().nullable().optional(),
+    ageMode: AgeMode.nullable().optional(),
+    email: z.string().nullable().optional(),
   })
   .passthrough();
 export type MemberView = z.infer<typeof MemberView>;
