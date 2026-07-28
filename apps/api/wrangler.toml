@@ -43,11 +43,19 @@ queue = "export-processing"
 [triggers]
 crons = ["5 0 * * *", "*/15 * * * *"]  # 00:05 instance-generatie · elke 15 min notificaties
 
-# Secrets (via `wrangler secret put`): JWT_SECRET, APNS_KEY, APNS_KEY_ID,
-# APNS_TEAM_ID, APPLE_CLIENT_ID, APPLE_BUNDLE_ID, TURNSTILE_SECRET,
-# EMAIL_API_KEY, EMAIL_FROM
-# Vars (optioneel): APP_BASE_URL (voor uitnodigings-links in e-mail), APNS_ENV
-# (`sandbox` in dev/TestFlight, `production` in App Store/prod)
+# Plain-text vars (safe in git). Secrets stay out of this file — see [secrets] + CI sync.
+[vars]
+APP_BASE_URL = "https://taakhelden-web.oostelaar.workers.dev"
+APNS_ENV = "sandbox"
+APPLE_CLIENT_ID = "com.taakhelden.web"
+APPLE_BUNDLE_ID = "nl.taakhelden.app"
+
+# Deploy fails if these are missing on the Worker. Set via GitHub Environment
+# secrets (synced in deploy-prod.yml) or `npx wrangler secret put <NAME>`.
+# Optional secrets (Turnstile / APNs key / email) are listed in
+# docs/cloudflare-bindings-audit.md and synced when present in GitHub.
+[secrets]
+required = ["JWT_SECRET"]
 
 [env.production]
 name = "taakhelden-api-prod"

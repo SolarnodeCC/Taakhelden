@@ -85,7 +85,10 @@ auth.post("/apple", validate("json", AppleAuthBody), async (c) => {
   await rateLimit(c, "apple", 5);
   const body = c.req.valid("json");
 
-  const claims = await verifyAppleIdentityToken(body.identityToken, c.env.APPLE_CLIENT_ID);
+  const claims = await verifyAppleIdentityToken(
+    body.identityToken,
+    c.env.APPLE_CLIENT_ID ?? "",
+  );
   if (!claims) {
     throw new ApiException(
       401,
