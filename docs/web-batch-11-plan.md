@@ -5,6 +5,9 @@ document is de scope- en aanpakafspraak; de implementatie volgt in een aparte PR
 **nadat Batch 10 is gemerged** (Batch 11 bouwt voort op het complete
 gezinsbeheer-dashboard + bestaande Vandaag/Goedkeuren-pagina's).
 
+> Centraal backlog-overzicht (Inzichten, WS, drag-drop, post-MVP):
+> [`web-dashboard-roadmap.md`](./web-dashboard-roadmap.md).
+
 ## Waar we staan (batch 1–10)
 
 | Batch | Inhoud | Status |
