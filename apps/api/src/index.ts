@@ -23,7 +23,7 @@ const app = new Hono<AppBindings>().basePath("/v1");
 app.onError(errorHandler);
 app.get("/health", async (c) => {
   // Lightweight readiness for deploy smoke tests — never expose secret values.
-  let db = false;
+  let db: boolean;
   try {
     db = (await c.env.DB.prepare("SELECT 1 AS ok").first<{ ok: number }>())?.ok === 1;
   } catch {

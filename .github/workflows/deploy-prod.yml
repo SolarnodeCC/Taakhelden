@@ -81,13 +81,13 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: "5546763229b35df670e33d9316d7f2e0"
           JWT_SECRET_FROM_GITHUB: ${{ secrets.JWT_SECRET }}
         run: |
-          set -e
-          list=$(npx wrangler secret list 2>/dev/null || true)
-          if echo "$list" | grep -q '"name": "JWT_SECRET"'; then
+          set -euo pipefail
+          list=$(npx wrangler secret list)
+          if printf '%s' "$list" | grep -q '"name": "JWT_SECRET"'; then
             echo "JWT_SECRET already configured"
             exit 0
           fi
-          if [ -n "$JWT_SECRET_FROM_GITHUB" ]; then
+          if [ -n "${JWT_SECRET_FROM_GITHUB}" ]; then
             printf '%s' "$JWT_SECRET_FROM_GITHUB" | npx wrangler secret put JWT_SECRET
           else
             echo "JWT_SECRET missing — generating bootstrap secret"
@@ -98,17 +98,22 @@ jobs:
       # https://api.taakhelden.nl/v1/health zodra dat domein gekoppeld is.
       - name: Smoke test
         run: |
-          set -e
+          set -euo pipefail
           body=$(curl --fail -sS https://taakhelden-api.oostelaar.workers.dev/v1/health)
           echo "health=$body"
-          echo "$body" | grep -q '"ok":true'
-          echo "$body" | grep -q '"jwt":true'
-          echo "$body" | grep -q '"db":true'
-          # Register must succeed end-to-end (not 500).
+          printf '%s' "$body" | grep -q '"ok":true'
+          printf '%s' "$body" | grep -q '"jwt":true'
+          printf '%s' "$body" | grep -q '"db":true'
+          # Register must succeed end-to-end (not 500). Do not log the body —
+          # a 201 response includes access/refresh tokens.
           email="smoke-$(date +%s)@example.com"
           code=$(curl -sS -o /tmp/reg.json -w "%{http_code}" \
             -X POST https://taakhelden-api.oostelaar.workers.dev/v1/auth/register \
             -H "Content-Type: application/json" \
             -d "{\"email\":\"$email\",\"password\":\"SmokeTestPassword1\",\"familyName\":\"Smoke\",\"displayName\":\"Smoke\",\"turnstileToken\":\"dev-bypass\"}")
-          echo "register status=$code body=$(cat /tmp/reg.json)"
+          echo "register status=$code"
+          if [ "$code" != "201" ]; then
+            # Log error code only (no tokens).
+            python3 -c 'import json,sys; d=json.load(open("/tmp/reg.json")); print("error=", (d.get("error") or {}).get("code"))'
+          fi
           test "$code" = "201"
