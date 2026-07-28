@@ -84,13 +84,11 @@ jobs:
           set -euo pipefail
           list=$(npx wrangler secret list)
           if printf '%s' "$list" | grep -q '"name": "JWT_SECRET"'; then
-            echo "JWT_SECRET already configured"
             exit 0
           fi
           if [ -n "${JWT_SECRET_FROM_GITHUB}" ]; then
             printf '%s' "$JWT_SECRET_FROM_GITHUB" | npx wrangler secret put JWT_SECRET
           else
-            echo "JWT_SECRET missing — generating bootstrap secret"
             openssl rand -hex 32 | npx wrangler secret put JWT_SECRET
           fi
       # Smoke-test tegen de workers.dev-URL zolang api.taakhelden.nl nog niet
