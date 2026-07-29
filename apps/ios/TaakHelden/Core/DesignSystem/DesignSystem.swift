@@ -54,7 +54,8 @@ enum THPalettes {
         mutedText: THColorToken(hex: 0x6B5D4C),
         accent: THColorToken(hex: 0xFF6F59), // --kid-coral
         accentSoft: THColorToken(hex: 0xFFE1DA), // --kid-coral-soft
-        onAccent: THColorToken(hex: 0xFFFFFF),
+        // White on coral is ~2.74:1 (fails WCAG UI-component 3:1); use kid-text.
+        onAccent: THColorToken(hex: 0x2B2116),
         secondary: THColorToken(hex: 0x0E9F8E), // --kid-turquoise
         highlight: THColorToken(hex: 0xFFC93C), // --kid-yellow
         shadow: THColorToken(hex: 0xFF6F59, alpha: 0.28) // --shadow-kid

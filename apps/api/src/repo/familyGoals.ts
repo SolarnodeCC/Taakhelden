@@ -3,8 +3,12 @@
  * nooit huidig saldo, nooit per-kind ranking in de response voor kind-UI.
  */
 import type { CreateFamilyGoalBody, FamilyGoal, FamilyGoalProgress, PatchFamilyGoalBody } from "@taakhelden/shared";
+import { z } from "zod";
 import { newId } from "../services/ids";
+import { parseJsonColumn } from "../services/jsonParse";
 import { listChildren } from "./families";
+
+const ChildIdList = z.array(z.string().min(1));
 
 interface FamilyGoalRow {
   id: string;
@@ -19,13 +23,7 @@ interface FamilyGoalRow {
 }
 
 function parseChildIds(raw: string | null): string[] {
-  if (!raw) return [];
-  try {
-    const parsed = JSON.parse(raw) as unknown;
-    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === "string") : [];
-  } catch {
-    return [];
-  }
+  return parseJsonColumn(raw, ChildIdList, []);
 }
 
 function mapGoal(row: FamilyGoalRow): FamilyGoal {
