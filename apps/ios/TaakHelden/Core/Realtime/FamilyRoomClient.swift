@@ -155,25 +155,65 @@ final class LiveFamilyRoomClient: FamilyRoomClient, @unchecked Sendable {
             lock.unlock()
 
             task.resume()
-            statusHandler?(.connected)
             lock.lock()
             reconnectAttempt = 0
             lock.unlock()
-            await receiveLoop(task)
+            startPingLoop(task)
+            await receiveLoop(task, markConnectedOnFirstReceive: true)
         } catch {
             scheduleReconnect()
         }
     }
 
-    private func receiveLoop(_ task: URLSessionWebSocketTask) async {
+    private func startPingLoop(_ task: URLSessionWebSocketTask) {
+        Task { [weak self] in
+            while true {
+                guard let self else { return }
+                self.lock.lock()
+                let running = self.shouldRun
+                self.lock.unlock()
+                guard running else { return }
+
+                try? await Task.sleep(nanoseconds: 25_000_000_000)
+                self.lock.lock()
+                let stillRunning = self.shouldRun
+                let active = self.task
+                self.lock.unlock()
+                guard stillRunning, active === task else { return }
+
+                do {
+                    try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+                        task.sendPing { error in
+                            if let error {
+                                continuation.resume(throwing: error)
+                            } else {
+                                continuation.resume()
+                            }
+                        }
+                    }
+                } catch {
+                    self.scheduleReconnect()
+                    return
+                }
+            }
+        }
+    }
+
+    private func receiveLoop(_ task: URLSessionWebSocketTask, markConnectedOnFirstReceive: Bool) async {
+        var announcedConnected = !markConnectedOnFirstReceive
         while true {
             lock.lock()
             let running = shouldRun
+            let statusHandler = onStatusChange
             lock.unlock()
             guard running else { return }
 
             do {
                 let message = try await task.receive()
+                if !announcedConnected {
+                    announcedConnected = true
+                    statusHandler?(.connected)
+                }
                 switch message {
                 case .string(let text):
                     handleMessage(text)

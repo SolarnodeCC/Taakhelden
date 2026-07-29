@@ -136,6 +136,7 @@ describe("fotoflow: upload → strip → ready", () => {
     const approve = await api(`/instances/${instanceId}/approve`, {
       method: "POST",
       token: await parentToken(fam.parentId, fam.familyId),
+      idempotencyKey: crypto.randomUUID(),
     });
     const result = (await approve.json()) as { photoBonusPoints: number; newBalance: number };
     expect(result.photoBonusPoints).toBe(5);

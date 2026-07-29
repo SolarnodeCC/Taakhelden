@@ -148,8 +148,10 @@ struct ChildUnlockView: View {
                 errorMessage = nil
                 appState.unlockChildHome()
             }
-        } catch {
+        } catch let error as LocalAuthenticationError {
             errorMessage = error.localizedDescription
+        } catch {
+            errorMessage = LocalAuthenticationError.unavailable.localizedDescription
         }
     }
 }

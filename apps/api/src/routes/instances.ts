@@ -119,12 +119,12 @@ instances.post("/:id/complete", requireIdempotencyKey, idempotency, async (c) =>
   callFamilyRoom(c, "/complete", { instanceId: c.req.param("id") }),
 );
 
-instances.post("/:id/approve", idempotency, async (c) => {
+instances.post("/:id/approve", requireIdempotencyKey, idempotency, async (c) => {
   requireParent(c);
   return callFamilyRoom(c, "/approve", { instanceId: c.req.param("id") });
 });
 
-instances.post("/:id/redo", validate("json", RedoBody), async (c) => {
+instances.post("/:id/redo", requireIdempotencyKey, idempotency, validate("json", RedoBody), async (c) => {
   requireParent(c);
   // Vriendelijke toelichting verplicht; GEEN puntenaftrek (architectuurregel 4).
   return callFamilyRoom(c, "/redo", {
@@ -133,7 +133,7 @@ instances.post("/:id/redo", validate("json", RedoBody), async (c) => {
   });
 });
 
-instances.post("/:id/undo", async (c) =>
+instances.post("/:id/undo", requireIdempotencyKey, idempotency, async (c) =>
   callFamilyRoom(c, "/undo", { instanceId: c.req.param("id") }),
 );
 

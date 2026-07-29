@@ -216,12 +216,12 @@ struct ParentModeRootView: View {
 
             HStack(spacing: THSpacing.md) {
                 ParentStatusPill(
-                    title: "Live",
+                    title: String(localized: "parent.sync.live"),
                     detail: connectionLabel(for: store.connectionState),
                     palette: palette
                 )
                 ParentStatusPill(
-                    title: "Sync",
+                    title: String(localized: "parent.sync.sync"),
                     detail: syncLabel(for: store.syncCoordinator.state),
                     palette: palette
                 )
@@ -316,7 +316,7 @@ private struct ParentTodayView: View {
                                     Text("\(child.avatar) \(child.displayName)")
                                         .font(.system(size: 22, weight: .bold, design: .default))
                                         .foregroundStyle(palette.text.color)
-                                    Text("\(child.balancePoints) punten")
+                                    Text(String(format: String(localized: "parent.today.balance"), child.balancePoints))
                                         .foregroundStyle(palette.mutedText.color)
                                 }
                                 Spacer()

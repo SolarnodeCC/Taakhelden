@@ -66,7 +66,12 @@ extension TaakHeldenAPIClient {
 
     func archiveTask(id: String) async throws {
         _ = try await sendAsParent(
-            HTTPRequest(path: "/tasks/\(id)", method: .delete, requiresAuth: true)
+            HTTPRequest(
+                path: "/tasks/\(id)",
+                method: .delete,
+                requiresAuth: true,
+                idempotencyKey: IdempotencyKey.forTaskArchive(taskID: id)
+            )
         )
     }
 
@@ -101,7 +106,12 @@ extension TaakHeldenAPIClient {
 
     func archiveReward(id: String) async throws {
         _ = try await sendAsParent(
-            HTTPRequest(path: "/rewards/\(id)", method: .delete, requiresAuth: true)
+            HTTPRequest(
+                path: "/rewards/\(id)",
+                method: .delete,
+                requiresAuth: true,
+                idempotencyKey: IdempotencyKey.forRewardArchive(rewardID: id)
+            )
         )
     }
 

@@ -130,7 +130,7 @@ final class Phase2ParentModeTests: XCTestCase {
 
     func testManagedTaskCreateAppearsInPreviewStore() async {
         let apiClient = PreviewAPIClient()
-        let store = ParentModeStore(apiClient: apiClient)
+        let store = ParentModeStore(apiClient: apiClient, familyRoomClient: PreviewFamilyRoomClient())
         await store.refresh(trigger: .manualRefresh)
         await MainActor.run {
             store.draftTaskTitle = "Schoenen wegzetten"
@@ -148,7 +148,6 @@ final class Phase2ParentModeTests: XCTestCase {
         // Keep iOS reconnect policy stable as the realtime partner of sync deltas.
         XCTAssertEqual(FamilyRoomReconnectPolicy.parentDefault.delaysInSeconds, [2, 4, 8])
     }
-}
 
     func testReconnectPolicyUsesApprovedBackoffSequence() {
         let policy = FamilyRoomReconnectPolicy.parentDefault
@@ -184,5 +183,20 @@ final class Phase2ParentModeTests: XCTestCase {
             XCTAssertEqual(store.snapshot?.pendingApprovalCount, 1)
             XCTAssertEqual(store.syncCoordinator.lastTrigger, .approvalResolved)
         }
+    }
+
+    func testApprovalIdempotencyKeysAreDeterministic() {
+        XCTAssertEqual(
+            IdempotencyKey.forApproval(instanceID: "ti_1"),
+            IdempotencyKey.forApproval(instanceID: "ti_1")
+        )
+        XCTAssertEqual(
+            IdempotencyKey.forRedo(instanceID: "ti_1"),
+            IdempotencyKey.forRedo(instanceID: "ti_1")
+        )
+        XCTAssertNotEqual(
+            IdempotencyKey.forApproval(instanceID: "ti_1"),
+            IdempotencyKey.forRedo(instanceID: "ti_1")
+        )
     }
 }

@@ -27,10 +27,13 @@ final class ParentModeStore {
     var draftTaskPoints = 10
     var draftRewardTitle = ""
     var draftRewardPrice = 40
+    private var exportTask: Task<Void, Never>?
+
+    static let bulkConcurrencyLimit = 4
 
     init(
         apiClient: APIClient,
-        familyRoomClient: FamilyRoomClient = PreviewFamilyRoomClient(),
+        familyRoomClient: FamilyRoomClient,
         syncCoordinator: ParentSyncCoordinator = ParentSyncCoordinator()
     ) {
         self.apiClient = apiClient
@@ -57,6 +60,8 @@ final class ParentModeStore {
     @MainActor
     func endSession() {
         isSessionActive = false
+        exportTask?.cancel()
+        exportTask = nil
         familyRoomClient.disconnect()
         connectionState = .disconnected
         selectedApprovalIDs = []
@@ -134,12 +139,21 @@ final class ParentModeStore {
 
     @MainActor
     func requestExport() async {
-        do {
-            let receipt = try await apiClient.requestParentDataExport()
-            exportStatusMessage = receipt.message
-        } catch {
-            exportStatusMessage = error.localizedDescription
+        exportTask?.cancel()
+        let task = Task { @MainActor in
+            do {
+                let receipt = try await apiClient.requestParentDataExport()
+                guard !Task.isCancelled else { return }
+                exportStatusMessage = receipt.message
+            } catch is CancellationError {
+                return
+            } catch {
+                guard !Task.isCancelled else { return }
+                exportStatusMessage = error.localizedDescription
+            }
         }
+        exportTask = task
+        await task.value
     }
 
     @MainActor
@@ -225,41 +239,6 @@ final class ParentModeStore {
         }
     }
 
-    func isSelected(_ item: ApprovalQueueItem) -> Bool {
-        selectedApprovalIDs.contains(item.id)
-    }
-
-    func toggleSelection(for item: ApprovalQueueItem) {
-        if selectedApprovalIDs.contains(item.id) {
-            selectedApprovalIDs.remove(item.id)
-        } else {
-            selectedApprovalIDs.insert(item.id)
-        }
-
-        if !selectedApprovalIDs.contains(where: { selectedID in
-            snapshot?.approvalItem(id: selectedID)?.hasPhoto == true
-        }) {
-            acknowledgedBulkPhotoReview = false
-        }
-    }
-
-    func selectedItems() -> [ApprovalQueueItem] {
-        guard let snapshot else { return [] }
-        return snapshot.approvalSections
-            .flatMap(\.items)
-            .sorted { $0.submittedAt < $1.submittedAt }
-            .filter { selectedApprovalIDs.contains($0.id) }
-    }
-
-    func bulkApprovalValidation() -> BulkApprovalValidation {
-        ParentApprovalRules.validateBulkApproval(
-            selectedItems: selectedItems(),
-            acknowledgedPhotoReview: acknowledgedBulkPhotoReview
-        )
-    }
-
-    static let bulkConcurrencyLimit = 4
-
     @MainActor
     func approveSelectedItems() async {
         let items = selectedItems()
@@ -271,30 +250,31 @@ final class ParentModeStore {
         bulkFailureMessage = nil
         defer { isBulkApproving = false }
 
-        let keys = items.map { IdempotencyKey.forApproval(instanceID: $0.id) }
+        let keys = Dictionary(uniqueKeysWithValues: items.map { ($0.id, IdempotencyKey.forApproval(instanceID: $0.id)) })
         var failures = 0
+        var inFlight = 0
 
         await withTaskGroup(of: Bool.self) { group in
-            for (index, item) in items.enumerated() {
-                if index >= Self.bulkConcurrencyLimit {
-                    if let ok = await group.next(), !ok {
-                        failures += 1
+            for item in items {
+                if inFlight >= Self.bulkConcurrencyLimit {
+                    if let ok = await group.next() {
+                        inFlight -= 1
+                        if !ok { failures += 1 }
                     }
                 }
+                inFlight += 1
+                let key = keys[item.id] ?? IdempotencyKey.forApproval(instanceID: item.id)
                 group.addTask { [apiClient] in
                     do {
-                        _ = try await apiClient.approveApproval(
-                            id: item.id,
-                            idempotencyKey: keys[index]
-                        )
+                        _ = try await apiClient.approveApproval(id: item.id, idempotencyKey: key)
                         return true
                     } catch {
                         return false
                     }
                 }
             }
-            for await ok in group where !ok {
-                failures += 1
+            for await ok in group {
+                if !ok { failures += 1 }
             }
         }
 
@@ -326,8 +306,46 @@ final class ParentModeStore {
         fullscreenPhoto = asset
     }
 
+    @MainActor
     func closeFullscreenPhoto() {
         fullscreenPhoto = nil
+    }
+
+    @MainActor
+    func isSelected(_ item: ApprovalQueueItem) -> Bool {
+        selectedApprovalIDs.contains(item.id)
+    }
+
+    @MainActor
+    func toggleSelection(for item: ApprovalQueueItem) {
+        if selectedApprovalIDs.contains(item.id) {
+            selectedApprovalIDs.remove(item.id)
+        } else {
+            selectedApprovalIDs.insert(item.id)
+        }
+
+        if !selectedApprovalIDs.contains(where: { selectedID in
+            snapshot?.approvalItem(id: selectedID)?.hasPhoto == true
+        }) {
+            acknowledgedBulkPhotoReview = false
+        }
+    }
+
+    @MainActor
+    func selectedItems() -> [ApprovalQueueItem] {
+        guard let snapshot else { return [] }
+        return snapshot.approvalSections
+            .flatMap(\.items)
+            .sorted { $0.submittedAt < $1.submittedAt }
+            .filter { selectedApprovalIDs.contains($0.id) }
+    }
+
+    @MainActor
+    func bulkApprovalValidation() -> BulkApprovalValidation {
+        ParentApprovalRules.validateBulkApproval(
+            selectedItems: selectedItems(),
+            acknowledgedPhotoReview: acknowledgedBulkPhotoReview
+        )
     }
 
     private func connectRealtime() {
@@ -363,28 +381,5 @@ final class ParentModeStore {
             loadErrorMessage = error.localizedDescription
             syncCoordinator.fail(trigger, message: error.localizedDescription)
         }
-    }
-}
-
-/// Lightweight App Group / defaults bridge for the optional home-screen widget.
-enum OpenTaskCountStore {
-    static let shared = OpenTaskCountStoreBox()
-}
-
-final class OpenTaskCountStoreBox {
-    private let defaults: UserDefaults
-    private let key = "taakhelden.openTaskCount"
-
-    init(suiteName: String = "group.nl.taakhelden.family") {
-        defaults = UserDefaults(suiteName: suiteName) ?? .standard
-    }
-
-    func update(count: Int) {
-        defaults.set(count, forKey: key)
-        defaults.synchronize()
-    }
-
-    var count: Int {
-        defaults.integer(forKey: key)
     }
 }

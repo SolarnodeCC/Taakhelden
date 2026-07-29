@@ -91,14 +91,14 @@ final class TaakHeldenAPIClient {
             "pincode": AnyEncodable(pin),
         ]
         let body = try encoder.encode(payload)
-        let response = try await sendAuthorized(
+        let response = try await sendAsParent(
             HTTPRequest(path: "/members/children", method: .post, body: body, requiresAuth: true)
         )
         return try decoder.decode(MemberViewDTO.self, from: response.data)
     }
 
     func fetchParentFamily() async throws -> ParentFamilyViewDTO {
-        let response = try await sendAuthorized(
+        let response = try await sendAsParent(
             HTTPRequest(path: "/families/me", method: .get, requiresAuth: true, requiresContractV2: true)
         )
         return try decoder.decode(ParentFamilyViewDTO.self, from: response.data)
@@ -220,19 +220,26 @@ final class TaakHeldenAPIClient {
 
     // MARK: - Internals
 
-    private func sendAuthorized(_ request: HTTPRequest, retried: Bool = false) async throws -> HTTPResponse {
-        let token = authStore.childSession?.accessToken ?? authStore.parentSession?.accessToken
+    /// Child-session token only. Parent ops must use `sendAsParent`.
+    func sendAsChild(_ request: HTTPRequest, retried: Bool = false) async throws -> HTTPResponse {
+        guard let token = authStore.childSession?.accessToken else {
+            throw APIClientError.sessionMissing
+        }
         do {
             return try await transport.send(request, accessToken: token)
         } catch let HTTPTransportError.httpStatus(401, _) where !retried {
-            if authStore.childSession != nil {
-                _ = try await refreshChildSession()
-            } else if let parentRefresh = authStore.parentSession?.refreshToken {
-                let dto = try await refreshCoordinator.refreshParent(refreshToken: parentRefresh, transport: transport)
-                authStore.updateParentTokens(accessToken: dto.accessToken, refreshToken: dto.refreshToken)
-            }
-            return try await sendAuthorized(request, retried: true)
+            _ = try await refreshChildSession()
+            return try await sendAsChild(request, retried: true)
         }
+    }
+
+    /// Prefer child token when present (child home path); otherwise parent.
+    /// Do not use for parent-only endpoints — use `sendAsParent`.
+    private func sendAuthorized(_ request: HTTPRequest, retried: Bool = false) async throws -> HTTPResponse {
+        if authStore.childSession != nil {
+            return try await sendAsChild(request, retried: retried)
+        }
+        return try await sendAsParent(request, retried: retried)
     }
 
     private func mapChildSession(_ dto: ChildSessionResultDTO, ageBand: ChildAgeBand) -> ChildSession {

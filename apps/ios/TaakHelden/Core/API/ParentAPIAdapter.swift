@@ -56,6 +56,8 @@ final class ParentAPIAdapter: APIClient {
     }
 
     func updateParentSettings(soundEnabled: Bool) async throws -> ParentSettingsSnapshot {
+        // Intentionally local-only: child reward sound is a device preference behind the
+        // parental gate, not a server notification-settings field.
         cachedSoundEnabled = soundEnabled
         AppSettings.childSoundsEnabled = soundEnabled
         return ParentSettingsSnapshot(soundEnabled: soundEnabled, exportAvailable: true, deleteAvailable: true)
@@ -70,7 +72,9 @@ final class ParentAPIAdapter: APIClient {
 
         // Poll a few times for local/staging responsiveness.
         for _ in 0..<8 {
+            try Task.checkCancellation()
             try await Task.sleep(nanoseconds: 750_000_000)
+            try Task.checkCancellation()
             let status = try await api.fetchAccountExport(id: job.exportId)
             if status.status == "ready", let url = status.downloadUrl {
                 return ParentExportReceipt(message: String(format: String(localized: "parent.settings.export.ready"), url))
@@ -255,7 +259,7 @@ enum ParentDashboardMapper {
         return ParentPhotoAsset(
             id: photoId,
             previewURL: nil,
-            accessibilityLabel: "Foto bij \(instance.title)",
+            accessibilityLabel: String(localized: "parent.photo.accessibility.label"),
             status: instance.photoStatus
         )
     }

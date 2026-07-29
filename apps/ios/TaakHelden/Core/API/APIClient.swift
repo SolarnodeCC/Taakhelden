@@ -21,23 +21,23 @@ protocol APIClient: AnyObject {
 
 extension APIClient {
     func deleteParentAccount(appleIdentityToken: String) async throws {
-        try await deleteParentAccount()
+        throw APIClientError.parentReauthRequired
     }
 
     func createManagedTask(title: String, points: Int, childIDs: [String], idempotencyKey: String) async throws -> ParentDashboardSnapshot {
-        try await fetchParentDashboard()
+        throw APIClientError.notImplemented
     }
 
     func archiveManagedTask(id: String) async throws -> ParentDashboardSnapshot {
-        try await fetchParentDashboard()
+        throw APIClientError.notImplemented
     }
 
     func createManagedReward(title: String, price: Int, idempotencyKey: String) async throws -> ParentDashboardSnapshot {
-        try await fetchParentDashboard()
+        throw APIClientError.notImplemented
     }
 
     func archiveManagedReward(id: String) async throws -> ParentDashboardSnapshot {
-        try await fetchParentDashboard()
+        throw APIClientError.notImplemented
     }
 
     func fetchPhotoURL(photoID: String) async throws -> URL? { nil }
@@ -240,6 +240,7 @@ enum APIClientError: LocalizedError, Equatable {
     case sessionMissing
     case parentSessionMissing
     case parentReauthRequired
+    case notImplemented
 
     var errorDescription: String? {
         switch self {
@@ -255,17 +256,28 @@ enum APIClientError: LocalizedError, Equatable {
             return "Log even in met je ouderaccount om goed te keuren of te beheren."
         case .parentReauthRequired:
             return "Bevestig opnieuw met Apple om het account te verwijderen."
+        case .notImplemented:
+            return "Deze actie is nog niet beschikbaar op dit toestel."
         }
     }
 }
 
 enum IdempotencyKey {
+    /// Deterministic per instance — retries must not mint a new key (double-award risk).
     static func forApproval(instanceID: String) -> String {
-        "approve-\(instanceID)-\(UUID().uuidString)"
+        "approve-\(instanceID)"
     }
 
     static func forRedo(instanceID: String) -> String {
-        "redo-\(instanceID)-\(UUID().uuidString)"
+        "redo-\(instanceID)"
+    }
+
+    static func forTaskArchive(taskID: String) -> String {
+        "archive-task-\(taskID)"
+    }
+
+    static func forRewardArchive(rewardID: String) -> String {
+        "archive-reward-\(rewardID)"
     }
 
     static func forTaskCreate() -> String {

@@ -131,3 +131,5 @@
 "child.young.picture.hint" = "Tap three animals (practice mode), then use your PIN.";
 "child.young.pin.retry" = "That code isn't right yet — try again calmly.";
 "parent.tasks.need.child" = "Pair a child profile before adding a task.";
+"parent.today.balance" = "%d points";
+"parent.photo.accessibility.label" = "Task photo";

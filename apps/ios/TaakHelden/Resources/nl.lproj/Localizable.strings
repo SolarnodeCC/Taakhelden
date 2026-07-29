@@ -131,3 +131,5 @@
 "child.young.picture.hint" = "Tik drie dieren (oefenmodus) en gebruik daarna je pincode.";
 "child.young.pin.retry" = "Die code klopt nog niet — probeer het rustig opnieuw.";
 "parent.tasks.need.child" = "Koppel eerst een kindprofiel voordat je een taak toevoegt.";
+"parent.today.balance" = "%d punten";
+"parent.photo.accessibility.label" = "Taakfoto";
