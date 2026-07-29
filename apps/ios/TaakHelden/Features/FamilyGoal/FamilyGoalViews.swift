@@ -1,21 +1,42 @@
 import Foundation
 import SwiftUI
 
+enum FamilyGoalLoadState: Equatable {
+    case idle
+    case loading
+    case ready(FamilyGoalProgressDTO?)
+    case failed
+}
+
 @Observable
 @MainActor
 final class FamilyGoalViewModel {
     private let apiClient: TaakHeldenAPIClient
-    var progress: FamilyGoalProgressDTO?
-    var isLoading = false
+    var loadState: FamilyGoalLoadState = .idle
 
     init(apiClient: TaakHeldenAPIClient) {
         self.apiClient = apiClient
     }
 
+    var progress: FamilyGoalProgressDTO? {
+        if case .ready(let progress) = loadState { return progress }
+        return nil
+    }
+
     func load() async {
-        isLoading = true
-        defer { isLoading = false }
-        progress = try? await apiClient.fetchActiveFamilyGoalProgress().progress
+        let previous = loadState
+        loadState = .loading
+        do {
+            let response = try await apiClient.fetchActiveFamilyGoalProgress()
+            loadState = .ready(response.progress)
+        } catch {
+            // Keep last successful progress visible when refresh fails.
+            if case .ready(let progress) = previous {
+                loadState = .ready(progress)
+                return
+            }
+            loadState = .failed
+        }
     }
 }
 
@@ -26,8 +47,7 @@ struct FamilyGoalCard: View {
     let isTeen: Bool
 
     private var fraction: Double {
-        guard progress.targetPoints > 0 else { return 0 }
-        return min(1, Double(progress.earnedPoints) / Double(progress.targetPoints))
+        HeroProgress.goalFraction(earned: progress.earnedPoints, target: progress.targetPoints)
     }
 
     var body: some View {
@@ -35,6 +55,7 @@ struct FamilyGoalCard: View {
             HStack(alignment: .top, spacing: THSpacing.md) {
                 Text(progress.icon)
                     .font(.system(size: isYoung ? 40 : 28))
+                    .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: THSpacing.sm) {
                     Text(LocalizedStringKey("goal.card.title"))
                         .font(.headline)
@@ -43,6 +64,7 @@ struct FamilyGoalCard: View {
                         .foregroundStyle(palette.text.color)
                     ProgressView(value: fraction)
                         .tint(palette.accent.color)
+                        .accessibilityHidden(true)
                     Text(String(
                         format: String(localized: isTeen ? "goal.card.progress.teen" : "goal.card.progress"),
                         progress.earnedPoints,
@@ -64,6 +86,7 @@ struct FamilyGoalCard: View {
             }
         }
         .accessibilityElement(children: .combine)
+        .accessibilityValue(Text("\(Int(fraction * 100))%"))
     }
 }
 
@@ -71,7 +94,9 @@ struct FamilyGoalCard: View {
 @MainActor
 final class ParentFamilyGoalSettingsViewModel {
     private let apiClient: TaakHeldenAPIClient
-    var title = "Samen pizza-avond"
+    private var pendingCreateKey: String?
+
+    var title = String(localized: "goal.parent.default.title")
     var icon = "🍕"
     var targetPoints = 500
     var statusMessage: String?
@@ -81,22 +106,38 @@ final class ParentFamilyGoalSettingsViewModel {
         self.apiClient = apiClient
     }
 
+    var canCreate: Bool {
+        !title.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && !icon.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            && targetPoints >= 50
+            && !isSaving
+    }
+
     func create() async {
+        guard canCreate else { return }
         isSaving = true
         defer { isSaving = false }
+
+        let key = pendingCreateKey ?? UUID().uuidString
+        pendingCreateKey = key
+
         do {
             _ = try await apiClient.createFamilyGoal(
-                title: title,
-                icon: icon,
+                title: title.trimmingCharacters(in: .whitespacesAndNewlines),
+                icon: icon.trimmingCharacters(in: .whitespacesAndNewlines),
                 targetPoints: targetPoints,
-                childIds: [],
-                idempotencyKey: UUID().uuidString
+                childIds: [], // empty = all children (server contract)
+                idempotencyKey: key
             )
+            pendingCreateKey = nil
             statusMessage = String(localized: "goal.parent.created")
         } catch {
             statusMessage = String(localized: "goal.parent.error")
         }
     }
+
+    /// Test seam for idempotent create retries.
+    var pendingKeyForTests: String? { pendingCreateKey }
 }
 
 struct ParentFamilyGoalSettingsView: View {
@@ -124,7 +165,7 @@ struct ParentFamilyGoalSettingsView: View {
             }
             .buttonStyle(.borderedProminent)
             .tint(palette.accent.color)
-            .disabled(viewModel.isSaving)
+            .disabled(!viewModel.canCreate)
             if let statusMessage = viewModel.statusMessage {
                 Text(statusMessage)
                     .font(.footnote)

@@ -37,6 +37,8 @@ struct THPalette {
     let mutedText: THColorToken
     let accent: THColorToken
     let accentSoft: THColorToken
+    /// Text/icon color on solid accent fills (Speak button, etc.).
+    let onAccent: THColorToken
     /// Companion accent (kid turquoise / teen mint soft companion).
     let secondary: THColorToken
     let highlight: THColorToken
@@ -52,6 +54,7 @@ enum THPalettes {
         mutedText: THColorToken(hex: 0x6B5D4C),
         accent: THColorToken(hex: 0xFF6F59), // --kid-coral
         accentSoft: THColorToken(hex: 0xFFE1DA), // --kid-coral-soft
+        onAccent: THColorToken(hex: 0xFFFFFF),
         secondary: THColorToken(hex: 0x0E9F8E), // --kid-turquoise
         highlight: THColorToken(hex: 0xFFC93C), // --kid-yellow
         shadow: THColorToken(hex: 0xFF6F59, alpha: 0.28) // --shadow-kid
@@ -64,6 +67,7 @@ enum THPalettes {
         mutedText: THColorToken(hex: 0x9AA6C3), // --teen-muted
         accent: THColorToken(hex: 0x7FD8C4), // --teen-mint
         accentSoft: THColorToken(hex: 0x364260),
+        onAccent: THColorToken(hex: 0x1F2A44),
         secondary: THColorToken(hex: 0x7FD8C4),
         highlight: THColorToken(hex: 0x7FD8C4),
         shadow: THColorToken(hex: 0x1F2A44, alpha: 0.35)
@@ -76,6 +80,7 @@ enum THPalettes {
         mutedText: THColorToken(hex: 0x5A6470),
         accent: THColorToken(hex: 0x0E9F8E),
         accentSoft: THColorToken(hex: 0xD9F2EF),
+        onAccent: THColorToken(hex: 0xFFFFFF),
         secondary: THColorToken(hex: 0x0E9F8E),
         highlight: THColorToken(hex: 0x0E9F8E),
         shadow: THColorToken(hex: 0x000000, alpha: 0.08)
@@ -102,7 +107,7 @@ struct THCard<Content: View>: View {
 }
 
 struct THBadge: View {
-    let text: LocalizedStringKey
+    let text: String
     let palette: THPalette
     var fontDesign: Font.Design = .rounded
 
@@ -114,6 +119,18 @@ struct THBadge: View {
             .padding(.vertical, THSpacing.sm)
             .background(palette.accentSoft.color)
             .clipShape(Capsule())
+    }
+}
+
+/// Shared level curve — mirrors `levelFromLifetime` in apps/api/src/repo/avatar.ts.
+enum HeroProgress {
+    static func level(fromLifetime lifetimeEarned: Int) -> Int {
+        max(1, lifetimeEarned / 100)
+    }
+
+    static func goalFraction(earned: Int, target: Int) -> Double {
+        guard target > 0 else { return 0 }
+        return min(1, Double(earned) / Double(target))
     }
 }
 

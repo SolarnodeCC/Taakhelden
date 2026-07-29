@@ -42,11 +42,12 @@ export const LogoutBody = z.object({
   refreshToken: z.string().min(1),
 });
 
-/** Kindprofiel zoals getoond in de kind-loginflow (geen PII). */
+/** Kindprofiel zoals getoond in de kind-loginflow (geen e-mail/PII). */
 export const ChildProfile = z.object({
   id: z.string(),
   displayName: z.string(),
   avatarId: z.string().nullable(),
+  ageMode: z.enum(["young", "mid", "teen"]),
 });
 export type ChildProfile = z.infer<typeof ChildProfile>;
 

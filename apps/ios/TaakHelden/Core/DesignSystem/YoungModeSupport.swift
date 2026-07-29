@@ -1,6 +1,7 @@
 import AVFoundation
 import Foundation
 import SwiftUI
+import UIKit
 
 /// Young mode (4–7): near-textless chrome, large targets, TTS.
 enum YoungModeSupport {
@@ -8,6 +9,8 @@ enum YoungModeSupport {
     static let picturePINChoices = ["🦊", "🐼", "🦁", "🐸", "🦄", "🐙"]
 
     static func speak(_ text: String, language: String = "nl-NL") {
+        // Avoid fighting VoiceOver's speech engine.
+        guard !UIAccessibility.isVoiceOverRunning else { return }
         let utterance = AVSpeechUtterance(string: text)
         utterance.voice = AVSpeechSynthesisVoice(language: language)
         utterance.rate = AVSpeechUtteranceDefaultSpeechRate * 0.9

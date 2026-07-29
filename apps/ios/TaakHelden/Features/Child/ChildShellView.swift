@@ -291,7 +291,11 @@ private struct MijnDagTabView: View {
                         .foregroundStyle(palette.accent.color)
                         .accessibilityLabel(Text("child.task.done"))
                 } else if isYoung {
-                    YoungPrimaryButton(titleKey: "child.task.done.button", systemImage: "checkmark") {
+                    YoungPrimaryButton(
+                        titleKey: "child.task.done.button",
+                        systemImage: "checkmark",
+                        palette: palette
+                    ) {
                         Task { await viewModel?.complete(instanceID: instance.id, reduceMotion: reduceMotion) }
                     }
                 } else {
@@ -390,6 +394,11 @@ private struct WinkelTabView: View {
                         THCard(palette: palette) {
                             Text(error)
                                 .foregroundStyle(palette.text.color)
+                            Button(String(localized: "child.retry")) {
+                                Task { await viewModel?.load() }
+                            }
+                            .buttonStyle(.bordered)
+                            .frame(minHeight: isYoung ? YoungModeSupport.minTapTarget : 44)
                         }
                     }
                 }
@@ -426,6 +435,9 @@ private struct MijnHeldTabView: View {
                             Text(avatar)
                                 .font(.system(size: isYoung ? 72 : 56))
                                 .accessibilityLabel(Text("held.avatar.preview"))
+                                .accessibilityAction(named: Text("held.parent.gate.action")) {
+                                    appState.openParentGate(from: .heroWordmarkLongPress)
+                                }
                             HStack {
                                 Text(displayName)
                                     .font(.system(size: isYoung ? 32 : 28, weight: .bold, design: .rounded))
@@ -435,11 +447,10 @@ private struct MijnHeldTabView: View {
                                 }
                             }
                             if let heroBalance {
-                                Text(String(
-                                    format: String(localized: "held.level.format"),
-                                    max(1, heroBalance.lifetimeEarned / 100)
-                                ))
-                                .foregroundStyle(palette.mutedText.color)
+                                let level = avatarShopViewModel?.state?.level
+                                    ?? HeroProgress.level(fromLifetime: heroBalance.lifetimeEarned)
+                                Text(String(format: String(localized: "held.level.format"), level))
+                                    .foregroundStyle(palette.mutedText.color)
                                 Text(String(
                                     format: String(localized: "held.lifetime.format"),
                                     heroBalance.lifetimeEarned,
@@ -472,7 +483,6 @@ private struct MijnHeldTabView: View {
             .onTapGesture(count: 5) {
                 appState.openParentGate(from: .buildNumberFiveTap)
             }
-            .accessibilityHint(Text("held.parent.gate.hint"))
         }
     }
 }

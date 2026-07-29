@@ -31,7 +31,9 @@ struct ChildUnlockView: View {
             if let session {
                 Text(session.avatar)
                     .font(.system(size: isYoung ? 88 : 72))
-                Text(isYoung ? "Hoi!" : "Hoi \(session.displayName)!")
+                Text(isYoung
+                      ? String(localized: "child.unlock.hi.young")
+                      : String(format: String(localized: "child.unlock.hi"), session.displayName))
                     .font(.system(size: isYoung ? 36 : 32, weight: .bold, design: .rounded))
                     .foregroundStyle(palette.text.color)
 
@@ -104,7 +106,7 @@ struct ChildUnlockView: View {
 
             if let errorMessage {
                 Text(errorMessage)
-                    .foregroundStyle(.red)
+                    .foregroundStyle(palette.accent.color)
                     .multilineTextAlignment(.center)
             }
 

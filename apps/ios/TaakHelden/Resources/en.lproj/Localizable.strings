@@ -209,3 +209,10 @@
 "goal.parent.create" = "Start family goal";
 "goal.parent.created" = "Family goal is ready — children see progress on My Day.";
 "goal.parent.error" = "That didn't work. Maybe a goal is already active.";
+"child.shop.load.error" = "We couldn't load the shop — try again soon.";
+"child.photo.upload.error" = "Photo didn't work — you can try again.";
+"goal.parent.default.title" = "Pizza night together";
+"held.parent.gate.action" = "Open parent gate";
+"held.parent.gate.hint" = "Press and hold to open the parent gate";
+"child.unlock.hi" = "Hi %@!";
+"child.unlock.hi.young" = "Hi!";

@@ -1,17 +1,36 @@
 import Foundation
 import SwiftUI
 
+enum AvatarSlotFilter: String, CaseIterable, Identifiable {
+    case hat
+    case background
+    case accessory
+
+    var id: String { rawValue }
+
+    var titleKey: LocalizedStringKey {
+        switch self {
+        case .hat: "held.avatar.slot.hat"
+        case .background: "held.avatar.slot.background"
+        case .accessory: "held.avatar.slot.accessory"
+        }
+    }
+}
+
 @Observable
 @MainActor
 final class AvatarShopViewModel {
     private let apiClient: TaakHeldenAPIClient
     private let memberID: String
+    /// Stable Idempotency-Key per equip intent until success (retry-safe).
+    private var pendingEquipKeys: [String: String] = [:]
 
     var catalog: [AvatarCatalogItemDTO] = []
     var state: MemberAvatarStateDTO?
     var isLoading = false
+    var isEquipping = false
     var errorMessage: String?
-    var selectedSlot: String = "hat"
+    var selectedSlot: AvatarSlotFilter = .hat
 
     init(apiClient: TaakHeldenAPIClient, memberID: String) {
         self.apiClient = apiClient
@@ -20,7 +39,7 @@ final class AvatarShopViewModel {
 
     var itemsForSelectedSlot: [AvatarCatalogItemDTO] {
         catalog
-            .filter { $0.slot == selectedSlot }
+            .filter { $0.slot == selectedSlot.rawValue }
             .sorted { $0.sortOrder < $1.sortOrder }
     }
 
@@ -45,30 +64,54 @@ final class AvatarShopViewModel {
     func isEquipped(_ item: AvatarCatalogItemDTO) -> Bool {
         guard let state else { return false }
         switch item.slot {
-        case "hat": return state.equipped.hat == item.id
-        case "background": return state.equipped.background == item.id
-        case "accessory": return state.equipped.accessory == item.id
+        case AvatarSlotFilter.hat.rawValue: return state.equipped.hat == item.id
+        case AvatarSlotFilter.background.rawValue: return state.equipped.background == item.id
+        case AvatarSlotFilter.accessory.rawValue: return state.equipped.accessory == item.id
         default: return false
         }
     }
 
     func equip(_ item: AvatarCatalogItemDTO) async {
-        guard isUnlocked(item) else { return }
+        guard isUnlocked(item), !isEquipping else { return }
+        isEquipping = true
+        defer { isEquipping = false }
+
+        let key = pendingEquipKeys[item.id] ?? UUID().uuidString
+        pendingEquipKeys[item.id] = key
+
         do {
-            let key = UUID().uuidString
             switch item.slot {
-            case "hat":
-                state = try await apiClient.equipAvatar(memberID: memberID, hat: .value(item.id), idempotencyKey: key)
-            case "background":
-                state = try await apiClient.equipAvatar(memberID: memberID, background: .value(item.id), idempotencyKey: key)
-            case "accessory":
-                state = try await apiClient.equipAvatar(memberID: memberID, accessory: .value(item.id), idempotencyKey: key)
+            case AvatarSlotFilter.hat.rawValue:
+                state = try await apiClient.equipAvatar(
+                    memberID: memberID,
+                    hat: .value(item.id),
+                    idempotencyKey: key
+                )
+            case AvatarSlotFilter.background.rawValue:
+                state = try await apiClient.equipAvatar(
+                    memberID: memberID,
+                    background: .value(item.id),
+                    idempotencyKey: key
+                )
+            case AvatarSlotFilter.accessory.rawValue:
+                state = try await apiClient.equipAvatar(
+                    memberID: memberID,
+                    accessory: .value(item.id),
+                    idempotencyKey: key
+                )
             default:
-                break
+                return
             }
+            pendingEquipKeys.removeValue(forKey: item.id)
+            errorMessage = nil
         } catch {
             errorMessage = String(localized: "held.avatar.equip.error")
         }
+    }
+
+    /// Test seam: pending key for an item after a failed/incomplete equip.
+    func pendingKey(for itemID: String) -> String? {
+        pendingEquipKeys[itemID]
     }
 }
 
@@ -82,17 +125,27 @@ struct AvatarShopView: View {
         VStack(alignment: .leading, spacing: THSpacing.lg) {
             preview
             Picker(String(localized: "held.avatar.slot"), selection: $viewModel.selectedSlot) {
-                Text(LocalizedStringKey("held.avatar.slot.hat")).tag("hat")
-                Text(LocalizedStringKey("held.avatar.slot.background")).tag("background")
-                Text(LocalizedStringKey("held.avatar.slot.accessory")).tag("accessory")
+                ForEach(AvatarSlotFilter.allCases) { slot in
+                    Text(slot.titleKey).tag(slot)
+                }
             }
             .pickerStyle(.segmented)
 
             if viewModel.isLoading {
                 ProgressView(String(localized: "held.avatar.loading"))
-            } else if let error = viewModel.errorMessage {
-                Text(error).foregroundStyle(palette.mutedText.color)
+            } else if let error = viewModel.errorMessage, viewModel.catalog.isEmpty {
+                VStack(alignment: .leading, spacing: THSpacing.sm) {
+                    Text(error).foregroundStyle(palette.mutedText.color)
+                    Button(String(localized: "child.retry")) {
+                        Task { await viewModel.load() }
+                    }
+                    .buttonStyle(.bordered)
+                    .frame(minHeight: isYoung ? YoungModeSupport.minTapTarget : 44)
+                }
             } else {
+                if let error = viewModel.errorMessage {
+                    Text(error).foregroundStyle(palette.mutedText.color)
+                }
                 ForEach(viewModel.itemsForSelectedSlot) { item in
                     itemRow(item)
                 }
@@ -146,6 +199,7 @@ struct AvatarShopView: View {
             HStack {
                 Text(item.previewEmoji)
                     .font(.system(size: isYoung ? 40 : 28))
+                    .accessibilityHidden(true)
                 VStack(alignment: .leading) {
                     Text(item.title)
                         .foregroundStyle(palette.text.color)
@@ -164,11 +218,12 @@ struct AvatarShopView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(palette.accent.color)
-                    .disabled(equipped)
+                    .disabled(equipped || viewModel.isEquipping)
                     .frame(minHeight: isYoung ? YoungModeSupport.minTapTarget : 44)
                 }
             }
             .opacity(unlocked ? 1 : 0.75)
+            .accessibilityElement(children: .combine)
         }
     }
 

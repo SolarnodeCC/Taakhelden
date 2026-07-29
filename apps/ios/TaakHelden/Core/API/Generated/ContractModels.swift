@@ -14,6 +14,7 @@ struct ChildProfileDTO: Codable, Equatable {
     let id: String
     let displayName: String
     let avatarId: String?
+    let ageMode: String
 }
 
 struct FamilyCodeResultDTO: Codable {

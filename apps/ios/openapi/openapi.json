@@ -1381,12 +1381,21 @@
                   "avatarId": {
                     "type": "string",
                     "nullable": true
+                  },
+                  "ageMode": {
+                    "type": "string",
+                    "enum": [
+                      "young",
+                      "mid",
+                      "teen"
+                    ]
                   }
                 },
                 "required": [
                   "id",
                   "displayName",
-                  "avatarId"
+                  "avatarId",
+                  "ageMode"
                 ],
                 "additionalProperties": false
               }
@@ -1424,12 +1433,21 @@
                     "avatarId": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "ageMode": {
+                      "type": "string",
+                      "enum": [
+                        "young",
+                        "mid",
+                        "teen"
+                      ]
                     }
                   },
                   "required": [
                     "id",
                     "displayName",
-                    "avatarId"
+                    "avatarId",
+                    "ageMode"
                   ],
                   "additionalProperties": false
                 }

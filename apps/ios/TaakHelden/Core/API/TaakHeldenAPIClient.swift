@@ -34,7 +34,7 @@ final class TaakHeldenAPIClient {
                     id: $0.id,
                     displayName: $0.displayName,
                     avatar: AvatarCatalog.emoji(for: $0.avatarId),
-                    ageBand: .mid
+                    ageBand: AvatarCatalog.ageBand(from: $0.ageMode)
                 )
             }
         )
@@ -52,7 +52,7 @@ final class TaakHeldenAPIClient {
             accessToken: nil
         )
         let dto = try decoder.decode(ChildSessionResultDTO.self, from: response.data)
-        return mapChildSession(dto, ageBand: request.ageBand)
+        return mapChildSession(dto)
     }
 
     func refreshChildSession() async throws -> ChildSession {
@@ -60,7 +60,7 @@ final class TaakHeldenAPIClient {
             throw APIClientError.sessionMissing
         }
         let dto = try await refreshCoordinator.refreshChild(refreshToken: refreshToken, transport: transport)
-        let session = mapChildSession(dto, ageBand: authStore.childSession?.ageBand ?? .mid)
+        let session = mapChildSession(dto)
         authStore.updateChildTokens(accessToken: session.accessToken, refreshToken: session.refreshToken)
         return session
     }
@@ -306,12 +306,12 @@ final class TaakHeldenAPIClient {
         return try await sendAsParent(request, retried: retried)
     }
 
-    private func mapChildSession(_ dto: ChildSessionResultDTO, ageBand: ChildAgeBand) -> ChildSession {
+    private func mapChildSession(_ dto: ChildSessionResultDTO) -> ChildSession {
         ChildSession(
             childID: dto.child.id,
             displayName: dto.child.displayName,
             avatar: AvatarCatalog.emoji(for: dto.child.avatarId),
-            ageBand: ageBand,
+            ageBand: AvatarCatalog.ageBand(from: dto.child.ageMode),
             accessToken: dto.accessToken,
             refreshToken: dto.refreshToken
         )
@@ -331,12 +331,12 @@ struct AnyEncodable: Encodable {
 }
 
 /// Distinguishes omit vs explicit null for equip PATCH bodies.
-enum OptionalNullString {
+enum OptionalNullString: Equatable {
     case omit
     case value(String?)
 }
 
-private struct EquipAvatarPayload: Encodable {
+struct EquipAvatarPayload: Encodable, Equatable {
     let hat: OptionalNullString
     let background: OptionalNullString
     let accessory: OptionalNullString

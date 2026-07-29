@@ -203,11 +203,9 @@ struct ParentModeRootView: View {
                 }
                 Spacer()
                 THBadge(
-                    text: LocalizedStringKey(
-                        String(
-                            format: String(localized: "parent.mode.pending"),
-                            store.snapshot?.pendingApprovalCount ?? 0
-                        )
+                    text: String(
+                        format: String(localized: "parent.mode.pending"),
+                        store.snapshot?.pendingApprovalCount ?? 0
                     ),
                     palette: palette,
                     fontDesign: .default
@@ -576,7 +574,7 @@ private struct ParentApprovalDetailCard: View {
             }
 
             if item.photoProcessing {
-                THBadge(text: LocalizedStringKey("parent.approvals.photo.processing"), palette: palette, fontDesign: .default)
+                THBadge(text: String(localized: "parent.approvals.photo.processing"), palette: palette, fontDesign: .default)
             }
 
             if let photoAsset = item.photoAsset {
@@ -607,7 +605,7 @@ private struct ParentApprovalDetailCard: View {
                 }
                 .buttonStyle(.plain)
             } else {
-                THBadge(text: LocalizedStringKey("parent.approvals.no.photo"), palette: palette, fontDesign: .default)
+                THBadge(text: String(localized: "parent.approvals.no.photo"), palette: palette, fontDesign: .default)
             }
 
             if let onToggleSelection {
