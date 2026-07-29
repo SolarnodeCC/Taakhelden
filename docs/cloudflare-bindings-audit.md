@@ -1,6 +1,6 @@
 # Cloudflare bindings & secrets audit
 
-_Audit date: 2026-07-28 (updated). Baseline: post-#72 (`taakhelden-web` → `API` service binding)._
+_Audit date: 2026-07-28. Last live verification: 2026-07-29. Baseline: post-#72 (`taakhelden-web` → `API` service binding)._
 
 Live secret **values** are never recorded here. Secret **names** only.
 Account ID (non-secret): `5546763229b35df670e33d9316d7f2e0`.
@@ -18,10 +18,9 @@ Account ID (non-secret): `5546763229b35df670e33d9316d7f2e0`.
 | API vars `APP_BASE_URL`, `APNS_ENV`, `APPLE_CLIENT_ID`, `APPLE_BUNDLE_ID` | wrangler.toml `[vars]` | Implemented |
 | API required secret `JWT_SECRET` | wrangler.toml `[secrets].required` + deploy sync | **Declared**; must exist in GitHub Environment `production` |
 | Optional secrets (Turnstile / APNs key / email) | deploy-prod sync when set in GitHub | Implemented (upload-if-present) |
+| Optional secrets (Turnstile / APNs key / email) | deploy-prod sync when set in GitHub | Implemented (upload-if-present) |
 
 ---
-
-## `taakhelden-web`
 
 | Type | Name | Value / target |
 |---|---|---|
