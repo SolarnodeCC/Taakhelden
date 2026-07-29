@@ -681,6 +681,7 @@ private struct ParentBulkApprovalBar: View {
 
 private struct ParentSettingsView: View {
     @Environment(AppState.self) private var appState
+    @State private var familyGoalSettings: ParentFamilyGoalSettingsViewModel?
     let snapshot: ParentDashboardSnapshot?
     let exportStatusMessage: String?
     let deletionStatusMessage: String?
@@ -728,6 +729,10 @@ private struct ParentSettingsView: View {
                     .tint(palette.accent.color)
                 }
 
+                if let familyGoalSettings {
+                    ParentFamilyGoalSettingsView(viewModel: familyGoalSettings, palette: palette)
+                }
+
                 THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
                     Text(LocalizedStringKey("parent.settings.privacy.title"))
                         .font(.headline)
@@ -755,6 +760,11 @@ private struct ParentSettingsView: View {
                 }
             }
             .padding(THSpacing.xl)
+        }
+        .task {
+            if familyGoalSettings == nil {
+                familyGoalSettings = ParentFamilyGoalSettingsViewModel(apiClient: appState.apiClient)
+            }
         }
     }
 }

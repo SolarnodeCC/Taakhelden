@@ -5,17 +5,21 @@ import {
   PincodeBody,
   AttachPhotoBody,
   RevokeChildSessionsResult,
+  EquipAvatarBody,
   ErrorCodes,
+  MemberAvatarState,
 } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
-import { requireParent } from "../middleware/authz";
+import { requireParent, requireSelfOrParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
+import { idempotency, requireIdempotencyKey } from "../middleware/idempotency";
 import { newId } from "../services/ids";
 import { hashSecret } from "../services/passwords";
 import * as repo from "../repo/families";
 import { revokeChildDeviceSessions } from "../repo/auth";
 import { getPhoto, setMemberPhotoKey } from "../repo/photos";
+import { EquipAvatarError, equipAvatarItems, getMemberAvatarState } from "../repo/avatar";
 
 const members = new Hono<AppBindings>();
 
@@ -92,6 +96,55 @@ members.patch("/:id", validate("json", UpdateMemberBody), async (c) => {
   const updated = await repo.getMember(c.env.DB, auth.familyId, memberId);
   return c.json(memberView(updated as Record<string, unknown>, auth.role));
 });
+
+members.get("/:id/avatar", async (c) => {
+  const memberId = c.req.param("id");
+  const auth = requireSelfOrParent(c, memberId);
+  const state = await getMemberAvatarState(c.env.DB, auth.familyId, memberId);
+  if (!state) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
+  }
+  return c.json(MemberAvatarState.parse(state));
+});
+
+members.patch(
+  "/:id/avatar",
+  requireIdempotencyKey,
+  idempotency,
+  validate("json", EquipAvatarBody),
+  async (c) => {
+    const memberId = c.req.param("id");
+    const auth = requireSelfOrParent(c, memberId);
+    try {
+      const state = await equipAvatarItems(
+        c.env.DB,
+        auth.familyId,
+        memberId,
+        c.req.valid("json"),
+      );
+      if (!state) {
+        throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
+      }
+      return c.json(MemberAvatarState.parse(state));
+    } catch (err) {
+      if (err instanceof EquipAvatarError) {
+        if (err.code === "ITEM_LOCKED") {
+          throw new ApiException(
+            403,
+            ErrorCodes.FORBIDDEN,
+            "Dit item is nog niet ontgrendeld — bijna!",
+          );
+        }
+        throw new ApiException(
+          400,
+          ErrorCodes.VALIDATION_FAILED,
+          "Dit item past niet bij dat vakje.",
+        );
+      }
+      throw err;
+    }
+  },
+);
 
 members.post("/:id/pincode", validate("json", PincodeBody), async (c) => {
   const { familyId } = requireParent(c, { full: true });

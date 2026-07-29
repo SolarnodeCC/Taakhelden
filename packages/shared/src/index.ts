@@ -12,3 +12,5 @@ export * from "./schemas/badge";
 export * from "./schemas/account";
 export * from "./schemas/notification";
 export * from "./schemas/ws";
+export * from "./schemas/avatar";
+export * from "./schemas/familyGoal";

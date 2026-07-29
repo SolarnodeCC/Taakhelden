@@ -83,13 +83,19 @@ Handmatige JSON-DTO's toevoegen is niet toegestaan — wijzig het gedeelde contr
 - Young-mode foundations (TTS + picture-PIN oefen-UI)
 - Open-task count App Group store + widget scaffold
 
-## Phase 3 — later (plan)
+## Phase 3 — in uitvoering
 
-Uitgewerkt plan: **[`docs/ios-phase3-plan.md`](../../docs/ios-phase3-plan.md)**
+Plan: **[`docs/ios-phase3-plan.md`](../../docs/ios-phase3-plan.md)**  
+Workstreams: **[`docs/ios-phase3-workstreams.md`](../../docs/ios-phase3-workstreams.md)**
 
-Epics: EN-locale (uitbreiden), avatar-shop, coöperatieve gezinsdoelen,
-onderhandel-knop (teen), huiswerk-focustimer, Apple Watch, young-mode design pass,
-co-ouderschap (ADR-0004), break-glass support. Android valt buiten iOS-scope.
+Geleverd in code (slices 3a–3f):
+
+- Young-mode chrome (grote targets, TTS, Speak-knop)
+- EN/NL kind-strings uitgebreid
+- Avatar-catalogus + equip API (`/avatar/catalog`, `/members/:id/avatar`) + Mijn Held shop
+- Coöperatieve gezinsdoelen API + kind-kaart + ouder-settings
+
+Nog gepland: E4 onderhandelen, E5 focustimer, E6 Watch, E7 co-ouderschap (ADR), E8 break-glass.
 
 ## Nog handmatig (Phase 2 residual — blokkeert geen Phase 3 code-start)
 

@@ -2,7 +2,7 @@
 
 *Uitwerking van **Fase 3 — Later** uit `docs/taakhelden-ios-bouwvoorstel.md` §11. Leidend voor iOS; product-roadmap in `docs/taakhelden-productvoorstel.md` §8 kan afwijken — zie §1.2.*
 
-**Status:** plan ter beslissing — geen implementatie in deze fase-documentatie.  
+**Status:** in uitvoering (workstreams 3a–3f in code). Zie `docs/ios-phase3-workstreams.md`.  
 **Basis:** Phase 2 core code is **complete** (merged [#78](https://github.com/SolarnodeCC/Taakhelden/pull/78), 2026-07-29). Zie `docs/ios-phase2-plan.md`.
 
 ---

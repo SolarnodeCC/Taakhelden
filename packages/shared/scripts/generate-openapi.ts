@@ -41,6 +41,16 @@ import {
   TodayViewerResponse,
   UploadIntentBody,
   UploadIntentResponse,
+  AvatarCatalogItem,
+  AvatarCatalogResponse,
+  MemberAvatarState,
+  EquipAvatarBody,
+  FamilyGoal,
+  FamilyGoalsResponse,
+  FamilyGoalProgress,
+  FamilyGoalProgressResponse,
+  CreateFamilyGoalBody,
+  PatchFamilyGoalBody,
 } from "../src/index";
 
 type JsonSchema = Record<string, unknown>;
@@ -93,6 +103,16 @@ const schemas: Record<string, JsonSchema> = {
   NotificationSetting: schemaFor("NotificationSetting", NotificationSetting),
   NotificationSettingsPatch: schemaFor("NotificationSettingsPatch", NotificationSettingsPatch),
   PushPayload: schemaFor("PushPayload", PushPayload),
+  AvatarCatalogItem: schemaFor("AvatarCatalogItem", AvatarCatalogItem),
+  AvatarCatalogResponse: schemaFor("AvatarCatalogResponse", AvatarCatalogResponse),
+  MemberAvatarState: schemaFor("MemberAvatarState", MemberAvatarState),
+  EquipAvatarBody: schemaFor("EquipAvatarBody", EquipAvatarBody),
+  FamilyGoal: schemaFor("FamilyGoal", FamilyGoal),
+  FamilyGoalsResponse: schemaFor("FamilyGoalsResponse", FamilyGoalsResponse),
+  FamilyGoalProgress: schemaFor("FamilyGoalProgress", FamilyGoalProgress),
+  FamilyGoalProgressResponse: schemaFor("FamilyGoalProgressResponse", FamilyGoalProgressResponse),
+  CreateFamilyGoalBody: schemaFor("CreateFamilyGoalBody", CreateFamilyGoalBody),
+  PatchFamilyGoalBody: schemaFor("PatchFamilyGoalBody", PatchFamilyGoalBody),
 };
 
 function json(schemaName: string) {
@@ -283,6 +303,55 @@ const spec = {
         summary: "Soft-delete the family account",
         requestBody: { required: true, ...json("AccountDeleteBody") },
         responses: { "200": json("AccountDeleteResult"), "401": json("ApiError") },
+      },
+    },
+    "/avatar/catalog": {
+      get: {
+        summary: "List avatar cosmetic catalogue (progression unlocks, no IAP)",
+        responses: { "200": json("AvatarCatalogResponse"), "401": json("ApiError") },
+      },
+    },
+    "/members/{id}/avatar": {
+      get: {
+        summary: "Read equipped + unlocked avatar state for a child",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": json("MemberAvatarState"), "403": json("ApiError"), "404": json("ApiError") },
+      },
+      patch: {
+        summary: "Equip unlocked avatar items (idempotent)",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        requestBody: { required: true, ...json("EquipAvatarBody") },
+        responses: { "200": json("MemberAvatarState"), "403": json("ApiError"), "404": json("ApiError") },
+      },
+    },
+    "/families/me/goals": {
+      get: {
+        summary: "List non-archived family goals",
+        responses: { "200": json("FamilyGoalsResponse"), "401": json("ApiError") },
+      },
+      post: {
+        summary: "Create a cooperative family goal (one active max)",
+        requestBody: { required: true, ...json("CreateFamilyGoalBody") },
+        responses: { "201": json("FamilyGoal"), "403": json("ApiError"), "409": json("ApiError") },
+      },
+    },
+    "/families/me/goals/active/progress": {
+      get: {
+        summary: "Active family goal progress (sum of earned points, no sibling ranking)",
+        responses: { "200": json("FamilyGoalProgressResponse"), "401": json("ApiError") },
+      },
+    },
+    "/families/me/goals/{id}": {
+      get: {
+        summary: "Get one family goal",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": json("FamilyGoal"), "404": json("ApiError") },
+      },
+      patch: {
+        summary: "Archive or complete a family goal",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        requestBody: { required: true, ...json("PatchFamilyGoalBody") },
+        responses: { "200": json("FamilyGoal"), "403": json("ApiError"), "404": json("ApiError") },
       },
     },
   },

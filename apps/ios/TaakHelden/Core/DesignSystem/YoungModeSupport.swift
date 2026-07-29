@@ -1,9 +1,10 @@
 import AVFoundation
 import Foundation
+import SwiftUI
 
-/// Foundations for `ageMode: young` (4–7): picture-PIN selection + optional TTS.
-/// Full near-textless shell lands after design pass; this keeps the contract hooks ready.
+/// Young mode (4–7): near-textless chrome, large targets, TTS.
 enum YoungModeSupport {
+    static let minTapTarget: CGFloat = 64
     static let picturePINChoices = ["🦊", "🐼", "🦁", "🐸", "🦄", "🐙"]
 
     static func speak(_ text: String, language: String = "nl-NL") {
@@ -13,7 +14,6 @@ enum YoungModeSupport {
         YoungSpeechBus.shared.speak(utterance)
     }
 
-    /// Validates a 3-emoji picture sequence against a stored sequence string.
     static func matchesPicturePIN(selection: [String], stored: [String]) -> Bool {
         guard selection.count == stored.count, !stored.isEmpty else { return false }
         return selection == stored
@@ -41,5 +41,43 @@ struct PicturePINChallenge: Equatable {
             options: YoungModeSupport.picturePINChoices,
             target: Array(YoungModeSupport.picturePINChoices.prefix(3))
         )
+    }
+}
+
+/// Speak button for young-mode surfaces.
+struct YoungSpeakButton: View {
+    let text: String
+    let palette: THPalette
+
+    var body: some View {
+        Button {
+            YoungModeSupport.speak(text)
+        } label: {
+            Image(systemName: "speaker.wave.2.fill")
+                .font(.system(size: 22, weight: .bold))
+                .foregroundStyle(palette.onAccent.color)
+                .frame(width: YoungModeSupport.minTapTarget, height: YoungModeSupport.minTapTarget)
+                .background(palette.accent.color, in: Circle())
+        }
+        .accessibilityLabel(Text("child.young.speak"))
+        .accessibilityHint(Text(text))
+    }
+}
+
+struct YoungPrimaryButton: View {
+    let titleKey: LocalizedStringKey
+    let systemImage: String
+    let palette: THPalette
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Label(titleKey, systemImage: systemImage)
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+                .frame(minWidth: YoungModeSupport.minTapTarget, minHeight: YoungModeSupport.minTapTarget)
+                .padding(.horizontal, THSpacing.lg)
+        }
+        .buttonStyle(.borderedProminent)
+        .tint(palette.accent.color)
     }
 }

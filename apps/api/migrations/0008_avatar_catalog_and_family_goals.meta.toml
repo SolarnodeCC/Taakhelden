@@ -1,0 +1,21 @@
+# Structured migration evidence for Jankurai HLT-030 (sql-bad-behavior).
+# Runtime engine is Cloudflare D1 / SQLite.
+
+engine = "sqlite"
+phase = "expand"
+risk = "low"
+owner = "api"
+approval = "ios-phase3-avatar-goals"
+affected_objects = [
+  "avatar_catalog",
+  "users.equipped_hat",
+  "users.equipped_background",
+  "users.equipped_accessory",
+  "family_goals",
+  "idx_family_goals_family_status",
+]
+lock_timeout = "n/a-sqlite-d1"
+statement_timeout = "n/a-sqlite-d1"
+rollback = "roll-forward only; additive tables/columns"
+backup = "D1 point-in-time / local wrangler state"
+verify = "apps/api/test avatar + family-goals authz coverage"
