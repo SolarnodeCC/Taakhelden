@@ -14,6 +14,7 @@ struct ChildProfileDTO: Codable, Equatable {
     let id: String
     let displayName: String
     let avatarId: String?
+    let ageMode: String
 }
 
 struct FamilyCodeResultDTO: Codable {
@@ -201,6 +202,59 @@ struct PhotoStatusResponseDTO: Codable {
     let photoId: String
     let status: String
     let url: String?
+}
+
+struct AvatarCatalogItemDTO: Codable, Identifiable, Equatable {
+    let id: String
+    let slot: String
+    let unlockType: String
+    let unlockThreshold: Int
+    let unlockBadgeId: String?
+    let previewEmoji: String
+    let title: String
+    let sortOrder: Int
+}
+
+struct AvatarCatalogResponseDTO: Codable {
+    let items: [AvatarCatalogItemDTO]
+}
+
+struct MemberAvatarEquippedDTO: Codable, Equatable {
+    let hat: String?
+    let background: String?
+    let accessory: String?
+}
+
+struct MemberAvatarStateDTO: Codable, Equatable {
+    let memberId: String
+    let equipped: MemberAvatarEquippedDTO
+    let unlocked: [String]
+    let level: Int
+    let lifetimeEarned: Int
+}
+
+struct FamilyGoalDTO: Codable, Identifiable, Equatable {
+    let id: String
+    let title: String
+    let icon: String
+    let targetPoints: Int
+    let childIds: [String]
+    let startedAt: String
+    let completedAt: String?
+    let status: String
+}
+
+struct FamilyGoalProgressDTO: Codable, Equatable {
+    let goalId: String
+    let title: String
+    let icon: String
+    let earnedPoints: Int
+    let targetPoints: Int
+    let status: String
+}
+
+struct FamilyGoalProgressResponseDTO: Codable {
+    let progress: FamilyGoalProgressDTO?
 }
 
 enum JSONValue: Codable, Equatable {

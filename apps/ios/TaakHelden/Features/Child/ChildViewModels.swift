@@ -49,7 +49,7 @@ final class ChildDayViewModel {
             if mutationQueue.hasPendingWork {
                 state = .offline
             } else {
-                state = .error(error.localizedDescription)
+                state = .error(String(localized: "child.connection.safe"))
             }
         }
     }
@@ -71,7 +71,7 @@ final class ChildDayViewModel {
             try await photoBonusService.uploadTaskPhoto(instanceID: instanceID, jpegData: jpegData)
             await load()
         } catch {
-            state = .error(error.localizedDescription)
+            state = .error(String(localized: "child.photo.upload.error"))
         }
     }
 }
@@ -98,7 +98,7 @@ final class ChildShopViewModel {
             redemptions = try await apiClient.fetchChildRedemptions().redemptions
             errorMessage = nil
         } catch {
-            errorMessage = error.localizedDescription
+            errorMessage = String(localized: "child.shop.load.error")
         }
     }
 }
@@ -118,6 +118,6 @@ final class ChildHeroViewModel {
     }
 
     var level: Int {
-        max(1, lifetimeEarned / 100)
+        HeroProgress.level(fromLifetime: lifetimeEarned)
     }
 }

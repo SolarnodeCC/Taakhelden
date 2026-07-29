@@ -45,7 +45,13 @@ export async function issueParentTokens(
 export async function issueChildTokens(
   db: D1Database,
   secret: string,
-  child: { id: string; family_id: string; display_name: string; avatar_id: string | null },
+  child: {
+    id: string;
+    family_id: string;
+    display_name: string;
+    avatar_id: string | null;
+    age_mode: string | null;
+  },
 ): Promise<ChildSessionResult> {
   const payload: JwtPayload = {
     sub: child.id,
@@ -54,6 +60,10 @@ export async function issueChildTokens(
   };
   const refreshToken = randomToken();
   await storeChildDeviceSession(db, child.family_id, child.id, refreshToken, CHILD_REFRESH_TTL_DAYS);
+  const ageMode =
+    child.age_mode === "young" || child.age_mode === "teen" || child.age_mode === "mid"
+      ? child.age_mode
+      : "mid";
   return {
     accessToken: await signJwt(payload, secret, ACCESS_TTL_CHILD),
     refreshToken,
@@ -62,6 +72,7 @@ export async function issueChildTokens(
       id: child.id,
       displayName: child.display_name,
       avatarId: child.avatar_id,
+      ageMode,
     },
   };
 }

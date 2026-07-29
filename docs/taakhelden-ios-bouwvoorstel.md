@@ -564,9 +564,13 @@ Zonder dit is elke Swift-regel technische schuld.
 - Widget “nog N taken” (optioneel vroeg als het lean blijft).
 - Privacyverklaring + datalek-runbook af; DPIA afgerond vóór echte kinderfoto’s in productie.
 
+**Status (2026-07-29):** core code **complete** via [#78](https://github.com/SolarnodeCC/Taakhelden/pull/78) — zie `docs/ios-phase2-plan.md`. Residual: young-mode design pass, widget XcodeGen wiring, 2-device E2E, DPIA/privacy paperwork.
+
 ### Fase 3 — Later
 
-Watch, coöperatieve gezinsdoelen, avatar-shop, onderhandel-knop (teen), co-ouderschap over twee huishoudens (grote datamodel-breuk — niet half voorbereiden), Android, EN-locale; eventuele break-glass support-toegang met audit (§10.2).
+Watch, coöperatieve gezinsdoelen, avatar-shop, onderhandel-knop (teen), co-ouderschap over twee huishoudens (grote datamodel-breuk — niet half voorbereiden), Android, EN-locale; eventuele break-glass support-toegang met audit (§10.2); young-mode design completion (carry-in).
+
+**Uitwerking:** zie [`docs/ios-phase3-plan.md`](ios-phase3-plan.md) (epics E0–E8, contract, ADR's, exit-criteria; basis = Phase 2 na #78).
 
 ---
 

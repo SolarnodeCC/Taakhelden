@@ -1,6 +1,7 @@
 # iOS Phase 2 — remaining workstreams plan
 
-Status after this branch: **core workstreams implemented in code**; device E2E + DPIA paperwork still manual.
+**Status:** core workstreams **merged** via [#78](https://github.com/SolarnodeCC/Taakhelden/pull/78) (2026-07-29).  
+Device E2E + DPIA paperwork still manual. Phase 3 plan: `docs/ios-phase3-plan.md`.
 
 ## Delivered in code
 
@@ -14,19 +15,19 @@ Status after this branch: **core workstreams implemented in code**; device E2E +
 | 2f | Oldest-first queue, photoStatus chips, pinch/swipe photo, bulk failures | Done |
 | 2g | Streak forgiveness (1 miss/week) in API + tests | Done |
 | 2h | `updated_at` migration + sync delta + silent push hook | Done |
-| 2i | Young mode foundations (TTS + picture-PIN practice UI) | Foundations |
-| 2j | Widget scaffold + App Group count store | Scaffold |
-| 2k | This plan + DPIA checklist still open for legal | Docs |
+| 2i | Young mode foundations (TTS + picture-PIN practice UI) | Foundations → Phase 3 E0 |
+| 2j | Widget scaffold + App Group count store | Scaffold → Phase 3 E6 polish |
+| 2k | This plan + DPIA checklist still open for legal | Docs (open) |
 
 ## Still manual / product
 
 1. Phase 1 2-device E2E checklist (`docs/ios-phase1-e2e-checklist.md`)
 2. Apple Developer: App Group, SIWA, push entitlements on the team account
 3. Wire `TaakHeldenWidget` target in XcodeGen on macOS (`apps/ios/TaakHeldenWidget/`)
-4. Full young-mode design pass (near-textless shell; picture-PIN stored server-side if product wants non-numeric unlock)
+4. Full young-mode design pass (near-textless shell; picture-PIN stored server-side if product wants non-numeric unlock) — **Phase 3 E0**
 5. DPIA finish + public privacy statement + subprocessors + breach runbook drill (`docs/taakhelden-dpia-starter.md`)
 6. Staging smoke of parent approve / WS / export against real Worker
 
 ## Exit criteria
 
-See bouwvoorstel §11 Fase 2. Production child photos remain blocked until DPIA exit items are checked.
+See bouwvoorstel §11 Fase 2. **Code exit met #78 gehaald.** Production child photos remain blocked until DPIA exit items are checked. Phase 3 feature work may start; see `docs/ios-phase3-plan.md` §1.4.

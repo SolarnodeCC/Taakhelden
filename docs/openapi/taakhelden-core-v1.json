@@ -842,6 +842,306 @@
           }
         }
       }
+    },
+    "/avatar/catalog": {
+      "get": {
+        "summary": "List avatar cosmetic catalogue (progression unlocks, no IAP)",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvatarCatalogResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/{id}/avatar": {
+      "get": {
+        "summary": "Read equipped + unlocked avatar state for a child",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberAvatarState"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Equip unlocked avatar items (idempotent)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EquipAvatarBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MemberAvatarState"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/me/goals": {
+      "get": {
+        "summary": "List non-archived family goals",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyGoalsResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a cooperative family goal (one active max)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFamilyGoalBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyGoal"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/me/goals/active/progress": {
+      "get": {
+        "summary": "Active family goal progress (sum of earned points, no sibling ranking)",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyGoalProgressResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/me/goals/{id}": {
+      "get": {
+        "summary": "Get one family goal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyGoal"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "summary": "Archive or complete a family goal",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PatchFamilyGoalBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyGoal"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1081,12 +1381,21 @@
                   "avatarId": {
                     "type": "string",
                     "nullable": true
+                  },
+                  "ageMode": {
+                    "type": "string",
+                    "enum": [
+                      "young",
+                      "mid",
+                      "teen"
+                    ]
                   }
                 },
                 "required": [
                   "id",
                   "displayName",
-                  "avatarId"
+                  "avatarId",
+                  "ageMode"
                 ],
                 "additionalProperties": false
               }
@@ -1124,12 +1433,21 @@
                     "avatarId": {
                       "type": "string",
                       "nullable": true
+                    },
+                    "ageMode": {
+                      "type": "string",
+                      "enum": [
+                        "young",
+                        "mid",
+                        "teen"
+                      ]
                     }
                   },
                   "required": [
                     "id",
                     "displayName",
-                    "avatarId"
+                    "avatarId",
+                    "ageMode"
                   ],
                   "additionalProperties": false
                 }
@@ -3470,6 +3788,526 @@
             "required": [
               "type"
             ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "AvatarCatalogItem": {
+        "$ref": "#/definitions/AvatarCatalogItem",
+        "definitions": {
+          "AvatarCatalogItem": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "slot": {
+                "type": "string",
+                "enum": [
+                  "hat",
+                  "background",
+                  "accessory"
+                ]
+              },
+              "unlockType": {
+                "type": "string",
+                "enum": [
+                  "level",
+                  "badge",
+                  "lifetimePoints"
+                ]
+              },
+              "unlockThreshold": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "unlockBadgeId": {
+                "type": "string",
+                "nullable": true
+              },
+              "previewEmoji": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "sortOrder": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "slot",
+              "unlockType",
+              "unlockThreshold",
+              "unlockBadgeId",
+              "previewEmoji",
+              "title",
+              "sortOrder"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "AvatarCatalogResponse": {
+        "$ref": "#/definitions/AvatarCatalogResponse",
+        "definitions": {
+          "AvatarCatalogResponse": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "slot": {
+                      "type": "string",
+                      "enum": [
+                        "hat",
+                        "background",
+                        "accessory"
+                      ]
+                    },
+                    "unlockType": {
+                      "type": "string",
+                      "enum": [
+                        "level",
+                        "badge",
+                        "lifetimePoints"
+                      ]
+                    },
+                    "unlockThreshold": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "unlockBadgeId": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "previewEmoji": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 8
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "sortOrder": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slot",
+                    "unlockType",
+                    "unlockThreshold",
+                    "unlockBadgeId",
+                    "previewEmoji",
+                    "title",
+                    "sortOrder"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "items"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "MemberAvatarState": {
+        "$ref": "#/definitions/MemberAvatarState",
+        "definitions": {
+          "MemberAvatarState": {
+            "type": "object",
+            "properties": {
+              "memberId": {
+                "type": "string"
+              },
+              "equipped": {
+                "type": "object",
+                "properties": {
+                  "hat": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "background": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "accessory": {
+                    "type": "string",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "hat",
+                  "background",
+                  "accessory"
+                ],
+                "additionalProperties": false
+              },
+              "unlocked": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "level": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "lifetimeEarned": {
+                "type": "integer",
+                "minimum": 0
+              }
+            },
+            "required": [
+              "memberId",
+              "equipped",
+              "unlocked",
+              "level",
+              "lifetimeEarned"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "EquipAvatarBody": {
+        "$ref": "#/definitions/EquipAvatarBody",
+        "definitions": {
+          "EquipAvatarBody": {
+            "type": "object",
+            "properties": {
+              "hat": {
+                "type": "string",
+                "nullable": true
+              },
+              "background": {
+                "type": "string",
+                "nullable": true
+              },
+              "accessory": {
+                "type": "string",
+                "nullable": true
+              }
+            },
+            "additionalProperties": false
+          }
+        }
+      },
+      "FamilyGoal": {
+        "$ref": "#/definitions/FamilyGoal",
+        "definitions": {
+          "FamilyGoal": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "icon": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8
+              },
+              "targetPoints": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              "childIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              },
+              "startedAt": {
+                "type": "string",
+                "minLength": 1
+              },
+              "completedAt": {
+                "type": "string",
+                "nullable": true
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "completed",
+                  "archived"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "icon",
+              "targetPoints",
+              "startedAt",
+              "completedAt",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "FamilyGoalsResponse": {
+        "$ref": "#/definitions/FamilyGoalsResponse",
+        "definitions": {
+          "FamilyGoalsResponse": {
+            "type": "object",
+            "properties": {
+              "goals": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "title": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 80
+                    },
+                    "icon": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 8
+                    },
+                    "targetPoints": {
+                      "type": "integer",
+                      "minimum": 1,
+                      "maximum": 100000
+                    },
+                    "childIds": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "default": []
+                    },
+                    "startedAt": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "completedAt": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "active",
+                        "completed",
+                        "archived"
+                      ]
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "title",
+                    "icon",
+                    "targetPoints",
+                    "startedAt",
+                    "completedAt",
+                    "status"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "goals"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "FamilyGoalProgress": {
+        "$ref": "#/definitions/FamilyGoalProgress",
+        "definitions": {
+          "FamilyGoalProgress": {
+            "type": "object",
+            "properties": {
+              "goalId": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "earnedPoints": {
+                "type": "integer",
+                "minimum": 0
+              },
+              "targetPoints": {
+                "type": "integer",
+                "exclusiveMinimum": true,
+                "minimum": 0
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "completed",
+                  "archived"
+                ]
+              }
+            },
+            "required": [
+              "goalId",
+              "title",
+              "icon",
+              "earnedPoints",
+              "targetPoints",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "FamilyGoalProgressResponse": {
+        "$ref": "#/definitions/FamilyGoalProgressResponse",
+        "definitions": {
+          "FamilyGoalProgressResponse": {
+            "type": "object",
+            "properties": {
+              "progress": {
+                "type": "object",
+                "properties": {
+                  "goalId": {
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "icon": {
+                    "type": "string"
+                  },
+                  "earnedPoints": {
+                    "type": "integer",
+                    "minimum": 0
+                  },
+                  "targetPoints": {
+                    "type": "integer",
+                    "exclusiveMinimum": true,
+                    "minimum": 0
+                  },
+                  "status": {
+                    "type": "string",
+                    "enum": [
+                      "active",
+                      "completed",
+                      "archived"
+                    ]
+                  }
+                },
+                "required": [
+                  "goalId",
+                  "title",
+                  "icon",
+                  "earnedPoints",
+                  "targetPoints",
+                  "status"
+                ],
+                "additionalProperties": false,
+                "nullable": true
+              }
+            },
+            "required": [
+              "progress"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "CreateFamilyGoalBody": {
+        "$ref": "#/definitions/CreateFamilyGoalBody",
+        "definitions": {
+          "CreateFamilyGoalBody": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "icon": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8,
+                "default": "🎯"
+              },
+              "targetPoints": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100000
+              },
+              "childIds": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 20,
+                "default": []
+              }
+            },
+            "required": [
+              "title",
+              "targetPoints"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "PatchFamilyGoalBody": {
+        "$ref": "#/definitions/PatchFamilyGoalBody",
+        "definitions": {
+          "PatchFamilyGoalBody": {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "archived",
+                  "completed"
+                ]
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "icon": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 8
+              }
+            },
             "additionalProperties": false
           }
         }

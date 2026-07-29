@@ -34,7 +34,7 @@ final class TaakHeldenAPIClient {
                     id: $0.id,
                     displayName: $0.displayName,
                     avatar: AvatarCatalog.emoji(for: $0.avatarId),
-                    ageBand: .mid
+                    ageBand: AvatarCatalog.ageBand(from: $0.ageMode)
                 )
             }
         )
@@ -52,7 +52,7 @@ final class TaakHeldenAPIClient {
             accessToken: nil
         )
         let dto = try decoder.decode(ChildSessionResultDTO.self, from: response.data)
-        return mapChildSession(dto, ageBand: request.ageBand)
+        return mapChildSession(dto)
     }
 
     func refreshChildSession() async throws -> ChildSession {
@@ -60,7 +60,7 @@ final class TaakHeldenAPIClient {
             throw APIClientError.sessionMissing
         }
         let dto = try await refreshCoordinator.refreshChild(refreshToken: refreshToken, transport: transport)
-        let session = mapChildSession(dto, ageBand: authStore.childSession?.ageBand ?? .mid)
+        let session = mapChildSession(dto)
         authStore.updateChildTokens(accessToken: session.accessToken, refreshToken: session.refreshToken)
         return session
     }
@@ -218,6 +218,70 @@ final class TaakHeldenAPIClient {
         )
     }
 
+    // MARK: - Phase 3: avatar shop + family goals
+
+    func fetchAvatarCatalog() async throws -> AvatarCatalogResponseDTO {
+        let response = try await sendAuthorized(
+            HTTPRequest(path: "/avatar/catalog", method: .get, requiresAuth: true)
+        )
+        return try decoder.decode(AvatarCatalogResponseDTO.self, from: response.data)
+    }
+
+    func fetchMemberAvatar(memberID: String) async throws -> MemberAvatarStateDTO {
+        let response = try await sendAuthorized(
+            HTTPRequest(path: "/members/\(memberID)/avatar", method: .get, requiresAuth: true)
+        )
+        return try decoder.decode(MemberAvatarStateDTO.self, from: response.data)
+    }
+
+    func equipAvatar(
+        memberID: String,
+        hat: OptionalNullString = .omit,
+        background: OptionalNullString = .omit,
+        accessory: OptionalNullString = .omit,
+        idempotencyKey: String
+    ) async throws -> MemberAvatarStateDTO {
+        let payload = EquipAvatarPayload(hat: hat, background: background, accessory: accessory)
+        let body = try encoder.encode(payload)
+        let response = try await sendAuthorized(
+            HTTPRequest(
+                path: "/members/\(memberID)/avatar",
+                method: .patch,
+                body: body,
+                requiresAuth: true,
+                idempotencyKey: idempotencyKey
+            )
+        )
+        return try decoder.decode(MemberAvatarStateDTO.self, from: response.data)
+    }
+
+    func fetchActiveFamilyGoalProgress() async throws -> FamilyGoalProgressResponseDTO {
+        let response = try await sendAuthorized(
+            HTTPRequest(path: "/families/me/goals/active/progress", method: .get, requiresAuth: true)
+        )
+        return try decoder.decode(FamilyGoalProgressResponseDTO.self, from: response.data)
+    }
+
+    func createFamilyGoal(title: String, icon: String, targetPoints: Int, childIds: [String], idempotencyKey: String) async throws -> FamilyGoalDTO {
+        let payload: [String: AnyEncodable] = [
+            "title": AnyEncodable(title),
+            "icon": AnyEncodable(icon),
+            "targetPoints": AnyEncodable(targetPoints),
+            "childIds": AnyEncodable(childIds),
+        ]
+        let body = try encoder.encode(payload)
+        let response = try await sendAsParent(
+            HTTPRequest(
+                path: "/families/me/goals",
+                method: .post,
+                body: body,
+                requiresAuth: true,
+                idempotencyKey: idempotencyKey
+            )
+        )
+        return try decoder.decode(FamilyGoalDTO.self, from: response.data)
+    }
+
     // MARK: - Internals
 
     /// Child-session token only. Parent ops must use `sendAsParent`.
@@ -242,12 +306,12 @@ final class TaakHeldenAPIClient {
         return try await sendAsParent(request, retried: retried)
     }
 
-    private func mapChildSession(_ dto: ChildSessionResultDTO, ageBand: ChildAgeBand) -> ChildSession {
+    private func mapChildSession(_ dto: ChildSessionResultDTO) -> ChildSession {
         ChildSession(
             childID: dto.child.id,
             displayName: dto.child.displayName,
             avatar: AvatarCatalog.emoji(for: dto.child.avatarId),
-            ageBand: ageBand,
+            ageBand: AvatarCatalog.ageBand(from: dto.child.ageMode),
             accessToken: dto.accessToken,
             refreshToken: dto.refreshToken
         )
@@ -263,5 +327,41 @@ struct AnyEncodable: Encodable {
 
     func encode(to encoder: Encoder) throws {
         try encodeClosure(encoder)
+    }
+}
+
+/// Distinguishes omit vs explicit null for equip PATCH bodies.
+enum OptionalNullString: Equatable {
+    case omit
+    case value(String?)
+}
+
+struct EquipAvatarPayload: Encodable, Equatable {
+    let hat: OptionalNullString
+    let background: OptionalNullString
+    let accessory: OptionalNullString
+
+    enum CodingKeys: String, CodingKey {
+        case hat, background, accessory
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try encodeSlot(&container, key: .hat, value: hat)
+        try encodeSlot(&container, key: .background, value: background)
+        try encodeSlot(&container, key: .accessory, value: accessory)
+    }
+
+    private func encodeSlot(
+        _ container: inout KeyedEncodingContainer<CodingKeys>,
+        key: CodingKeys,
+        value: OptionalNullString
+    ) throws {
+        switch value {
+        case .omit:
+            break
+        case .value(let string):
+            try container.encode(string, forKey: key)
+        }
     }
 }

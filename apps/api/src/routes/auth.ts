@@ -219,6 +219,7 @@ auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
     family_id: family.id as string,
     display_name: child.display_name as string,
     avatar_id: (child.avatar_id as string | null) ?? null,
+    age_mode: (child.age_mode as string | null) ?? null,
   })));
 });
 
@@ -237,6 +238,7 @@ auth.post("/child-session/refresh", validate("json", ChildSessionRefreshBody), a
     family_id: consumed.family_id as string,
     display_name: child.display_name as string,
     avatar_id: (child.avatar_id as string | null) ?? null,
+    age_mode: (child.age_mode as string | null) ?? null,
   })));
 });
 

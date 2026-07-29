@@ -65,7 +65,7 @@ export async function getChildForLogin(db: D1Database, familyId: string, childId
 export async function listChildProfiles(db: D1Database, familyId: string) {
   const { results } = await db
     .prepare(
-      "SELECT id, display_name, avatar_id FROM users WHERE family_id = ? AND role = 'child' AND deleted_at IS NULL ORDER BY created_at",
+      "SELECT id, display_name, avatar_id, age_mode FROM users WHERE family_id = ? AND role = 'child' AND deleted_at IS NULL ORDER BY created_at",
     )
     .bind(familyId)
     .all();
@@ -73,6 +73,7 @@ export async function listChildProfiles(db: D1Database, familyId: string) {
     id: r.id as string,
     displayName: r.display_name as string,
     avatarId: (r.avatar_id as string | null) ?? null,
+    ageMode: ((r.age_mode as string | null) ?? "mid") as "young" | "mid" | "teen",
   }));
 }
 
