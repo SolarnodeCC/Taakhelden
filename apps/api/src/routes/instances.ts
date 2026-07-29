@@ -18,33 +18,11 @@ import { callFamilyRoom } from "../services/familyRoom";
 import { getFamily, listChildren } from "../repo/families";
 import { listForDate, listHistory } from "../repo/instances";
 import { isContractV2 } from "../services/contract";
+import { toInstanceView as instanceView } from "../services/instanceView";
 import { computeBalance } from "../services/pointsEngine";
 import { localDate } from "../services/time";
 
 const instances = new Hono<AppBindings>();
-
-function instanceView(row: Record<string, unknown>) {
-  return {
-    id: row.id,
-    taskId: row.task_id,
-    childId: row.child_id,
-    date: row.date,
-    status: row.status,
-    title: row.title,
-    icon: row.icon,
-    category: row.category,
-    points: row.task_points,
-    photoBonusPoints: row.photo_bonus_points,
-    approvalRequired: Boolean(row.approval_required),
-    daypart: row.daypart ?? null,
-    photoId: row.photo_id ?? null,
-    photoStatus: row.photo_status ?? null,
-    pointsEarned: row.points_earned ?? null,
-    redoNote: row.redo_note ?? null,
-    completedAt: row.completed_at ?? null,
-    approvedAt: row.approved_at ?? null,
-  };
-}
 
 type FamilyRow = { timezone: string; week_bonus_threshold: number };
 
@@ -141,12 +119,12 @@ instances.post("/:id/complete", requireIdempotencyKey, idempotency, async (c) =>
   callFamilyRoom(c, "/complete", { instanceId: c.req.param("id") }),
 );
 
-instances.post("/:id/approve", idempotency, async (c) => {
+instances.post("/:id/approve", requireIdempotencyKey, idempotency, async (c) => {
   requireParent(c);
   return callFamilyRoom(c, "/approve", { instanceId: c.req.param("id") });
 });
 
-instances.post("/:id/redo", validate("json", RedoBody), async (c) => {
+instances.post("/:id/redo", requireIdempotencyKey, idempotency, validate("json", RedoBody), async (c) => {
   requireParent(c);
   // Vriendelijke toelichting verplicht; GEEN puntenaftrek (architectuurregel 4).
   return callFamilyRoom(c, "/redo", {
@@ -155,7 +133,7 @@ instances.post("/:id/redo", validate("json", RedoBody), async (c) => {
   });
 });
 
-instances.post("/:id/undo", async (c) =>
+instances.post("/:id/undo", requireIdempotencyKey, idempotency, async (c) =>
   callFamilyRoom(c, "/undo", { instanceId: c.req.param("id") }),
 );
 

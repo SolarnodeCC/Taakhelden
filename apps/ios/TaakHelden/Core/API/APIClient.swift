@@ -1,10 +1,6 @@
 import Foundation
 
-// MARK: - Preview-layer models
-// These parent-mode types are the local view-model layer for Phase 2.
-// They will be replaced by generated Swift OpenAPI types once the codegen
-// pipeline from packages/shared lands on macOS CI.
-
+// MARK: - Parent-mode API surface
 protocol APIClient: AnyObject {
     func fetchWelcomeContext() async throws -> WelcomeContext
     func resolveFamilyCode(_ code: String) async throws -> FamilyCodeLookup
@@ -15,6 +11,36 @@ protocol APIClient: AnyObject {
     func updateParentSettings(soundEnabled: Bool) async throws -> ParentSettingsSnapshot
     func requestParentDataExport() async throws -> ParentExportReceipt
     func deleteParentAccount() async throws
+    func deleteParentAccount(appleIdentityToken: String) async throws
+    func createManagedTask(title: String, points: Int, childIDs: [String], idempotencyKey: String) async throws -> ParentDashboardSnapshot
+    func archiveManagedTask(id: String) async throws -> ParentDashboardSnapshot
+    func createManagedReward(title: String, price: Int, idempotencyKey: String) async throws -> ParentDashboardSnapshot
+    func archiveManagedReward(id: String) async throws -> ParentDashboardSnapshot
+    func fetchPhotoURL(photoID: String) async throws -> URL?
+}
+
+extension APIClient {
+    func deleteParentAccount(appleIdentityToken: String) async throws {
+        throw APIClientError.parentReauthRequired
+    }
+
+    func createManagedTask(title: String, points: Int, childIDs: [String], idempotencyKey: String) async throws -> ParentDashboardSnapshot {
+        throw APIClientError.notImplemented
+    }
+
+    func archiveManagedTask(id: String) async throws -> ParentDashboardSnapshot {
+        throw APIClientError.notImplemented
+    }
+
+    func createManagedReward(title: String, price: Int, idempotencyKey: String) async throws -> ParentDashboardSnapshot {
+        throw APIClientError.notImplemented
+    }
+
+    func archiveManagedReward(id: String) async throws -> ParentDashboardSnapshot {
+        throw APIClientError.notImplemented
+    }
+
+    func fetchPhotoURL(photoID: String) async throws -> URL? { nil }
 }
 
 struct WelcomeContext {
@@ -138,13 +164,83 @@ final class PreviewAPIClient: APIClient {
     func deleteParentAccount() async throws {
         withDashboard { d in d = PreviewParentData.dashboard }
     }
+
+    func deleteParentAccount(appleIdentityToken: String) async throws {
+        try await deleteParentAccount()
+    }
+
+    func createManagedTask(title: String, points: Int, childIDs: [String], idempotencyKey: String) async throws -> ParentDashboardSnapshot {
+        withDashboard { d in
+            var tasks = d.managedTasks
+            tasks.insert(
+                ParentManagedTask(id: UUID().uuidString, title: title, icon: "⭐️", points: points, assigneeCount: max(childIDs.count, 1)),
+                at: 0
+            )
+            d = ParentDashboardSnapshot(
+                todayChildren: d.todayChildren,
+                approvalSections: d.approvalSections,
+                managedTasks: tasks,
+                managedRewards: d.managedRewards,
+                settings: d.settings,
+                lastSyncedAt: .now
+            )
+            return d
+        }
+    }
+
+    func archiveManagedTask(id: String) async throws -> ParentDashboardSnapshot {
+        withDashboard { d in
+            d = ParentDashboardSnapshot(
+                todayChildren: d.todayChildren,
+                approvalSections: d.approvalSections,
+                managedTasks: d.managedTasks.filter { $0.id != id },
+                managedRewards: d.managedRewards,
+                settings: d.settings,
+                lastSyncedAt: .now
+            )
+            return d
+        }
+    }
+
+    func createManagedReward(title: String, price: Int, idempotencyKey: String) async throws -> ParentDashboardSnapshot {
+        withDashboard { d in
+            var rewards = d.managedRewards
+            rewards.insert(ParentManagedReward(id: UUID().uuidString, title: title, icon: "🎁", price: price), at: 0)
+            d = ParentDashboardSnapshot(
+                todayChildren: d.todayChildren,
+                approvalSections: d.approvalSections,
+                managedTasks: d.managedTasks,
+                managedRewards: rewards,
+                settings: d.settings,
+                lastSyncedAt: .now
+            )
+            return d
+        }
+    }
+
+    func archiveManagedReward(id: String) async throws -> ParentDashboardSnapshot {
+        withDashboard { d in
+            d = ParentDashboardSnapshot(
+                todayChildren: d.todayChildren,
+                approvalSections: d.approvalSections,
+                managedTasks: d.managedTasks,
+                managedRewards: d.managedRewards.filter { $0.id != id },
+                settings: d.settings,
+                lastSyncedAt: .now
+            )
+            return d
+        }
+    }
 }
 
-enum APIClientError: LocalizedError {
+enum APIClientError: LocalizedError, Equatable {
     case invalidFamilyCode
     case invalidPin
     case invalidParentNote
     case sessionMissing
+    case parentSessionMissing
+    case parentReauthRequired
+    case notImplemented
 
     var errorDescription: String? {
         switch self {
@@ -156,46 +252,77 @@ enum APIClientError: LocalizedError {
             return "Schrijf nog even een korte, positieve notitie."
         case .sessionMissing:
             return "Je sessie is verlopen. Koppel dit toestel opnieuw."
+        case .parentSessionMissing:
+            return "Log even in met je ouderaccount om goed te keuren of te beheren."
+        case .parentReauthRequired:
+            return "Bevestig opnieuw met Apple om het account te verwijderen."
+        case .notImplemented:
+            return "Deze actie is nog niet beschikbaar op dit toestel."
         }
     }
 }
 
 enum IdempotencyKey {
+    /// Deterministic per instance — retries must not mint a new key (double-award risk).
     static func forApproval(instanceID: String) -> String {
-        "approve-\(instanceID)-\(UUID().uuidString)"
+        "approve-\(instanceID)"
     }
 
     static func forRedo(instanceID: String) -> String {
-        "redo-\(instanceID)-\(UUID().uuidString)"
+        "redo-\(instanceID)"
+    }
+
+    static func forTaskArchive(taskID: String) -> String {
+        "archive-task-\(taskID)"
+    }
+
+    static func forRewardArchive(rewardID: String) -> String {
+        "archive-reward-\(rewardID)"
+    }
+
+    static func forTaskCreate() -> String {
+        "task-create-\(UUID().uuidString)"
+    }
+
+    static func forRewardCreate() -> String {
+        "reward-create-\(UUID().uuidString)"
     }
 }
 
 private enum PreviewParentData {
     static var dashboard: ParentDashboardSnapshot {
         let now = Date()
-        let photoOne = ParentPhotoAsset(id: "photo-kamer", previewURL: URL(string: "https://example.invalid/photo-kamer.jpg"), accessibilityLabel: "Foto van de opgeruimde kamer")
-        let photoTwo = ParentPhotoAsset(id: "photo-tafel", previewURL: URL(string: "https://example.invalid/photo-tafel.jpg"), accessibilityLabel: "Foto van de gedekte tafel")
+        let photoOne = ParentPhotoAsset(id: "photo-kamer", previewURL: URL(string: "https://example.invalid/photo-kamer.jpg"), accessibilityLabel: "Foto van de opgeruimde kamer", status: "ready")
+        let photoTwo = ParentPhotoAsset(id: "photo-tafel", previewURL: URL(string: "https://example.invalid/photo-tafel.jpg"), accessibilityLabel: "Foto van de gedekte tafel", status: "ready")
 
         return ParentDashboardSnapshot(
             todayChildren: [
                 ParentTodayChildSnapshot(id: "child-sam", displayName: "Sam", avatar: "🦊", balancePoints: 34, tasks: [
-                    ParentTaskSnapshot(id: "instance-kamer", title: "Kamer opruimen", icon: "🧹", status: .submitted, points: 12, submittedAt: now.addingTimeInterval(-3_600), photoAsset: photoOne),
-                    ParentTaskSnapshot(id: "instance-tafel", title: "Tafel dekken", icon: "🍽️", status: .submitted, points: 8, submittedAt: now.addingTimeInterval(-5_400), photoAsset: photoTwo),
-                    ParentTaskSnapshot(id: "instance-bed", title: "Bed opmaken", icon: "🛏️", status: .open, points: 6, submittedAt: nil, photoAsset: nil),
+                    ParentTaskSnapshot(id: "instance-kamer", title: "Kamer opruimen", icon: "🧹", status: .submitted, points: 12, submittedAt: now.addingTimeInterval(-3_600), photoAsset: photoOne, photoStatus: "ready"),
+                    ParentTaskSnapshot(id: "instance-tafel", title: "Tafel dekken", icon: "🍽️", status: .submitted, points: 8, submittedAt: now.addingTimeInterval(-5_400), photoAsset: photoTwo, photoStatus: "ready"),
+                    ParentTaskSnapshot(id: "instance-bed", title: "Bed opmaken", icon: "🛏️", status: .open, points: 6, submittedAt: nil, photoAsset: nil, photoStatus: nil),
                 ]),
                 ParentTodayChildSnapshot(id: "child-noor", displayName: "Noor", avatar: "🐼", balancePoints: 52, tasks: [
-                    ParentTaskSnapshot(id: "instance-fiets", title: "Fiets in de schuur zetten", icon: "🚲", status: .completed, points: 5, submittedAt: now.addingTimeInterval(-7_200), photoAsset: nil),
-                    ParentTaskSnapshot(id: "instance-huiswerk", title: "Wiskunde afmaken", icon: "📚", status: .submitted, points: 10, submittedAt: now.addingTimeInterval(-1_800), photoAsset: nil),
+                    ParentTaskSnapshot(id: "instance-fiets", title: "Fiets in de schuur zetten", icon: "🚲", status: .completed, points: 5, submittedAt: now.addingTimeInterval(-7_200), photoAsset: nil, photoStatus: nil),
+                    ParentTaskSnapshot(id: "instance-huiswerk", title: "Wiskunde afmaken", icon: "📚", status: .submitted, points: 10, submittedAt: now.addingTimeInterval(-1_800), photoAsset: nil, photoStatus: nil),
                 ]),
             ],
             approvalSections: [
                 ApprovalQueueSection(id: "queue-child-sam", childID: "child-sam", childName: "Sam", childAvatar: "🦊", items: [
-                    ApprovalQueueItem(id: "instance-tafel", childID: "child-sam", childName: "Sam", childAvatar: "🦊", title: "Tafel dekken", icon: "🍽️", submittedAt: now.addingTimeInterval(-5_400), points: 8, photoAsset: photoTwo),
-                    ApprovalQueueItem(id: "instance-kamer", childID: "child-sam", childName: "Sam", childAvatar: "🦊", title: "Kamer opruimen", icon: "🧹", submittedAt: now.addingTimeInterval(-3_600), points: 12, photoAsset: photoOne),
+                    ApprovalQueueItem(id: "instance-tafel", childID: "child-sam", childName: "Sam", childAvatar: "🦊", title: "Tafel dekken", icon: "🍽️", submittedAt: now.addingTimeInterval(-5_400), points: 8, photoAsset: photoTwo, photoStatus: "ready"),
+                    ApprovalQueueItem(id: "instance-kamer", childID: "child-sam", childName: "Sam", childAvatar: "🦊", title: "Kamer opruimen", icon: "🧹", submittedAt: now.addingTimeInterval(-3_600), points: 12, photoAsset: photoOne, photoStatus: "ready"),
                 ]),
                 ApprovalQueueSection(id: "queue-child-noor", childID: "child-noor", childName: "Noor", childAvatar: "🐼", items: [
-                    ApprovalQueueItem(id: "instance-huiswerk", childID: "child-noor", childName: "Noor", childAvatar: "🐼", title: "Wiskunde afmaken", icon: "📚", submittedAt: now.addingTimeInterval(-1_800), points: 10, photoAsset: nil),
+                    ApprovalQueueItem(id: "instance-huiswerk", childID: "child-noor", childName: "Noor", childAvatar: "🐼", title: "Wiskunde afmaken", icon: "📚", submittedAt: now.addingTimeInterval(-1_800), points: 10, photoAsset: nil, photoStatus: nil),
                 ]),
+            ],
+            managedTasks: [
+                ParentManagedTask(id: "task-kamer", title: "Kamer opruimen", icon: "🧹", points: 12, assigneeCount: 1),
+                ParentManagedTask(id: "task-huiswerk", title: "Wiskunde afmaken", icon: "📚", points: 10, assigneeCount: 1),
+            ],
+            managedRewards: [
+                ParentManagedReward(id: "reward-ijs", title: "IJsje", icon: "🍦", price: 40),
+                ParentManagedReward(id: "reward-film", title: "Filmavond", icon: "🎬", price: 80),
             ],
             settings: ParentSettingsSnapshot(soundEnabled: true, exportAvailable: true, deleteAvailable: true),
             lastSyncedAt: now
@@ -213,14 +340,37 @@ private extension ParentDashboardSnapshot {
         let updatedChildren = todayChildren.map { child in
             let tasks = child.tasks.map { task in
                 guard task.id == id else { return task }
-                return ParentTaskSnapshot(id: task.id, title: task.title, icon: task.icon, status: markingTaskAsApproved ? .approved : .openRedo, points: task.points, submittedAt: task.submittedAt, photoAsset: task.photoAsset)
+                return ParentTaskSnapshot(
+                    id: task.id,
+                    title: task.title,
+                    icon: task.icon,
+                    status: markingTaskAsApproved ? .approved : .openRedo,
+                    points: task.points,
+                    submittedAt: task.submittedAt,
+                    photoAsset: task.photoAsset,
+                    photoStatus: task.photoStatus
+                )
             }
             return ParentTodayChildSnapshot(id: child.id, displayName: child.displayName, avatar: child.avatar, balancePoints: child.balancePoints, tasks: tasks)
         }
-        return ParentDashboardSnapshot(todayChildren: updatedChildren, approvalSections: updatedSections, settings: settings, lastSyncedAt: .now)
+        return ParentDashboardSnapshot(
+            todayChildren: updatedChildren,
+            approvalSections: updatedSections,
+            managedTasks: managedTasks,
+            managedRewards: managedRewards,
+            settings: settings,
+            lastSyncedAt: .now
+        )
     }
 
     func updatingSettings(soundEnabled: Bool) -> ParentDashboardSnapshot {
-        ParentDashboardSnapshot(todayChildren: todayChildren, approvalSections: approvalSections, settings: ParentSettingsSnapshot(soundEnabled: soundEnabled, exportAvailable: settings.exportAvailable, deleteAvailable: settings.deleteAvailable), lastSyncedAt: .now)
+        ParentDashboardSnapshot(
+            todayChildren: todayChildren,
+            approvalSections: approvalSections,
+            managedTasks: managedTasks,
+            managedRewards: managedRewards,
+            settings: ParentSettingsSnapshot(soundEnabled: soundEnabled, exportAvailable: settings.exportAvailable, deleteAvailable: settings.deleteAvailable),
+            lastSyncedAt: .now
+        )
     }
 }

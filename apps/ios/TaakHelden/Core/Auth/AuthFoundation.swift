@@ -170,6 +170,16 @@ final class AuthStore {
         keychain.deleteValue(for: .childPIN)
     }
 
+    func clearParentSession() {
+        parentSession = nil
+        keychain.deleteValue(for: .parentSession)
+    }
+
+    func clearAllSessions() {
+        clearChildSession()
+        clearParentSession()
+    }
+
     private func persistParent() {
         if let session = parentSession, let data = try? encoder.encode(session) {
             keychain.saveValue(data, for: .parentSession)

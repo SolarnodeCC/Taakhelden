@@ -10,9 +10,10 @@ import type { Env } from "../types";
 import { ApiException } from "../middleware/error";
 import { applyComplete, applyUndo, applyRedeem, applyAttachPhoto, type Actor } from "./pointsEngine";
 import { getFamily } from "../repo/families";
-import { listForDate, type InstanceRow } from "../repo/instances";
+import { listForDate, listUpdatedSince } from "../repo/instances";
 import { entriesSince } from "../repo/ledger";
 import { listRewards } from "../repo/rewards";
+import { parseInstanceView } from "./instanceView";
 import { localDate } from "./time";
 import { parseJsonOrThrow } from "./jsonParse";
 
@@ -107,34 +108,42 @@ export async function processSyncBatch(
   return { results, changes, serverTime: new Date().toISOString() };
 }
 
+const EPOCH_ISO = "1970-01-01T00:00:00.000Z";
+
 /**
- * Delta sinds `since`: ledger-entries (created_at > since) en de dag-instances
- * van de aanroeper. Instances hebben geen updated_at, dus we sturen de volledige
- * dag terug — klein genoeg, en de app reconcilieert op instance-id.
+ * Normaliseert de `since` naar hetzelfde ISO-formaat als `task_instances.updated_at`
+ * (millis erbij), zodat de lexicografische vergelijking in SQL klopt.
+ */
+function normalizeSince(since: string | undefined): string {
+  if (!since) return EPOCH_ISO;
+  const at = Date.parse(since);
+  return Number.isNaN(at) ? EPOCH_ISO : new Date(at).toISOString();
+}
+
+/**
+ * Delta sinds `since`: ledger-entries (created_at > since) en de instances van de
+ * aanroeper die daarna gewijzigd zijn (`updated_at`, migratie 0007). Zonder
+ * `since` — eerste sync na (her)installatie — sturen we de volledige dag van
+ * vandaag terug; de app reconcilieert op instance-id.
  */
 async function collectChanges(env: Env, familyId: string, actor: Actor, since: string | undefined) {
   const db = env.DB;
   const family = (await getFamily(db, familyId)) as unknown as { timezone: string } | null;
   const today = localDate(family?.timezone ?? "Europe/Amsterdam");
-  const sinceIso = since ?? "1970-01-01T00:00:00Z";
+  const sinceIso = normalizeSince(since);
 
   const isChild = actor.role === "child";
+  const childScope = isChild ? actor.userId : undefined;
   const [ledgerRows, instanceRows, rewardRows] = await Promise.all([
-    entriesSince(db, familyId, sinceIso, isChild ? actor.userId : undefined),
-    listForDate(db, familyId, today, isChild ? actor.userId : undefined),
+    entriesSince(db, familyId, sinceIso, childScope),
+    since
+      ? listUpdatedSince(db, familyId, sinceIso, childScope)
+      : listForDate(db, familyId, today, childScope),
     listRewards(db, familyId),
   ]);
 
   return {
-    instances: (instanceRows as unknown as InstanceRow[]).map((r) => ({
-      id: r.id,
-      taskId: r.task_id,
-      childId: r.child_id,
-      date: r.date,
-      status: r.status,
-      pointsEarned: r.points_earned ?? null,
-      photoStatus: r.photo_status ?? null,
-    })),
+    instances: instanceRows.map((r) => parseInstanceView(r)),
     ledger: ledgerRows.map((r) => ({
       id: r.id,
       childId: r.child_id,

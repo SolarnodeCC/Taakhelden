@@ -1,7 +1,6 @@
 # TaakHelden iOS (SwiftUI)
 
-Phase 1 MVP foundations live in deze map, volgens het bouwvoorstel en de
-goedgekeurde ADRs:
+Phase 1 MVP + Phase 2 parent-mode workstreams live in deze map.
 
 - iOS 17 minimum
 - een familie-app met kind- en oudermodus
@@ -12,6 +11,7 @@ goedgekeurde ADRs:
 ## Bouwvoorstel (leidend)
 
 Zie **[`docs/taakhelden-ios-bouwvoorstel.md`](../../docs/taakhelden-ios-bouwvoorstel.md)**.
+Phase 2 plan: **[`docs/ios-phase2-plan.md`](../../docs/ios-phase2-plan.md)**.
 
 Leidende ADRs:
 
@@ -24,64 +24,36 @@ Leidende ADRs:
 ```
 apps/ios/
 ├── project.yml
-├── TaakHelden.entitlements          # SIWA + APNs development
+├── TaakHelden.entitlements          # SIWA + APNs + App Group
 ├── Scripts/
-│   ├── sync-openapi-contract.sh
-│   └── generate-openapi-client.sh   # Swift OpenAPI Generator (macOS CI)
 ├── openapi/
-│   ├── openapi.json
-│   └── openapi-generator-config.yaml
 ├── ReviewNotes.md
 ├── TaakHelden/
 │   ├── App/
-│   ├── Core/
-│   │   ├── API/
-│   │   ├── Auth/
-│   │   ├── DesignSystem/
-│   │   ├── ParentGate/
-│   │   ├── Push/
-│   │   └── Sync/
-│   ├── Features/
-│   │   ├── Child/
-│   │   ├── Onboarding/
-│   │   └── Parent/
+│   ├── Core/ (API, Auth, DesignSystem, Parent, ParentGate, Push, Realtime, Sync)
+│   ├── Features/ (Child, Onboarding, Parent)
 │   └── Resources/
+├── TaakHeldenWidget/                # optional WidgetKit scaffold
 └── TaakHeldenTests/
 ```
 
-## Contract & codegen
+## Phase 2 (geïmplementeerd in code)
 
-1. `packages/shared` genereert `docs/openapi/taakhelden-core-v1.json`
-2. `apps/ios/Scripts/sync-openapi-contract.sh` kopieert naar `openapi/openapi.json`
-3. `packages/shared/scripts/generate-swift-contract.ts` → `ContractModels.swift`
-4. `apps/ios/Scripts/generate-openapi-client.sh` → optionele Swift OpenAPI HTTP client
-5. `npm run openapi:check` valideert beide snapshots in CI
+- Parental gate → live `ParentModeRootView` (device-owner LA of ouder-SIWA)
+- Vandaag / Goedkeuren / Taken / Beloningen / Instellingen
+- `ParentAPIAdapter` op echte parent-JWT endpoints (preview alleen in tests)
+- `LiveFamilyRoomClient` + silent-push refresh hook
+- Export-poll + SIWA account-delete
+- Young-mode foundations (TTS + picture-PIN oefen-UI)
+- Open-task count App Group store + widget scaffold
 
-Handmatige JSON-DTO's toevoegen is niet toegestaan — wijzig het gedeelde contract.
+## Nog handmatig
 
-## Phase 1 foundations (geïmplementeerd)
-
-- Keychain-sessies (ouder + kind) met device refresh
-- Child unlock: zichtbare PIN voor onder 13 + optionele Face ID
-- Parental gate: verborgen gebaar + LocalAuthentication **vóór** settings
-- Welcome hub in parent-register (familie-app); kind-koppelen in kid-register
-- Paletten gespiegeld aan `apps/web/app/globals.css` (incl. teen-navy + kid-turquoise)
-- Ouder-onboarding: Sign in with Apple → kind + gezinscode
-- Kind-tabs: Mijn Dag / Winkel / Mijn Held (live API + empty/loading/error)
-- MutationQueue + SyncEngine (offline afvinken)
-- Foto-bonus: camera + PHPicker, JPEG ~2 MP compressie
-- Beloningsmoment: confetti of reduce-motion glow + haptic + chime
-- Push: opt-in, optioneel, generieke lockscreen-copy
-- WCAG AA palette contrast unit-tests
-- App Review-pakket: `ReviewNotes.md` + E2E-checklist + DPIA starter
-
-## Nog handmatig vóór Phase 2
-
-- E2E happy path op **twee fysieke devices** tegen staging Worker
-  (`docs/ios-phase1-e2e-checklist.md`)
-- Staging gezinscode in `ReviewNotes.md` bijwerken na review-gezin aanmaken
-- Xcode signing team + SIWA capability in Apple Developer portal
-- Optioneel: `task-complete.wav` in Resources (systeem-fallback werkt zonder)
+- E2E happy path op **twee fysieke devices** (`docs/ios-phase1-e2e-checklist.md`)
+- Apple Developer: signing, SIWA, App Group, push
+- Widget-target in XcodeGen op macOS afronden
+- DPIA / privacyverklaring exit (`docs/taakhelden-dpia-starter.md`)
+- Staging smoke tegen Worker
 
 ## Lokaal bouwen (macOS)
 
@@ -92,7 +64,3 @@ open TaakHelden.xcodeproj
 ```
 
 Stel `TAAKHELDEN_API_BASE_URL` in op het scheme voor staging tests.
-
-## Design System
-
-Kid UI-kits: `Design System/ui_kits/kid-app/`. Tokens: `apps/web/app/globals.css`.

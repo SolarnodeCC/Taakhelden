@@ -49,6 +49,8 @@ Niet in scope van deze starter: co-ouderschap over twee huishoudens (fase 3).
 - [ ] Datalek-runbook oefenen (zie privacy-minimum §4)
 - [ ] Staging/review alleen synthetische of ouder-eigen testfoto's
 
+Zie ook `docs/ios-phase2-plan.md` (workstream 2k).
+
 ## 6. Fase 1 exit
 
 Fase 1 vereist dat deze DPIA **gestart** is (dit document). Afronding blijft een

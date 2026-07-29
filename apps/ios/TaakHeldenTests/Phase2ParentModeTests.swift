@@ -46,7 +46,8 @@ final class Phase2ParentModeTests: XCTestCase {
     func testPreviewLAClientSucceeds() async throws {
         let client = PreviewLocalAuthenticationClient()
         XCTAssertTrue(client.canEvaluateBiometrics())
-        let success = try await client.evaluateBiometrics(reason: "test")
+        XCTAssertTrue(client.canEvaluateDeviceOwner())
+        let success = try await client.evaluateDeviceOwner(reason: "test")
         XCTAssertTrue(success)
     }
 
@@ -60,7 +61,8 @@ final class Phase2ParentModeTests: XCTestCase {
             icon: "🧹",
             submittedAt: .now,
             points: 12,
-            photoAsset: ParentPhotoAsset(id: "photo", previewURL: nil, accessibilityLabel: "Foto")
+            photoAsset: ParentPhotoAsset(id: "photo", previewURL: nil, accessibilityLabel: "Foto", status: "ready"),
+            photoStatus: "ready"
         )
         let secondChild = ApprovalQueueItem(
             id: "two",
@@ -71,7 +73,8 @@ final class Phase2ParentModeTests: XCTestCase {
             icon: "📚",
             submittedAt: .now,
             points: 8,
-            photoAsset: nil
+            photoAsset: nil,
+            photoStatus: nil
         )
 
         XCTAssertEqual(
@@ -92,10 +95,58 @@ final class Phase2ParentModeTests: XCTestCase {
         let asset = ParentPhotoAsset(
             id: "photo-safe",
             previewURL: URL(string: "https://example.invalid/review.jpg"),
-            accessibilityLabel: "Foto van de taak"
+            accessibilityLabel: "Foto van de taak",
+            status: "ready"
         )
 
         XCTAssertFalse(asset.showsSensitiveMetadata)
+    }
+
+    func testDeviceOwnerLAUnlocksParentModeViaAppState() async {
+        let state = AppState(usePreviewData: true)
+        state.openParentGate(from: .heroWordmarkLongPress, preferSurface: .goedkeuren)
+        XCTAssertTrue(state.parentGate.isChallengePresented)
+
+        let unlocked = await state.attemptLocalAuthUnlock()
+        XCTAssertTrue(unlocked)
+        XCTAssertTrue(state.parentGate.isParentModePresented)
+        XCTAssertEqual(state.parentMode.activeSurface, .goedkeuren)
+    }
+
+    func testYoungPicturePINMatching() {
+        XCTAssertTrue(
+            YoungModeSupport.matchesPicturePIN(
+                selection: ["🦊", "🐼", "🦁"],
+                stored: ["🦊", "🐼", "🦁"]
+            )
+        )
+        XCTAssertFalse(
+            YoungModeSupport.matchesPicturePIN(
+                selection: ["🦊", "🐼", "🐸"],
+                stored: ["🦊", "🐼", "🦁"]
+            )
+        )
+    }
+
+    func testManagedTaskCreateAppearsInPreviewStore() async {
+        let apiClient = PreviewAPIClient()
+        let store = ParentModeStore(apiClient: apiClient, familyRoomClient: PreviewFamilyRoomClient())
+        await store.refresh(trigger: .manualRefresh)
+        await MainActor.run {
+            store.draftTaskTitle = "Schoenen wegzetten"
+            store.draftTaskPoints = 7
+        }
+        await store.createTaskFromDraft(defaultChildIDs: ["child-sam"])
+        await MainActor.run {
+            XCTAssertEqual(store.snapshot?.managedTasks.first?.title, "Schoenen wegzetten")
+            XCTAssertEqual(store.snapshot?.managedTasks.first?.points, 7)
+        }
+    }
+
+    func testStreakForgivenessDocumentedByReconnectPolicyStillStable() {
+        // Backend streak forgiveness is covered by apps/api/test/points-streak.test.ts.
+        // Keep iOS reconnect policy stable as the realtime partner of sync deltas.
+        XCTAssertEqual(FamilyRoomReconnectPolicy.parentDefault.delaysInSeconds, [2, 4, 8])
     }
 
     func testReconnectPolicyUsesApprovedBackoffSequence() {
@@ -132,5 +183,20 @@ final class Phase2ParentModeTests: XCTestCase {
             XCTAssertEqual(store.snapshot?.pendingApprovalCount, 1)
             XCTAssertEqual(store.syncCoordinator.lastTrigger, .approvalResolved)
         }
+    }
+
+    func testApprovalIdempotencyKeysAreDeterministic() {
+        XCTAssertEqual(
+            IdempotencyKey.forApproval(instanceID: "ti_1"),
+            IdempotencyKey.forApproval(instanceID: "ti_1")
+        )
+        XCTAssertEqual(
+            IdempotencyKey.forRedo(instanceID: "ti_1"),
+            IdempotencyKey.forRedo(instanceID: "ti_1")
+        )
+        XCTAssertNotEqual(
+            IdempotencyKey.forApproval(instanceID: "ti_1"),
+            IdempotencyKey.forRedo(instanceID: "ti_1")
+        )
     }
 }

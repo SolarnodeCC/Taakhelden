@@ -6,6 +6,14 @@ import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
 import { seedFamily, seedTask, seedInstance, seedWeekFiller, childToken, api, todayAmsterdam } from "./helpers";
 
+type InstanceDelta = {
+  id: string;
+  status: string;
+  title: string;
+  points: number;
+  updatedAt?: string;
+};
+
 describe("POST /sync", () => {
   it("past mutaties op volgorde toe en levert een changes-delta", async () => {
     const fam = await seedFamily("syn");
@@ -85,6 +93,53 @@ describe("POST /sync", () => {
     expect(out.results[0]!.status).toBe("applied");
     expect(out.results[1]!.status).toBe("rejected");
     expect(out.results[1]!.code).toBe("INSUFFICIENT_POINTS");
+  });
+
+  it("changes.instances heeft de volledige InstanceView-vorm, inclusief updatedAt", async () => {
+    const fam = await seedFamily("syncv");
+    const taskId = await seedTask(fam.familyId, fam.childA, { points: 15 });
+    const instanceId = await seedInstance(fam.familyId, taskId, fam.childA, todayAmsterdam());
+    const token = await childToken(fam.childA, fam.familyId);
+
+    // Zonder `since` (eerste sync na installatie): de volledige dag van vandaag.
+    const res = await api("/sync", { token, body: { mutations: [] } });
+    const out = (await res.json()) as { changes: { instances: InstanceDelta[] } };
+    const view = out.changes.instances.find((i) => i.id === instanceId)!;
+    expect(view.title).toBe("Testtaak");
+    expect(view.points).toBe(15);
+    expect(view.status).toBe("open");
+    expect(view.updatedAt).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/);
+  });
+
+  it("met `since` komen alleen instances terug die daarna gewijzigd zijn", async () => {
+    const fam = await seedFamily("syncs");
+    const today = todayAmsterdam();
+    const touchedTask = await seedTask(fam.familyId, fam.childA, { points: 15 });
+    const untouchedTask = await seedTask(fam.familyId, fam.childA, { points: 10 });
+    const touched = await seedInstance(fam.familyId, touchedTask, fam.childA, today);
+    const untouched = await seedInstance(fam.familyId, untouchedTask, fam.childA, today);
+    const token = await childToken(fam.childA, fam.familyId);
+
+    // Eerste sync: levert serverTime als watermerk voor de volgende ronde.
+    const first = await api("/sync", { token, body: { mutations: [] } });
+    const { serverTime } = (await first.json()) as { serverTime: string };
+    await new Promise((resolve) => setTimeout(resolve, 20));
+
+    const second = await api("/sync", {
+      token,
+      body: { since: serverTime, mutations: [{ key: crypto.randomUUID(), op: "complete", instanceId: touched }] },
+    });
+    const out = (await second.json()) as {
+      changes: { instances: InstanceDelta[]; ledger: Array<{ type: string }> };
+    };
+    const ids = out.changes.instances.map((i) => i.id);
+    expect(ids).toContain(touched);
+    expect(ids).not.toContain(untouched);
+    expect(out.changes.instances.find((i) => i.id === touched)!.status).toBe("approved");
+    expect(out.changes.instances.find((i) => i.id === touched)!.updatedAt! > serverTime).toBe(true);
+    // Ook de ledger-delta moet de boeking van net teruggeven, ook bij een
+    // `since` van enkele milliseconden oud (formaatverschil created_at ↔ ISO).
+    expect(out.changes.ledger.map((l) => l.type)).toContain("task");
   });
 
   it("dubbel afvinken binnen dezelfde batch: tweede wordt vriendelijk afgewezen", async () => {

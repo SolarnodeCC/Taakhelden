@@ -12,7 +12,25 @@ export interface InstanceRow {
   completed_at: string | null;
   approved_at: string | null;
   approved_by: string | null;
+  updated_at: string;
 }
+
+/**
+ * Servertijd in hetzelfde ISO-formaat als `new Date().toISOString()`, zodat
+ * `updated_at` lexicografisch vergelijkbaar blijft met de `since` uit de
+ * sync-body (zie migratie 0007). Elke mutatie op een instance zet deze kolom.
+ */
+const NOW_ISO = "strftime('%Y-%m-%dT%H:%M:%fZ', 'now')";
+
+/** Instance + taakinfo + laatste ready-foto — de InstanceView-vorm voor de UI. */
+const INSTANCE_WITH_TASK = `
+  SELECT i.*, t.title, t.icon, t.category, t.points AS task_points,
+         t.photo_bonus_points, t.approval_required, t.daypart,
+         (SELECT p.id FROM photos p
+            WHERE p.family_id = i.family_id AND p.ref_id = i.id
+              AND p.purpose = 'task' AND p.status = 'ready'
+            ORDER BY p.created_at DESC LIMIT 1) AS photo_id
+  FROM task_instances i JOIN tasks t ON t.id = i.task_id`;
 
 export async function getInstance(db: D1Database, familyId: string, instanceId: string) {
   return db
@@ -24,16 +42,7 @@ export async function getInstance(db: D1Database, familyId: string, instanceId: 
 /** Instance met taakinfo (zelfde join als listForDate) voor move-response. */
 export async function getInstanceWithTask(db: D1Database, familyId: string, instanceId: string) {
   return db
-    .prepare(
-      `SELECT i.*, t.title, t.icon, t.category, t.points AS task_points,
-              t.photo_bonus_points, t.approval_required, t.daypart,
-              (SELECT p.id FROM photos p
-                 WHERE p.family_id = i.family_id AND p.ref_id = i.id
-                   AND p.purpose = 'task' AND p.status = 'ready'
-                 ORDER BY p.created_at DESC LIMIT 1) AS photo_id
-       FROM task_instances i JOIN tasks t ON t.id = i.task_id
-       WHERE i.family_id = ? AND i.id = ?`,
-    )
+    .prepare(`${INSTANCE_WITH_TASK} WHERE i.family_id = ? AND i.id = ?`)
     .bind(familyId, instanceId)
     .first<Record<string, unknown>>();
 }
@@ -68,7 +77,7 @@ export async function moveInstance(
   const result = await db
     .prepare(
       `UPDATE task_instances
-       SET date = ?, child_id = ?
+       SET date = ?, child_id = ?, updated_at = ${NOW_ISO}
        WHERE family_id = ? AND id = ? AND status IN ('open', 'open_redo')`,
     )
     .bind(target.date, target.childId, familyId, instanceId)
@@ -78,19 +87,37 @@ export async function moveInstance(
 
 /** Instances van één dag, met taakinfo erbij (titel/punten/daypart voor de UI). */
 export async function listForDate(db: D1Database, familyId: string, date: string, childId?: string) {
-  const base = `
-    SELECT i.*, t.title, t.icon, t.category, t.points AS task_points,
-           t.photo_bonus_points, t.approval_required, t.daypart,
-           (SELECT p.id FROM photos p
-              WHERE p.family_id = i.family_id AND p.ref_id = i.id
-                AND p.purpose = 'task' AND p.status = 'ready'
-              ORDER BY p.created_at DESC LIMIT 1) AS photo_id
-    FROM task_instances i JOIN tasks t ON t.id = i.task_id
-    WHERE i.family_id = ? AND i.date = ?`;
+  const base = `${INSTANCE_WITH_TASK} WHERE i.family_id = ? AND i.date = ?`;
   const stmt = childId
     ? db.prepare(`${base} AND i.child_id = ? ORDER BY t.daypart, t.created_at`).bind(familyId, date, childId)
     : db.prepare(`${base} ORDER BY i.child_id, t.daypart, t.created_at`).bind(familyId, date);
   const { results } = await stmt.all();
+  return results;
+}
+
+/**
+ * Sync-delta (§3.11): instances die na `sinceIso` zijn gewijzigd, oudste wijziging
+ * eerst. `sinceIso` is een ISO-8601 UTC-string (zelfde formaat als `updated_at`).
+ * Zonder childId = alle kinderen van het gezin (ouder-view).
+ */
+export async function listUpdatedSince(
+  db: D1Database,
+  familyId: string,
+  sinceIso: string,
+  childId?: string,
+  limit = 500,
+) {
+  const conditions = ["i.family_id = ?", "i.updated_at > ?"];
+  const values: unknown[] = [familyId, sinceIso];
+  if (childId) { conditions.push("i.child_id = ?"); values.push(childId); }
+  const { results } = await db
+    .prepare(
+      `${INSTANCE_WITH_TASK}
+       WHERE ${conditions.join(" AND ")}
+       ORDER BY i.updated_at, i.id LIMIT ?`,
+    )
+    .bind(...values, limit)
+    .all();
   return results;
 }
 
@@ -129,8 +156,8 @@ export async function insertInstance(
   // OR IGNORE + UNIQUE(task_id, child_id, date): generatie is idempotent.
   await db
     .prepare(
-      `INSERT OR IGNORE INTO task_instances (id, task_id, family_id, child_id, date)
-       VALUES (?, ?, ?, ?, ?)`,
+      `INSERT OR IGNORE INTO task_instances (id, task_id, family_id, child_id, date, updated_at)
+       VALUES (?, ?, ?, ?, ?, ${NOW_ISO})`,
     )
     .bind(input.id, input.taskId, familyId, input.childId, input.date)
     .run();
@@ -157,7 +184,8 @@ export async function setStatus(
          redo_note = ?,
          completed_at = COALESCE(?, completed_at),
          approved_at = COALESCE(?, approved_at),
-         approved_by = COALESCE(?, approved_by)
+         approved_by = COALESCE(?, approved_by),
+         updated_at = ${NOW_ISO}
        WHERE family_id = ? AND id = ?`,
     )
     .bind(
@@ -181,7 +209,10 @@ export async function setPhoto(
   fields: { photoKey: string; photoStatus: "processing" | "ready" },
 ) {
   await db
-    .prepare("UPDATE task_instances SET photo_key = ?, photo_status = ? WHERE family_id = ? AND id = ?")
+    .prepare(
+      `UPDATE task_instances SET photo_key = ?, photo_status = ?, updated_at = ${NOW_ISO}
+       WHERE family_id = ? AND id = ?`,
+    )
     .bind(fields.photoKey, fields.photoStatus, familyId, instanceId)
     .run();
 }
@@ -191,7 +222,8 @@ export async function reopenInstance(db: D1Database, familyId: string, instanceI
   await db
     .prepare(
       `UPDATE task_instances
-       SET status = 'open', completed_at = NULL, points_earned = NULL, redo_note = NULL
+       SET status = 'open', completed_at = NULL, points_earned = NULL, redo_note = NULL,
+           updated_at = ${NOW_ISO}
        WHERE family_id = ? AND id = ?`,
     )
     .bind(familyId, instanceId)
