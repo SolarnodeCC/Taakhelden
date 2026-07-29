@@ -7,7 +7,7 @@ Phase 2 core code is **complete** (merged via [#78](https://github.com/Solarnode
 - een familie-app met kind- en oudermodus
 - geen permanente ouder-tab in kindmodus
 - child mode light-only in MVP
-- `UIRequiresFullScreen` voor iPad-kindgebruik
+- iPad: multitasking toegestaan (geen `UIRequiresFullScreen` — App Store-eis)
 
 ## Bouwvoorstel (leidend)
 
@@ -28,7 +28,8 @@ Leidende ADRs:
 ```
 apps/ios/
 ├── project.yml
-├── TaakHelden.entitlements          # SIWA + APNs + App Group
+├── TaakHelden/TaakHelden.Debug.entitlements    # SIWA + APNs development + App Group
+├── TaakHelden/TaakHelden.Release.entitlements  # SIWA + APNs production + App Group
 ├── Scripts/
 │   ├── sync-openapi-contract.sh
 │   └── generate-openapi-client.sh   # Swift OpenAPI Generator (macOS CI)
@@ -115,7 +116,10 @@ cd apps/ios && xcodegen generate
 open TaakHelden.xcodeproj
 ```
 
-Stel `TAAKHELDEN_API_BASE_URL` in op het scheme voor staging tests.
+- **Debug**: Info.plist/API → `http://localhost:8787/v1` (start API eerst).
+- **Release / Archive**: → `https://taakhelden-api.oostelaar.workers.dev/v1`.
+- Override: scheme env `TAAKHELDEN_API_BASE_URL` (wint van Info.plist).
+- Archive gebruikt `TaakHelden.Release.entitlements` (`aps-environment = production`).
 
 ## Design System
 

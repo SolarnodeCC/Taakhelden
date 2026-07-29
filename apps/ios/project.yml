@@ -9,7 +9,14 @@ settings:
     PRODUCT_BUNDLE_IDENTIFIER: nl.taakhelden.family
     SWIFT_VERSION: "5.10"
     DEVELOPMENT_LANGUAGE: nl
+    # iPhone + iPad. Multitasking is required on iPad (no UIRequiresFullScreen).
     TARGETED_DEVICE_FAMILY: "1,2"
+  configs:
+    Debug:
+      TAAKHELDEN_API_BASE_URL: http://localhost:8787/v1
+    Release:
+      # Staging Workers URL until api.taakhelden.nl is attached; override in CI/xcconfig for prod.
+      TAAKHELDEN_API_BASE_URL: https://taakhelden-api.oostelaar.workers.dev/v1
 packages:
   OpenAPIRuntime:
     url: https://github.com/apple/swift-openapi-runtime
@@ -25,17 +32,24 @@ targets:
       - path: TaakHelden
         excludes:
           - Info.plist
+          - "*.entitlements"
     resources:
       - path: TaakHelden/Resources
     info:
       path: TaakHelden/Info.plist
+      properties:
+        TAAKHELDEN_API_BASE_URL: $(TAAKHELDEN_API_BASE_URL)
     entitlements:
-      path: TaakHelden/TaakHelden.entitlements
+      path: TaakHelden/TaakHelden.Debug.entitlements
     settings:
       base:
         PRODUCT_NAME: TaakHelden
-        CODE_SIGN_ENTITLEMENTS: TaakHelden/TaakHelden.entitlements
         GENERATE_INFOPLIST_FILE: NO
+      configs:
+        Debug:
+          CODE_SIGN_ENTITLEMENTS: TaakHelden/TaakHelden.Debug.entitlements
+        Release:
+          CODE_SIGN_ENTITLEMENTS: TaakHelden/TaakHelden.Release.entitlements
     dependencies:
       - package: OpenAPIRuntime
       - package: OpenAPIURLSession

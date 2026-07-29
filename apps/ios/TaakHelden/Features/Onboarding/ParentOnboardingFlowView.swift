@@ -143,13 +143,6 @@ struct ParentOnboardingFlowView: View {
                 .foregroundStyle(palette.mutedText.color)
         }
 
-        THCard(palette: palette) {
-            Text("App Review")
-                .font(.headline)
-            Text("Noteer gezinscode en pincode ook in ReviewNotes voor één-device review.")
-                .foregroundStyle(palette.mutedText.color)
-        }
-
         Button("Ga naar kind-koppelen") {
             appState.openChildPairing()
         }

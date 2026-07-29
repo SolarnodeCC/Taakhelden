@@ -15,6 +15,7 @@ struct ChildShellView: View {
     @State private var shopViewModel: ChildShopViewModel?
     @State private var goalViewModel: FamilyGoalViewModel?
     @State private var avatarShopViewModel: AvatarShopViewModel?
+    @State private var showPushPrimer = false
 
     var body: some View {
         @Bindable var appState = appState
@@ -87,7 +88,7 @@ struct ChildShellView: View {
             await dayViewModel?.load()
             await shopViewModel?.load()
             await goalViewModel?.load()
-            await registerPushIfNeeded()
+            await preparePushOptIn()
         }
         .overlay {
             ConfettiOverlay(token: appState.celebrationService.confettiToken)
@@ -119,17 +120,70 @@ struct ChildShellView: View {
         )) {
             ParentModeRootView()
         }
+        .sheet(isPresented: $showPushPrimer) {
+            PushOptInPrimerSheet(palette: palette) {
+                showPushPrimer = false
+                Task { await requestPushAuthorization() }
+            } onDecline: {
+                showPushPrimer = false
+            }
+            .presentationDetents([.medium])
+        }
+    }
+
+    /// Show an in-app explanation before the system permission dialog (Guideline 5.1.1).
+    @MainActor
+    private func preparePushOptIn() async {
+        let center = UNUserNotificationCenter.current()
+        let settings = await center.notificationSettings()
+        switch settings.authorizationStatus {
+        case .notDetermined:
+            showPushPrimer = true
+        case .authorized, .provisional, .ephemeral:
+            await UIApplication.shared.registerForRemoteNotifications()
+            await appState.pushService.registerIfNeeded(tokenProvider: APNSTokenStore.shared)
+        default:
+            break
+        }
     }
 
     @MainActor
-    private func registerPushIfNeeded() async {
+    private func requestPushAuthorization() async {
         let center = UNUserNotificationCenter.current()
-        let settings = await center.notificationSettings()
-        if settings.authorizationStatus == .notDetermined {
-            _ = try? await center.requestAuthorization(options: [.alert, .badge, .sound])
-        }
+        _ = try? await center.requestAuthorization(options: [.alert, .badge, .sound])
         await UIApplication.shared.registerForRemoteNotifications()
         await appState.pushService.registerIfNeeded(tokenProvider: APNSTokenStore.shared)
+    }
+}
+
+/// Pre-permission primer so children/parents understand why we ask (HIG + 5.1.1).
+private struct PushOptInPrimerSheet: View {
+    let palette: THPalette
+    let onAccept: () -> Void
+    let onDecline: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: THSpacing.lg) {
+            Text(LocalizedStringKey("child.push.primer.title"))
+                .font(.title2.bold())
+                .foregroundStyle(palette.text.color)
+            Text(LocalizedStringKey("child.push.primer.body"))
+                .foregroundStyle(palette.mutedText.color)
+            Spacer(minLength: THSpacing.md)
+            Button(action: onAccept) {
+                Text(LocalizedStringKey("child.push.primer.accept"))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.borderedProminent)
+            .tint(palette.accent.color)
+            Button(action: onDecline) {
+                Text(LocalizedStringKey("child.push.primer.decline"))
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.bordered)
+        }
+        .padding(THSpacing.xl)
+        .background(palette.background.color.ignoresSafeArea())
     }
 }
 
@@ -473,6 +527,13 @@ private struct MijnHeldTabView: View {
                             isYoung: isYoung
                         )
                     }
+
+                    // Discoverable parent-gate hint (no permanent Ouder tab — ADR-0003).
+                    Text(LocalizedStringKey("held.parent.gate.hint"))
+                        .font(.footnote)
+                        .foregroundStyle(palette.mutedText.color)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .accessibilityHint(Text("held.parent.gate.action"))
                 }
                 .padding(THSpacing.xl)
             }
