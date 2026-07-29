@@ -27,7 +27,11 @@ Middleware runs on every matching request — keep it fast, side-effect aware, a
 
 ## Rate limiting (`middleware/ratelimit.ts`)
 
-- PIN lockout and abuse paths use KV with explicit TTLs (`pinfail:*`, etc.).
+- **Abuse ceilings (auth):** KV fixed-window today — known non-atomic MVP gap.
+  Successor: Workers Rate Limiting API — see `docs/atomic-rate-limiting-plan.md`
+  and ADR-0005. Do not “fix” with a smarter KV counter.
+- **Exact counters stay on KV:** PIN lockout (`pinfail:*`), photo day-quota, etc.
+  Those need accounting semantics; the Rate Limiting API is permissive/colo-local.
 
 ## Errors (`middleware/error.ts`)
 

@@ -5,8 +5,9 @@ import type { AppBindings } from "../types";
 
 /**
  * Eenvoudige KV-teller per sleutel (fixed window, min. 60 s door KV-TTL).
- * Niet atomair — voor MVP-schaal ruim voldoende; strengere handhaving kan
- * later via de Workers Rate Limiting API / WAF (zie architectuurdoc §3).
+ * Niet atomair — voor MVP-schaal ruim voldoende; strengere handhaving via
+ * Workers Rate Limiting API / WAF: zie ADR-0005 + docs/atomic-rate-limiting-plan.md
+ * (architectuurdoc §3).
  */
 export async function rateLimit(
   c: Context<AppBindings>,

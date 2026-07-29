@@ -58,7 +58,7 @@ Cloudflare dekt vrijwel alles wat TaakHelden nodig heeft serverless af: API, dat
 | **Sessies/cache** | **KV** | Sessietokens (kind-pincodesessies kort TTL), gezinscodes, template-cache. |
 | **Web-dashboard** | **Workers** (OpenNext) + static assets | Next.js BFF; service binding `API` → `taakhelden-api` (zelfde `*.workers.dev`-zone kan geen global `fetch` Worker→Worker). Zie `docs/cloudflare-bindings-audit.md`. |
 | **Bot/misbruikbescherming** | **Turnstile** op registratie/login | Onzichtbare captcha, privacyvriendelijk (geen tracking — belangrijk gezien doelgroep). |
-| **Rate limiting** | Workers Rate Limiting API / WAF-rules | Op login, pincode-pogingen, uploads. |
+| **Rate limiting** | Workers Rate Limiting API / WAF-rules | Op login, pincode-pogingen, uploads. **Huidige code:** KV fixed-window (niet-atomair, MVP-gap). Migratieplan: [`docs/atomic-rate-limiting-plan.md`](./atomic-rate-limiting-plan.md) + [ADR-0005](./adr/ADR-0005-workers-rate-limiting.md). PIN-lock/quota blijven exacte KV/D1-tellers. |
 | **Secrets** | `wrangler secret` + GitHub Environments | `JWT_SECRET`, APNs, Apple Sign-in, Turnstile, email. Never in code. Inventory: `docs/cloudflare-bindings-audit.md`. |
 | **Observability** | Workers Logs / Logpush + Sentry (EU-regio) | Foutmonitoring zonder PII in logs (log family_id, nooit namen/foto-URLs). |
 
