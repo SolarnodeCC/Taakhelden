@@ -34,6 +34,11 @@ auth.post("/register", validate("json", RegisterBody), async (c) => {
   await rateLimit(c, "register", 5);
   const body = c.req.valid("json");
 
+  if (!c.env.JWT_SECRET) {
+    console.error("unhandled", "JWT_SECRET is not configured");
+    throw new Error("JWT_SECRET is not configured");
+  }
+
   const human = await verifyTurnstile(
     c.env.TURNSTILE_SECRET,
     body.turnstileToken,
@@ -42,7 +47,8 @@ auth.post("/register", validate("json", RegisterBody), async (c) => {
   if (!human) {
     throw new ApiException(400, ErrorCodes.VALIDATION_FAILED, "Verificatie mislukt, probeer het opnieuw.");
   }
-  if (await repo.getParentByEmail(c.env.DB, body.email)) {
+  // Use emailInUse (no deleted_at filter) so UNIQUE conflicts become 409, not 500.
+  if (await repo.emailInUse(c.env.DB, body.email)) {
     throw new ApiException(409, ErrorCodes.EMAIL_IN_USE, "Dit e-mailadres is al in gebruik.");
   }
 

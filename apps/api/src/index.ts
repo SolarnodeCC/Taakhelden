@@ -21,7 +21,18 @@ import wsRoutes, { handleWsUpgrade } from "./routes/ws";
 const app = new Hono<AppBindings>().basePath("/v1");
 
 app.onError(errorHandler);
-app.get("/health", (c) => c.json({ ok: true }));
+app.get("/health", async (c) => {
+  // Lightweight readiness for deploy smoke tests — never expose secret values.
+  let db: boolean;
+  try {
+    db = (await c.env.DB.prepare("SELECT 1 AS ok").first<{ ok: number }>())?.ok === 1;
+  } catch {
+    db = false;
+  }
+  const jwt = Boolean(c.env.JWT_SECRET);
+  const ready = db && jwt;
+  return c.json({ ok: ready, db, jwt }, ready ? 200 : 503);
+});
 
 // Publiek (eigen rate limits + Turnstile in de handlers)
 app.route("/auth", authRoutes);
