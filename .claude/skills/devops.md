@@ -15,7 +15,8 @@ Worker (apps/api)   → Hono API on Cloudflare Workers (wrangler deploy)
 Durable Objects     → FamilyRoom (one per family; serializes ledger writes + realtime WS)
 D1 (SQLite)         → taakhelden-db (location hint weur) — families, tasks, ledger, rewards, …
 R2                  → child task photos (jurisdiction eu, 30-day lifecycle, presigned URLs)
-KV                  → rate limits, idempotency, pin-fail counters, invite tokens
+KV                  → idempotency, pin-fail counters, invite tokens, product quotas
+                      (abuse rate limits → Workers Rate Limiting API; see docs/atomic-rate-limiting-plan.md)
 Web (apps/web)      → Next.js BFF Worker; service binding API → taakhelden-api
 Cron/queues         → jobs/ (photo EXIF consumer, export consumer, scheduled cron)
 ```
