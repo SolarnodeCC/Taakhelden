@@ -24,6 +24,12 @@ export const InstanceView = z.object({
   redoNote: z.string().nullable(),
   completedAt: z.string().nullable(),
   approvedAt: z.string().nullable(),
+  /**
+   * Servertijd (ISO-8601 UTC) van de laatste wijziging — de sleutel voor de
+   * sync-delta (`since`). Optioneel voor achterwaartse compatibiliteit met
+   * clients van vóór migratie 0007.
+   */
+  updatedAt: z.string().optional(),
 });
 export type InstanceView = z.infer<typeof InstanceView>;
 

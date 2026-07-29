@@ -110,7 +110,9 @@ Eén bron van waarheid voor het API-contract: Zod-schemas in `packages/shared`, 
 
 Cloudflare-deploys via `cloudflare/wrangler-action`; het Cloudflare API-token (scoped: alleen Workers/D1/R2 van dit account) staat als secret in de GitHub Environment.
 
-**D1-migraties**: genummerde SQL-bestanden in `apps/api/migrations/`, toegepast door de pipeline vóór de deploy — nooit handmatig op productie.
+**D1-migraties**: genummerde SQL-bestanden in `apps/api/migrations/`, toegepast door de pipeline vóór de deploy — nooit handmatig op productie. Bestaande migraties worden nooit gewijzigd; een schemawijziging is altijd een nieuw nummer.
+
+**Tijdstempels in D1**: `created_at`-kolommen gebruiken `datetime('now')` ("YYYY-MM-DD HH:MM:SS"). Kolommen die tegen een client-`since` vergeleken worden — `task_instances.updated_at` (migratie `0007`, met index `idx_instances_family_updated` op `(family_id, updated_at)`) — staan bewust in ISO-8601 UTC met millis (`strftime('%Y-%m-%dT%H:%M:%fZ','now')`), identiek aan `new Date().toISOString()`. Het spatie-formaat sorteert lexicografisch vóór elke ISO-waarde van hetzelfde moment, waardoor rijen stil uit de sync-delta zouden vallen. Elke instance-mutatie in `repo/instances.ts` (plus `markInstancePhotoReady` in `repo/photos.ts`) zet `updated_at` mee.
 
 ### 4.4 Repo-hygiëne
 - **CODEOWNERS** voor `migrations/` en auth-code (extra review op gevoelige wijzigingen).

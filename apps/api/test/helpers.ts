@@ -64,9 +64,11 @@ export async function seedTask(
 export async function seedInstance(familyId: string, taskId: string, childId: string, date: string) {
   counter++;
   const instanceId = `ti_test${counter}`;
+  // updated_at expliciet, net als repo/instances.insertInstance (migratie 0007).
   await env.DB
     .prepare(
-      "INSERT INTO task_instances (id, task_id, family_id, child_id, date) VALUES (?, ?, ?, ?, ?)",
+      `INSERT INTO task_instances (id, task_id, family_id, child_id, date, updated_at)
+       VALUES (?, ?, ?, ?, ?, strftime('%Y-%m-%dT%H:%M:%fZ', 'now'))`,
     )
     .bind(instanceId, taskId, familyId, childId, date)
     .run();

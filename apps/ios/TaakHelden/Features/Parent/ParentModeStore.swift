@@ -21,6 +21,12 @@ final class ParentModeStore {
     var loadErrorMessage: String?
     var connectionState: FamilyRoomConnectionState = .disconnected
     var isSessionActive = false
+    var needsParentAccount = false
+    var bulkFailureMessage: String?
+    var draftTaskTitle = ""
+    var draftTaskPoints = 10
+    var draftRewardTitle = ""
+    var draftRewardPrice = 40
 
     init(
         apiClient: APIClient,
@@ -59,23 +65,31 @@ final class ParentModeStore {
         selectedApprovalID = nil
         exportStatusMessage = nil
         deletionStatusMessage = nil
+        bulkFailureMessage = nil
+        needsParentAccount = false
     }
 
     @MainActor
     func refresh(trigger: ParentSyncTrigger) async {
         isLoading = true
         loadErrorMessage = nil
+        needsParentAccount = false
         syncCoordinator.begin(trigger)
 
         do {
             let dashboard = try await apiClient.fetchParentDashboard()
             snapshot = dashboard
+            OpenTaskCountStore.shared.update(count: dashboard.openTaskCount)
             if selectedApprovalID == nil {
                 selectedApprovalID = dashboard.approvalSections.first?.items.first?.id
             } else if dashboard.approvalItem(id: selectedApprovalID ?? "") == nil {
                 selectedApprovalID = dashboard.approvalSections.first?.items.first?.id
             }
             syncCoordinator.finish(trigger, at: dashboard.lastSyncedAt)
+        } catch let error as APIClientError where error == .parentSessionMissing {
+            needsParentAccount = true
+            loadErrorMessage = error.localizedDescription
+            syncCoordinator.fail(trigger, message: error.localizedDescription)
         } catch {
             loadErrorMessage = error.localizedDescription
             syncCoordinator.fail(trigger, message: error.localizedDescription)
@@ -102,7 +116,10 @@ final class ParentModeStore {
 
     @MainActor
     func updateSoundPreference(isEnabled: Bool) async {
-        guard var currentSnapshot = snapshot else { return }
+        guard var currentSnapshot = snapshot else {
+            _ = try? await apiClient.updateParentSettings(soundEnabled: isEnabled)
+            return
+        }
         syncCoordinator.begin(.settingsChanged)
         do {
             let updated = try await apiClient.updateParentSettings(soundEnabled: isEnabled)
@@ -131,9 +148,80 @@ final class ParentModeStore {
             try await apiClient.deleteParentAccount()
             deletionStatusMessage = String(localized: "parent.settings.delete.success")
             return true
+        } catch let error as APIClientError where error == .parentReauthRequired {
+            deletionStatusMessage = error.localizedDescription
+            return false
         } catch {
             deletionStatusMessage = error.localizedDescription
             return false
+        }
+    }
+
+    @MainActor
+    func requestDeleteAccount(appleIdentityToken: String) async -> Bool {
+        do {
+            try await apiClient.deleteParentAccount(appleIdentityToken: appleIdentityToken)
+            deletionStatusMessage = String(localized: "parent.settings.delete.success")
+            return true
+        } catch {
+            deletionStatusMessage = error.localizedDescription
+            return false
+        }
+    }
+
+    @MainActor
+    func createTaskFromDraft(defaultChildIDs: [String]) async {
+        let title = draftTaskTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else { return }
+        let childIDs = defaultChildIDs.filter { !$0.isEmpty }
+        guard !childIDs.isEmpty else {
+            loadErrorMessage = String(localized: "parent.tasks.need.child")
+            return
+        }
+        do {
+            snapshot = try await apiClient.createManagedTask(
+                title: title,
+                points: max(draftTaskPoints, 1),
+                childIDs: childIDs,
+                idempotencyKey: IdempotencyKey.forTaskCreate()
+            )
+            draftTaskTitle = ""
+        } catch {
+            loadErrorMessage = error.localizedDescription
+        }
+    }
+
+    @MainActor
+    func archiveTask(id: String) async {
+        do {
+            snapshot = try await apiClient.archiveManagedTask(id: id)
+        } catch {
+            loadErrorMessage = error.localizedDescription
+        }
+    }
+
+    @MainActor
+    func createRewardFromDraft() async {
+        let title = draftRewardTitle.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else { return }
+        do {
+            snapshot = try await apiClient.createManagedReward(
+                title: title,
+                price: max(draftRewardPrice, 1),
+                idempotencyKey: IdempotencyKey.forRewardCreate()
+            )
+            draftRewardTitle = ""
+        } catch {
+            loadErrorMessage = error.localizedDescription
+        }
+    }
+
+    @MainActor
+    func archiveReward(id: String) async {
+        do {
+            snapshot = try await apiClient.archiveManagedReward(id: id)
+        } catch {
+            loadErrorMessage = error.localizedDescription
         }
     }
 
@@ -159,6 +247,7 @@ final class ParentModeStore {
         guard let snapshot else { return [] }
         return snapshot.approvalSections
             .flatMap(\.items)
+            .sorted { $0.submittedAt < $1.submittedAt }
             .filter { selectedApprovalIDs.contains($0.id) }
     }
 
@@ -179,33 +268,62 @@ final class ParentModeStore {
         }
 
         isBulkApproving = true
+        bulkFailureMessage = nil
         defer { isBulkApproving = false }
 
         let keys = items.map { IdempotencyKey.forApproval(instanceID: $0.id) }
+        var failures = 0
 
-        await withTaskGroup(of: Void.self) { group in
+        await withTaskGroup(of: Bool.self) { group in
             for (index, item) in items.enumerated() {
                 if index >= Self.bulkConcurrencyLimit {
-                    await group.next()
+                    if let ok = await group.next(), !ok {
+                        failures += 1
+                    }
                 }
                 group.addTask { [apiClient] in
-                    _ = try? await apiClient.approveApproval(
-                        id: item.id,
-                        idempotencyKey: keys[index]
-                    )
+                    do {
+                        _ = try await apiClient.approveApproval(
+                            id: item.id,
+                            idempotencyKey: keys[index]
+                        )
+                        return true
+                    } catch {
+                        return false
+                    }
                 }
+            }
+            for await ok in group where !ok {
+                failures += 1
             }
         }
 
         await refresh(trigger: .approvalResolved)
 
+        if failures > 0 {
+            bulkFailureMessage = String(format: String(localized: "parent.bulk.failures"), failures)
+        }
+
         selectedApprovalIDs.removeAll()
         acknowledgedBulkPhotoReview = false
     }
 
-    func openFullscreenPhoto(for item: ApprovalQueueItem) {
-        fullscreenPhoto = item.photoAsset
+    @MainActor
+    func openFullscreenPhoto(for item: ApprovalQueueItem) async {
         selectedApprovalID = item.id
+        guard var asset = item.photoAsset else {
+            fullscreenPhoto = nil
+            return
+        }
+        if asset.previewURL == nil, let url = try? await apiClient.fetchPhotoURL(photoID: asset.id) {
+            asset = ParentPhotoAsset(
+                id: asset.id,
+                previewURL: url,
+                accessibilityLabel: asset.accessibilityLabel,
+                status: asset.status
+            )
+        }
+        fullscreenPhoto = asset
     }
 
     func closeFullscreenPhoto() {
@@ -245,5 +363,28 @@ final class ParentModeStore {
             loadErrorMessage = error.localizedDescription
             syncCoordinator.fail(trigger, message: error.localizedDescription)
         }
+    }
+}
+
+/// Lightweight App Group / defaults bridge for the optional home-screen widget.
+enum OpenTaskCountStore {
+    static let shared = OpenTaskCountStoreBox()
+}
+
+final class OpenTaskCountStoreBox {
+    private let defaults: UserDefaults
+    private let key = "taakhelden.openTaskCount"
+
+    init(suiteName: String = "group.nl.taakhelden.family") {
+        defaults = UserDefaults(suiteName: suiteName) ?? .standard
+    }
+
+    func update(count: Int) {
+        defaults.set(count, forKey: key)
+        defaults.synchronize()
+    }
+
+    var count: Int {
+        defaults.integer(forKey: key)
     }
 }

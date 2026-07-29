@@ -4,6 +4,7 @@ struct ChildUnlockView: View {
     @Environment(AppState.self) private var appState
     @State private var pin = ""
     @State private var errorMessage: String?
+    @State private var pictureSelection: [String] = []
 
     private var session: StoredChildSession? {
         appState.authStore.childSession
@@ -17,6 +18,10 @@ struct ChildUnlockView: View {
         )
     }
 
+    private var isYoung: Bool {
+        session?.ageBand == .young
+    }
+
     var body: some View {
         let palette = session?.ageBand == .teen ? THPalettes.teen : THPalettes.kid
 
@@ -25,14 +30,25 @@ struct ChildUnlockView: View {
 
             if let session {
                 Text(session.avatar)
-                    .font(.system(size: 72))
-                Text("Hoi \(session.displayName)!")
-                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .font(.system(size: isYoung ? 88 : 72))
+                Text(isYoung ? "Hoi!" : "Hoi \(session.displayName)!")
+                    .font(.system(size: isYoung ? 36 : 32, weight: .bold, design: .rounded))
                     .foregroundStyle(palette.text.color)
+
+                if isYoung {
+                    Button {
+                        YoungModeSupport.speak("Hoi \(session.displayName). Ontgrendel je heldenplek.")
+                    } label: {
+                        Label(String(localized: "child.young.speak"), systemImage: "speaker.wave.2.fill")
+                    }
+                    .buttonStyle(.bordered)
+                    .tint(palette.accent.color)
+                    .accessibilityLabel(String(localized: "child.young.speak"))
+                }
             }
 
             THCard(palette: palette) {
-                Text("Ontgrendel je heldenplek")
+                Text(isYoung ? String(localized: "child.young.unlock.title") : "Ontgrendel je heldenplek")
                     .font(.headline)
                     .foregroundStyle(palette.text.color)
 
@@ -47,12 +63,38 @@ struct ChildUnlockView: View {
                     .tint(palette.accent.color)
                 }
 
-                if unlockMode == .biometricsWithVisiblePIN || unlockMode == .biometricsWithOptionalPIN || unlockMode == .pinOnly {
-                    Button("Gebruik pincode") {
-                        // PIN pad is always visible below for under-13 compliance.
+                if isYoung {
+                    Text(LocalizedStringKey("child.young.picture.hint"))
+                        .font(.footnote)
+                        .foregroundStyle(palette.mutedText.color)
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 64))], spacing: THSpacing.md) {
+                        ForEach(YoungModeSupport.picturePINChoices, id: \.self) { emoji in
+                            Button {
+                                selectPicture(emoji)
+                            } label: {
+                                Text(emoji)
+                                    .font(.system(size: 40))
+                                    .frame(width: 64, height: 64)
+                                    .background(palette.surface.color)
+                                    .clipShape(RoundedRectangle(cornerRadius: THRadius.large, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+                            .accessibilityLabel(emoji)
+                        }
                     }
-                    .buttonStyle(.bordered)
-                    .accessibilityHint("Altijd beschikbaar naast Face ID")
+                    Text(pictureSelection.joined(separator: " "))
+                        .font(.title2)
+                        .frame(minHeight: 36)
+                }
+
+                if unlockMode == .biometricsWithVisiblePIN || unlockMode == .biometricsWithOptionalPIN || unlockMode == .pinOnly {
+                    if !isYoung {
+                        Button("Gebruik pincode") {
+                            // PIN pad is always visible below for under-13 compliance.
+                        }
+                        .buttonStyle(.bordered)
+                        .accessibilityHint("Altijd beschikbaar naast Face ID")
+                    }
 
                     NumericPINPad(pin: $pin, maxDigits: 4) {
                         submitPIN()
@@ -73,9 +115,23 @@ struct ChildUnlockView: View {
         .preferredColorScheme(.light)
     }
 
+    private func selectPicture(_ emoji: String) {
+        if pictureSelection.count >= 3 {
+            pictureSelection.removeAll()
+        }
+        pictureSelection.append(emoji)
+        if pictureSelection.count == 3 {
+            // Picture-PIN is an unlock UX foundation; MVP still validates numeric PIN
+            // until parents can configure a picture sequence server-side.
+            YoungModeSupport.speak("Kies nu je pincode.")
+        }
+    }
+
     private func submitPIN() {
         guard appState.authStore.verifyPIN(pin) else {
-            errorMessage = "Die pincode klopt nog niet — probeer het rustig opnieuw."
+            errorMessage = isYoung
+                ? String(localized: "child.young.pin.retry")
+                : "Die pincode klopt nog niet — probeer het rustig opnieuw."
             pin = ""
             return
         }

@@ -56,8 +56,11 @@ struct RootView: View {
         }
         .onReceive(NotificationCenter.default.publisher(for: .pushDeepLinkReceived)) { _ in
             if appState.route == .childHome {
-                appState.parentGate.openGate()
+                appState.openParentGate(from: .heroWordmarkLongPress, preferSurface: .goedkeuren)
             }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .silentPushReceived)) { _ in
+            Task { await appState.handleBackgroundPushRefresh() }
         }
     }
 }

@@ -1,15 +1,14 @@
 import Foundation
 
 // MARK: - Preview-layer models
-// These types are the local view-model layer for Phase 2 parent mode.
-// They will be replaced by generated Swift OpenAPI types once the codegen
-// pipeline from packages/shared lands on macOS CI. Do not use these as the
-// real transport layer — they intentionally diverge from wire format where
-// the preview needs simplification.
+// Local view-model layer for Phase 2 parent mode. Transport DTOs live in
+// ContractModels / TaakHeldenAPIClient; this layer stays UI-friendly.
 
 enum ParentSurface: String, CaseIterable, Identifiable {
     case vandaag
     case goedkeuren
+    case taken
+    case beloningen
     case instellingen
 
     var id: String { rawValue }
@@ -30,14 +29,14 @@ enum ParentTaskBucket: String, CaseIterable, Identifiable, Codable {
 
     var id: String { rawValue }
 
-    var title: String {
+    var titleKey: String {
         switch self {
         case .open:
-            return "Te doen"
+            return "parent.bucket.open"
         case .awaitingApproval:
-            return "Wacht op goedkeuring"
+            return "parent.bucket.awaiting"
         case .done:
-            return "Af"
+            return "parent.bucket.done"
         }
     }
 }
@@ -46,6 +45,7 @@ struct ParentPhotoAsset: Identifiable, Hashable, Equatable {
     let id: String
     let previewURL: URL?
     let accessibilityLabel: String
+    var status: String?
 
     // Privacy by design: the fullscreen viewer never exposes EXIF or location.
     var showsSensitiveMetadata: Bool { false }
@@ -59,6 +59,7 @@ struct ParentTaskSnapshot: Identifiable, Equatable {
     let points: Int
     let submittedAt: Date?
     let photoAsset: ParentPhotoAsset?
+    var photoStatus: String?
 
     var bucket: ParentTaskBucket {
         switch status {
@@ -71,18 +72,18 @@ struct ParentTaskSnapshot: Identifiable, Equatable {
         }
     }
 
-    var statusLabel: String {
+    var statusLabelKey: String {
         switch status {
         case .open:
-            return "Klaar om op te pakken"
+            return "parent.task.status.open"
         case .submitted:
-            return "Wacht op goedkeuring"
+            return "parent.task.status.submitted"
         case .approved:
-            return "Goedgekeurd"
+            return "parent.task.status.approved"
         case .completed:
-            return "Afgerond"
+            return "parent.task.status.completed"
         case .openRedo:
-            return "Nog even afronden"
+            return "parent.task.status.redo"
         }
     }
 }
@@ -111,8 +112,11 @@ struct ApprovalQueueItem: Identifiable, Hashable, Equatable {
     let submittedAt: Date
     let points: Int
     let photoAsset: ParentPhotoAsset?
+    var photoStatus: String?
 
     var hasPhoto: Bool { photoAsset != nil }
+    var photoReady: Bool { photoStatus == "ready" }
+    var photoProcessing: Bool { photoStatus == "processing" }
 }
 
 struct ApprovalQueueSection: Identifiable, Equatable {
@@ -121,6 +125,21 @@ struct ApprovalQueueSection: Identifiable, Equatable {
     let childName: String
     let childAvatar: String
     let items: [ApprovalQueueItem]
+}
+
+struct ParentManagedTask: Identifiable, Equatable {
+    let id: String
+    let title: String
+    let icon: String?
+    let points: Int
+    let assigneeCount: Int
+}
+
+struct ParentManagedReward: Identifiable, Equatable {
+    let id: String
+    let title: String
+    let icon: String?
+    let price: Int
 }
 
 struct ParentSettingsSnapshot: Codable, Equatable {
@@ -136,12 +155,20 @@ struct ParentExportReceipt: Codable, Equatable {
 struct ParentDashboardSnapshot: Equatable {
     let todayChildren: [ParentTodayChildSnapshot]
     let approvalSections: [ApprovalQueueSection]
+    var managedTasks: [ParentManagedTask]
+    var managedRewards: [ParentManagedReward]
     var settings: ParentSettingsSnapshot
     var lastSyncedAt: Date
 
     var pendingApprovalCount: Int {
         approvalSections.reduce(into: 0) { partialResult, section in
             partialResult += section.items.count
+        }
+    }
+
+    var openTaskCount: Int {
+        todayChildren.reduce(into: 0) { total, child in
+            total += child.tasks.filter { $0.bucket == .open }.count
         }
     }
 

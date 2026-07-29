@@ -26,10 +26,14 @@ final class AppState {
     var pushService: PushRegistrationService { environment.pushService }
 
     var parentMode: ParentModeStore
+    var pendingParentDeepLinkSurface: ParentSurface?
 
     init(usePreviewData: Bool = false) {
         environment = AppEnvironment(usePreviewData: usePreviewData)
-        parentMode = ParentModeStore(apiClient: PreviewAPIClient())
+        parentMode = ParentModeStore(
+            apiClient: environment.parentAPIClient,
+            familyRoomClient: environment.familyRoomClient
+        )
     }
 
     @MainActor
@@ -63,18 +67,22 @@ final class AppState {
         route = .childHome
     }
 
-    func openParentGate(from entryPoint: ParentGateEntryPoint) {
+    func openParentGate(from entryPoint: ParentGateEntryPoint, preferSurface: ParentSurface? = nil) {
+        if let preferSurface {
+            pendingParentDeepLinkSurface = preferSurface
+        }
         parentGate.openGate(from: entryPoint)
     }
 
     @MainActor
     func attemptLocalAuthUnlock() async -> Bool {
         do {
-            let success = try await localAuth.evaluateBiometrics(
+            let success = try await localAuth.evaluateDeviceOwner(
                 reason: NSLocalizedString("parent.gate.la.reason", comment: "")
             )
             if success {
                 parentGate.unlock(using: .localAuthentication)
+                applyPendingDeepLinkSurface()
             }
             return success
         } catch {
@@ -84,15 +92,41 @@ final class AppState {
 
     func unlockParentMode(using method: ParentGateUnlockMethod) {
         parentGate.unlock(using: method)
+        applyPendingDeepLinkSurface()
     }
 
     @MainActor
     func closeParentMode() {
         parentMode.endSession()
         parentGate.closeParentMode()
+        pendingParentDeepLinkSurface = nil
     }
 
     func returnToWelcome() {
+        authStore.clearAllSessions()
         route = .welcome
+    }
+
+    @MainActor
+    func handleBackgroundPushRefresh() async {
+        await syncEngine.syncNow()
+        if parentGate.isParentModePresented {
+            await parentMode.handleBackgroundPushRefresh()
+        }
+    }
+
+    @MainActor
+    func enforceParentIdleTimeoutIfNeeded() {
+        guard parentGate.isParentModePresented else { return }
+        if parentGate.parentSessionRequiresReauth() {
+            closeParentMode()
+        }
+    }
+
+    private func applyPendingDeepLinkSurface() {
+        if let pendingParentDeepLinkSurface {
+            parentMode.activeSurface = pendingParentDeepLinkSurface
+            self.pendingParentDeepLinkSurface = nil
+        }
     }
 }

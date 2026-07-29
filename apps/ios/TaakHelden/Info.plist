@@ -39,6 +39,10 @@
 	</array>
 	<key>UIUserInterfaceStyle</key>
 	<string>Light</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>remote-notification</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>TaakHelden gebruikt de camera alleen als je een foto voor een bonusmoment wilt maken.</string>
 	<key>NSFaceIDUsageDescription</key>

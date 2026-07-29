@@ -13,10 +13,15 @@ filter:
     - /families/me
     - /instances/today
     - /instances/{id}/complete
+    - /instances/{id}/approve
+    - /instances/{id}/redo
     - /instances/{id}/undo
     - /instances/{id}/photo
     - /points/balance
+    - /tasks
+    - /tasks/{id}
     - /rewards
+    - /rewards/{id}
     - /rewards/{id}/redeem
     - /redemptions
     - /sync
@@ -24,4 +29,8 @@ filter:
     - /photos/{id}
     - /photos/{id}/confirm
     - /devices
+    - /ws/token
+    - /account
+    - /account/export
+    - /account/export/{id}
 namingStrategy: idiomatic

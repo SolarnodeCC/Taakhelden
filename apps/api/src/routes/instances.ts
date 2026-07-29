@@ -18,33 +18,11 @@ import { callFamilyRoom } from "../services/familyRoom";
 import { getFamily, listChildren } from "../repo/families";
 import { listForDate, listHistory } from "../repo/instances";
 import { isContractV2 } from "../services/contract";
+import { toInstanceView as instanceView } from "../services/instanceView";
 import { computeBalance } from "../services/pointsEngine";
 import { localDate } from "../services/time";
 
 const instances = new Hono<AppBindings>();
-
-function instanceView(row: Record<string, unknown>) {
-  return {
-    id: row.id,
-    taskId: row.task_id,
-    childId: row.child_id,
-    date: row.date,
-    status: row.status,
-    title: row.title,
-    icon: row.icon,
-    category: row.category,
-    points: row.task_points,
-    photoBonusPoints: row.photo_bonus_points,
-    approvalRequired: Boolean(row.approval_required),
-    daypart: row.daypart ?? null,
-    photoId: row.photo_id ?? null,
-    photoStatus: row.photo_status ?? null,
-    pointsEarned: row.points_earned ?? null,
-    redoNote: row.redo_note ?? null,
-    completedAt: row.completed_at ?? null,
-    approvedAt: row.approved_at ?? null,
-  };
-}
 
 type FamilyRow = { timezone: string; week_bonus_threshold: number };
 

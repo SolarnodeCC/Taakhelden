@@ -2,11 +2,11 @@ import Foundation
 
 @Observable
 final class TaakHeldenAPIClient {
-    private let transport: HTTPTransporting
-    private let authStore: AuthStore
-    private let refreshCoordinator: TokenRefreshCoordinator
-    private let decoder = JSONDecoder.apiDecoder
-    private let encoder = JSONEncoder.apiEncoder
+    let transport: HTTPTransporting
+    let authStore: AuthStore
+    let refreshCoordinator: TokenRefreshCoordinator
+    let decoder = JSONDecoder.apiDecoder
+    let encoder = JSONEncoder.apiEncoder
 
     init(
         transport: HTTPTransporting,

@@ -1,32 +1,10 @@
-import { ErrorCodes, InstanceView } from "@taakhelden/shared";
+import { ErrorCodes, type InstanceView } from "@taakhelden/shared";
 import { ApiException } from "../middleware/error";
 import { getFamily, listChildren } from "../repo/families";
 import * as instances from "../repo/instances";
+import { parseInstanceView as instanceViewFromRow } from "./instanceView";
 import { localDate } from "./time";
 import type { Actor } from "./pointsEngine";
-
-function instanceViewFromRow(row: Record<string, unknown>) {
-  return InstanceView.parse({
-    id: row.id,
-    taskId: row.task_id,
-    childId: row.child_id,
-    date: row.date,
-    status: row.status,
-    title: row.title,
-    icon: row.icon,
-    category: row.category,
-    points: row.task_points,
-    photoBonusPoints: row.photo_bonus_points,
-    approvalRequired: Boolean(row.approval_required),
-    daypart: row.daypart ?? null,
-    photoId: row.photo_id ?? null,
-    photoStatus: row.photo_status ?? null,
-    pointsEarned: row.points_earned ?? null,
-    redoNote: row.redo_note ?? null,
-    completedAt: row.completed_at ?? null,
-    approvedAt: row.approved_at ?? null,
-  });
-}
 
 const MOVABLE_STATUSES = new Set(["open", "open_redo"]);
 

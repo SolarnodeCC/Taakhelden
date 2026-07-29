@@ -52,7 +52,11 @@ export async function setPhotoStatus(db: D1Database, familyId: string, photoId: 
 /** Na de EXIF-strip: gekoppelde taak-instances op 'ready' zetten. */
 export async function markInstancePhotoReady(db: D1Database, familyId: string, r2Key: string) {
   await db
-    .prepare("UPDATE task_instances SET photo_status = 'ready' WHERE family_id = ? AND photo_key = ?")
+    .prepare(
+      `UPDATE task_instances
+       SET photo_status = 'ready', updated_at = strftime('%Y-%m-%dT%H:%M:%fZ', 'now')
+       WHERE family_id = ? AND photo_key = ?`,
+    )
     .bind(familyId, r2Key)
     .run();
 }
