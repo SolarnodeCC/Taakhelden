@@ -42,6 +42,10 @@ final class ParentGateCoordinator {
     var lastUnlockMethod: ParentGateUnlockMethod?
     var lastUnlockedAt: Date?
 
+    func openGate() {
+        isChallengePresented = true
+    }
+
     func openGate(from entryPoint: ParentGateEntryPoint) {
         activeEntryPoint = entryPoint
         isChallengePresented = true

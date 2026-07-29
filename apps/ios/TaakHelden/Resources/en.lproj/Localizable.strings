@@ -3,4 +3,90 @@
 "child.pin.visible" = "Use PIN";
 "child.offline.safe" = "Saved for later - we'll send it soon.";
 "child.all.done" = "All done - you were a hero today!";
+
+/* Parent gate */
 "parent.gate.title" = "Parent gate";
+"parent.gate.description" = "Parent mode stays hidden from children and opens only via device authentication or a parent account.";
+"parent.gate.behind" = "What's behind the gate";
+"parent.gate.behind.detail" = "Today per child, approvals with safe photo review, quiet settings and privacy actions like export or delete.";
+"parent.gate.child.pin.blocked" = "Child PIN cannot open this";
+"parent.gate.la.button" = "Unlock with Face ID or passcode";
+"parent.gate.la.reason" = "Unlock TaakHelden parent mode";
+"parent.gate.la.failed" = "Authentication failed. Try again or use your parent account.";
+"parent.gate.account.button" = "Use parent account";
+"parent.gate.cancel" = "Go back";
+
+/* Parent mode */
+"parent.mode.title" = "Parent mode";
+"parent.mode.subtitle" = "See what's happening per child today, safely approve photos and manage settings.";
+"parent.mode.pending" = "%d to review";
+"parent.mode.back" = "Back to child mode";
+"parent.mode.refresh" = "Refresh";
+"parent.surface.vandaag" = "Today";
+"parent.surface.goedkeuren" = "Approvals";
+"parent.surface.instellingen" = "Settings";
+
+/* Parent Today */
+"parent.today.loading" = "Loading today…";
+"parent.today.loading.detail" = "Fetching the latest overview per child.";
+"parent.today.empty" = "No children visible yet";
+"parent.today.empty.detail" = "Once a profile is paired, you'll see each child's day in three columns here.";
+"parent.today.child.quiet" = "It's quiet today for %@.";
+
+/* Parent Approvals */
+"parent.approvals.empty" = "Nothing to review — nice and quiet.";
+"parent.approvals.empty.detail" = "New photos and approvals will appear here automatically behind the parent gate.";
+"parent.approvals.submitted.by" = "Submitted by %@";
+"parent.approvals.approve" = "Approve";
+"parent.approvals.redo" = "Needs another look";
+"parent.approvals.no.photo" = "No photo";
+"parent.approvals.photo.safe" = "View fullscreen without showing location or camera metadata.";
+"parent.approvals.toggle.bulk" = "Include in bulk approval";
+"parent.approvals.ipad.pick" = "Pick a card";
+
+/* Bulk approve */
+"parent.bulk.title" = "Bulk approve";
+"parent.bulk.button" = "Approve %d cards";
+"parent.bulk.allowed" = "Your selection belongs to the same child and can be approved together.";
+"parent.bulk.empty" = "Pick a few cards from the same child first.";
+"parent.bulk.mixed" = "Bulk approve only works for cards from the same child.";
+"parent.bulk.photo.ack" = "For selected photos we ask for a conscious acknowledgement first.";
+"parent.bulk.photo.toggle" = "I have consciously reviewed the selected photos.";
+
+/* Redo sheet */
+"parent.redo.title" = "Needs another look";
+"parent.redo.note.prompt" = "Send a short, positive note for %@.";
+"parent.redo.note.placeholder" = "Almost! Take another look at the corners and you're done.";
+"parent.redo.cancel" = "Cancel";
+"parent.redo.submit" = "Send note";
+
+/* Settings */
+"parent.settings.sound.title" = "Sounds";
+"parent.settings.sound.detail" = "Parents can toggle the reward sound here without it being visible in child mode.";
+"parent.settings.sound.toggle" = "Sounds on";
+"parent.settings.privacy.title" = "Privacy and data";
+"parent.settings.privacy.detail" = "You can request your family data or delete your account. This is only accessible behind the parent gate.";
+"parent.settings.export" = "Request data export";
+"parent.settings.delete" = "Delete account and family";
+"parent.settings.delete.confirm.title" = "Are you sure?";
+"parent.settings.delete.confirm.message" = "This will request deletion of your account and family data. This stays behind the parent gate.";
+"parent.settings.delete.confirm.button" = "Delete account";
+"parent.settings.delete.confirm.cancel" = "Cancel";
+"parent.settings.delete.success" = "Your account deletion request has been processed. You will be safely returned.";
+
+/* Photo viewer */
+"parent.photo.safe.title" = "Safe photo viewer";
+"parent.photo.safe.detail" = "TaakHelden intentionally hides EXIF, location and camera data here. Only the photo itself matters for review.";
+"parent.photo.close" = "Close";
+
+/* Sync status */
+"parent.sync.live" = "Live";
+"parent.sync.sync" = "Sync";
+"parent.sync.disconnected" = "Disconnected";
+"parent.sync.connecting" = "Connecting…";
+"parent.sync.connected" = "Connected";
+"parent.sync.reconnect" = "Retrying in %ds";
+"parent.sync.idle" = "Not started yet";
+"parent.sync.busy" = "Syncing";
+"parent.sync.updated" = "Updated at %@";
+"parent.sync.retry" = "Try again";

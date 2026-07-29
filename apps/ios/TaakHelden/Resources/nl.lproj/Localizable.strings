@@ -3,4 +3,90 @@
 "child.pin.visible" = "Gebruik pincode";
 "child.offline.safe" = "Wordt bewaard - sturen we zo.";
 "child.all.done" = "Alles gedaan - je bent vandaag al een TaakHeld!";
+
+/* Parent gate */
 "parent.gate.title" = "Ouderpoort";
+"parent.gate.description" = "Oudermodus blijft verborgen voor kinderen en opent alleen via toestel-authenticatie of een ouderaccount.";
+"parent.gate.behind" = "Wat hierachter zit";
+"parent.gate.behind.detail" = "Vandaag per kind, goedkeuren met veilige fotoweergave, rustige instellingen en privacy-acties zoals export of verwijderen.";
+"parent.gate.child.pin.blocked" = "Kind-pincode opent dit bewust niet";
+"parent.gate.la.button" = "Ontgrendel met Face ID of toestelcode";
+"parent.gate.la.reason" = "Ontgrendel de oudermodus van TaakHelden";
+"parent.gate.la.failed" = "De authenticatie is niet gelukt. Probeer het nog eens of gebruik je ouderaccount.";
+"parent.gate.account.button" = "Gebruik ouderaccount";
+"parent.gate.cancel" = "Toch terug";
+
+/* Parent mode */
+"parent.mode.title" = "Oudermodus";
+"parent.mode.subtitle" = "Kijk per kind wat vandaag loopt, keur foto's veilig goed en houd instellingen rustig in de hand.";
+"parent.mode.pending" = "%d te keuren";
+"parent.mode.back" = "Terug naar kindmodus";
+"parent.mode.refresh" = "Ververs";
+"parent.surface.vandaag" = "Vandaag";
+"parent.surface.goedkeuren" = "Goedkeuren";
+"parent.surface.instellingen" = "Instellingen";
+
+/* Parent Today */
+"parent.today.loading" = "Vandaag laden…";
+"parent.today.loading.detail" = "We halen per kind rustig de nieuwste stand op.";
+"parent.today.empty" = "Nog geen kinderen zichtbaar";
+"parent.today.empty.detail" = "Zodra er een profiel gekoppeld is, zie je hier per kind de dag in drie rustige kolommen.";
+"parent.today.child.quiet" = "Vandaag is het rustig voor %@.";
+
+/* Parent Approvals */
+"parent.approvals.empty" = "Niets te keuren — lekker rustig.";
+"parent.approvals.empty.detail" = "Nieuwe foto's en goedkeuringen landen hier automatisch achter de ouderpoort.";
+"parent.approvals.submitted.by" = "Ingediend door %@";
+"parent.approvals.approve" = "Goedkeuren";
+"parent.approvals.redo" = "Nog even kijken";
+"parent.approvals.no.photo" = "Zonder foto";
+"parent.approvals.photo.safe" = "Fullscreen bekijken zonder locatie- of cameragegevens te tonen.";
+"parent.approvals.toggle.bulk" = "Kies mee voor bulk goedkeuren";
+"parent.approvals.ipad.pick" = "Kies een kaartje";
+
+/* Bulk approve */
+"parent.bulk.title" = "Bulk goedkeuren";
+"parent.bulk.button" = "Keur %d kaartjes goed";
+"parent.bulk.allowed" = "Je selectie hoort bij hetzelfde kind en kan veilig samen door.";
+"parent.bulk.empty" = "Kies eerst een paar kaartjes van hetzelfde kind.";
+"parent.bulk.mixed" = "Bulk goedkeuren werkt alleen voor kaartjes van hetzelfde kind.";
+"parent.bulk.photo.ack" = "Voor geselecteerde foto's vragen we eerst een bewuste bevestiging.";
+"parent.bulk.photo.toggle" = "Ik heb de geselecteerde foto's bewust bekeken.";
+
+/* Redo sheet */
+"parent.redo.title" = "Nog even kijken";
+"parent.redo.note.prompt" = "Stuur een korte, positieve notitie mee voor %@.";
+"parent.redo.note.placeholder" = "Bijna! Kijk nog even naar de hoekjes, dan is hij klaar.";
+"parent.redo.cancel" = "Annuleren";
+"parent.redo.submit" = "Verstuur notitie";
+
+/* Settings */
+"parent.settings.sound.title" = "Geluiden";
+"parent.settings.sound.detail" = "Ouders kunnen het beloningsgeluid hier rustig aan- of uitzetten zonder dat die instelling in kindmodus zichtbaar is.";
+"parent.settings.sound.toggle" = "Geluiden aan";
+"parent.settings.privacy.title" = "Privacy en gegevens";
+"parent.settings.privacy.detail" = "Je kunt je gezinsdata opvragen of je account verwijderen. Dit blijft alleen bereikbaar achter de ouderpoort.";
+"parent.settings.export" = "Vraag je data-export aan";
+"parent.settings.delete" = "Verwijder account en gezin";
+"parent.settings.delete.confirm.title" = "Weet je het zeker?";
+"parent.settings.delete.confirm.message" = "Hiermee vraag je om je account en gezinsdata te verwijderen. Dit blijft bewust achter de ouderpoort.";
+"parent.settings.delete.confirm.button" = "Account verwijderen";
+"parent.settings.delete.confirm.cancel" = "Annuleren";
+"parent.settings.delete.success" = "Je accountverzoek is verwerkt. Je wordt nu veilig teruggezet.";
+
+/* Photo viewer */
+"parent.photo.safe.title" = "Veilige fotoweergave";
+"parent.photo.safe.detail" = "TaakHelden laat hier bewust geen EXIF-, locatie- of cameragegevens zien. Alleen de foto zelf telt mee voor de beoordeling.";
+"parent.photo.close" = "Sluiten";
+
+/* Sync status */
+"parent.sync.live" = "Live";
+"parent.sync.sync" = "Sync";
+"parent.sync.disconnected" = "Niet verbonden";
+"parent.sync.connecting" = "Verbinden…";
+"parent.sync.connected" = "Verbonden";
+"parent.sync.reconnect" = "Opnieuw in %ds";
+"parent.sync.idle" = "Nog niet gestart";
+"parent.sync.busy" = "Bezig";
+"parent.sync.updated" = "Bijgewerkt om %@";
+"parent.sync.retry" = "Nogmaals proberen";

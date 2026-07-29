@@ -1,5 +1,12 @@
 import Foundation
 
+// MARK: - Preview-layer models
+// These types are the local view-model layer for Phase 2 parent mode.
+// They will be replaced by generated Swift OpenAPI types once the codegen
+// pipeline from packages/shared lands on macOS CI. Do not use these as the
+// real transport layer — they intentionally diverge from wire format where
+// the preview needs simplification.
+
 enum ParentSurface: String, CaseIterable, Identifiable {
     case vandaag
     case goedkeuren
@@ -8,15 +15,15 @@ enum ParentSurface: String, CaseIterable, Identifiable {
     var id: String { rawValue }
 }
 
-enum ParentTaskStatus: Equatable {
+enum ParentTaskStatus: String, Codable, Equatable {
     case open
     case submitted
     case approved
     case completed
-    case openRedo
+    case openRedo = "open_redo"
 }
 
-enum ParentTaskBucket: String, CaseIterable, Identifiable {
+enum ParentTaskBucket: String, CaseIterable, Identifiable, Codable {
     case open
     case awaitingApproval
     case done
@@ -35,7 +42,7 @@ enum ParentTaskBucket: String, CaseIterable, Identifiable {
     }
 }
 
-struct ParentPhotoAsset: Identifiable, Equatable {
+struct ParentPhotoAsset: Identifiable, Hashable, Equatable {
     let id: String
     let previewURL: URL?
     let accessibilityLabel: String
@@ -47,7 +54,7 @@ struct ParentPhotoAsset: Identifiable, Equatable {
 struct ParentTaskSnapshot: Identifiable, Equatable {
     let id: String
     let title: String
-    let icon: String
+    let icon: String?
     let status: ParentTaskStatus
     let points: Int
     let submittedAt: Date?
@@ -94,13 +101,13 @@ struct ParentTodayChildSnapshot: Identifiable, Equatable {
     }
 }
 
-struct ApprovalQueueItem: Identifiable, Equatable {
+struct ApprovalQueueItem: Identifiable, Hashable, Equatable {
     let id: String
     let childID: String
     let childName: String
     let childAvatar: String
     let title: String
-    let icon: String
+    let icon: String?
     let submittedAt: Date
     let points: Int
     let photoAsset: ParentPhotoAsset?
@@ -116,13 +123,13 @@ struct ApprovalQueueSection: Identifiable, Equatable {
     let items: [ApprovalQueueItem]
 }
 
-struct ParentSettingsSnapshot: Equatable {
+struct ParentSettingsSnapshot: Codable, Equatable {
     var soundEnabled: Bool
     let exportAvailable: Bool
     let deleteAvailable: Bool
 }
 
-struct ParentExportReceipt: Equatable {
+struct ParentExportReceipt: Codable, Equatable {
     let message: String
 }
 

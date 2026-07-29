@@ -86,15 +86,17 @@ final class ParentModeStore {
 
     @MainActor
     func approve(_ item: ApprovalQueueItem) async {
+        let key = IdempotencyKey.forApproval(instanceID: item.id)
         await mutateApprovalState(trigger: .approvalResolved) {
-            snapshot = try await apiClient.approveApproval(id: item.id)
+            snapshot = try await apiClient.approveApproval(id: item.id, idempotencyKey: key)
         }
     }
 
     @MainActor
     func sendRedo(for item: ApprovalQueueItem, note: String) async {
+        let key = IdempotencyKey.forRedo(instanceID: item.id)
         await mutateApprovalState(trigger: .approvalResolved) {
-            snapshot = try await apiClient.sendRedo(id: item.id, note: note)
+            snapshot = try await apiClient.sendRedo(id: item.id, note: note, idempotencyKey: key)
         }
     }
 
@@ -127,7 +129,7 @@ final class ParentModeStore {
     func requestDeleteAccount() async -> Bool {
         do {
             try await apiClient.deleteParentAccount()
-            deletionStatusMessage = "Je accountverzoek is verwerkt. Je wordt nu veilig teruggezet."
+            deletionStatusMessage = String(localized: "parent.settings.delete.success")
             return true
         } catch {
             deletionStatusMessage = error.localizedDescription
@@ -167,6 +169,8 @@ final class ParentModeStore {
         )
     }
 
+    static let bulkConcurrencyLimit = 4
+
     @MainActor
     func approveSelectedItems() async {
         let items = selectedItems()
@@ -177,9 +181,23 @@ final class ParentModeStore {
         isBulkApproving = true
         defer { isBulkApproving = false }
 
-        for item in items {
-            await approve(item)
+        let keys = items.map { IdempotencyKey.forApproval(instanceID: $0.id) }
+
+        await withTaskGroup(of: Void.self) { group in
+            for (index, item) in items.enumerated() {
+                if index >= Self.bulkConcurrencyLimit {
+                    await group.next()
+                }
+                group.addTask { [apiClient] in
+                    _ = try? await apiClient.approveApproval(
+                        id: item.id,
+                        idempotencyKey: keys[index]
+                    )
+                }
+            }
         }
+
+        await refresh(trigger: .approvalResolved)
 
         selectedApprovalIDs.removeAll()
         acknowledgedBulkPhotoReview = false

@@ -25,10 +25,11 @@ final class AppState {
     var photoBonusService: PhotoBonusService { environment.photoBonusService }
     var pushService: PushRegistrationService { environment.pushService }
 
-    private(set) lazy var parentMode = ParentModeStore(apiClient: PreviewAPIClient())
+    var parentMode: ParentModeStore
 
     init(usePreviewData: Bool = false) {
         environment = AppEnvironment(usePreviewData: usePreviewData)
+        parentMode = ParentModeStore(apiClient: PreviewAPIClient())
     }
 
     @MainActor
@@ -85,6 +86,7 @@ final class AppState {
         parentGate.unlock(using: method)
     }
 
+    @MainActor
     func closeParentMode() {
         parentMode.endSession()
         parentGate.closeParentMode()

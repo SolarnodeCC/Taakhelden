@@ -9,6 +9,7 @@ struct ParentModeRootView: View {
     @State private var showsDeleteConfirmation = false
 
     var body: some View {
+        @Bindable var appState = appState
         let palette = THPalettes.parent
         let store = appState.parentMode
 
@@ -16,10 +17,10 @@ struct ParentModeRootView: View {
             VStack(spacing: 0) {
                 header(palette: palette, store: store)
 
-                Picker("Oudermodus", selection: $appState.parentMode.activeSurface) {
-                    Text("Vandaag").tag(ParentSurface.vandaag)
-                    Text("Goedkeuren").tag(ParentSurface.goedkeuren)
-                    Text("Instellingen").tag(ParentSurface.instellingen)
+                Picker(String(localized: "parent.mode.title"), selection: $appState.parentMode.activeSurface) {
+                    Text(LocalizedStringKey("parent.surface.vandaag")).tag(ParentSurface.vandaag)
+                    Text(LocalizedStringKey("parent.surface.goedkeuren")).tag(ParentSurface.goedkeuren)
+                    Text(LocalizedStringKey("parent.surface.instellingen")).tag(ParentSurface.instellingen)
                 }
                 .pickerStyle(.segmented)
                 .padding(.horizontal, THSpacing.xl)
@@ -89,13 +90,13 @@ struct ParentModeRootView: View {
             .background(palette.background.color.ignoresSafeArea())
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
-                    Button("Terug naar kindmodus") {
+                    Button(String(localized: "parent.mode.back")) {
                         appState.closeParentMode()
                     }
                 }
 
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Ververs") {
+                    Button(String(localized: "parent.mode.refresh")) {
                         Task { await store.refresh(trigger: .manualRefresh) }
                     }
                     .disabled(store.isLoading)
@@ -150,11 +151,11 @@ struct ParentModeRootView: View {
             }
         }
         .confirmationDialog(
-            "Weet je het zeker?",
+            String(localized: "parent.settings.delete.confirm.title"),
             isPresented: $showsDeleteConfirmation,
             titleVisibility: .visible
         ) {
-            Button("Account verwijderen", role: .destructive) {
+            Button(String(localized: "parent.settings.delete.confirm.button"), role: .destructive) {
                 Task {
                     let deleted = await appState.parentMode.requestDeleteAccount()
                     if deleted {
@@ -163,9 +164,9 @@ struct ParentModeRootView: View {
                     }
                 }
             }
-            Button("Annuleren", role: .cancel) {}
+            Button(String(localized: "parent.settings.delete.confirm.cancel"), role: .cancel) {}
         } message: {
-            Text("Hiermee vraag je om je account en gezinsdata te verwijderen. Dit blijft bewust achter de ouderpoort.")
+            Text(LocalizedStringKey("parent.settings.delete.confirm.message"))
         }
     }
 
@@ -173,10 +174,10 @@ struct ParentModeRootView: View {
         VStack(alignment: .leading, spacing: THSpacing.sm) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: THSpacing.xs) {
-                    Text("Oudermodus")
+                    Text(LocalizedStringKey("parent.mode.title"))
                         .font(.system(size: 30, weight: .bold, design: .default))
                         .foregroundStyle(palette.text.color)
-                    Text("Kijk per kind wat vandaag loopt, keur foto’s veilig goed en houd instellingen rustig in de hand.")
+                    Text(LocalizedStringKey("parent.mode.subtitle"))
                         .foregroundStyle(palette.mutedText.color)
                 }
                 Spacer()
@@ -213,26 +214,26 @@ struct ParentModeRootView: View {
     private func connectionLabel(for state: FamilyRoomConnectionState) -> String {
         switch state {
         case .disconnected:
-            return "Niet verbonden"
+            return String(localized: "parent.sync.disconnected")
         case .connecting:
-            return "Verbinden…"
+            return String(localized: "parent.sync.connecting")
         case .connected:
-            return "Verbonden"
+            return String(localized: "parent.sync.connected")
         case .waitingToReconnect(let seconds):
-            return "Opnieuw in \(seconds)s"
+            return String(format: String(localized: "parent.sync.reconnect"), seconds)
         }
     }
 
     private func syncLabel(for state: ParentSyncState) -> String {
         switch state {
         case .idle:
-            return "Nog niet gestart"
+            return String(localized: "parent.sync.idle")
         case .syncing:
-            return "Bezig"
+            return String(localized: "parent.sync.busy")
         case .synced(_, let date):
-            return "Bijgewerkt om \(date.formatted(date: .omitted, time: .shortened))"
+            return String(format: String(localized: "parent.sync.updated"), date.formatted(date: .omitted, time: .shortened))
         case .failed:
-            return "Nogmaals proberen"
+            return String(localized: "parent.sync.retry")
         }
     }
 }
@@ -254,7 +255,7 @@ private struct ParentStatusPill: View {
         .padding(.horizontal, THSpacing.md)
         .padding(.vertical, THSpacing.sm)
         .background(palette.surface.color)
-        .clipShape(RoundedRectangle(cornerRadius: THRadius.large, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: THRadius.medium, style: .continuous))
     }
 }
 
@@ -269,16 +270,16 @@ private struct ParentTodayView: View {
             VStack(alignment: .leading, spacing: THSpacing.lg) {
                 if isLoading && snapshot == nil {
                     THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
-                        Text("Vandaag laden…")
+                        Text(LocalizedStringKey("parent.today.loading"))
                             .font(.headline)
-                        Text("We halen per kind rustig de nieuwste stand op.")
+                        Text(LocalizedStringKey("parent.today.loading.detail"))
                             .foregroundStyle(palette.mutedText.color)
                     }
                 } else if let snapshot, snapshot.todayChildren.isEmpty {
                     THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
-                        Text("Nog geen kinderen zichtbaar")
+                        Text(LocalizedStringKey("parent.today.empty"))
                             .font(.headline)
-                        Text("Zodra er een profiel gekoppeld is, zie je hier per kind de dag in drie rustige kolommen.")
+                        Text(LocalizedStringKey("parent.today.empty.detail"))
                             .foregroundStyle(palette.mutedText.color)
                     }
                 } else if let snapshot {
@@ -296,7 +297,7 @@ private struct ParentTodayView: View {
                             }
 
                             if child.tasks.isEmpty {
-                                Text("Vandaag is het rustig voor \(child.displayName.lowercased()).")
+                                Text(String(format: String(localized: "parent.today.child.quiet"), child.displayName.lowercased()))
                                     .foregroundStyle(palette.mutedText.color)
                             } else {
                                 ForEach(child.groupedTasks, id: \.bucket.id) { group in
@@ -310,7 +311,7 @@ private struct ParentTodayView: View {
                                         } else {
                                             ForEach(group.items) { item in
                                                 HStack(alignment: .top, spacing: THSpacing.sm) {
-                                                    Text(item.icon)
+                                                    if let icon = item.icon { Text(icon) }
                                                     VStack(alignment: .leading, spacing: THSpacing.xs) {
                                                         Text(item.title)
                                                             .foregroundStyle(palette.text.color)
@@ -363,9 +364,9 @@ private struct ParentApprovalsView: View {
             if sections.isEmpty {
                 ScrollView {
                     THCard(palette: THPalettes.parent, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
-                        Text("Niets te keuren — lekker rustig.")
+                        Text(LocalizedStringKey("parent.approvals.empty"))
                             .font(.headline)
-                        Text("Nieuwe foto’s en goedkeuringen landen hier automatisch achter de ouderpoort.")
+                        Text(LocalizedStringKey("parent.approvals.empty.detail"))
                             .foregroundStyle(THPalettes.parent.mutedText.color)
                     }
                     .padding(THSpacing.xl)
@@ -400,7 +401,7 @@ private struct ParentApprovalsView: View {
                         })
                         .padding(THSpacing.xl)
                     } else {
-                        ContentUnavailableView("Kies een kaartje", systemImage: "checklist")
+                        ContentUnavailableView(String(localized: "parent.approvals.ipad.pick"), systemImage: "checklist")
                     }
                 }
                 .safeAreaInset(edge: .bottom) {
@@ -479,7 +480,7 @@ private struct ParentApprovalRow: View {
 
                 Button(action: onSelect) {
                     VStack(alignment: .leading, spacing: THSpacing.xs) {
-                        Text("\(item.icon) \(item.title)")
+                        Text("\(item.icon ?? "") \(item.title)")
                             .foregroundStyle(THPalettes.parent.text.color)
                         Text(item.submittedAt.formatted(date: .abbreviated, time: .shortened))
                             .font(.footnote)
@@ -491,7 +492,7 @@ private struct ParentApprovalRow: View {
                 Spacer()
 
                 if item.hasPhoto {
-                    Button("Foto") {
+                    Button(String(localized: "parent.approvals.photo.safe")) {
                         onOpenPhoto()
                     }
                     .font(.footnote.weight(.semibold))
@@ -516,10 +517,10 @@ private struct ParentApprovalDetailCard: View {
         VStack(alignment: .leading, spacing: THSpacing.md) {
             HStack(alignment: .top) {
                 VStack(alignment: .leading, spacing: THSpacing.xs) {
-                    Text("\(item.icon) \(item.title)")
+                    Text("\(item.icon ?? "") \(item.title)")
                         .font(.system(size: 22, weight: .bold, design: .default))
                         .foregroundStyle(palette.text.color)
-                    Text("Ingediend door \(item.childName)")
+                    Text(String(format: String(localized: "parent.approvals.submitted.by"), item.childName))
                         .foregroundStyle(palette.mutedText.color)
                     Text(item.submittedAt.formatted(date: .abbreviated, time: .shortened))
                         .font(.footnote)
@@ -544,7 +545,7 @@ private struct ParentApprovalDetailCard: View {
                             Text(photoAsset.accessibilityLabel)
                                 .font(.footnote)
                                 .foregroundStyle(palette.text.color)
-                            Text("Fullscreen bekijken zonder locatie- of cameragegevens te tonen.")
+                            Text(LocalizedStringKey("parent.approvals.photo.safe"))
                                 .font(.footnote)
                                 .foregroundStyle(palette.mutedText.color)
                                 .multilineTextAlignment(.center)
@@ -554,7 +555,7 @@ private struct ParentApprovalDetailCard: View {
                 }
                 .buttonStyle(.plain)
             } else {
-                THBadge(text: "Zonder foto", palette: palette, fontDesign: .default)
+                THBadge(text: LocalizedStringKey("parent.approvals.no.photo"), palette: palette, fontDesign: .default)
             }
 
             if let onToggleSelection {
@@ -562,16 +563,16 @@ private struct ParentApprovalDetailCard: View {
                     get: { isSelected },
                     set: { _ in onToggleSelection() }
                 )) {
-                    Text("Kies mee voor bulk goedkeuren")
+                    Text(LocalizedStringKey("parent.approvals.toggle.bulk"))
                 }
                 .tint(palette.accent.color)
             }
 
             HStack {
-                Button("Goedkeuren", action: onApprove)
+                Button(String(localized: "parent.approvals.approve"), action: onApprove)
                     .buttonStyle(.borderedProminent)
                     .tint(palette.accent.color)
-                Button("Nog even kijken", action: onRedo)
+                Button(String(localized: "parent.approvals.redo"), action: onRedo)
                     .buttonStyle(.bordered)
             }
         }
@@ -592,17 +593,17 @@ private struct ParentBulkApprovalBar: View {
         let palette = THPalettes.parent
 
         THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
-            Text("Bulk goedkeuren")
+            Text(LocalizedStringKey("parent.bulk.title"))
                 .font(.headline)
             Text(message)
                 .foregroundStyle(palette.mutedText.color)
 
             if validation == .photoAcknowledgementRequired {
-                Toggle("Ik heb de geselecteerde foto’s bewust bekeken.", isOn: $acknowledgedBulkPhotoReview)
+                Toggle(String(localized: "parent.bulk.photo.toggle"), isOn: $acknowledgedBulkPhotoReview)
                     .tint(palette.accent.color)
             }
 
-            Button("Keur \(selectionCount) kaartjes goed") {
+            Button(String(format: String(localized: "parent.bulk.button"), selectionCount)) {
                 onApprove()
             }
             .buttonStyle(.borderedProminent)
@@ -615,13 +616,13 @@ private struct ParentBulkApprovalBar: View {
     private var message: String {
         switch validation {
         case .allowed:
-            return "Je selectie hoort bij hetzelfde kind en kan veilig samen door."
+            return String(localized: "parent.bulk.allowed")
         case .empty:
-            return "Kies eerst een paar kaartjes van hetzelfde kind."
+            return String(localized: "parent.bulk.empty")
         case .mixedChildren:
-            return "Bulk goedkeuren werkt alleen voor kaartjes van hetzelfde kind."
+            return String(localized: "parent.bulk.mixed")
         case .photoAcknowledgementRequired:
-            return "Voor geselecteerde foto’s vragen we eerst een bewuste bevestiging."
+            return String(localized: "parent.bulk.photo.ack")
         }
     }
 }
@@ -640,12 +641,12 @@ private struct ParentSettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: THSpacing.lg) {
                 THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
-                    Text("Geluiden")
+                    Text(LocalizedStringKey("parent.settings.sound.title"))
                         .font(.headline)
-                    Text("Ouders kunnen het beloningsgeluid hier rustig aan- of uitzetten zonder dat die instelling in kindmodus zichtbaar is.")
+                    Text(LocalizedStringKey("parent.settings.sound.detail"))
                         .foregroundStyle(palette.mutedText.color)
 
-                    Toggle("Geluiden aan", isOn: Binding(
+                    Toggle(String(localized: "parent.settings.sound.toggle"), isOn: Binding(
                         get: { snapshot?.settings.soundEnabled ?? true },
                         set: { onSoundToggle($0) }
                     ))
@@ -653,16 +654,16 @@ private struct ParentSettingsView: View {
                 }
 
                 THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
-                    Text("Privacy en gegevens")
+                    Text(LocalizedStringKey("parent.settings.privacy.title"))
                         .font(.headline)
-                    Text("Je kunt je gezinsdata opvragen of je account verwijderen. Dit blijft alleen bereikbaar achter de ouderpoort.")
+                    Text(LocalizedStringKey("parent.settings.privacy.detail"))
                         .foregroundStyle(palette.mutedText.color)
 
-                    Button("Vraag je data-export aan", action: onExport)
+                    Button(String(localized: "parent.settings.export"), action: onExport)
                         .buttonStyle(.borderedProminent)
                         .tint(palette.accent.color)
 
-                    Button("Verwijder account en gezin", role: .destructive, action: onDelete)
+                    Button(String(localized: "parent.settings.delete"), role: .destructive, action: onDelete)
                         .buttonStyle(.bordered)
 
                     if let exportStatusMessage {
@@ -693,19 +694,19 @@ private struct ParentRedoSheet: View {
         let palette = THPalettes.parent
 
         VStack(alignment: .leading, spacing: THSpacing.lg) {
-            Text("Nog even kijken")
+            Text(LocalizedStringKey("parent.redo.title"))
                 .font(.title2.bold())
-            Text("Stuur een korte, positieve notitie mee voor \(item.childName.lowercased()).")
+            Text(String(format: String(localized: "parent.redo.note.prompt"), item.childName.lowercased()))
                 .foregroundStyle(palette.mutedText.color)
 
-            TextField("Bijna! Kijk nog even naar de hoekjes, dan is hij klaar.", text: $note, axis: .vertical)
+            TextField(String(localized: "parent.redo.note.placeholder"), text: $note, axis: .vertical)
                 .textFieldStyle(.roundedBorder)
                 .lineLimit(3...5)
 
             HStack {
-                Button("Annuleren", action: onCancel)
+                Button(String(localized: "parent.redo.cancel"), action: onCancel)
                     .buttonStyle(.bordered)
-                Button("Verstuur notitie", action: onSubmit)
+                Button(String(localized: "parent.redo.submit"), action: onSubmit)
                     .buttonStyle(.borderedProminent)
                     .tint(palette.accent.color)
                     .disabled(note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -747,9 +748,9 @@ private struct ParentPhotoFullscreenView: View {
                     }
 
                     THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
-                        Text("Veilige fotoweergave")
+                        Text(LocalizedStringKey("parent.photo.safe.title"))
                             .font(.headline)
-                        Text("TaakHelden laat hier bewust geen EXIF-, locatie- of cameragegevens zien. Alleen de foto zelf telt mee voor de beoordeling.")
+                        Text(LocalizedStringKey("parent.photo.safe.detail"))
                             .foregroundStyle(palette.mutedText.color)
                     }
                 }
@@ -757,7 +758,7 @@ private struct ParentPhotoFullscreenView: View {
             }
             .toolbar {
                 ToolbarItem(placement: .topBarTrailing) {
-                    Button("Sluiten", action: onClose)
+                    Button(String(localized: "parent.photo.close"), action: onClose)
                 }
             }
         }

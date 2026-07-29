@@ -56,7 +56,18 @@ enum ContractSource {
 }
 
 final class PreviewAPIClient: APIClient {
-    private var dashboard = PreviewParentData.dashboard
+    private let lock = NSLock()
+    private var _dashboard = PreviewParentData.dashboard
+
+    private func withDashboard<T>(_ body: (inout ParentDashboardSnapshot) -> T) -> T {
+        lock.lock()
+        defer { lock.unlock() }
+        return body(&_dashboard)
+    }
+
+    private var dashboard: ParentDashboardSnapshot {
+        lock.withLock { _dashboard }
+    }
 
     func fetchWelcomeContext() async throws -> WelcomeContext {
         WelcomeContext(familyPitch: "Samen taken doen voelt lichter als je kleine helden ermee kunnen groeien.")
@@ -97,21 +108,27 @@ final class PreviewAPIClient: APIClient {
     }
 
     func approveApproval(id: String, idempotencyKey: String) async throws -> ParentDashboardSnapshot {
-        dashboard = dashboard.removingApproval(id: id, markingTaskAsApproved: true)
-        return dashboard
+        withDashboard { d in
+            d = d.removingApproval(id: id, markingTaskAsApproved: true)
+            return d
+        }
     }
 
     func sendRedo(id: String, note: String, idempotencyKey: String) async throws -> ParentDashboardSnapshot {
         guard note.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty == false else {
             throw APIClientError.invalidParentNote
         }
-        dashboard = dashboard.removingApproval(id: id, markingTaskAsApproved: false)
-        return dashboard
+        return withDashboard { d in
+            d = d.removingApproval(id: id, markingTaskAsApproved: false)
+            return d
+        }
     }
 
     func updateParentSettings(soundEnabled: Bool) async throws -> ParentSettingsSnapshot {
-        dashboard = dashboard.updatingSettings(soundEnabled: soundEnabled)
-        return dashboard.settings
+        withDashboard { d in
+            d = d.updatingSettings(soundEnabled: soundEnabled)
+            return d.settings
+        }
     }
 
     func requestParentDataExport() async throws -> ParentExportReceipt {
@@ -119,7 +136,7 @@ final class PreviewAPIClient: APIClient {
     }
 
     func deleteParentAccount() async throws {
-        dashboard = PreviewParentData.dashboard
+        withDashboard { d in d = PreviewParentData.dashboard }
     }
 }
 
