@@ -19,3 +19,31 @@ export async function purgeOldIdempotencyKeys(db: D1Database) {
     .prepare("DELETE FROM idempotency_keys WHERE created_at < datetime('now', '-2 days')")
     .run();
 }
+
+/** Cached DO-mutatieresponse voor `{userId}:{idempotencyKey}` — of null. */
+export async function getIdempotencyResponse(
+  db: D1Database,
+  storeKey: string,
+): Promise<string | null> {
+  const cached = await db
+    .prepare("SELECT response FROM idempotency_keys WHERE key = ?")
+    .bind(storeKey)
+    .first<{ response: string }>();
+  return cached?.response ?? null;
+}
+
+/**
+ * Slaat een succesvolle DO-mutatieresponse op. INSERT OR IGNORE: bij race
+ * wint de eerste write; de caller herleest daarna indien nodig.
+ */
+export async function storeIdempotencyResponse(
+  db: D1Database,
+  storeKey: string,
+  userId: string,
+  responseJson: string,
+): Promise<void> {
+  await db
+    .prepare("INSERT OR IGNORE INTO idempotency_keys (key, user_id, response) VALUES (?, ?, ?)")
+    .bind(storeKey, userId, responseJson)
+    .run();
+}

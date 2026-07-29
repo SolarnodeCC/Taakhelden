@@ -91,6 +91,7 @@ describe("fotoflow: upload → strip → ready", () => {
     const attach = await api(`/instances/${instanceId}/photo`, {
       method: "POST",
       token,
+      idempotencyKey: crypto.randomUUID(),
       body: { photoId },
     });
     expect(attach.status).toBe(200);
@@ -128,6 +129,7 @@ describe("fotoflow: upload → strip → ready", () => {
     const attach = await api(`/instances/${instanceId}/photo`, {
       method: "POST",
       token,
+      idempotencyKey: crypto.randomUUID(),
       body: { photoId },
     });
     // Nog niet goedgekeurd: bonus staat klaar maar is niet geboekt
@@ -159,7 +161,12 @@ describe("fotoflow: upload → strip → ready", () => {
       idempotencyKey: crypto.randomUUID(),
     });
     const photoId = await uploadFlow(childTok, instanceId, fam.familyId);
-    await api(`/instances/${instanceId}/photo`, { method: "POST", token: childTok, body: { photoId } });
+    await api(`/instances/${instanceId}/photo`, {
+      method: "POST",
+      token: childTok,
+      idempotencyKey: crypto.randomUUID(),
+      body: { photoId },
+    });
 
     // Ouder ziet de ingediende taak mét de photoId, zodat het dashboard de foto
     // via GET /photos/{id} kan tonen in de goedkeuringswachtrij.

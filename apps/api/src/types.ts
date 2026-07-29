@@ -7,8 +7,13 @@ export interface Env {
   PHOTO_QUEUE: Queue;
   EXPORT_QUEUE: Queue;
 
-  // Required secret — auth / signed URLs fail closed without it.
+  // Required secret — auth fails closed without it.
   JWT_SECRET: string;
+  /**
+   * Optional dedicated HMAC key for photo/export signed URLs.
+   * Falls back to JWT_SECRET when unset (see services/secrets.ts).
+   */
+  HMAC_SECRET?: string;
 
   // Plain vars (wrangler.toml [vars]) — may also be overridden as secrets.
   APP_BASE_URL?: string;

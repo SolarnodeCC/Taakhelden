@@ -101,18 +101,28 @@ describe("inlossen: kopen → afboeking → annuleren → terugboeking", () => {
     expect(pending.some((r) => r.id === result.redemptionId)).toBe(true);
 
     // Annuleren → tegenboeking, saldo terug op 80
+    const cancelKey = crypto.randomUUID();
     const cancel = await api(`/redemptions/${result.redemptionId}/cancel`, {
       method: "POST",
       token: parentTok,
+      idempotencyKey: cancelKey,
     });
     expect(cancel.status).toBe(200);
     expect(((await cancel.json()) as { newBalance: number }).newBalance).toBe(80);
     expect(await ledgerSum(fam.familyId, fam.childA)).toBe(80);
 
-    // Nogmaals annuleren → 409, geen dubbele terugboeking
+    // Zonder Idempotency-Key mag annuleren niet (architectuurregel 2)
+    const zonderCancelKey = await api(`/redemptions/${result.redemptionId}/cancel`, {
+      method: "POST",
+      token: parentTok,
+    });
+    expect(zonderCancelKey.status).toBe(400);
+
+    // Nogmaals annuleren met andere key → 409, geen dubbele terugboeking
     const dubbel = await api(`/redemptions/${result.redemptionId}/cancel`, {
       method: "POST",
       token: parentTok,
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(dubbel.status).toBe(409);
     expect(await ledgerSum(fam.familyId, fam.childA)).toBe(80);
@@ -180,9 +190,17 @@ describe("inlossen: kopen → afboeking → annuleren → terugboeking", () => {
     });
     const { redemptionId } = (await redeem.json()) as { redemptionId: string };
 
-    const fulfill = await api(`/redemptions/${redemptionId}/fulfill`, { method: "POST", token: parentTok });
+    const fulfill = await api(`/redemptions/${redemptionId}/fulfill`, {
+      method: "POST",
+      token: parentTok,
+      idempotencyKey: crypto.randomUUID(),
+    });
     expect(fulfill.status).toBe(200);
-    const again = await api(`/redemptions/${redemptionId}/fulfill`, { method: "POST", token: parentTok });
+    const again = await api(`/redemptions/${redemptionId}/fulfill`, {
+      method: "POST",
+      token: parentTok,
+      idempotencyKey: crypto.randomUUID(),
+    });
     expect(again.status).toBe(409);
   });
 

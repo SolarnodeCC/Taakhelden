@@ -26,6 +26,7 @@ import {
   exportDownloadUrl,
   verifyExportDownload,
 } from "../services/exportService";
+import { transferHmacSecret } from "../services/secrets";
 import type { ExportJob } from "../jobs/exportConsumer";
 
 const PURGE_AFTER_DAYS = 7;
@@ -52,7 +53,7 @@ account.get("/export/:id", async (c) => {
   if (job.status !== "ready") {
     return c.json({ exportId, status: job.status });
   }
-  const { exp, sig } = await signExportDownload(c.env.JWT_SECRET, familyId, exportId);
+  const { exp, sig } = await signExportDownload(transferHmacSecret(c.env), familyId, exportId);
   const origin = new URL(c.req.url).origin;
   return c.json({
     exportId,
@@ -104,7 +105,7 @@ exportDownload.get("/export/:id/file", async (c) => {
   const exportId = c.req.param("id");
   const familyId = c.req.query("fam");
   const ok = await verifyExportDownload(
-    c.env.JWT_SECRET,
+    transferHmacSecret(c.env),
     familyId,
     exportId,
     c.req.query("exp"),

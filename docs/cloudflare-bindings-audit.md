@@ -60,6 +60,7 @@ BFF uses `env.API.fetch()` ([`apps/web/lib/api/config.ts`](../apps/web/lib/api/c
 | Name | Required | Source |
 |---|---|---|
 | `JWT_SECRET` | **yes** (`[secrets].required`) | GitHub Environment `production` → synced by `deploy-prod.yml` |
+| `HMAC_SECRET` | no (falls back to `JWT_SECRET`) | Dedicated key for photo/export signed URLs — **recommended in production** |
 | `TURNSTILE_SECRET` | no | GitHub → sync if set |
 | `APNS_KEY` | no | GitHub → sync if set |
 | `APNS_KEY_ID` | no | GitHub → sync if set |
@@ -74,9 +75,9 @@ BFF uses `env.API.fetch()` ([`apps/web/lib/api/config.ts`](../apps/web/lib/api/c
 1. In GitHub → **Settings → Environments → production → Secrets**, set at least:
    - `CLOUDFLARE_API_TOKEN` (already used by deploy)
    - **`JWT_SECRET`** — long random value (`openssl rand -base64 48`)
-2. Optionally set: `TURNSTILE_SECRET`, `APNS_KEY`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `EMAIL_API_KEY`, `EMAIL_FROM`.
+2. Optionally set: `HMAC_SECRET` (recommended — photo/export URL signing; falls back to `JWT_SECRET`), `TURNSTILE_SECRET`, `APNS_KEY`, `APNS_KEY_ID`, `APNS_TEAM_ID`, `EMAIL_API_KEY`, `EMAIL_FROM`.
 3. On the next `deploy-prod` run, the **Sync Worker secrets** step uploads them, then `wrangler deploy` validates `JWT_SECRET` is present.
-4. Smoke: `POST /v1/auth/register` must return **201** (not 500).
+4. Smoke: `GET /v1/health` → `{ ok: true, db: true }`; `POST /v1/auth/register` must return **201** (not 500).
 
 One-shot local put (if you prefer not to wait for CI):
 

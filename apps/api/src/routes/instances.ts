@@ -138,7 +138,7 @@ instances.post("/:id/undo", requireIdempotencyKey, idempotency, async (c) =>
 );
 
 /** Foto-bonus koppelen (kind, eigen taak) — na de presigned-flow uit §3.6. */
-instances.post("/:id/photo", idempotency, validate("json", AttachPhotoBody), async (c) => {
+instances.post("/:id/photo", requireIdempotencyKey, idempotency, validate("json", AttachPhotoBody), async (c) => {
   const { role } = c.get("auth");
   if (role !== "child") {
     // Rollenmatrix §5: alleen het kind zelf koppelt taakfoto's.
