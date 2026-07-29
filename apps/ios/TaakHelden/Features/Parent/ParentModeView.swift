@@ -7,6 +7,7 @@ struct ParentModeRootView: View {
     @State private var redoTarget: ApprovalQueueItem?
     @State private var redoNote = ""
     @State private var showsDeleteConfirmation = false
+    @State private var showsAppleDeleteSheet = false
 
     var body: some View {
         @Bindable var appState = appState
@@ -20,6 +21,8 @@ struct ParentModeRootView: View {
                 Picker(String(localized: "parent.mode.title"), selection: $appState.parentMode.activeSurface) {
                     Text(LocalizedStringKey("parent.surface.vandaag")).tag(ParentSurface.vandaag)
                     Text(LocalizedStringKey("parent.surface.goedkeuren")).tag(ParentSurface.goedkeuren)
+                    Text(LocalizedStringKey("parent.surface.taken")).tag(ParentSurface.taken)
+                    Text(LocalizedStringKey("parent.surface.beloningen")).tag(ParentSurface.beloningen)
                     Text(LocalizedStringKey("parent.surface.instellingen")).tag(ParentSurface.instellingen)
                 }
                 .pickerStyle(.segmented)
@@ -47,6 +50,7 @@ struct ParentModeRootView: View {
                             ),
                             isRegularWidth: horizontalSizeClass == .regular,
                             isBulkApproving: store.isBulkApproving,
+                            bulkFailureMessage: store.bulkFailureMessage,
                             onSelect: { item in
                                 store.selectedApprovalID = item.id
                             },
@@ -64,15 +68,20 @@ struct ParentModeRootView: View {
                                 Task { await store.approveSelectedItems() }
                             },
                             onOpenPhoto: { item in
-                                store.openFullscreenPhoto(for: item)
+                                Task { await store.openFullscreenPhoto(for: item) }
                             },
                             bulkValidation: store.bulkApprovalValidation()
                         )
+                    case .taken:
+                        ParentTasksManageView(store: store)
+                    case .beloningen:
+                        ParentRewardsManageView(store: store)
                     case .instellingen:
                         ParentSettingsView(
                             snapshot: store.snapshot,
                             exportStatusMessage: store.exportStatusMessage,
                             deletionStatusMessage: store.deletionStatusMessage,
+                            needsParentAccount: store.needsParentAccount,
                             onSoundToggle: { isEnabled in
                                 Task { await store.updateSoundPreference(isEnabled: isEnabled) }
                             },
@@ -81,6 +90,10 @@ struct ParentModeRootView: View {
                             },
                             onDelete: {
                                 showsDeleteConfirmation = true
+                            },
+                            onParentSignIn: { session in
+                                appState.authStore.storeParentSession(session)
+                                Task { await store.refresh(trigger: .manualRefresh) }
                             }
                         )
                     }
@@ -107,6 +120,9 @@ struct ParentModeRootView: View {
             await store.beginSession()
         }
         .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active {
+                appState.enforceParentIdleTimeoutIfNeeded()
+            }
             guard newPhase == .active, store.isSessionActive else {
                 return
             }
@@ -156,17 +172,22 @@ struct ParentModeRootView: View {
             titleVisibility: .visible
         ) {
             Button(String(localized: "parent.settings.delete.confirm.button"), role: .destructive) {
+                showsAppleDeleteSheet = true
+            }
+            Button(String(localized: "parent.settings.delete.confirm.cancel"), role: .cancel) {}
+        } message: {
+            Text(LocalizedStringKey("parent.settings.delete.confirm.message"))
+        }
+        .sheet(isPresented: $showsAppleDeleteSheet) {
+            ParentDeleteConfirmSheet { token in
                 Task {
-                    let deleted = await appState.parentMode.requestDeleteAccount()
+                    let deleted = await store.requestDeleteAccount(appleIdentityToken: token)
                     if deleted {
                         appState.closeParentMode()
                         appState.returnToWelcome()
                     }
                 }
             }
-            Button(String(localized: "parent.settings.delete.confirm.cancel"), role: .cancel) {}
-        } message: {
-            Text(LocalizedStringKey("parent.settings.delete.confirm.message"))
         }
     }
 
@@ -182,7 +203,12 @@ struct ParentModeRootView: View {
                 }
                 Spacer()
                 THBadge(
-                    text: LocalizedStringKey("\(store.snapshot?.pendingApprovalCount ?? 0) te keuren"),
+                    text: LocalizedStringKey(
+                        String(
+                            format: String(localized: "parent.mode.pending"),
+                            store.snapshot?.pendingApprovalCount ?? 0
+                        )
+                    ),
                     palette: palette,
                     fontDesign: .default
                 )
@@ -190,12 +216,12 @@ struct ParentModeRootView: View {
 
             HStack(spacing: THSpacing.md) {
                 ParentStatusPill(
-                    title: "Live",
+                    title: String(localized: "parent.sync.live"),
                     detail: connectionLabel(for: store.connectionState),
                     palette: palette
                 )
                 ParentStatusPill(
-                    title: "Sync",
+                    title: String(localized: "parent.sync.sync"),
                     detail: syncLabel(for: store.syncCoordinator.state),
                     palette: palette
                 )
@@ -290,7 +316,7 @@ private struct ParentTodayView: View {
                                     Text("\(child.avatar) \(child.displayName)")
                                         .font(.system(size: 22, weight: .bold, design: .default))
                                         .foregroundStyle(palette.text.color)
-                                    Text("\(child.balancePoints) punten")
+                                    Text(String(format: String(localized: "parent.today.balance"), child.balancePoints))
                                         .foregroundStyle(palette.mutedText.color)
                                 }
                                 Spacer()
@@ -302,7 +328,7 @@ private struct ParentTodayView: View {
                             } else {
                                 ForEach(child.groupedTasks, id: \.bucket.id) { group in
                                     VStack(alignment: .leading, spacing: THSpacing.sm) {
-                                        Text(group.bucket.title)
+                                        Text(LocalizedStringKey(group.bucket.titleKey))
                                             .font(.caption.weight(.semibold))
                                             .foregroundStyle(palette.mutedText.color)
                                         if group.items.isEmpty {
@@ -315,7 +341,7 @@ private struct ParentTodayView: View {
                                                     VStack(alignment: .leading, spacing: THSpacing.xs) {
                                                         Text(item.title)
                                                             .foregroundStyle(palette.text.color)
-                                                        Text(item.statusLabel)
+                                                        Text(LocalizedStringKey(item.statusLabelKey))
                                                             .font(.footnote)
                                                             .foregroundStyle(palette.mutedText.color)
                                                     }
@@ -348,6 +374,7 @@ private struct ParentApprovalsView: View {
     @Binding var acknowledgedBulkPhotoReview: Bool
     let isRegularWidth: Bool
     let isBulkApproving: Bool
+    let bulkFailureMessage: String?
     let onSelect: (ApprovalQueueItem) -> Void
     let onToggleSelection: (ApprovalQueueItem) -> Void
     let onApprove: (ApprovalQueueItem) -> Void
@@ -357,10 +384,26 @@ private struct ParentApprovalsView: View {
     let bulkValidation: BulkApprovalValidation
 
     var body: some View {
-        let sections = snapshot?.approvalSections ?? []
+        let sections = (snapshot?.approvalSections ?? []).map { section in
+            ApprovalQueueSection(
+                id: section.id,
+                childID: section.childID,
+                childName: section.childName,
+                childAvatar: section.childAvatar,
+                items: section.items.sorted { $0.submittedAt < $1.submittedAt }
+            )
+        }
         let items = sections.flatMap(\.items)
 
-        Group {
+        VStack(spacing: 0) {
+            if let bulkFailureMessage {
+                Text(bulkFailureMessage)
+                    .font(.footnote)
+                    .foregroundStyle(THPalettes.parent.mutedText.color)
+                    .padding(.horizontal, THSpacing.xl)
+                    .padding(.bottom, THSpacing.sm)
+            }
+
             if sections.isEmpty {
                 ScrollView {
                     THCard(palette: THPalettes.parent, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
@@ -532,6 +575,10 @@ private struct ParentApprovalDetailCard: View {
                     .foregroundStyle(palette.mutedText.color)
             }
 
+            if item.photoProcessing {
+                THBadge(text: LocalizedStringKey("parent.approvals.photo.processing"), palette: palette, fontDesign: .default)
+            }
+
             if let photoAsset = item.photoAsset {
                 Button(action: onOpenPhoto) {
                     ZStack {
@@ -545,6 +592,11 @@ private struct ParentApprovalDetailCard: View {
                             Text(photoAsset.accessibilityLabel)
                                 .font(.footnote)
                                 .foregroundStyle(palette.text.color)
+                            if item.photoReady {
+                                Text(LocalizedStringKey("parent.approvals.photo.ready"))
+                                    .font(.footnote.weight(.semibold))
+                                    .foregroundStyle(palette.accent.color)
+                            }
                             Text(LocalizedStringKey("parent.approvals.photo.safe"))
                                 .font(.footnote)
                                 .foregroundStyle(palette.mutedText.color)
@@ -628,18 +680,41 @@ private struct ParentBulkApprovalBar: View {
 }
 
 private struct ParentSettingsView: View {
+    @Environment(AppState.self) private var appState
     let snapshot: ParentDashboardSnapshot?
     let exportStatusMessage: String?
     let deletionStatusMessage: String?
+    let needsParentAccount: Bool
     let onSoundToggle: (Bool) -> Void
     let onExport: () -> Void
     let onDelete: () -> Void
+    let onParentSignIn: (ParentSession) -> Void
 
     var body: some View {
         let palette = THPalettes.parent
 
         ScrollView {
             VStack(alignment: .leading, spacing: THSpacing.lg) {
+                if needsParentAccount {
+                    THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
+                        Text(LocalizedStringKey("parent.gate.account.title"))
+                            .font(.headline)
+                        Text(LocalizedStringKey("parent.gate.account.detail"))
+                            .foregroundStyle(palette.mutedText.color)
+                        SignInWithAppleButtonView { identityToken, familyName, displayName in
+                            Task {
+                                if let session = try? await appState.apiClient.signInWithApple(
+                                    identityToken: identityToken,
+                                    familyName: familyName,
+                                    displayName: displayName
+                                ) {
+                                    onParentSignIn(session)
+                                }
+                            }
+                        } onFailure: { _ in }
+                    }
+                }
+
                 THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
                     Text(LocalizedStringKey("parent.settings.sound.title"))
                         .font(.headline)
@@ -684,6 +759,133 @@ private struct ParentSettingsView: View {
     }
 }
 
+private struct ParentTasksManageView: View {
+    @Bindable var store: ParentModeStore
+
+    var body: some View {
+        let palette = THPalettes.parent
+        ScrollView {
+            VStack(alignment: .leading, spacing: THSpacing.lg) {
+                THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
+                    Text(LocalizedStringKey("parent.tasks.create.title"))
+                        .font(.headline)
+                    TextField(String(localized: "parent.tasks.create.placeholder"), text: $store.draftTaskTitle)
+                    Stepper(value: $store.draftTaskPoints, in: 1...100) {
+                        Text(String(format: String(localized: "parent.tasks.create.points"), store.draftTaskPoints))
+                    }
+                    Button(String(localized: "parent.tasks.create.button")) {
+                        let childIDs = store.snapshot?.todayChildren.map(\.id) ?? []
+                        Task { await store.createTaskFromDraft(defaultChildIDs: childIDs) }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(palette.accent.color)
+                }
+
+                if let tasks = store.snapshot?.managedTasks, !tasks.isEmpty {
+                    ForEach(tasks) { task in
+                        THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: THSpacing.xs) {
+                                    Text("\(task.icon ?? "⭐️") \(task.title)")
+                                        .font(.headline)
+                                    Text(String(format: String(localized: "parent.tasks.meta"), task.points, task.assigneeCount))
+                                        .foregroundStyle(palette.mutedText.color)
+                                }
+                                Spacer()
+                                Button(String(localized: "parent.tasks.archive"), role: .destructive) {
+                                    Task { await store.archiveTask(id: task.id) }
+                                }
+                                .buttonStyle(.bordered)
+                            }
+                        }
+                    }
+                } else {
+                    Text(LocalizedStringKey("parent.tasks.empty"))
+                        .foregroundStyle(palette.mutedText.color)
+                }
+            }
+            .padding(THSpacing.xl)
+        }
+    }
+}
+
+private struct ParentRewardsManageView: View {
+    @Bindable var store: ParentModeStore
+
+    var body: some View {
+        let palette = THPalettes.parent
+        ScrollView {
+            VStack(alignment: .leading, spacing: THSpacing.lg) {
+                THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
+                    Text(LocalizedStringKey("parent.rewards.create.title"))
+                        .font(.headline)
+                    TextField(String(localized: "parent.rewards.create.placeholder"), text: $store.draftRewardTitle)
+                    Stepper(value: $store.draftRewardPrice, in: 1...500) {
+                        Text(String(format: String(localized: "parent.rewards.create.price"), store.draftRewardPrice))
+                    }
+                    Button(String(localized: "parent.rewards.create.button")) {
+                        Task { await store.createRewardFromDraft() }
+                    }
+                    .buttonStyle(.borderedProminent)
+                    .tint(palette.accent.color)
+                }
+
+                if let rewards = store.snapshot?.managedRewards, !rewards.isEmpty {
+                    ForEach(rewards) { reward in
+                        THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {
+                            HStack {
+                                VStack(alignment: .leading, spacing: THSpacing.xs) {
+                                    Text("\(reward.icon ?? "🎁") \(reward.title)")
+                                        .font(.headline)
+                                    Text(String(format: String(localized: "parent.rewards.meta"), reward.price))
+                                        .foregroundStyle(palette.mutedText.color)
+                                }
+                                Spacer()
+                                Button(String(localized: "parent.rewards.archive"), role: .destructive) {
+                                    Task { await store.archiveReward(id: reward.id) }
+                                }
+                                .buttonStyle(.bordered)
+                            }
+                        }
+                    }
+                } else {
+                    Text(LocalizedStringKey("parent.rewards.empty"))
+                        .foregroundStyle(palette.mutedText.color)
+                }
+            }
+            .padding(THSpacing.xl)
+        }
+    }
+}
+
+private struct ParentDeleteConfirmSheet: View {
+    @Environment(\.dismiss) private var dismiss
+    let onToken: (String) -> Void
+
+    var body: some View {
+        let palette = THPalettes.parent
+        NavigationStack {
+            VStack(alignment: .leading, spacing: THSpacing.lg) {
+                Text(LocalizedStringKey("parent.settings.delete.siwa.title"))
+                    .font(.title3.bold())
+                Text(LocalizedStringKey("parent.settings.delete.siwa.detail"))
+                    .foregroundStyle(palette.mutedText.color)
+                SignInWithAppleButtonView { identityToken, _, _ in
+                    onToken(identityToken)
+                    dismiss()
+                } onFailure: { _ in }
+                Spacer()
+            }
+            .padding(THSpacing.xl)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button(String(localized: "parent.gate.cancel")) { dismiss() }
+                }
+            }
+        }
+    }
+}
+
 private struct ParentRedoSheet: View {
     let item: ApprovalQueueItem
     @Binding var note: String
@@ -719,6 +921,8 @@ private struct ParentRedoSheet: View {
 private struct ParentPhotoFullscreenView: View {
     let asset: ParentPhotoAsset
     let onClose: () -> Void
+    @State private var zoom: CGFloat = 1
+    @State private var dragOffset: CGSize = .zero
 
     var body: some View {
         let palette = THPalettes.parent
@@ -727,24 +931,47 @@ private struct ParentPhotoFullscreenView: View {
             ZStack {
                 palette.background.color.ignoresSafeArea()
                 VStack(spacing: THSpacing.lg) {
-                    if let previewURL = asset.previewURL {
-                        AsyncImage(url: previewURL) { phase in
-                            switch phase {
-                            case .empty:
-                                ProgressView()
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .scaledToFit()
-                                    .clipShape(RoundedRectangle(cornerRadius: THRadius.xlarge, style: .continuous))
-                            case .failure:
-                                fallbackImage
-                            @unknown default:
-                                fallbackImage
+                    Group {
+                        if let previewURL = asset.previewURL {
+                            AsyncImage(url: previewURL) { phase in
+                                switch phase {
+                                case .empty:
+                                    ProgressView()
+                                case .success(let image):
+                                    image
+                                        .resizable()
+                                        .scaledToFit()
+                                        .scaleEffect(zoom)
+                                        .offset(dragOffset)
+                                        .gesture(
+                                            MagnificationGesture()
+                                                .onChanged { value in
+                                                    zoom = max(1, min(value, 4))
+                                                }
+                                        )
+                                        .simultaneousGesture(
+                                            DragGesture()
+                                                .onChanged { value in
+                                                    dragOffset = value.translation
+                                                    if value.translation.height > 140 {
+                                                        onClose()
+                                                    }
+                                                }
+                                                .onEnded { _ in
+                                                    dragOffset = .zero
+                                                }
+                                        )
+                                        .clipShape(RoundedRectangle(cornerRadius: THRadius.xlarge, style: .continuous))
+                                        .accessibilityLabel(asset.accessibilityLabel)
+                                case .failure:
+                                    fallbackImage
+                                @unknown default:
+                                    fallbackImage
+                                }
                             }
+                        } else {
+                            fallbackImage
                         }
-                    } else {
-                        fallbackImage
                     }
 
                     THCard(palette: palette, cornerRadius: THRadius.medium, shadowRadius: 3, shadowYOffset: 1) {

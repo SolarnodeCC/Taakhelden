@@ -5,6 +5,7 @@ import UserNotifications
 extension Notification.Name {
     static let apnsTokenUpdated = Notification.Name("taakhelden.apnsTokenUpdated")
     static let pushDeepLinkReceived = Notification.Name("taakhelden.pushDeepLinkReceived")
+    static let silentPushReceived = Notification.Name("taakhelden.silentPushReceived")
 }
 
 final class APNSTokenStore: PushTokenProviding {
@@ -38,6 +39,16 @@ final class AppDelegate: NSObject, UIApplicationDelegate, UNUserNotificationCent
         didFailToRegisterForRemoteNotificationsWithError error: Error
     ) {
         // Push is optional — the app must keep working without APNs.
+    }
+
+    func application(
+        _ application: UIApplication,
+        didReceiveRemoteNotification userInfo: [AnyHashable: Any],
+        fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+    ) {
+        NotificationCenter.default.post(name: .silentPushReceived, object: userInfo)
+        // Sync runs asynchronously via RootView; report new data optimistically.
+        completionHandler(.newData)
     }
 
     func userNotificationCenter(

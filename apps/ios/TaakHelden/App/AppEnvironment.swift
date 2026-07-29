@@ -5,6 +5,8 @@ import Observation
 final class AppEnvironment {
     let authStore: AuthStore
     let apiClient: TaakHeldenAPIClient
+    let parentAPIClient: APIClient
+    let familyRoomClient: FamilyRoomClient
     let mutationQueue: MutationQueue
     let syncEngine: SyncEngine
     let celebrationService: CelebrationService
@@ -12,6 +14,7 @@ final class AppEnvironment {
     let pushService: PushRegistrationService
     let parentGate: ParentGateCoordinator
     let localAuth: LocalAuthenticationClient
+    let apiBaseURL: URL
 
     init(usePreviewData: Bool = false) {
         let keychain: KeychainStore = usePreviewData ? InMemoryKeychainStore() : SystemKeychainStore()
@@ -24,6 +27,13 @@ final class AppEnvironment {
 
         self.authStore = authStore
         self.apiClient = apiClient
+        self.apiBaseURL = baseURL
+        self.parentAPIClient = usePreviewData
+            ? PreviewAPIClient()
+            : ParentAPIAdapter(api: apiClient, authStore: authStore)
+        self.familyRoomClient = usePreviewData
+            ? PreviewFamilyRoomClient()
+            : LiveFamilyRoomClient(apiClient: apiClient, baseURL: baseURL)
         self.mutationQueue = mutationQueue
         self.syncEngine = syncEngine
         self.celebrationService = CelebrationService()
@@ -32,9 +42,4 @@ final class AppEnvironment {
         self.parentGate = ParentGateCoordinator()
         self.localAuth = usePreviewData ? PreviewLocalAuthenticationClient() : SystemLocalAuthenticationClient()
     }
-}
-
-struct PreviewLocalAuthenticationClient: LocalAuthenticationClient {
-    func canEvaluateBiometrics() -> Bool { true }
-    func evaluateBiometrics(reason: String) async throws -> Bool { true }
 }

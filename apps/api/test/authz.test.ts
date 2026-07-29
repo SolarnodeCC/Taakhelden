@@ -47,7 +47,11 @@ describe("authz-fundament", () => {
     const tokenA = await parentToken(famA.parentId, famA.familyId);
 
     // Instance van gezin B benaderen → bestaat niet binnen gezin A → 404
-    const approve = await api(`/instances/${instanceB}/approve`, { method: "POST", token: tokenA });
+    const approve = await api(`/instances/${instanceB}/approve`, {
+      method: "POST",
+      token: tokenA,
+      idempotencyKey: crypto.randomUUID(),
+    });
     expect(approve.status).toBe(404);
 
     // Taken van gezin B lekken niet in de lijst van gezin A
@@ -191,5 +195,30 @@ describe("authz-fundament", () => {
     expect(res.status).toBe(401);
     const body = (await res.json()) as { error: { code: string } };
     expect(body.error.code).toBe("UNAUTHORIZED");
+  });
+
+  it("POST /sync delta lekt geen instances uit een ander gezin", async () => {
+    const famA = await seedFamily("syna");
+    const famB = await seedFamily("synb");
+    const taskB = await seedTask(famB.familyId, famB.childA);
+    const instanceB = await seedInstance(famB.familyId, taskB, famB.childA, todayAmsterdam());
+
+    const completeB = await api(`/instances/${instanceB}/complete`, {
+      method: "POST",
+      token: await childToken(famB.childA, famB.familyId),
+      idempotencyKey: crypto.randomUUID(),
+    });
+    expect(completeB.status).toBe(200);
+
+    const syncA = await api("/sync", {
+      method: "POST",
+      token: await childToken(famA.childA, famA.familyId),
+      body: { since: "2020-01-01T00:00:00Z", mutations: [] },
+    });
+    expect(syncA.status).toBe(200);
+    const out = (await syncA.json()) as {
+      changes: { instances: Array<{ id: string }> };
+    };
+    expect(out.changes.instances.some((row) => row.id === instanceB)).toBe(false);
   });
 });

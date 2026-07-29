@@ -72,6 +72,7 @@ struct InstanceViewDTO: Codable, Identifiable, Equatable {
     let redoNote: String?
     let completedAt: String?
     let approvedAt: String?
+    let updatedAt: String?
 }
 
 struct TodayBalanceDTO: Codable, Equatable {

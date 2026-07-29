@@ -1,7 +1,7 @@
 # TaakHelden iOS (SwiftUI)
 
-Phase 1 MVP foundations live in deze map, volgens het bouwvoorstel en de
-goedgekeurde ADRs:
+Phase 1 MVP + Phase 2 parent-mode workstreams live in deze map.
+Phase 2 core code is **complete** (merged via [#78](https://github.com/SolarnodeCC/Taakhelden/pull/78)).
 
 - iOS 17 minimum
 - een familie-app met kind- en oudermodus
@@ -13,18 +13,22 @@ goedgekeurde ADRs:
 
 Zie **[`docs/taakhelden-ios-bouwvoorstel.md`](../../docs/taakhelden-ios-bouwvoorstel.md)**.
 
+- Phase 2 plan: **[`docs/ios-phase2-plan.md`](../../docs/ios-phase2-plan.md)** (code done; residual manual below)
+- Phase 3 plan: **[`docs/ios-phase3-plan.md`](../../docs/ios-phase3-plan.md)**
+
 Leidende ADRs:
 
 - `docs/adr/ADR-0001-role-aware-core-endpoints.md`
 - `docs/adr/ADR-0002-child-device-refresh-and-under13-unlock.md`
 - `docs/adr/ADR-0003-ios-family-app-shell-and-review-constraints.md`
+- `docs/adr/ADR-0004-coparenting-data-model.md` (concept — Phase 3 E7)
 
 ## Structuur
 
 ```
 apps/ios/
 ├── project.yml
-├── TaakHelden.entitlements          # SIWA + APNs development
+├── TaakHelden.entitlements          # SIWA + APNs + App Group
 ├── Scripts/
 │   ├── sync-openapi-contract.sh
 │   └── generate-openapi-client.sh   # Swift OpenAPI Generator (macOS CI)
@@ -34,18 +38,10 @@ apps/ios/
 ├── ReviewNotes.md
 ├── TaakHelden/
 │   ├── App/
-│   ├── Core/
-│   │   ├── API/
-│   │   ├── Auth/
-│   │   ├── DesignSystem/
-│   │   ├── ParentGate/
-│   │   ├── Push/
-│   │   └── Sync/
-│   ├── Features/
-│   │   ├── Child/
-│   │   ├── Onboarding/
-│   │   └── Parent/
-│   └── Resources/
+│   ├── Core/ (API, Auth, DesignSystem, Parent, ParentGate, Push, Realtime, Sync)
+│   ├── Features/ (Child, Onboarding, Parent)
+│   └── Resources/ (nl.lproj + en.lproj)
+├── TaakHeldenWidget/                # WidgetKit scaffold (XcodeGen wiring still manual)
 └── TaakHeldenTests/
 ```
 
@@ -75,30 +71,35 @@ Handmatige JSON-DTO's toevoegen is niet toegestaan — wijzig het gedeelde contr
 - WCAG AA palette contrast unit-tests
 - App Review-pakket: `ReviewNotes.md` + E2E-checklist + DPIA starter
 
-## Phase 2 — v1 ouder-modus + stevige sync
+## Phase 2 (geïmplementeerd in code — PR #78)
 
-Zie bouwvoorstel §11 Fase 2. In de codebase o.a.:
-
-- `ParentModeView` / goedkeuringsqueue + bulk
-- `FamilyRoomClient` (WebSocket)
-- `ParentSyncCoordinator` + delta-sync hooks
-- Young-modus, streak-bescherming, export/delete (in uitvoering)
+- Parental gate → live `ParentModeRootView` (device-owner LA of ouder-SIWA)
+- Vandaag / Goedkeuren / Taken / Beloningen / Instellingen
+- `ParentAPIAdapter` op echte parent-JWT endpoints (preview alleen in tests)
+- `LiveFamilyRoomClient` + silent-push refresh hook
+- Export-poll + SIWA account-delete
+- Streak forgiveness (1 miss/week) in API + tests
+- `updated_at` + sync delta
+- Young-mode foundations (TTS + picture-PIN oefen-UI)
+- Open-task count App Group store + widget scaffold
 
 ## Phase 3 — later (plan)
 
 Uitgewerkt plan: **[`docs/ios-phase3-plan.md`](../../docs/ios-phase3-plan.md)**
 
-Epics: EN-locale, avatar-shop (verdiende items), coöperatieve gezinsdoelen,
-onderhandel-knop (teen), huiswerk-focustimer, Apple Watch, co-ouderschap (ADR-0004),
-break-glass support. Android valt buiten iOS-scope.
+Epics: EN-locale (uitbreiden), avatar-shop, coöperatieve gezinsdoelen,
+onderhandel-knop (teen), huiswerk-focustimer, Apple Watch, young-mode design pass,
+co-ouderschap (ADR-0004), break-glass support. Android valt buiten iOS-scope.
 
-## Nog handmatig vóór Phase 2 afronding
+## Nog handmatig (Phase 2 residual — blokkeert geen Phase 3 code-start)
 
-- E2E happy path op **twee fysieke devices** tegen staging Worker
-  (`docs/ios-phase1-e2e-checklist.md`)
-- Staging gezinscode in `ReviewNotes.md` bijwerken na review-gezin aanmaken
-- Xcode signing team + SIWA capability in Apple Developer portal
-- Optioneel: `task-complete.wav` in Resources (systeem-fallback werkt zonder)
+- E2E happy path op **twee fysieke devices** (`docs/ios-phase1-e2e-checklist.md`)
+- Apple Developer: signing, SIWA, App Group, push
+- Widget-target in XcodeGen op macOS afronden (`TaakHeldenWidget/`)
+- Full young-mode design pass (near-textless shell) — opgenomen als Phase 3 carry-in
+- DPIA / privacyverklaring exit (`docs/taakhelden-dpia-starter.md`) — blijft productie-foto-blocker
+- Staging smoke van parent approve / WS / export tegen Worker
+- Staging gezinscode in `ReviewNotes.md` bijwerken
 
 ## Lokaal bouwen (macOS)
 

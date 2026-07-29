@@ -152,6 +152,8 @@ Limieten: max 10 MB, alleen `image/jpeg|heic|png`, max 20 uploads/kind/dag. R2-l
 
 Saldo = som van de ledger, berekend in de Durable Object van het gezin (serialisatie voorkomt race conditions bij simultaan afvinken). Dag- en weekbonussen worden **transactioneel bij de laatste kwalificerende `complete`** geboekt, niet door een aparte cron — directe feedback in de app.
 
+**Streak (`streakDays`)** = aaneengesloten dagen met dagbonus, t/m vandaag of gisteren (een nog open dag vandaag breekt niets). Streakbescherming, conform de productbelofte: **per ISO-kalenderweek (ma t/m zo) mag één dag zonder dagbonus overgeslagen worden** zonder dat de streak breekt; een tweede gemiste dag in diezelfde week stopt de streak. Een overgeslagen dag telt zelf niet mee als streakdag (hij is vergeven, niet verdiend), en "vandaag nog niet verdiend" kost géén weekvergeving. Vakantiemodus staat hier los van.
+
 ### 3.8 Rewards
 
 | Methode & pad | Rol | Beschrijving |
@@ -196,6 +198,13 @@ POST /sync
 }
 ```
 Regels: mutaties worden in volgorde toegepast in de Family-DO; `key` = idempotency; conflictregel "afgevinkt wint"; afgewezen mutaties toont de app vriendelijk ("je punten waren al uitgegeven op je andere apparaat"). Losse endpoints (§3.5–3.8) gebruiken online precies dezelfde interne handlers.
+
+**Delta (`changes`)**:
+- `changes.instances` is een array van volledige `InstanceView`-objecten, inclusief het nieuwe veld **`updatedAt`** (ISO-8601 UTC, servertijd van de laatste wijziging).
+- **Mét `since`**: alle instances van de aanroeper met `updated_at > since` (max 500, oudste wijziging eerst). Kind = eigen instances, ouder = alle kinderen van het gezin.
+- **Zonder `since`** (eerste sync na installatie): de volledige dag van vandaag, zoals `GET /instances/today`.
+- De client bewaart `serverTime` uit de response en stuurt die als `since` in de volgende ronde. Komen er precies 500 instances terug (mogelijk afgekapt na een lange offline-periode), gebruik dan de `updatedAt` van de laatste instance als `since` en sync direct nog een ronde.
+- `updatedAt` is optioneel in het contract, zodat clients van vóór deze wijziging niet breken.
 
 ### 3.12 Account (AVG)
 

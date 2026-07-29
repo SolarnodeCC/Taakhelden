@@ -513,22 +513,38 @@ export async function computeBalance(
 
 /**
  * Aaneengesloten dagen met dagbonus, eindigend vandaag of gisteren
- * (`bonusDates` aflopend gesorteerd). Eén open dag vandaag breekt de streak
- * niet — die loopt dan t/m gisteren.
+ * (`bonusDates` in willekeurige volgorde; alleen de datums tellen).
+ *
+ * Streakbescherming (productbelofte): per ISO-kalenderweek (ma t/m zo, zie
+ * `weekKey`) mag één dag zonder dagbonus overgeslagen worden zonder dat de
+ * streak breekt. Een tweede gemiste dag in diezelfde week breekt de streak wél.
+ * Een overgeslagen dag telt zelf niet mee in het aantal streakdagen — hij is
+ * vergeven, niet verdiend.
+ *
+ * Eén open dag vandaag breekt de streak niet en kost géén weekvergeving: de dag
+ * is nog niet voorbij. De streak loopt dan t/m gisteren.
+ *
+ * Vakantiemodus staat hier los van (dat is een gezinsinstelling).
  */
 export function computeStreak(bonusDates: string[], today: string): number {
+  if (bonusDates.length === 0) return 0;
+  const earned = new Set(bonusDates);
+  const oldest = bonusDates.reduce((min, date) => (date < min ? date : min));
+
+  let cursor = earned.has(today) ? today : yesterdayOf(today);
   let streak = 0;
-  let expected = today;
-  for (const date of bonusDates) {
-    if (date !== expected) {
-      if (streak === 0 && date === yesterdayOf(today)) {
-        expected = date; // vandaag nog niet verdiend — streak loopt t/m gisteren
-      } else {
-        break;
-      }
+  const gapsPerWeek = new Map<string, number>();
+
+  while (cursor >= oldest) {
+    if (earned.has(cursor)) {
+      streak++;
+    } else {
+      const week = weekKey(cursor);
+      const gapsThisWeek = gapsPerWeek.get(week) ?? 0;
+      if (gapsThisWeek >= 1) break; // tweede gemiste dag in deze week: streak stopt hier
+      gapsPerWeek.set(week, gapsThisWeek + 1);
     }
-    streak++;
-    expected = yesterdayOf(expected);
+    cursor = yesterdayOf(cursor);
   }
   return streak;
 }

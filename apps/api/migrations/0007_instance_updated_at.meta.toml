@@ -1,0 +1,15 @@
+# Structured migration evidence for Jankurai HLT-030 (sql-bad-behavior).
+# Runtime engine is Cloudflare D1 / SQLite — Postgres SET lock_timeout /
+# statement_timeout would fail if executed; declared here as audit posture only.
+
+engine = "sqlite"
+phase = "expand"
+risk = "low"
+owner = "api"
+approval = "ios-phase2-sync-delta"
+affected_objects = ["task_instances.updated_at", "idx_instances_family_updated"]
+lock_timeout = "n/a-sqlite-d1"
+statement_timeout = "n/a-sqlite-d1"
+rollback = "roll-forward only; column is additive and non-destructive"
+backup = "D1 point-in-time / local wrangler state; additive column with sentinel default"
+verify = "apps/api/test sync delta + instance updated_at coverage"

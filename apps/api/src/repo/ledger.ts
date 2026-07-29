@@ -87,14 +87,22 @@ export async function listEntries(
   return results;
 }
 
-/** Ledger-entries van na `since` (sync-delta). childId = null → alle kinderen (ouder). */
+/**
+ * Ledger-entries van na `since` (sync-delta). childId = null → alle kinderen (ouder).
+ *
+ * `created_at` staat in het datetime('now')-formaat ("YYYY-MM-DD HH:MM:SS") en
+ * `since` is een ISO-8601 UTC-string; die twee zijn niet lexicografisch te
+ * vergelijken (' ' < 'T'), dus we zetten de grens via `datetime(?)` om naar
+ * hetzelfde formaat. De marge van één seconde vangt het precisieverschil op:
+ * liever één entry dubbel (de app reconcilieert op id) dan een gemiste boeking.
+ */
 export async function entriesSince(
   db: D1Database,
   familyId: string,
   since: string,
   childId?: string,
 ) {
-  const conditions = ["family_id = ?", "created_at > ?"];
+  const conditions = ["family_id = ?", "created_at > datetime(?, '-1 second')"];
   const values: unknown[] = [familyId, since];
   if (childId) { conditions.push("child_id = ?"); values.push(childId); }
   const { results } = await db

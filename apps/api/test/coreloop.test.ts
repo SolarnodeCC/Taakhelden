@@ -239,6 +239,7 @@ describe("kernlus: afvinken → punten → idempotent", () => {
     const redo = await api(`/instances/${instanceId}/redo`, {
       method: "POST",
       token: await parentToken(fam.parentId, fam.familyId),
+      idempotencyKey: crypto.randomUUID(),
       body: { note: "Kijk nog even onder je bed 😉" },
     });
     expect(redo.status).toBe(200);

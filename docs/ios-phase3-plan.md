@@ -2,7 +2,8 @@
 
 *Uitwerking van **Fase 3 — Later** uit `docs/taakhelden-ios-bouwvoorstel.md` §11. Leidend voor iOS; product-roadmap in `docs/taakhelden-productvoorstel.md` §8 kan afwijken — zie §1.2.*
 
-**Status:** plan ter beslissing — geen implementatie in deze fase-documentatie.
+**Status:** plan ter beslissing — geen implementatie in deze fase-documentatie.  
+**Basis:** Phase 2 core code is **complete** (merged [#78](https://github.com/SolarnodeCC/Taakhelden/pull/78), 2026-07-29). Zie `docs/ios-phase2-plan.md`.
 
 ---
 
@@ -10,19 +11,20 @@
 
 ### 1.1 Doel
 
-Phase 3 breidt TaakHelden iOS uit van een **volwassen familie-app** (Phase 1 kind-MVP + Phase 2 ouder-modus/sync) naar een **rijkere, marktbrede ervaring** zonder de zes harde architectuurregels te breken. Focus: engagement op secundaire surfaces (Watch, avatar-progressie), coöperatieve gezinsmechanieken, tiener-autonomie, internationale uitbreiding, en — als aparte, zware epic — co-ouderschap over twee huishoudens.
+Phase 3 breidt TaakHelden iOS uit van een **volwassen familie-app** (Phase 1 kind-MVP + Phase 2 ouder-modus/sync) naar een **rijkere, marktbrede ervaring** zonder de zes harde architectuurregels te breken. Focus: engagement op secundaire surfaces (Watch, avatar-progressie), coöperatieve gezinsmechanieken, tiener-autonomie, internationale uitbreiding, young-mode design completion, en — als aparte, zware epic — co-ouderschap over twee huishoudens.
 
 ### 1.2 Afstemming product-roadmap
 
 | Onderwerp | iOS bouwvoorstel | Productvoorstel §8 | Besluit voor dit plan |
 |---|---|---|---|
-| Widget | Phase 2 (optioneel) | Phase 2 | Buiten Phase 3; vereist als Phase 2-exit |
+| Widget | Phase 2 (optioneel) | Phase 2 | **Scaffold in #78**; XcodeGen wiring + polish = residual / Phase 3 E6-input |
+| Young-modus (full design) | Phase 2 | — | **Foundations in #78**; full near-textless pass = Phase 3 carry-in **E0** |
 | Coöperatieve gezinsdoelen | Phase 3 | Phase 2 | Phase 3 (iOS leidend) |
-| Co-ouderschap | Phase 3 | Phase 2 | Phase 3 — **geen half werk** (§6) |
-| Apple Watch | Phase 3 | Phase 2 (widget) / Phase 3 (Watch) | Phase 3 |
+| Co-ouderschap | Phase 3 | Phase 2 | Phase 3 — **geen half werk** (§9) |
+| Apple Watch | Phase 3 | Phase 2 (widget) / Phase 3 (Watch) | Phase 3 — bouwt op `OpenTaskCountStore` |
 | Avatar-shop | Phase 3 | Phase 3 | Phase 3 |
 | Huiswerk-focustimer | niet expliciet | Phase 3 | Phase 3 epic (iOS-relevant) |
-| EN-locale | Phase 3 | Phase 3 | Phase 3 |
+| EN-locale | Phase 3 | Phase 3 | Phase 3 — **uitbreiden** (ouder-strings al deels in `en.lproj` via #78) |
 | Android | Phase 3 (vermelding) | Phase 3 | **Buiten scope** — apart platform, geen iOS-werk |
 
 ### 1.3 Harde voorwaarden (onveranderd)
@@ -32,20 +34,25 @@ Phase 3 breidt TaakHelden iOS uit van een **volwassen familie-app** (Phase 1 kin
 3. Punten = ledger-som; avatar-items en gezinsdoelen wijzigen het saldo alleen via bestaande ledger-paden.
 4. Geen negatieve mechanieken (geen ranglijst broer/zus; gezinsdoel is coöperatief, niet competitief).
 5. Geen kind-PII in logs, Watch-complications of push-teksten.
-6. Kindgerichte copy NL-first; EN via `Localizable.xcstrings` + `@dutch-child-copy` review voor NL.
+6. Kindgerichte copy NL-first; EN via bestaande `*.lproj` / `Localizable.xcstrings` + `@dutch-child-copy` review voor NL.
 
-### 1.4 Phase 2-exit vóór Phase 3-start
+### 1.4 Phase 2-status (na PR #78)
 
-Phase 3 start pas als Phase 2 **afgerond** is (zie bouwvoorstel §11 Fase 2):
+Phase 2 **code-exit is gehaald**. Phase 3 feature-werk mag starten. Residual items hieronder blokkeren **geen** Phase 3 code-PRs, behalve waar expliciet genoteerd.
 
-- [ ] Ouder-modus: Vandaag, goedkeuringsqueue (§7.2.4), licht taken/beloningen-beheer, instellingen
-- [ ] `FamilyRoomClient` + reconnect/backoff
-- [ ] Delta-sync + `updated_at` + stille push → background sync
-- [ ] `ageMode: young` (beeld-PIN, voorleesknop, extra grote targets)
-- [ ] Streak-bescherming in lijn met productcopy
-- [ ] In-app accountverwijdering + data-export
-- [ ] Privacyverklaring + datalek-runbook + DPIA afgerond (productie-foto's)
-- [ ] Widget “nog N taken” (indien in Phase 2 opgenomen)
+| Bouwvoorstel §11 Fase 2 | Status na #78 |
+|---|---|
+| Ouder-modus: Vandaag, goedkeuringsqueue, licht taken/beloningen, instellingen | ✅ Done (`ParentModeRootView`, slices 2a–2f) |
+| `FamilyRoomClient` + reconnect/backoff | ✅ Done (`LiveFamilyRoomClient`, 2/4/8 s) |
+| Delta-sync + `updated_at` + stille push → background sync | ✅ Done (migratie `0007`, silent-push hook) |
+| Streak-bescherming in lijn met productcopy | ✅ Done (1 miss/week + `points-streak` tests) |
+| In-app accountverwijdering + data-export | ✅ Done (export-poll + SIWA re-auth delete) |
+| Widget “nog N taken” | 🟡 Scaffold + App Group store; XcodeGen target wiring nog handmatig |
+| `ageMode: young` (beeld-PIN, voorleesknop, grote targets) | 🟡 Foundations (TTS + picture-PIN practice UI); full design → Phase 3 **E0** |
+| Privacyverklaring + datalek-runbook + DPIA | 🔴 Nog open — blijft **productie-foto-blocker** |
+| 2-device E2E + staging smoke | 🔴 Handmatig (zie `docs/ios-phase1-e2e-checklist.md`) |
+
+**Bron:** `docs/ios-phase2-plan.md` + merge [#78](https://github.com/SolarnodeCC/Taakhelden/pull/78).
 
 ---
 
@@ -53,16 +60,44 @@ Phase 3 start pas als Phase 2 **afgerond** is (zie bouwvoorstel §11 Fase 2):
 
 | # | Epic | Complexiteit | Backend | Design | Aanbevolen volgorde |
 |---|---|---|---|---|---|
-| **E1** | EN-locale (i18n) | M | Laag | Laag | 1 — ontsluit test/markt zonder feature-werk |
+| **E0** | Young-mode design pass (carry-in uit #78) | M | Laag* | H | 0 — product/design; optioneel server picture-PIN |
+| **E1** | EN-locale (i18n) — uitbreiden | M | Laag | Laag | 1 — ouder-strings al deels aanwezig |
 | **E2** | Avatar-shop (verdiende items) | M | M | M | 2 — bouwt voort op Mijn Held + `lifetimeEarned` |
 | **E3** | Coöperatieve gezinsdoelen | M | M | M | 3 — zelfstandig; geen co-ouderschap nodig |
 | **E4** | Onderhandel-knop (teen) | M | M | Laag | 4 — vereist notificatie + ouder-queue |
 | **E5** | Huiswerk-focustimer | M | Laag | M | 5 — grotendeels lokaal; optioneel server-koppeling |
-| **E6** | Apple Watch companion | H | M | M | 6 — profiteert van stabiele sync + widget-data |
+| **E6** | Apple Watch companion (+ widget polish) | H | M | M | 6 — hergebruikt `OpenTaskCountStore` / App Group |
 | **E7** | Co-ouderschap (2 huishoudens) | **Zeer hoog** | **Zeer hoog** | M | 7 — alleen na ADR + migratie; geen voorbereidende shortcuts |
 | **E8** | Break-glass support-toegang | H | H | — | 8 — beleid + audit; geen product-feature voor kind |
 
+\*Picture-PIN server-side alleen als product non-numeric unlock wil (ADR).
+
 **Niet in Phase 3 iOS:** Android-app (apart repo/team), mascotte “Vinkie”, IAP/echte aankopen in kind-UI, Kids Category.
+
+**Herbruikbaar uit Phase 2 (#78):** `ParentAPIAdapter`, `LiveFamilyRoomClient`, `ParentModeStore`, sync delta, streak engine, `OpenTaskCountStore`, `YoungModeSupport`, `en.lproj`/`nl.lproj` parent strings, widget scaffold.
+
+---
+
+## 2a. Epic E0 — Young-mode design pass (Phase 2 carry-in)
+
+### Doel
+
+Phase 2 leverde **foundations** (`YoungModeSupport`, TTS, picture-PIN practice UI). Phase 3 maakt young (4–7) product-klaar: near-textless shell, grote targets, voorlees overal, optioneel server-opgeslagen beeld-PIN.
+
+### Scope
+
+| In scope | Buiten / later |
+|---|---|
+| Near-textless Mijn Dag / Winkel / Held | Volledige mascotte “Vinkie” |
+| Voorleesknop op taken, beloningen, empty states | Competitie-UI |
+| Picture-PIN als **dagelijkse unlock** (als ADR) | Numeriek PIN verwijderen voor mid |
+| Extra grote tap-targets (≥64 pt) | Aparte young App Store listing |
+
+### Exit-criteria
+
+- [ ] Young-profiel doorloopt dagelijkse unlock + afvinken zonder leesvaardigheid
+- [ ] `@dutch-child-copy` + VoiceOver-pass
+- [ ] Geen regressie mid/teen
 
 ---
 
@@ -71,6 +106,8 @@ Phase 3 start pas als Phase 2 **afgerond** is (zie bouwvoorstel §11 Fase 2):
 ### 3.1 Doel
 
 Ouders en tieners in niet-NL markten kunnen de app in het Engels gebruiken. Kind-modus blijft pedagogisch NL-first tot een bewuste EN-kindcopy-pass (aparte `@dutch-child-copy`-equivalent review).
+
+**Update na #78:** parent-modus heeft al `en.lproj`/`nl.lproj` Localizable.strings voor gate/parent surfaces. E1 is **geen greenfield** — afronden van dekking + kind-chrome + App Store strings + locale-preference.
 
 ### 3.2 Scope
 
@@ -87,14 +124,16 @@ Ouders en tieners in niet-NL markten kunnen de app in het Engels gebruiken. Kind
 
 ```
 TaakHelden/Resources/
-├── Localizable.xcstrings     # NL (development language) + EN
-└── InfoPlist.xcstrings       # permission strings, CFBundleDisplayName
+├── nl.lproj/Localizable.strings   # al aanwezig (#78 parent surfaces)
+├── en.lproj/Localizable.strings   # al aanwezig (#78); uitbreiden
+└── (optioneel) Localizable.xcstrings  # migratiepad als team String Catalogs prefereert
 ```
 
 - Geen hardcoded NL in SwiftUI-views; `String(localized:)` / `LocalizedStringKey`.
 - `AppLanguage` preference in ouder-instellingen: *Volg systeem* | *Nederlands* | *English* — kind-modus erft van device of ouder-keuze achter gate.
-- CI: snapshot of lint die nieuwe strings zonder vertaling flagt (optioneel `xcstringstool` check).
+- CI: snapshot of lint die nieuwe strings zonder vertaling flagt.
 - API-foutcodes blijven machine-keys; user-facing mapping in client per locale.
+- Gap-analyse t.o.v. #78: kind-tabs empty/loading/error, celebrations, onboarding kind-koppelen, ReviewNotes EN.
 
 ### 3.4 Exit-criteria
 
@@ -332,17 +371,19 @@ Toetsdatum-taken en focus-modus (productvoorstel §7): *“elke dag 15 min Frans
 
 ---
 
-## 8. Epic E6 — Apple Watch companion
+## 8. Epic E6 — Apple Watch companion (+ widget polish)
 
 ### 8.1 Doel
 
 Lage drempel: *“vandaag nog 2 taken”* zonder iPhone te openen. Geen volledige app-pariteit.
 
+**Update na #78:** `OpenTaskCountStore` (App Group) + `TaakHeldenWidget/OpenTasksWidget.swift` scaffold bestaan al. E6 (1) rondt widget XcodeGen/signing af en (2) voegt watchOS companion toe die dezelfde snapshot-bron deelt.
+
 ### 8.2 watchOS-scope
 
 | Complication | Data |
 |---|---|
-| **Circular / rectangular** | Open taken count vandaag |
+| **Circular / rectangular** | Open taken count vandaag (zelfde App Group / phone push als widget) |
 | **Modular** | Punten (server snapshot) — optioneel, uitzetbaar in Watch-instellingen |
 
 | App (Watch) | Functie |
@@ -361,12 +402,13 @@ TaakHeldenWatch/          # watchOS target
 
 TaakHelden/Core/Watch/
 ├── PhoneWatchSession.swift    # WCSession delegate on iOS
-└── WatchSnapshotBuilder.swift # compact TodaySnapshot
+└── WatchSnapshotBuilder.swift # compact TodaySnapshot (feeds widget + Watch)
 ```
 
 - **Phone is orchestrator**: Watch stuurt intent + idempotency key; iPhone voert API uit (JWT in Keychain op phone).
-- Snapshot push bij: sync success, WS event, `scenePhase` active.
+- Snapshot push bij: sync success, WS event (`LiveFamilyRoomClient`), `scenePhase` active.
 - Offline Watch: toon laatste snapshot + “Open je iPhone om te syncen”.
+- Widget: XcodeGen target + entitlements op team-account afronden (Phase 2 residual).
 
 ### 8.4 Backend
 
@@ -374,6 +416,7 @@ Geen aparte Watch-endpoints. Hergebruik `GET /instances/today` (child viewer) vi
 
 ### 8.5 Exit-criteria
 
+- [ ] Widget toont actuele open-count op homescreen (XcodeGen target live)
 - [ ] Complication toont actuele open-count na phone sync
 - [ ] Complete op Watch → punten via phone → server (idempotent)
 - [ ] Geen JWT op Watch Keychain
@@ -507,13 +550,14 @@ Bestaande §9.2 MutationQueue-tests blijven verplicht groen.
 
 Phase 3 is **klaar** wanneer:
 
-1. **E1–E6** zijn afgerond en in TestFlight.
+1. **E0–E6** zijn afgerond en in TestFlight.
 2. **E7** is afgerond *of* expliciet uitgesteld met PO-besluit (ADR-0004 niet goedgekeurd).
 3. **E8** runbook + audit bestaat (geen user-facing feature).
 4. Alle nieuwe endpoints hebben authz-tests in `apps/api/test`.
 5. `npm run openapi:check` + iOS contract-tests groen.
 6. Web-dashboard toont gezinsdoel + negotiation queue (pariteit waar product dat vereist).
 7. App Review notes bijgewerkt (Watch, geen IAP, co-ouderschap demo indien E7 live).
+8. Phase 2 residual: 2-device E2E + staging smoke afgevinkt; DPIA af vóór productie-foto's (onafhankelijk van feature-exit).
 
 ---
 
@@ -527,6 +571,8 @@ Phase 3 is **klaar** wanneer:
 | Gezinsdoel → sibling rivalry | Geen per-kind breakdown in kind-UI; code review checklist |
 | EN kind-copy te formeel/onvriendelijk | Aparte copy-pass; niet alleen machine-translate |
 | Focustimer → strafgevoel | Geen ledger-koppeling bij abandon; positieve stop-copy |
+| Young-mode half af (foundations only) | E0 expliciet in scope; niet “impliciet klaar” door #78 |
+| DPIA open → productie-foto's | Blijft hard gate; Phase 3 features mogen zonder echte kinderfoto's |
 | Scope creep (Android, Vinkie) | Expliciet buiten Phase 3 |
 
 ---
@@ -534,6 +580,7 @@ Phase 3 is **klaar** wanneer:
 ## 16. Referenties
 
 - `docs/taakhelden-ios-bouwvoorstel.md` §11 Fase 3
+- `docs/ios-phase2-plan.md` + PR [#78](https://github.com/SolarnodeCC/Taakhelden/pull/78)
 - `docs/taakhelden-productvoorstel.md` §3.4, §7, §8
 - `docs/taakhelden-api-specificatie.md`
 - `docs/ios-phase1-e2e-checklist.md`
@@ -545,9 +592,10 @@ Phase 3 is **klaar** wanneer:
 
 ## 17. Beslislijst kickoff Phase 3
 
-1. Bevestig epic-volgorde §2 (PO).
-2. Keur ADR-0005 t/m 0009 goed vóór eerste epic-start (0004 alleen voor E7).
+1. Bevestig epic-volgorde §2 inclusief **E0** young-mode carry-in (PO).
+2. Keur ADR-0005 t/m 0009 goed vóór eerste nieuwe-feature epic (0004 alleen voor E7).
 3. Wijs backend-eigenaar voor `FamilyGoal` + `Negotiation` schemas.
-4. Design: avatar-item previews + gezinsdoel-kaart (kid + ouder).
-5. Akkoord: co-ouderschap (E7) mag slippen; E1–E6 niet afhankelijk van E7.
+4. Design: avatar-item previews + gezinsdoel-kaart + young near-textless shell.
+5. Akkoord: co-ouderschap (E7) mag slippen; E0–E6 niet afhankelijk van E7.
 6. Marketing: EN App Store listing parallel aan E1.
+7. Parallel track: DPIA + 2-device E2E (Phase 2 residual) — eigenaar security/PO, niet iOS-feature-blocker.
