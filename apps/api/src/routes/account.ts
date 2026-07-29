@@ -73,7 +73,10 @@ account.delete("/", validate("json", AccountDeleteBody), async (c) => {
   if (hash && body.password) {
     confirmed = await verifySecret(body.password, hash);
   } else if (appleSub && body.appleIdentityToken) {
-    const claims = await verifyAppleIdentityToken(body.appleIdentityToken, c.env.APPLE_CLIENT_ID);
+    const claims = await verifyAppleIdentityToken(
+      body.appleIdentityToken,
+      c.env.APPLE_CLIENT_ID ?? "",
+    );
     confirmed = claims?.sub === appleSub;
   }
   if (!confirmed) {

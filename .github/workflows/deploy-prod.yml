@@ -64,6 +64,42 @@ jobs:
           echo "$out"
           echo "$out" | grep -qi "already exists" && code=0
           test "$code" -eq 0
+      # Sync GitHub Environment secrets → Cloudflare Worker secrets.
+      # JWT_SECRET is required (wrangler.toml [secrets].required). Optional
+      # secrets are uploaded only when set in the Environment (non-empty).
+      - name: Sync Worker secrets
+        working-directory: apps/api
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: "5546763229b35df670e33d9316d7f2e0"
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          TURNSTILE_SECRET: ${{ secrets.TURNSTILE_SECRET }}
+          APNS_KEY: ${{ secrets.APNS_KEY }}
+          APNS_KEY_ID: ${{ secrets.APNS_KEY_ID }}
+          APNS_TEAM_ID: ${{ secrets.APNS_TEAM_ID }}
+          EMAIL_API_KEY: ${{ secrets.EMAIL_API_KEY }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+        run: |
+          set -euo pipefail
+          put_secret() {
+            local name="$1" val="${2:-}"
+            if [ -z "$val" ]; then
+              echo "skip $name (not set in GitHub Environment secrets)"
+              return 0
+            fi
+            printf '%s' "$val" | npx wrangler secret put "$name"
+          }
+          if [ -z "${JWT_SECRET:-}" ]; then
+            echo "::error::JWT_SECRET must be set on the GitHub Environment 'production' (Settings → Environments → production → Secrets)."
+            exit 1
+          fi
+          put_secret JWT_SECRET "$JWT_SECRET"
+          put_secret TURNSTILE_SECRET "${TURNSTILE_SECRET:-}"
+          put_secret APNS_KEY "${APNS_KEY:-}"
+          put_secret APNS_KEY_ID "${APNS_KEY_ID:-}"
+          put_secret APNS_TEAM_ID "${APNS_TEAM_ID:-}"
+          put_secret EMAIL_API_KEY "${EMAIL_API_KEY:-}"
+          put_secret EMAIL_FROM "${EMAIL_FROM:-}"
       - name: Deploy API
         uses: cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0 # v4
         with:

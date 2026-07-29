@@ -53,8 +53,11 @@ npx wrangler secret put <APPLE_KEY_ID / APPLE_PRIVATE_KEY / ...>
 npx wrangler secret list                    # names only — values never printed
 ```
 
-- **Safe in `wrangler.toml [vars]`**: non-secret config (URLs, feature flags, R2/D1 names).
-- **NEVER in `wrangler.toml`**: `JWT_SECRET`, Apple signing keys, `TURNSTILE_SECRET`, any signing key.
+- **NEVER in `wrangler.toml`**: `JWT_SECRET`, APNs private key, `TURNSTILE_SECRET`,
+  email API keys. Declare required names under `[secrets] required = [...]`;
+  plain config under `[vars]`. Sync values from GitHub Environment `production`
+  via `deploy-prod.yml` (or `wrangler secret put`). Inventory:
+  `docs/cloudflare-bindings-audit.md`.
 - `JWT_SECRET` rotation invalidates all sessions — warn before rotating; rotate immediately on any suspected leak, then notify PO.
 
 ## R2 / photo privacy
