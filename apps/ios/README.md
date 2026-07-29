@@ -75,7 +75,24 @@ Handmatige JSON-DTO's toevoegen is niet toegestaan — wijzig het gedeelde contr
 - WCAG AA palette contrast unit-tests
 - App Review-pakket: `ReviewNotes.md` + E2E-checklist + DPIA starter
 
-## Nog handmatig vóór Phase 2
+## Phase 2 — v1 ouder-modus + stevige sync
+
+Zie bouwvoorstel §11 Fase 2. In de codebase o.a.:
+
+- `ParentModeView` / goedkeuringsqueue + bulk
+- `FamilyRoomClient` (WebSocket)
+- `ParentSyncCoordinator` + delta-sync hooks
+- Young-modus, streak-bescherming, export/delete (in uitvoering)
+
+## Phase 3 — later (plan)
+
+Uitgewerkt plan: **[`docs/ios-phase3-plan.md`](../../docs/ios-phase3-plan.md)**
+
+Epics: EN-locale, avatar-shop (verdiende items), coöperatieve gezinsdoelen,
+onderhandel-knop (teen), huiswerk-focustimer, Apple Watch, co-ouderschap (ADR-0004),
+break-glass support. Android valt buiten iOS-scope.
+
+## Nog handmatig vóór Phase 2 afronding
 
 - E2E happy path op **twee fysieke devices** tegen staging Worker
   (`docs/ios-phase1-e2e-checklist.md`)

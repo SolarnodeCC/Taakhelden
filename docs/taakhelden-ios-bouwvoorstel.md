@@ -568,6 +568,8 @@ Zonder dit is elke Swift-regel technische schuld.
 
 Watch, coöperatieve gezinsdoelen, avatar-shop, onderhandel-knop (teen), co-ouderschap over twee huishoudens (grote datamodel-breuk — niet half voorbereiden), Android, EN-locale; eventuele break-glass support-toegang met audit (§10.2).
 
+**Uitwerking:** zie [`docs/ios-phase3-plan.md`](ios-phase3-plan.md) (epics, contract, ADR's, exit-criteria).
+
 ---
 
 ## 12. Backend-werk dat iOS deblokkeert (prioriteit)
