@@ -25,8 +25,11 @@ TaakHelden ships as one family app with separate child and parent modes.
 6. Parent mode on the child device is protected by a hidden parental gate plus
    LocalAuthentication and/or parent login. There is no permanent "Ouder" tab in
    child mode.
-7. Child mode on iPad runs fullscreen to avoid Split View and Stage Manager
-   weakening the parental gate.
+7. Child mode on iPad previously used `UIRequiresFullScreen` to harden the
+   parental gate against Split View. **App Store multitasking rules require
+   iPad apps to support multitasking**, so Release builds no longer set
+   `UIRequiresFullScreen`. The gate still requires LocalAuthentication /
+   parent login before settings; document the Split View trade-off in ReviewNotes.
 8. Dark mode is explicitly out of scope for child mode until the branding pass;
    child mode stays light-only for MVP and v1.
 9. Photo bonus flows use direct camera capture or an out-of-process picker only;

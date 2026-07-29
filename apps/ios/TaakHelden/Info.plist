@@ -24,8 +24,9 @@
 	<true/>
 	<key>UILaunchScreen</key>
 	<dict/>
-	<key>UIRequiresFullScreen</key>
-	<true/>
+	<!-- No UIRequiresFullScreen: App Store requires iPad multitasking when iPad is targeted. -->
+	<key>TAAKHELDEN_API_BASE_URL</key>
+	<string>$(TAAKHELDEN_API_BASE_URL)</string>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

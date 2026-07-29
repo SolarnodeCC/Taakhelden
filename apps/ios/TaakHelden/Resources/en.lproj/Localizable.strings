@@ -128,8 +128,13 @@
 "parent.rewards.empty" = "No rewards in the shop yet.";
 "child.young.speak" = "Read aloud";
 "child.young.unlock.title" = "Open your space";
-"child.young.picture.hint" = "Tap three animals (practice mode), then use your PIN.";
 "child.young.pin.retry" = "That code isn't right yet — try again calmly.";
+"child.unlock.pin.alternative" = "Or use your PIN";
+"child.unlock.pin.alternative.hint" = "PIN is always available next to Face ID";
+"child.push.primer.title" = "May TaakHelden send you a nudge?";
+"child.push.primer.body" = "Only short, friendly reminders — no task names or photos on your lock screen. You can turn this off later.";
+"child.push.primer.accept" = "Yes, please";
+"child.push.primer.decline" = "Not now";
 "parent.tasks.need.child" = "Pair a child profile before adding a task.";
 "parent.today.balance" = "%d points";
 "parent.photo.accessibility.label" = "Task photo";
@@ -213,6 +218,5 @@
 "child.photo.upload.error" = "Photo didn't work — you can try again.";
 "goal.parent.default.title" = "Pizza night together";
 "held.parent.gate.action" = "Open parent gate";
-"held.parent.gate.hint" = "Press and hold to open the parent gate";
 "child.unlock.hi" = "Hi %@!";
 "child.unlock.hi.young" = "Hi!";

@@ -128,8 +128,13 @@
 "parent.rewards.empty" = "Nog geen beloningen in de winkel.";
 "child.young.speak" = "Voorleesknop";
 "child.young.unlock.title" = "Open je plek";
-"child.young.picture.hint" = "Tik drie dieren (oefenmodus) en gebruik daarna je pincode.";
 "child.young.pin.retry" = "Die code klopt nog niet — probeer het rustig opnieuw.";
+"child.unlock.pin.alternative" = "Of gebruik je pincode";
+"child.unlock.pin.alternative.hint" = "Pincode is altijd beschikbaar naast Face ID";
+"child.push.primer.title" = "Mag TaakHelden je een seintje geven?";
+"child.push.primer.body" = "Alleen korte, vriendelijke herinneringen — zonder taaknamen of foto’s op je vergrendelscherm. Je kunt dit later uitzetten.";
+"child.push.primer.accept" = "Ja, mag";
+"child.push.primer.decline" = "Nu niet";
 "parent.tasks.need.child" = "Koppel eerst een kindprofiel voordat je een taak toevoegt.";
 "parent.today.balance" = "%d punten";
 "parent.photo.accessibility.label" = "Taakfoto";
