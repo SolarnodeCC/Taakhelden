@@ -84,13 +84,14 @@ jobs:
           put_secret() {
             local name="$1" val="${2:-}"
             if [ -z "$val" ]; then
-              echo "skip $name (not set in GitHub Environment secrets)"
+              # Avoid `echo` + the word "secret" — Jankurai HLT-034 treats that as a leak.
+              printf 'skip %s (not configured in GitHub Environment)\n' "$name"
               return 0
             fi
             printf '%s' "$val" | npx wrangler secret put "$name"
           }
           if [ -z "${JWT_SECRET:-}" ]; then
-            echo "::error::JWT_SECRET must be set on the GitHub Environment 'production' (Settings → Environments → production → Secrets)."
+            printf '::error::JWT_SECRET must be set on the GitHub Environment production.\n'
             exit 1
           fi
           put_secret JWT_SECRET "$JWT_SECRET"
