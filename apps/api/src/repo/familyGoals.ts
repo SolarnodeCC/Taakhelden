@@ -216,6 +216,31 @@ export async function computeGoalProgress(
   };
 }
 
+/**
+ * Atomic complete when earned ≥ target. Safe under concurrent callers
+ * (`WHERE status = 'active'`). Intended for ledger-write paths (FamilyRoom),
+ * not for GET handlers — keeps progress reads side-effect free.
+ */
+export async function completeActiveGoalIfReached(
+  db: D1Database,
+  familyId: string,
+): Promise<boolean> {
+  const goal = await getActiveFamilyGoal(db, familyId);
+  if (!goal) return false;
+  const progress = await computeGoalProgress(db, familyId, goal);
+  if (progress.earnedPoints < progress.targetPoints) return false;
+  const completedAt = new Date().toISOString();
+  const result = await db
+    .prepare(
+      `UPDATE family_goals
+       SET status = 'completed', completed_at = ?
+       WHERE family_id = ? AND id = ? AND status = 'active'`,
+    )
+    .bind(completedAt, familyId, goal.id)
+    .run();
+  return (result.meta.changes ?? 0) > 0;
+}
+
 export class FamilyGoalError extends Error {
   constructor(readonly code: "ACTIVE_EXISTS" | "CHILD_INVALID") {
     super(code);

@@ -49,6 +49,42 @@ describe("phase3-family-goals-authz", () => {
     // Geen per-kind breakdown of namen in de progress-response.
     expect(body.progress).not.toHaveProperty("childIds");
     expect(JSON.stringify(body)).not.toMatch(/"childId"|Noor/);
+
+    // GET blijft side-effect-vrij: status in DB blijft active tot een ledger-write.
+    const row = await env.DB.prepare(
+      "SELECT status FROM family_goals WHERE family_id = ? AND id = ?",
+    )
+      .bind(fam.familyId, goal.id)
+      .first<{ status: string }>();
+    expect(row?.status).toBe("active");
+  });
+
+  it("ledger-write rondt actief doel af wanneer target bereikt is", async () => {
+    const fam = await seedFamily("fgdone");
+    const parent = await parentToken(fam.parentId, fam.familyId);
+    const created = await api("/families/me/goals", {
+      method: "POST",
+      token: parent,
+      idempotencyKey: "fg-done-create",
+      body: { title: "Klaar", icon: "⭐", targetPoints: 20, childIds: [] },
+    });
+    expect(created.status).toBe(201);
+    const goal = await created.json<{ id: string }>();
+
+    const adjust = await api("/points/adjust", {
+      method: "POST",
+      token: parent,
+      idempotencyKey: "fg-done-adj",
+      body: { childId: fam.childA, amount: 25, note: "Doel halen" },
+    });
+    expect(adjust.status).toBe(200);
+
+    const row = await env.DB.prepare(
+      "SELECT status FROM family_goals WHERE family_id = ? AND id = ?",
+    )
+      .bind(fam.familyId, goal.id)
+      .first<{ status: string }>();
+    expect(row?.status).toBe("completed");
   });
 
   it("kind mag geen gezinsdoel aanmaken", async () => {

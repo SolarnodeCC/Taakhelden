@@ -30,8 +30,9 @@ in `CLAUDE.md` — use those. Notes below are the non-obvious bits for running l
 
 ### Running the API locally (gotchas)
 - Auth flows need a `JWT_SECRET`. Copy `apps/api/.dev.vars.example` to `apps/api/.dev.vars`
-  (gitignored). Without it the Worker still boots and `/v1/health` returns
-  `{ ok: true }`, but register/login and any authed endpoint fail.
+  (gitignored). Without it the Worker still boots, but `/v1/health` returns 503 and
+  register/login / any authed endpoint fail. Optional `HMAC_SECRET` is used for
+  photo/export signed URLs (falls back to `JWT_SECRET` when unset).
 - Apply local D1 migrations before first use: `npm run db:migrate:local -w apps/api`
   (writes to `apps/api/.wrangler/state`). Re-run after adding a migration.
 - Turnstile, email invites, APNs push, and Sign in with Apple are env-guarded no-ops when

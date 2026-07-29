@@ -6,6 +6,10 @@
 # Required for auth (token issue/verify). Without it, register/login that mint JWTs return 500.
 JWT_SECRET=local-dev-secret-change-me
 
+# Optional dedicated HMAC for photo/export signed URLs. When unset, JWT_SECRET is used.
+# Production should set HMAC_SECRET separately (see docs/cloudflare-bindings-audit.md).
+HMAC_SECRET=
+
 # Turnstile — leave empty locally; verifyTurnstile skips when unset (accepts any token).
 TURNSTILE_SECRET=
 

@@ -6,6 +6,7 @@
  * Routes sturen mutaties als interne POST /complete|/approve|/redo|/undo|/adjust;
  * de payload bevat altijd familyId zodat elke repo-aanroep gescoped blijft.
  */
+import { ErrorCodes, type SyncMutation, type CompleteResult } from "@taakhelden/shared";
 import type { Env } from "../types";
 import { ApiException } from "../middleware/error";
 import {
@@ -23,20 +24,21 @@ import {
 import { notifyChild, notifyParents, memberName, childCopy, parentCopy } from "../services/notifier";
 import { processSyncBatch } from "../services/syncService";
 import { applyMoveInstance } from "../services/instanceService";
-import type { SyncMutation, CompleteResult } from "@taakhelden/shared";
+import { getIdempotencyResponse, storeIdempotencyResponse } from "../repo/system";
+import { completeActiveGoalIfReached } from "../repo/familyGoals";
 
 interface MutationBody {
   familyId: string;
   instanceId?: string;
   actor: Actor;
   note?: string;
-    childId?: string;
-    amount?: number;
-    rewardId?: string;
-    redemptionId?: string;
-    photoId?: string;
-    date?: string;
-    mutations?: SyncMutation[];
+  childId?: string;
+  amount?: number;
+  rewardId?: string;
+  redemptionId?: string;
+  photoId?: string;
+  date?: string;
+  mutations?: SyncMutation[];
   since?: string;
   idempotencyKey?: string;
 }
@@ -45,7 +47,10 @@ export class FamilyRoom implements DurableObject {
   /** Promise-ketting: mutaties draaien strikt na elkaar, per gezin. */
   private chain: Promise<unknown> = Promise.resolve();
 
-  constructor(private state: DurableObjectState, private env: Env) {}
+  constructor(
+    private state: DurableObjectState,
+    private env: Env,
+  ) {}
 
   async fetch(req: Request): Promise<Response> {
     if (req.headers.get("Upgrade") === "websocket") {
@@ -58,8 +63,8 @@ export class FamilyRoom implements DurableObject {
     }
 
     const path = new URL(req.url).pathname;
-    const body = (await req.json()) as MutationBody;
     try {
+      const body = (await req.json()) as MutationBody;
       const result = await this.serialize(() => this.runIdempotent(path, body));
       return Response.json(result);
     } catch (err) {
@@ -67,6 +72,13 @@ export class FamilyRoom implements DurableObject {
         return Response.json(
           { error: { code: err.code, message: err.message, details: err.details } },
           { status: err.status },
+        );
+      }
+      // Malformed JSON → structured 400 (req.json was previously outside the try).
+      if (err instanceof SyntaxError) {
+        return Response.json(
+          { error: { code: ErrorCodes.VALIDATION_FAILED, message: "Ongeldige mutatie-payload." } },
+          { status: 400 },
         );
       }
       throw err;
@@ -90,17 +102,20 @@ export class FamilyRoom implements DurableObject {
     const rawKey = body.idempotencyKey;
     if (!rawKey) return this.handleMutation(path, body);
     const storeKey = `${body.actor.userId}:${rawKey}`;
-    const cached = await this.env.DB
-      .prepare("SELECT response FROM idempotency_keys WHERE key = ?")
-      .bind(storeKey)
-      .first<{ response: string }>();
-    if (cached) return JSON.parse(cached.response);
+    const cached = await getIdempotencyResponse(this.env.DB, storeKey);
+    if (cached) return JSON.parse(cached);
     const result = await this.handleMutation(path, body);
-    await this.env.DB
-      .prepare("INSERT OR IGNORE INTO idempotency_keys (key, user_id, response) VALUES (?, ?, ?)")
-      .bind(storeKey, body.actor.userId, JSON.stringify(result))
-      .run();
+    await storeIdempotencyResponse(this.env.DB, storeKey, body.actor.userId, JSON.stringify(result));
     return result;
+  }
+
+  /** Na positieve ledger-writes: actief gezinsdoel afronden als target bereikt. */
+  private async maybeCompleteGoal(familyId: string) {
+    try {
+      await completeActiveGoalIfReached(this.env.DB, familyId);
+    } catch {
+      /* best-effort — mutatie zelf mag niet falen op goal-progress */
+    }
   }
 
   private async handleMutation(path: string, body: MutationBody): Promise<unknown> {
@@ -113,6 +128,7 @@ export class FamilyRoom implements DurableObject {
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
         if (result.pointsEarned > 0) {
           this.broadcast("points.changed", { childId, newBalance: result.newBalance });
+          await this.maybeCompleteGoal(familyId);
         }
         this.broadcastBadges(childId, result.newBadges);
         return result;
@@ -121,11 +137,16 @@ export class FamilyRoom implements DurableObject {
         const { result, status, childId } = await applyApprove(db, familyId, body.instanceId!, actor);
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
         this.broadcast("points.changed", { childId, newBalance: result.newBalance });
+        await this.maybeCompleteGoal(familyId);
         this.broadcastBadges(childId, result.newBadges);
         await this.tryNotify(() =>
-          notifyChild(this.env, familyId, childId,
+          notifyChild(
+            this.env,
+            familyId,
+            childId,
             childCopy.approved(result.pointsEarned + result.photoBonusPoints),
-            { type: "task_approved", refId: body.instanceId, childId, contentAvailable: true }),
+            { type: "task_approved", refId: body.instanceId, childId, contentAvailable: true },
+          ),
         );
         return result;
       }
@@ -133,9 +154,13 @@ export class FamilyRoom implements DurableObject {
         const { status, childId } = await applyRedo(db, familyId, body.instanceId!, body.note ?? "");
         this.broadcast("instance.updated", { instanceId: body.instanceId, status, childId });
         await this.tryNotify(async () =>
-          notifyChild(this.env, familyId, childId,
+          notifyChild(
+            this.env,
+            familyId,
+            childId,
             childCopy.redo(await memberName(this.env, familyId, actor.userId)),
-            { type: "task_redo", refId: body.instanceId, childId, contentAvailable: true }),
+            { type: "task_redo", refId: body.instanceId, childId, contentAvailable: true },
+          ),
         );
         return { status };
       }
@@ -153,6 +178,7 @@ export class FamilyRoom implements DurableObject {
         });
         if (result.photoBonusPoints > 0) {
           this.broadcast("points.changed", { childId: result.childId, newBalance: result.newBalance });
+          await this.maybeCompleteGoal(familyId);
         }
         return result;
       }
@@ -166,9 +192,12 @@ export class FamilyRoom implements DurableObject {
         });
         this.broadcast("points.changed", { childId, newBalance: result.newBalance });
         await this.tryNotify(async () =>
-          notifyParents(this.env, familyId,
+          notifyParents(
+            this.env,
+            familyId,
             parentCopy.redemption(await memberName(this.env, familyId, childId), rewardTitle),
-            { type: "approval_queue", refId: result.redemptionId, childId, contentAvailable: true }),
+            { type: "approval_queue", refId: result.redemptionId, childId, contentAvailable: true },
+          ),
         );
         return result;
       }
@@ -178,14 +207,20 @@ export class FamilyRoom implements DurableObject {
         return { status };
       }
       case "/redemption-cancel": {
-        const { status, childId, newBalance } = await applyCancelRedemption(db, familyId, body.redemptionId!, body.actor);
+        const { status, childId, newBalance } = await applyCancelRedemption(
+          db,
+          familyId,
+          body.redemptionId!,
+          body.actor,
+        );
         this.broadcast("redemption.updated", { redemptionId: body.redemptionId, status, childId });
         this.broadcast("points.changed", { childId, newBalance });
+        await this.maybeCompleteGoal(familyId);
         return { status, newBalance };
       }
       case "/sync": {
         // Hele batch in één DO-turn: strikt op volgorde, per gezin geserialiseerd.
-        return await processSyncBatch(
+        const syncResult = await processSyncBatch(
           this.env,
           familyId,
           actor,
@@ -193,6 +228,8 @@ export class FamilyRoom implements DurableObject {
           body.since,
           (event, data) => this.broadcast(event, data),
         );
+        await this.maybeCompleteGoal(familyId);
+        return syncResult;
       }
       case "/adjust": {
         const { newBalance } = await applyAdjust(db, familyId, {
@@ -201,6 +238,7 @@ export class FamilyRoom implements DurableObject {
           note: body.note ?? "",
         });
         this.broadcast("points.changed", { childId: body.childId, newBalance });
+        await this.maybeCompleteGoal(familyId);
         return { newBalance };
       }
       case "/move": {
@@ -215,7 +253,7 @@ export class FamilyRoom implements DurableObject {
         return view;
       }
       default:
-        throw new ApiException(404, "NOT_FOUND", "Onbekende mutatie.");
+        throw new ApiException(404, ErrorCodes.NOT_FOUND, "Onbekende mutatie.");
     }
   }
 
@@ -238,7 +276,11 @@ export class FamilyRoom implements DurableObject {
   broadcast(event: string, data: unknown) {
     const msg = JSON.stringify({ event, data });
     for (const ws of this.state.getWebSockets()) {
-      try { ws.send(msg); } catch { /* gesloten socket — hibernation-API ruimt op */ }
+      try {
+        ws.send(msg);
+      } catch {
+        /* gesloten socket — hibernation-API ruimt op */
+      }
     }
   }
 }

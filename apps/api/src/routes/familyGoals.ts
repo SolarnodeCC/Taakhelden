@@ -38,9 +38,10 @@ familyGoals.get("/active/progress", async (c) => {
     return c.json(body);
   }
   const progress = await computeGoalProgress(c.env.DB, familyId, goal);
-  // Auto-complete when target reached (positive only — no reverse).
-  if (progress.earnedPoints >= progress.targetPoints && goal.status === "active") {
-    await patchFamilyGoal(c.env.DB, familyId, goal.id, { status: "completed" });
+  // Read-only: persistence happens on ledger writes (FamilyRoom). Overlay
+  // "completed" in the response when the target is already met so UI stays
+  // accurate between the last earn and the next mutation.
+  if (progress.earnedPoints >= progress.targetPoints && progress.status === "active") {
     progress.status = "completed";
   }
   return c.json({ progress } satisfies FamilyGoalProgressResponse);

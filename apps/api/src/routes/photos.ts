@@ -13,6 +13,7 @@ import {
   UPLOAD_URL_TTL_SECONDS,
   DOWNLOAD_URL_TTL_SECONDS,
 } from "../services/photoService";
+import { transferHmacSecret } from "../services/secrets";
 import * as repo from "../repo/photos";
 import { getInstance } from "../repo/instances";
 import { getMember } from "../repo/families";
@@ -28,7 +29,7 @@ photoTransfer.put("/:id/upload", async (c) => {
   const photoId = c.req.param("id");
   const familyId = c.req.query("fam");
   const ok = await verifyPhotoTransfer(
-    c.env.JWT_SECRET, familyId, photoId, "put", c.req.query("exp"), c.req.query("sig"),
+    transferHmacSecret(c.env), familyId, photoId, "put", c.req.query("exp"), c.req.query("sig"),
   );
   if (!ok) {
     throw new ApiException(403, ErrorCodes.FORBIDDEN, "Deze uploadlink is verlopen. Vraag een nieuwe aan.");
@@ -54,7 +55,7 @@ photoTransfer.get("/:id/file", async (c) => {
   const photoId = c.req.param("id");
   const familyId = c.req.query("fam");
   const ok = await verifyPhotoTransfer(
-    c.env.JWT_SECRET, familyId, photoId, "get", c.req.query("exp"), c.req.query("sig"),
+    transferHmacSecret(c.env), familyId, photoId, "get", c.req.query("exp"), c.req.query("sig"),
   );
   if (!ok) {
     throw new ApiException(403, ErrorCodes.FORBIDDEN, "Deze link is verlopen. Vraag een nieuwe aan.");
@@ -118,7 +119,7 @@ photos.post("/upload-intent", validate("json", UploadIntentBody), async (c) => {
   });
 
   const { exp, sig } = await signPhotoTransfer(
-    c.env.JWT_SECRET, familyId, photoId, "put", UPLOAD_URL_TTL_SECONDS,
+    transferHmacSecret(c.env), familyId, photoId, "put", UPLOAD_URL_TTL_SECONDS,
   );
   const origin = new URL(c.req.url).origin;
   return c.json({ photoId, uploadUrl: transferUrl(origin, familyId, photoId, "put", exp, sig) }, 201);
@@ -158,7 +159,7 @@ photos.get("/:id", async (c) => {
   let url: string | null = null;
   if (photo.status === "ready") {
     const { exp, sig } = await signPhotoTransfer(
-      c.env.JWT_SECRET, familyId, photoId, "get", DOWNLOAD_URL_TTL_SECONDS,
+      transferHmacSecret(c.env), familyId, photoId, "get", DOWNLOAD_URL_TTL_SECONDS,
     );
     url = transferUrl(new URL(c.req.url).origin, familyId, photoId, "get", exp, sig);
   }
