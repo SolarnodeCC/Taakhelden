@@ -10,7 +10,7 @@ import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
-import { idempotency, requireIdempotencyKey } from "../middleware/idempotency";
+import { requireIdempotencyKey } from "../middleware/idempotency";
 import {
   FamilyGoalError,
   computeGoalProgress,
@@ -50,7 +50,6 @@ familyGoals.get("/active/progress", async (c) => {
 familyGoals.post(
   "/",
   requireIdempotencyKey,
-  idempotency,
   validate("json", CreateFamilyGoalBody),
   async (c) => {
     const { familyId } = requireParent(c, { full: true });
@@ -76,7 +75,6 @@ familyGoals.post(
 familyGoals.patch(
   "/:id",
   requireIdempotencyKey,
-  idempotency,
   validate("json", PatchFamilyGoalBody),
   async (c) => {
     const { familyId } = requireParent(c, { full: true });

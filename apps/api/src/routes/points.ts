@@ -5,7 +5,7 @@ import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
-import { idempotency, requireIdempotencyKey } from "../middleware/idempotency";
+import { requireIdempotencyKey } from "../middleware/idempotency";
 import { callFamilyRoom } from "../services/familyRoom";
 import { isContractV2 } from "../services/contract";
 import { getFamily, getMember, listChildren } from "../repo/families";
@@ -101,7 +101,7 @@ points.get("/ledger", async (c) => {
 });
 
 /** Handmatige bijboeking mét reden — alleen positief (architectuurregel 4). */
-points.post("/adjust", requireIdempotencyKey, idempotency, validate("json", AdjustBody), async (c) => {
+points.post("/adjust", requireIdempotencyKey, validate("json", AdjustBody), async (c) => {
   const { familyId } = requireParent(c, { full: true });
   const body = c.req.valid("json");
   const child = await getMember(c.env.DB, familyId, body.childId);

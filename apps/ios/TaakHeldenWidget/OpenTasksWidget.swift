@@ -30,7 +30,7 @@ struct OpenTasksWidgetView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            Text("TaakHelden")
+            Text("Wispel")
                 .font(.headline)
             Text(entry.openCount == 0 ? "Alles af voor nu" : "Nog \(entry.openCount) taken")
                 .font(.title2.bold())

@@ -41,7 +41,10 @@ notifications.patch("/", validate("json", NotificationSettingsPatch), async (c) 
     quietStart: body.quietStart !== undefined ? body.quietStart : current.quiet_start,
     quietEnd: body.quietEnd !== undefined ? body.quietEnd : current.quiet_end,
   };
-  await upsertSetting(c.env.DB, body.childId, merged);
+  const ok = await upsertSetting(c.env.DB, familyId, body.childId, merged);
+  if (!ok) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
+  }
 
   return c.json(
     view({

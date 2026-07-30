@@ -16,7 +16,7 @@
     },
     "deletedFamily": "Je gezin is gemarkeerd voor verwijdering. Alles wordt definitief verwijderd rond {purgeAfter}.",
     "register": {
-      "intro": "Maak een account aan en start je gezin op TaakHelden.",
+      "intro": "Maak een account aan en start je gezin op Wispel.",
       "displayName": "Jouw roepnaam",
       "familyName": "Naam van je gezin",
       "passwordHint": "Minstens 10 tekens.",
@@ -261,7 +261,7 @@
     },
     "invite": {
       "title": "Gezinscode",
-      "hint": "Open de TaakHelden-app op het kindertoestel en vul deze code in.",
+      "hint": "Open de Wispel-app op het kindertoestel en vul deze code in.",
       "copy": "Kopiëren",
       "copied": "Gekopieerd",
       "regenerate": "Nieuwe code maken",
@@ -311,7 +311,7 @@
       "copy": "Link kopiëren",
       "copied": "Gekopieerd",
       "errors": {
-        "EMAIL_IN_USE": "Dit e-mailadres is al in gebruik in TaakHelden.",
+        "EMAIL_IN_USE": "Dit e-mailadres is al in gebruik in Wispel.",
         "VALIDATION_FAILED": "Vul een geldig e-mailadres in.",
         "FORBIDDEN": "Alleen ouders met volledig beheer kunnen uitnodigen.",
         "generic": "Uitnodigen lukte niet. Probeer het nog eens."
@@ -374,7 +374,7 @@
   },
   "instellingen": {
     "title": "Instellingen",
-    "subtitle": "Notificaties en privacy voor je gezin.",
+    "subtitle": "Notificaties, privacy en steun voor je gezin.",
     "loading": "Laden…",
     "loadError": "Kon instellingen niet laden.",
     "notifications": {
@@ -417,6 +417,12 @@
       "deleteWorking": "Bezig…",
       "deleteFailed": "Verwijderen lukte niet. Probeer het nog eens.",
       "errorForbidden": "Alleen volledig beheer mag het gezin verwijderen."
+    },
+    "steun": {
+      "title": "Steun Wispel",
+      "body": "Wispel blijft gratis. Optionele donaties komen binnenkort — tot die tijd kun je ons mailen. Nooit zichtbaar voor kinderen.",
+      "link": "Mail steun@wispel.cc",
+      "pageLink": "Meer over steun"
     }
   },
   "punten": {
@@ -458,5 +464,241 @@
       "title": "Inzichten",
       "body": "Binnenkort: trends per week als hulp voor het gesprek — nooit als controlemiddel."
     }
+  },
+  "marketing": {
+    "metaTitle": "Wispel — gratis voor gezinnen",
+    "metaDescription": "Wispel helpt gezinnen met huiswerk en klusjes — privacy first, gratis voor je gezin. Positief voor kids, rustig voor ouders.",
+    "brand": "Wispel",
+    "headline": "Huiswerk en klusjes die wél lukken",
+    "support": "Kinderen verdienen sterren met taken. Jij houdt het overzicht. Gratis voor je gezin — privacy first, zonder advertenties.",
+    "ctaPrimary": "Start met je gezin — gratis",
+    "ctaSecondary": "Inloggen",
+    "ctaSteun": "Steun Wispel (binnenkort)",
+    "nav": {
+      "login": "Inloggen",
+      "cta": "Gratis starten"
+    },
+    "auth": {
+      "login": "Log in op het ouderdashboard — kalm overzicht voor je gezin.",
+      "register": "Maak een account en start je gezin. Gratis, privacy first.",
+      "accept": "Accepteer je uitnodiging en help mee in het gezin.",
+      "loginTitle": "Inloggen",
+      "registerTitle": "Gezin starten",
+      "acceptTitle": "Uitnodiging"
+    },
+    "visual": {
+      "dayLabel": "Mijn dag",
+      "starLabel": "Mijn Ster",
+      "pointsLabel": "punten"
+    },
+    "howItWorks": {
+      "title": "Zo werkt Wispel",
+      "support": "Eén lus voor het hele gezin — positief voor kinderen, rustig voor jou.",
+      "steps": [
+        {
+          "title": "Jij plant taken",
+          "body": "Huiswerk en klusjes in één plek. Kids zien wat er vandaag speelt."
+        },
+        {
+          "title": "Kinderen verdienen sterren",
+          "body": "Afvinken voelt goed. Geen schuldgevoel-taal, geen ranglijst tussen broers en zussen."
+        },
+        {
+          "title": "Goedkeuren en inwisselen",
+          "body": "Jij houdt de regie. Kids sparen naar een beloning in de winkel."
+        }
+      ]
+    },
+    "preview": {
+      "title": "Warm voor kids, kalm voor ouders",
+      "support": "Zelfde merk, twee registers — zo blijft de kind-app speels zonder dat jouw dashboard schreeuwt.",
+      "kidLabel": "Kind-app",
+      "kidLine": "Alles gedaan — wat een ster vandaag!",
+      "kidTask1": "Kamer opruimen · +10",
+      "kidTask2": "Rekenen afmaken · +15",
+      "parentLabel": "Ouderdashboard",
+      "parentLine": "Vandaag: 2 te goedkeuren",
+      "parentItem1": "Lisa · Kamer opruimen",
+      "parentItem2": "Noah · Rekenen afmaken"
+    },
+    "privacy": {
+      "title": "Privacy first",
+      "body": "We bouwen voor Nederlandse gezinnen: zo weinig mogelijk gegevens, en alles uitgelegd in gewone taal.",
+      "points": [
+        "Geen advertenties en geen verkoop van gezinsdata",
+        "Geen tracking van kinderen; geen kind-e-mailaccount",
+        "EU-first hosting; taakfoto’s maximaal 30 dagen"
+      ],
+      "link": "Lees de privacyverklaring"
+    },
+    "gratis": {
+      "title": "Gratis voor gezinnen",
+      "body": "Kernfuncties zijn gratis. Geen proefperiode, geen abonnementstabel, geen betaalmuur om alles te gebruiken."
+    },
+    "faq": {
+      "title": "Veelgestelde vragen",
+      "items": [
+        {
+          "q": "Is Wispel echt gratis?",
+          "a": "Ja. Kernfuncties zijn gratis voor gezinnen. Optionele steun (donaties) is alleen voor ouders — nooit op kind-tabbladen."
+        },
+        {
+          "q": "Wat betekent privacy first?",
+          "a": "Geen ads, geen kindtracking, geen verkoop van gezinsdata. Kinderen hebben geen eigen e-mailaccount bij ons."
+        },
+        {
+          "q": "Werkt het voor huiswerk én klusjes?",
+          "a": "Ja. Beide horen bij de dagelijkse lus — plannen, afvinken, goedkeuren, sterren sparen."
+        },
+        {
+          "q": "Zijn er ranglijsten tussen kids?",
+          "a": "Nee. Wispel viert wat goed ging. Geen individuele leaderboards die een kind onderaan zetten."
+        },
+        {
+          "q": "Voor wie is Wispel?",
+          "a": "Voor Nederlandse gezinnen die huiswerk en klusjes positief willen organiseren — zonder schuldgevoel-taal."
+        }
+      ]
+    },
+    "audience": {
+      "title": "Wel of niet voor jullie?",
+      "forTitle": "Wel voor",
+      "forItems": [
+        "Gezinnen in NL die huiswerk en klusjes samen willen aanpakken",
+        "Ouders die rust willen zonder te controleren als een scorebord",
+        "Kids die aanmoediging verdienen — sterren, niet strafpunten"
+      ],
+      "notForTitle": "Niet voor",
+      "notForItems": [
+        "Wie een abonnement of proefperiode nodig heeft om ‘volledig’ te werken",
+        "Wie kids tegen elkaar wil laten scoren",
+        "Wie kindtracking of ads oké vindt in een gezinsapp"
+      ]
+    },
+    "steun": {
+      "title": "Steun Wispel",
+      "body": "Als Wispel jullie helpt, mag je ons steunen. Donaties komen binnenkort — tot die tijd kun je een mailtje sturen. Nooit verplicht, nooit op kind-tabbladen.",
+      "link": "Mail steun@wispel.cc"
+    },
+    "finalCta": {
+      "title": "Klaar om te starten?",
+      "support": "Maak je gezin aan — gratis. Privacy first vanaf de eerste klik."
+    },
+    "footer": {
+      "tagline": "Gratis voor gezinnen · Privacy first",
+      "privacy": "Privacy",
+      "terms": "Voorwaarden",
+      "steun": "Steun"
+    },
+    "steunPage": {
+      "metaTitle": "Steun Wispel",
+      "title": "Steun Wispel",
+      "intro": "Wispel is gratis voor gezinnen. Optionele steun helpt ons verder bouwen — alleen voor ouders, nooit op kind-tabbladen.",
+      "status": "Donaties via iDEAL of kaart komen binnenkort. Tot die tijd: stuur ons een mailtje.",
+      "link": "Mail steun@wispel.cc",
+      "back": "Terug naar home"
+    }
+  },
+  "legal": {
+    "backToLogin": "Terug naar inloggen",
+    "links": {
+      "privacy": "Privacy",
+      "terms": "Voorwaarden"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "updated": "Laatst bijgewerkt: 30 juli 2026",
+      "intro": "Wispel is privacy first. We bouwen voor Nederlandse gezinnen: zo weinig mogelijk gegevens, geen advertenties, en kinderen krijgen geen tracking. Hieronder staat in gewone taal wat we wel en niet doen.",
+      "sections": [
+        {
+          "heading": "Voor wie is deze verklaring?",
+          "body": "Voor ouders/verzorgers die een Wispel-gezin beheren, en voor iedereen die onze website bezoekt. Kinderen gebruiken Wispel via een ouder-gekoppeld profiel — zij hebben geen eigen e-mailaccount bij ons."
+        },
+        {
+          "heading": "Welke gegevens gebruiken we?",
+          "body": "Ouderaccount: e-mailadres, roepnaam, wachtwoord (versleuteld) of Sign in with Apple.\nGezin: gezinsnaam, kindprofielen (roepnaam, geboortejaar, avatar), taken, beloningen, puntenledger, goedkeuringen.\nOptioneel: taakfoto’s die een ouder of kind uploadt als bewijs.\nApparaten: sessie-/apparaattokens om ingelogd te blijven en (als je dat toelaat) pushmeldingen."
+        },
+        {
+          "heading": "Wat we níet doen",
+          "body": "Geen advertenties.\nGeen verkoop van gezinsdata.\nGeen third-party tracking- of advertentie-SDK’s in de kindomgeving.\nGeen e-mailadres van kinderen.\nWe loggen geen kindnamen of foto-URL’s in onze applicatielogs."
+        },
+        {
+          "heading": "Waarom hebben we die gegevens nodig?",
+          "body": "Om het gezin te laten werken: taken plannen, afvinken, goedkeuren, punten bijhouden en beloningen inwisselen. Zonder accountgegevens kunnen we je niet veilig laten inloggen. Foto’s zijn optioneel en alleen bedoeld als bewijs voor een ouder."
+        },
+        {
+          "heading": "Foto’s",
+          "body": "Taakfoto’s bewaren we maximaal 30 dagen, daarna worden ze verwijderd. Voor het tonen strippen we EXIF-/locatiegegevens. Productiegebruik met echte kinderfoto’s volgt ons privacy-minimum en DPIA-traject; tot die afronding kan fotogebruik beperkt zijn."
+        },
+        {
+          "heading": "Waar staan de gegevens?",
+          "body": "We hosten op Cloudflare (Workers, D1, R2) met EU-first locatiekeuzes (onder meer D1 weur, R2 eu). Apple kan betrokken zijn bij Sign in with Apple en push (APNs). Een e-mailprovider kan co-ouderuitnodigingen versturen — alleen naar ouder-e-mailadressen."
+        },
+        {
+          "heading": "Wie heeft toegang?",
+          "body": "Alleen leden van jouw gezin (ouders/verzorgers en gekoppelde kindprofielen) binnen de app. Er is geen standaard support-tool die zomaar in gezinsdata of kinderfoto’s kan kijken."
+        },
+        {
+          "heading": "Jouw rechten",
+          "body": "Je kunt gezinsgegevens exporteren en het gezin laten verwijderen via Instellingen in het ouderdashboard. Na verwijderen volgt een korte bewaartermijn vóór definitieve purge (zoals in de app aangegeven). Voor vragen of AVG-verzoeken: mail steun@wispel.cc (of het contact in de App Store-vermelding zodra die live staat)."
+        },
+        {
+          "heading": "Donaties",
+          "body": "Wispel is gratis voor gezinnen. Optionele donaties komen later via een aparte, ouder-gerichte flow (nooit op kind-tabbladen). Tot die tijd kun je ons mailen via steun@wispel.cc. Een betalingsprovider is nog niet actief."
+        },
+        {
+          "heading": "Wijzigingen",
+          "body": "Als we iets wezenlijks wijzigen, passen we deze pagina aan en vermelden we de datum hierboven. Bij grote wijzigingen informeren we ouders zo duidelijk mogelijk."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Voorwaarden",
+      "updated": "Laatst bijgewerkt: 30 juli 2026",
+      "intro": "Deze voorwaarden gelden voor het gebruik van Wispel (app en ouderdashboard) op wispel.cc en bijbehorende diensten. Wispel is gratis voor gezinnen; donaties zijn optioneel.",
+      "sections": [
+        {
+          "heading": "De dienst",
+          "body": "Wispel helpt gezinnen om huiswerk en klusjes positief te organiseren met taken, goedkeuringen, punten en beloningen. We mogen de dienst verbeteren, onderhouden of onderdelen tijdelijk onderbreken (bijvoorbeeld voor beveiliging of storingen)."
+        },
+        {
+          "heading": "Accounts en verantwoordelijkheid",
+          "body": "Een ouder/verzorger maakt het gezin aan en is verantwoordelijk voor kindprofielen, instellingen en goedkeuringen. Je houdt inloggegevens geheim. Gebruik Wispel niet om anderen te schaden, te pesten of wetten te overtreden."
+        },
+        {
+          "heading": "Kinderen",
+          "body": "Kindprofielen zijn onderdeel van het ouderaccount. Er is geen zelfstandig kind-e-mailaccount. Ouders bepalen wat kinderen mogen doen in de app en blijven verantwoordelijk voor toezicht."
+        },
+        {
+          "heading": "Gratis en donaties",
+          "body": "Kernfuncties zijn gratis. Er is geen abonnement nodig om Wispel te gebruiken. Optionele donaties ondersteunen de ontwikkeling; ze ontgrendelen geen betaalmuren en zijn nooit zichtbaar op kind-tabbladen."
+        },
+        {
+          "heading": "Content en foto’s",
+          "body": "Je blijft eigenaar van wat je uploadt. Je geeft ons toestemming om die content te verwerken om de dienst te leveren (bijvoorbeeld een taakfoto tonen aan een ouder). Upload niets onrechtmatigs of schadelijks. Foto’s kunnen na 30 dagen worden verwijderd."
+        },
+        {
+          "heading": "Beschikbaarheid",
+          "body": "We streven naar een stabiele dienst, maar garanderen geen ononderbroken beschikbaarheid. Plan geen kritieke gezinsprocessen uitsluitend op Wispel zonder eigen back-up."
+        },
+        {
+          "heading": "Aansprakelijkheid",
+          "body": "Wispel wordt “as is” aangeboden voor persoonlijk gezinsgebruik. Voor zover de wet dat toelaat zijn we niet aansprakelijk voor indirecte schade of gevolgschade. Dwingend consumentenrecht blijft van toepassing."
+        },
+        {
+          "heading": "Beëindiging",
+          "body": "Je kunt je gezin verwijderen via de privacy-instellingen. Wij mogen toegang beperken of beëindigen bij misbruik, beveiligingsrisico’s of schending van deze voorwaarden."
+        },
+        {
+          "heading": "Privacy",
+          "body": "Hoe we met gegevens omgaan staat in onze Privacyverklaring. Die hoort bij deze voorwaarden."
+        },
+        {
+          "heading": "Recht en contact",
+          "body": "Op deze voorwaarden is Nederlands recht van toepassing, voor zover dwingend recht niets anders voorschrijft. Contact: steun@wispel.cc — en later ook via de App Store-vermelding wanneer die live is."
+        }
+      ]
+    },
+    "backHome": "Terug naar home"
   }
 }

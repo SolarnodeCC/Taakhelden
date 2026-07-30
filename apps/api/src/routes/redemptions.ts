@@ -5,7 +5,7 @@ import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { ErrorCodes } from "@taakhelden/shared";
 import { requireParent } from "../middleware/authz";
-import { idempotency, requireIdempotencyKey } from "../middleware/idempotency";
+import { requireIdempotencyKey } from "../middleware/idempotency";
 import { isContractV2 } from "../services/contract";
 import { callFamilyRoom } from "../services/familyRoom";
 import { listRedemptions } from "../repo/rewards";
@@ -49,13 +49,13 @@ redemptions.get("/", async (c) => {
   return c.json(LegacyRedemptionList.parse(response));
 });
 
-redemptions.post("/:id/fulfill", requireIdempotencyKey, idempotency, async (c) => {
+redemptions.post("/:id/fulfill", requireIdempotencyKey, async (c) => {
   requireParent(c);
   return callFamilyRoom(c, "/redemption-fulfill", { redemptionId: c.req.param("id") });
 });
 
 /** Annuleren → tegenboeking in het ledger (punten terug naar het kind). */
-redemptions.post("/:id/cancel", requireIdempotencyKey, idempotency, async (c) => {
+redemptions.post("/:id/cancel", requireIdempotencyKey, async (c) => {
   requireParent(c);
   return callFamilyRoom(c, "/redemption-cancel", { redemptionId: c.req.param("id") });
 });

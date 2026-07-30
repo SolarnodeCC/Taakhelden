@@ -10,6 +10,7 @@ import {
   SessionInfo,
   type MemberView,
 } from "../../../lib/api/types";
+import { NavIcon, WispelWordmark } from "../../../components/brand";
 import {
   FamilyRealtimeProvider,
   useFamilyRealtime,
@@ -98,7 +99,9 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-surface">
-        <div className="px-5 py-5 text-lg font-semibold text-accent">TaakHelden</div>
+        <div className="px-5 py-5 text-lg font-semibold">
+          <WispelWordmark markClassName="h-6 w-6" />
+        </div>
         <nav className="flex flex-col gap-1 px-2">
           {visibleNav.map((item) => {
             const active = pathname === item.href;
@@ -108,12 +111,13 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
                 href={item.href}
                 aria-current={active ? "page" : undefined}
                 className={
-                  "rounded px-3 py-2 text-sm font-medium transition-colors " +
+                  "inline-flex items-center gap-2.5 rounded px-3 py-2 text-sm font-medium transition-colors " +
                   (active
                     ? "bg-accent text-accent-fg"
                     : "text-text hover:bg-border/50")
                 }
               >
+                <NavIcon name={item.key} />
                 {tNav(item.key)}
               </Link>
             );

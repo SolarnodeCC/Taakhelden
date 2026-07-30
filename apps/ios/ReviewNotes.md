@@ -1,7 +1,7 @@
-# App Review notes — TaakHelden (familie-app)
+# App Review notes — Wispel (familie-app)
 
-TaakHelden wordt in de App Store gepositioneerd als **familie-app**. De listing
-blijft family-first en niet child-primary (niet Kids Category).
+**Wispel** wordt in de App Store gepositioneerd als **familie-app**. De listing
+blijft family-first en niet child-primary (niet Kids Category). Display name: Wispel.
 
 ## Staging demo credentials
 
@@ -27,7 +27,7 @@ de onderstaande voorbeeldwaarden als het gezin al is ingericht):
 3. Vul gezinscode **482916** (of actuele staging-code) en kind-PIN **4242** in.
 4. Kies profiel **DemoKind** en voltooi koppeling.
 5. In kindmodus: taak afvinken op **Mijn Dag** (haptic + confetti of reduce-motion glow).
-6. Open de ouderpoort via **Mijn Held**: houd ~1,5 s vast op het scherm (hinttekst
+6. Open de ouderpoort via **Mijn Ster**: houd ~1,5 s vast op het scherm (hinttekst
    onderaan), of tik vijf keer. Alternatief: VoiceOver → “Open ouderpoort” op de avatar.
 7. Bevestig dat Face ID / toestelcode **eerst** vereist is; pas daarna verschijnen
    ouderinstellingen. Kind-PIN opent die poort niet.
@@ -36,7 +36,7 @@ de onderstaande voorbeeldwaarden als het gezin al is ingericht):
 ## Build / environment (voor reviewers & CI)
 
 - **Release** builds gebruiken `https://taakhelden-api.oostelaar.workers.dev/v1`
-  (Info.plist `TAAKHELDEN_API_BASE_URL`). Debug gebruikt localhost voor lokale API.
+  (Info.plist `TAAKHELDEN_API_BASE_URL` — Worker rename follows WS-INFRA). Debug gebruikt localhost voor lokale API.
 - Release entitlements: `aps-environment = production`.
 - Override voor een eigen staging: scheme env `TAAKHELDEN_API_BASE_URL`.
 
@@ -53,6 +53,7 @@ de onderstaande voorbeeldwaarden als het gezin al is ingericht):
 - Privacy Nutrition Labels (App Store Connect): Photos or Videos (taakfoto’s),
   Contact Info (ouder e-mail via SIWA), Identifiers (device/push token). Geen
   tracking / geen third-party analytics.
+- Camera / Face ID usage strings: productnaam **Wispel**.
 
 ## Gerelateerde docs
 
@@ -60,3 +61,4 @@ de onderstaande voorbeeldwaarden als het gezin al is ingericht):
 - DPIA starter: `docs/taakhelden-dpia-starter.md`
 - Privacy minimum: `docs/taakhelden-privacy-minimum.md`
 - ADR review constraints: `docs/adr/ADR-0003-ios-family-app-shell-and-review-constraints.md`
+- Brand sheet: `docs/brand/wispel-brand-v1.md`

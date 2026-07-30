@@ -11,7 +11,7 @@ in `apps/web` zijn gebouwd. Implementatieplannen per batch:
 | Onderwerp | Waar gepland | Notitie |
 | --- | --- | --- |
 | **Inzichten** (statistieken/trends) | Batch 6 / Fase 2 | Nog `SectionStub` op `/inzichten` |
-| SIWA op web, wachtwoord-vergeten, marketing-landing, profielfoto-upload | Diverse batches / post-MVP | Bewust buiten scope gebleven (zie hieronder) |
+| SIWA op web, wachtwoord-vergeten, marketing-landing, profielfoto-upload | Diverse batches / post-MVP | Bewust buiten scope gebleven (zie hieronder). **Rebrand + UI:** [wispel-rebrand-and-ui-plan.md](./wispel-rebrand-and-ui-plan.md). **Build/workstreams:** [wispel-build-plan-workstreams.md](./wispel-build-plan-workstreams.md). |
 
 ## Bewust buiten web-MVP (niet in batches 1–12)
 

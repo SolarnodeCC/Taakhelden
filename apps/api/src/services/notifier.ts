@@ -16,17 +16,17 @@ export const childCopy = {
   taskOpen: (title: string, points: number) => {
     void title;
     void points;
-    return "Er staat iets nieuws klaar in TaakHelden.";
+    return "Er staat iets nieuws klaar in Wispel.";
   },
-  almostDayBonus: () => "Er staat iets leuks klaar in TaakHelden.",
-  weekBonus: () => "Er staat iets leuks klaar in TaakHelden.",
+  almostDayBonus: () => "Er staat iets leuks klaar in Wispel.",
+  weekBonus: () => "Er staat iets leuks klaar in Wispel.",
   approved: (points: number) => {
     void points;
-    return "Er staat iets leuks klaar in TaakHelden.";
+    return "Er staat iets leuks klaar in Wispel.";
   },
   redo: (parentName: string) => {
     void parentName;
-    return "Er is iets bijgewerkt in TaakHelden.";
+    return "Er is iets bijgewerkt in Wispel.";
   },
 } as const;
 
@@ -34,11 +34,11 @@ export const parentCopy = {
   redemption: (childName: string, rewardTitle: string) => {
     void childName;
     void rewardTitle;
-    return "Er wacht iets op je goedkeuring in TaakHelden.";
+    return "Er wacht iets op je goedkeuring in Wispel.";
   },
   pinLock: (childName: string) => {
     void childName;
-    return "Er is iets belangrijks in TaakHelden.";
+    return "Er is iets belangrijks in Wispel.";
   },
 } as const;
 
@@ -144,7 +144,7 @@ export async function notifyChild(
   if (used >= DAILY_CHILD_PUSH_LIMIT) return;
 
   const tokens = await listDeviceTokensForUsers(env.DB, familyId, [childId]);
-  const sent = await apnsSend(env, tokens, { title: "TaakHelden", body }, payload);
+  const sent = await apnsSend(env, tokens, { title: "Wispel", body }, payload);
   if (sent > 0) {
     await env.KV.put(countKey, String(used + 1), { expirationTtl: 60 * 60 * 24 });
   }
@@ -160,7 +160,7 @@ export async function notifyParents(
   const { results } = await getMembers(env.DB, familyId);
   const parentIds = results.filter((m) => m.role === "parent").map((m) => m.id as string);
   const tokens = await listDeviceTokensForUsers(env.DB, familyId, parentIds);
-  await apnsSend(env, tokens, { title: "TaakHelden", body }, payload);
+  await apnsSend(env, tokens, { title: "Wispel", body }, payload);
 }
 
 /** Roepnaam voor in pushtekst (nooit loggen — privacyregel 5). */

@@ -2,7 +2,7 @@
 "welcome.child" = "I already have a family code";
 "child.pin.visible" = "Use PIN";
 "child.offline.safe" = "Saved for later - we'll send it soon.";
-"child.all.done" = "All done - you were a hero today!";
+"child.all.done" = "All done - you're a star today!";
 
 /* Parent gate */
 "parent.gate.title" = "Parent gate";
@@ -11,7 +11,7 @@
 "parent.gate.behind.detail" = "Today per child, approvals with safe photo review, quiet settings and privacy actions like export or delete.";
 "parent.gate.child.pin.blocked" = "Child PIN cannot open this";
 "parent.gate.la.button" = "Unlock with Face ID or passcode";
-"parent.gate.la.reason" = "Unlock TaakHelden parent mode";
+"parent.gate.la.reason" = "Unlock Wispel parent mode";
 "parent.gate.la.failed" = "Authentication failed. Try again or use your parent account.";
 "parent.gate.account.button" = "Use parent account";
 "parent.gate.cancel" = "Go back";
@@ -76,7 +76,7 @@
 
 /* Photo viewer */
 "parent.photo.safe.title" = "Safe photo viewer";
-"parent.photo.safe.detail" = "TaakHelden intentionally hides EXIF, location and camera data here. Only the photo itself matters for review.";
+"parent.photo.safe.detail" = "Wispel intentionally hides EXIF, location and camera data here. Only the photo itself matters for review.";
 "parent.photo.close" = "Close";
 
 /* Sync status */
@@ -131,7 +131,7 @@
 "child.young.pin.retry" = "That code isn't right yet — try again calmly.";
 "child.unlock.pin.alternative" = "Or use your PIN";
 "child.unlock.pin.alternative.hint" = "PIN is always available next to Face ID";
-"child.push.primer.title" = "May TaakHelden send you a nudge?";
+"child.push.primer.title" = "May Wispel send you a nudge?";
 "child.push.primer.body" = "Only short, friendly reminders — no task names or photos on your lock screen. You can turn this off later.";
 "child.push.primer.accept" = "Yes, please";
 "child.push.primer.decline" = "Not now";
@@ -144,8 +144,8 @@
 "child.tab.day.young" = "Day";
 "child.tab.shop" = "Shop";
 "child.tab.shop.young" = "Shop";
-"child.tab.hero" = "My Hero";
-"child.tab.hero.young" = "Hero";
+"child.tab.hero" = "My Star";
+"child.tab.hero.young" = "Star";
 "child.day.loading" = "Loading your hero day…";
 "child.day.title" = "Today";
 "child.day.progress" = "%d of %d done";
@@ -153,7 +153,6 @@
 "child.points.badge" = "%d points";
 "child.streak" = "🔥 %d day streak";
 "child.streak.teen" = "%d day streak";
-"child.all.done" = "All done — you're a Task Hero today!";
 "child.all.done.teen" = "All done — solid day.";
 "child.all.done.detail" = "New missions will be ready tomorrow.";
 "child.no.missions" = "No missions yet";
@@ -177,8 +176,8 @@
 "child.offline.safe" = "Saved — we'll send it soon.";
 "child.young.speak" = "Read aloud";
 
-/* Phase 3 — My Hero / avatar */
-"held.fallback.name" = "Hero";
+/* Phase 3 — My Star / avatar */
+"held.fallback.name" = "Star";
 "held.level.format" = "Level %d";
 "held.level.speak" = "You are on level %d";
 "held.lifetime.format" = "Lifetime: %d points · streak %d";
@@ -215,6 +214,16 @@
 "goal.parent.created" = "Family goal is ready — children see progress on My Day.";
 "goal.parent.error" = "That didn't work. Maybe a goal is already active.";
 "child.shop.load.error" = "We couldn't load the shop — try again soon.";
+"child.shop.redeem" = "Redeem!";
+"child.shop.redeem.young" = "Buy";
+"child.shop.pin" = "Save for this";
+"child.shop.pinned" = "Your savings goal";
+"child.shop.goal.progress" = "%d more points until %@ — you've got this!";
+"child.shop.goal.progress.teen" = "%d more points until %@";
+"child.shop.redeem.success" = "Nice! A parent will check this soon.";
+"child.shop.insufficient" = "Almost! Keep earning — you can do it.";
+"child.shop.pending" = "Waiting on a parent…";
+"child.shop.pin.error" = "Couldn't set your savings goal — try again soon.";
 "child.photo.upload.error" = "Photo didn't work — you can try again.";
 "goal.parent.default.title" = "Pizza night together";
 "held.parent.gate.action" = "Open parent gate";

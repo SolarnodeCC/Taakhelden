@@ -60,7 +60,7 @@ describe("push-notifications", () => {
         APNS_ENV: "sandbox",
       },
       fam.familyId,
-      "Er wacht iets op je goedkeuring in TaakHelden.",
+      "Er wacht iets op je goedkeuring in Wispel.",
       { type: "approval_queue", refId: "rd_1", childId: fam.childA, contentAvailable: true },
     );
 
@@ -72,7 +72,7 @@ describe("push-notifications", () => {
       aps: { alert: { body: string }; "content-available"?: number };
       th: { type: string; refId: string };
     };
-    expect(body.aps.alert.body).toBe("Er wacht iets op je goedkeuring in TaakHelden.");
+    expect(body.aps.alert.body).toBe("Er wacht iets op je goedkeuring in Wispel.");
     expect(body.aps["content-available"]).toBe(1);
     expect(body.th).toMatchObject({ type: "approval_queue", refId: "rd_1" });
   });

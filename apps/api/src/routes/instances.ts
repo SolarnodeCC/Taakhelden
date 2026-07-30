@@ -13,7 +13,7 @@ import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
-import { idempotency, requireIdempotencyKey } from "../middleware/idempotency";
+import { requireIdempotencyKey } from "../middleware/idempotency";
 import { callFamilyRoom } from "../services/familyRoom";
 import { getFamily, listChildren } from "../repo/families";
 import { listForDate, listHistory } from "../repo/instances";
@@ -115,16 +115,16 @@ instances.get("/", async (c) => {
 });
 
 // Alle mutaties lopen via de FamilyRoom-DO (ledger-serialisatie per gezin).
-instances.post("/:id/complete", requireIdempotencyKey, idempotency, async (c) =>
+instances.post("/:id/complete", requireIdempotencyKey, async (c) =>
   callFamilyRoom(c, "/complete", { instanceId: c.req.param("id") }),
 );
 
-instances.post("/:id/approve", requireIdempotencyKey, idempotency, async (c) => {
+instances.post("/:id/approve", requireIdempotencyKey, async (c) => {
   requireParent(c);
   return callFamilyRoom(c, "/approve", { instanceId: c.req.param("id") });
 });
 
-instances.post("/:id/redo", requireIdempotencyKey, idempotency, validate("json", RedoBody), async (c) => {
+instances.post("/:id/redo", requireIdempotencyKey, validate("json", RedoBody), async (c) => {
   requireParent(c);
   // Vriendelijke toelichting verplicht; GEEN puntenaftrek (architectuurregel 4).
   return callFamilyRoom(c, "/redo", {
@@ -133,12 +133,12 @@ instances.post("/:id/redo", requireIdempotencyKey, idempotency, validate("json",
   });
 });
 
-instances.post("/:id/undo", requireIdempotencyKey, idempotency, async (c) =>
+instances.post("/:id/undo", requireIdempotencyKey, async (c) =>
   callFamilyRoom(c, "/undo", { instanceId: c.req.param("id") }),
 );
 
 /** Foto-bonus koppelen (kind, eigen taak) — na de presigned-flow uit §3.6. */
-instances.post("/:id/photo", requireIdempotencyKey, idempotency, validate("json", AttachPhotoBody), async (c) => {
+instances.post("/:id/photo", requireIdempotencyKey, validate("json", AttachPhotoBody), async (c) => {
   const { role } = c.get("auth");
   if (role !== "child") {
     // Rollenmatrix §5: alleen het kind zelf koppelt taakfoto's.
@@ -150,7 +150,7 @@ instances.post("/:id/photo", requireIdempotencyKey, idempotency, validate("json"
   });
 });
 
-instances.post("/:id/move", requireIdempotencyKey, idempotency, validate("json", MoveInstanceBody), async (c) => {
+instances.post("/:id/move", requireIdempotencyKey, validate("json", MoveInstanceBody), async (c) => {
   requireParent(c, { full: true });
   const body = c.req.valid("json");
   return callFamilyRoom(c, "/move", {

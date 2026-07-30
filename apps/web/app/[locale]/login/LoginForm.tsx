@@ -44,7 +44,7 @@ export default function LoginForm() {
     setBusy(true);
     try {
       await apiClient.post("/api/auth/login", parsed.data);
-      router.push("/");
+      router.push("/vandaag");
       router.refresh();
     } catch (err) {
       const code = err instanceof ApiClientError ? err.code : null;
@@ -55,7 +55,7 @@ export default function LoginForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-6 flex flex-col gap-4">
+    <form onSubmit={onSubmit} className="flex flex-col gap-4">
       <Field label={t("email")}>
         <Input
           type="email"

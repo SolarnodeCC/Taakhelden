@@ -16,16 +16,16 @@ De mapping staat in `apps/web/tailwind.config.ts`. Belangrijkste:
 | `bg-accent` / `hover:bg-accent-hover` / `text-accent-fg` | `--color-accent…` | teal `#0e9f8e` |
 | `text-danger` / `bg-danger-bg` | `--color-danger…` | `#b00020` / `#fdecef` |
 | `text-success` / `bg-success-bg` | `--color-success…` | `#1f9254` / `#eaf7ef` |
-| `bg-kid-coral` / `-turquoise` / `-yellow` / `-cream` (+ `-soft`) | `--kid-*` | inferred |
-| `bg-teen-navy` / `-navy-surface` / `text-teen-mint` | `--teen-*` | inferred |
+| `bg-kid-coral` / `-turquoise` / `-yellow` / `-cream` (+ `-soft`) | `--kid-*` | shipping v1 |
+| `bg-teen-navy` / `-navy-surface` / `text-teen-mint` | `--teen-*` | shipping v1 |
+| `font-sans` / `font-display` / `font-rounded` | `--font-sans` / `--font-display` / `--font-rounded` | system / Outfit / Fredoka |
 | `rounded-sm/DEFAULT/lg/xl/full` | `--radius-*` | 6 / 10 / 16 / 24 / pill px |
 | `shadow-sm/md/kid` | `--shadow-*` | vlak / medium / warm coral |
-| `font-sans` / `font-rounded` | `--font-sans` / `--font-rounded` | system / Fredoka |
 | type `text-xs…text-4xl`, `font-medium/semibold/bold` | `--text-*` / `--weight-*` | 4px-schaal |
 | spacing `p-4`, `gap-6`, … | `--space-*` | 4px-basis |
 
-**Kid/teen-paletten zijn inferred/placeholder** (vertaald uit productvoorstel §4.1),
-niet brand-final. Zie de vlaggen in `globals.css`.
+**Kid/teen-paletten zijn shipping brand v1** (zie `docs/brand/wispel-brand-v1.md`).
+Wijzig hex alleen via de token-owner (O17) op globals.css + DS tokens + `THPalettes`.
 
 ## Web-primitives (`apps/web/components/ui/`)
 Importeer via `../…/components/ui` (barrel `index.ts`):

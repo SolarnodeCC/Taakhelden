@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import type { AppBindings, Env } from "./types";
 import { errorHandler } from "./middleware/error";
 import { authMiddleware } from "./middleware/auth";
+import { idempotency } from "./middleware/idempotency";
 import authRoutes from "./routes/auth";
 import familyRoutes, { parentAccept } from "./routes/families";
 import memberRoutes from "./routes/members";
@@ -50,6 +51,15 @@ app.get("/ws", (c) => handleWsUpgrade(c));
 
 // Alles hieronder vereist een geldige JWT
 app.use("*", authMiddleware);
+// Optional Idempotency-Key replay for authenticated mutations (CLAUDE.md §2).
+// Ledger routes still require the header via requireIdempotencyKey.
+app.use("*", async (c, next) => {
+  const method = c.req.method;
+  if (method === "GET" || method === "HEAD" || method === "OPTIONS") {
+    return next();
+  }
+  return idempotency(c, next);
+});
 app.route("/families", familyRoutes);
 app.route("/members", memberRoutes);
 app.route("/tasks", taskRoutes);

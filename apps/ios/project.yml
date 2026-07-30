@@ -43,7 +43,9 @@ targets:
       path: TaakHelden/TaakHelden.Debug.entitlements
     settings:
       base:
-        PRODUCT_NAME: TaakHelden
+        # Keep PRODUCT_NAME = target name (TaakHelden) so TEST_HOST and
+        # `@testable import TaakHelden` stay aligned. User-facing name is
+        # CFBundleDisplayName = Wispel in Info.plist.
         GENERATE_INFOPLIST_FILE: NO
       configs:
         Debug:

@@ -21,11 +21,14 @@ devices.post("/", validate("json", DeviceBody), async (c) => {
       throw new ApiException(404, ErrorCodes.NOT_FOUND, "Gezinslid niet gevonden.");
     }
   }
-  await registerDevice(c.env.DB, familyId, {
+  const registered = await registerDevice(c.env.DB, familyId, {
     userId: target,
     apnsToken: body.apnsToken,
     platform: body.platform,
   });
+  if (!registered) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Gezinslid niet gevonden.");
+  }
   return c.json({ ok: true }, 201);
 });
 

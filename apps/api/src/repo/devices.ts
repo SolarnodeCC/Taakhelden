@@ -3,14 +3,18 @@ export async function registerDevice(
   familyId: string,
   input: { userId: string; apnsToken: string; platform: string },
 ) {
-  // Membership van userId binnen familyId is door de route gecheckt.
-  await db
+  // Only insert when userId is a member of familyId (CLAUDE.md regel 1).
+  const result = await db
     .prepare(
-      `INSERT INTO devices (apns_token, user_id, platform) VALUES (?, ?, ?)
+      `INSERT INTO devices (apns_token, user_id, platform)
+       SELECT ?, u.id, ?
+       FROM users u
+       WHERE u.id = ? AND u.family_id = ? AND u.deleted_at IS NULL
        ON CONFLICT (apns_token, user_id) DO UPDATE SET platform = excluded.platform`,
     )
-    .bind(input.apnsToken, input.userId, input.platform)
+    .bind(input.apnsToken, input.platform, input.userId, familyId)
     .run();
+  return (result.meta.changes ?? 0) > 0;
 }
 
 /**

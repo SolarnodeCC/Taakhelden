@@ -13,7 +13,7 @@ import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent, requireSelfOrParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
-import { idempotency, requireIdempotencyKey } from "../middleware/idempotency";
+import { requireIdempotencyKey } from "../middleware/idempotency";
 import { newId } from "../services/ids";
 import { hashSecret } from "../services/passwords";
 import * as repo from "../repo/families";
@@ -110,7 +110,6 @@ members.get("/:id/avatar", async (c) => {
 members.patch(
   "/:id/avatar",
   requireIdempotencyKey,
-  idempotency,
   validate("json", EquipAvatarBody),
   async (c) => {
     const memberId = c.req.param("id");

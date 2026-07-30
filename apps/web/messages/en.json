@@ -16,7 +16,7 @@
     },
     "deletedFamily": "Your family is marked for deletion. Everything will be permanently removed around {purgeAfter}.",
     "register": {
-      "intro": "Create an account and start your family on TaakHelden.",
+      "intro": "Create an account and start your family on Wispel.",
       "displayName": "Your first name",
       "familyName": "Family name",
       "passwordHint": "At least 10 characters.",
@@ -261,7 +261,7 @@
     },
     "invite": {
       "title": "Family code",
-      "hint": "Open the TaakHelden app on the child's device and enter this code.",
+      "hint": "Open the Wispel app on the child's device and enter this code.",
       "copy": "Copy",
       "copied": "Copied",
       "regenerate": "Create new code",
@@ -311,7 +311,7 @@
       "copy": "Copy link",
       "copied": "Copied",
       "errors": {
-        "EMAIL_IN_USE": "This email is already in use on TaakHelden.",
+        "EMAIL_IN_USE": "This email is already in use on Wispel.",
         "VALIDATION_FAILED": "Please enter a valid email address.",
         "FORBIDDEN": "Only parents with full access can invite.",
         "generic": "Couldn't send the invitation. Please try again."
@@ -374,7 +374,7 @@
   },
   "instellingen": {
     "title": "Settings",
-    "subtitle": "Notifications and privacy for your family.",
+    "subtitle": "Notifications, privacy, and support for your family.",
     "loading": "Loading…",
     "loadError": "Couldn't load settings.",
     "notifications": {
@@ -417,6 +417,12 @@
       "deleteWorking": "Working…",
       "deleteFailed": "Couldn't delete. Please try again.",
       "errorForbidden": "Only full access can delete the family."
+    },
+    "steun": {
+      "title": "Support Wispel",
+      "body": "Wispel stays free. Optional donations are coming soon — until then you can email us. Never shown to children.",
+      "link": "Email steun@wispel.cc",
+      "pageLink": "More about support"
     }
   },
   "punten": {
@@ -458,5 +464,241 @@
       "title": "Insights",
       "body": "Coming soon: weekly trends to support the conversation — never as a monitoring tool."
     }
+  },
+  "marketing": {
+    "metaTitle": "Wispel — free for families",
+    "metaDescription": "Wispel helps families with homework and chores — privacy first, free for your family. Positive for kids, calm for parents.",
+    "brand": "Wispel",
+    "headline": "Homework and chores that actually stick",
+    "support": "Kids earn stars with tasks. You keep a calm overview. Free for your family — privacy first, no ads.",
+    "ctaPrimary": "Start your family — free",
+    "ctaSecondary": "Sign in",
+    "ctaSteun": "Support Wispel (coming soon)",
+    "nav": {
+      "login": "Sign in",
+      "cta": "Start free"
+    },
+    "auth": {
+      "login": "Sign in to the parent dashboard — a calm overview for your family.",
+      "register": "Create an account and start your family. Free, privacy first.",
+      "accept": "Accept your invite and join the family.",
+      "loginTitle": "Sign in",
+      "registerTitle": "Start family",
+      "acceptTitle": "Invitation"
+    },
+    "visual": {
+      "dayLabel": "My day",
+      "starLabel": "My Star",
+      "pointsLabel": "points"
+    },
+    "howItWorks": {
+      "title": "How Wispel works",
+      "support": "One loop for the whole family — positive for kids, calm for you.",
+      "steps": [
+        {
+          "title": "You plan tasks",
+          "body": "Homework and chores in one place. Kids see what’s on for today."
+        },
+        {
+          "title": "Kids earn stars",
+          "body": "Checking off feels good. No guilt language, no sibling rankings."
+        },
+        {
+          "title": "Approve and redeem",
+          "body": "You stay in control. Kids save toward a reward in the shop."
+        }
+      ]
+    },
+    "preview": {
+      "title": "Warm for kids, calm for parents",
+      "support": "One brand, two registers — so the kid app stays playful without making your dashboard shout.",
+      "kidLabel": "Kid app",
+      "kidLine": "All done — what a star today!",
+      "kidTask1": "Tidy room · +10",
+      "kidTask2": "Finish maths · +15",
+      "parentLabel": "Parent dashboard",
+      "parentLine": "Today: 2 to approve",
+      "parentItem1": "Lisa · Tidy room",
+      "parentItem2": "Noah · Finish maths"
+    },
+    "privacy": {
+      "title": "Privacy first",
+      "body": "We build for Dutch families: as little data as possible, explained in plain language.",
+      "points": [
+        "No ads and no selling family data",
+        "No child tracking; no child email accounts",
+        "EU-first hosting; task photos kept at most 30 days"
+      ],
+      "link": "Read the privacy notice"
+    },
+    "gratis": {
+      "title": "Free for families",
+      "body": "Core features are free. No trial countdown, no subscription table, no paywall for ‘full household access’."
+    },
+    "faq": {
+      "title": "FAQ",
+      "items": [
+        {
+          "q": "Is Wispel really free?",
+          "a": "Yes. Core features are free for families. Optional support (donations) is parent-only — never on child tabs."
+        },
+        {
+          "q": "What does privacy first mean?",
+          "a": "No ads, no child tracking, no selling family data. Children don’t get their own email account with us."
+        },
+        {
+          "q": "Does it cover homework and chores?",
+          "a": "Yes. Both belong in the daily loop — plan, check off, approve, save stars."
+        },
+        {
+          "q": "Are there rankings between kids?",
+          "a": "No. Wispel celebrates what went well. No individual leaderboards that put a child last."
+        },
+        {
+          "q": "Who is Wispel for?",
+          "a": "Dutch families who want to organise homework and chores positively — without guilt language."
+        }
+      ]
+    },
+    "audience": {
+      "title": "Is it for you?",
+      "forTitle": "A good fit if",
+      "forItems": [
+        "You’re a NL family tackling homework and chores together",
+        "You want calm oversight without a scoreboard vibe",
+        "Your kids deserve encouragement — stars, not penalties"
+      ],
+      "notForTitle": "Not a fit if",
+      "notForItems": [
+        "You need a subscription or trial to unlock ‘full’ access",
+        "You want kids competing on a leaderboard",
+        "You’re fine with child tracking or ads in a family app"
+      ]
+    },
+    "steun": {
+      "title": "Support Wispel",
+      "body": "If Wispel helps your family, you’re welcome to support us. Donations are coming soon — until then you can email. Never required, never on child tabs.",
+      "link": "Email steun@wispel.cc"
+    },
+    "finalCta": {
+      "title": "Ready to start?",
+      "support": "Create your family — free. Privacy first from the first click."
+    },
+    "footer": {
+      "tagline": "Free for families · Privacy first",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "steun": "Support"
+    },
+    "steunPage": {
+      "metaTitle": "Support Wispel",
+      "title": "Support Wispel",
+      "intro": "Wispel is free for families. Optional support helps us keep building — parent-only, never on child tabs.",
+      "status": "Donations via iDEAL or card are coming soon. Until then: send us an email.",
+      "link": "Email steun@wispel.cc",
+      "back": "Back to home"
+    }
+  },
+  "legal": {
+    "backToLogin": "Back to sign in",
+    "links": {
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "updated": "Last updated: 30 July 2026",
+      "intro": "Wispel is privacy first. We build for families: collect as little as we can, no ads, and no tracking of children. Below is what we do and don’t do — in plain language.",
+      "sections": [
+        {
+          "heading": "Who this is for",
+          "body": "Parents/caregivers who manage a Wispel family, and anyone visiting our website. Children use Wispel through a parent-linked profile — they do not have their own email account with us."
+        },
+        {
+          "heading": "What data we use",
+          "body": "Parent account: email, display name, password (hashed) or Sign in with Apple.\nFamily: family name, child profiles (display name, birth year, avatar), tasks, rewards, points ledger, approvals.\nOptional: task photos uploaded as proof.\nDevices: session/device tokens to stay signed in and (if you allow it) push notifications."
+        },
+        {
+          "heading": "What we don’t do",
+          "body": "No advertising.\nNo selling family data.\nNo third-party tracking or ad SDKs in the child experience.\nNo child email addresses.\nWe do not log child names or photo URLs in application logs."
+        },
+        {
+          "heading": "Why we need it",
+          "body": "To run the family loop: plan tasks, check them off, approve, track points and redeem rewards. Without account data we cannot sign you in safely. Photos are optional and only for parent review."
+        },
+        {
+          "heading": "Photos",
+          "body": "Task photos are kept for at most 30 days, then deleted. We strip EXIF/location data before display. Production use with real child photos follows our privacy minimum and DPIA track; until that is complete, photo use may be limited."
+        },
+        {
+          "heading": "Where data lives",
+          "body": "We host on Cloudflare (Workers, D1, R2) with EU-first location choices (including D1 weur, R2 eu). Apple may be involved for Sign in with Apple and push (APNs). An email provider may send co-parent invites — only to parent emails."
+        },
+        {
+          "heading": "Who can access it",
+          "body": "Only members of your family (parents/caregivers and linked child profiles) inside the app. There is no default support tool that can browse family data or child photos."
+        },
+        {
+          "heading": "Your rights",
+          "body": "You can export family data and delete the family via Settings in the parent dashboard. After deletion there is a short retention window before final purge (as shown in the app). For questions or GDPR requests: email steun@wispel.cc (or the App Store listing contact once that is live)."
+        },
+        {
+          "heading": "Donations",
+          "body": "Wispel is free for families. Optional donations will later use a separate, parent-only flow (never on child tabs). Until then you can email steun@wispel.cc. A payment provider is not active yet."
+        },
+        {
+          "heading": "Changes",
+          "body": "If we change something material, we update this page and the date above. For major changes we inform parents as clearly as we can."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms",
+      "updated": "Last updated: 30 July 2026",
+      "intro": "These terms apply to Wispel (app and parent dashboard) on wispel.cc and related services. Wispel is free for families; donations are optional.",
+      "sections": [
+        {
+          "heading": "The service",
+          "body": "Wispel helps families organise homework and chores positively with tasks, approvals, points and rewards. We may improve, maintain or temporarily interrupt parts of the service (for example for security or outages)."
+        },
+        {
+          "heading": "Accounts and responsibility",
+          "body": "A parent/caregiver creates the family and is responsible for child profiles, settings and approvals. Keep your credentials private. Do not use Wispel to harm others, bully, or break the law."
+        },
+        {
+          "heading": "Children",
+          "body": "Child profiles belong to the parent account. There is no standalone child email account. Parents decide what children may do in the app and remain responsible for supervision."
+        },
+        {
+          "heading": "Free and donations",
+          "body": "Core features are free. No subscription is required to use Wispel. Optional donations support development; they do not unlock paywalls and are never shown on child tabs."
+        },
+        {
+          "heading": "Content and photos",
+          "body": "You keep ownership of what you upload. You grant us permission to process that content to provide the service (for example showing a task photo to a parent). Do not upload unlawful or harmful content. Photos may be deleted after 30 days."
+        },
+        {
+          "heading": "Availability",
+          "body": "We aim for a stable service but do not guarantee uninterrupted availability. Do not rely on Wispel alone for critical family processes without your own backup."
+        },
+        {
+          "heading": "Liability",
+          "body": "Wispel is provided “as is” for personal family use. To the extent permitted by law we are not liable for indirect or consequential damage. Mandatory consumer law still applies."
+        },
+        {
+          "heading": "Termination",
+          "body": "You can delete your family via privacy settings. We may limit or end access in case of abuse, security risk, or breach of these terms."
+        },
+        {
+          "heading": "Privacy",
+          "body": "How we handle data is described in our Privacy notice. It forms part of these terms."
+        },
+        {
+          "heading": "Law and contact",
+          "body": "Dutch law applies to these terms, unless mandatory law says otherwise. Contact: steun@wispel.cc — and later via the App Store listing when that is live."
+        }
+      ]
+    },
+    "backHome": "Back to home"
   }
 }

@@ -26,3 +26,4 @@ target/jankurai/repair-queue.jsonl
 target/jankurai/security/
 target/jankurai/update/
 target/jankurai/receipts/
+chorehero_audit/

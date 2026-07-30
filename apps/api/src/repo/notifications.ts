@@ -1,7 +1,7 @@
 /**
  * Notificatie-instellingen per kind (§3.10). Een ontbrekende rij betekent de
  * standaard: aan, met het gezinsvenster (quiet hours) als tijdvenster.
- * Family-gescoped via een join op users (CLAUDE.md regel 1).
+ * Family-gescoped via users.family_id (CLAUDE.md regel 1).
  */
 export interface NotificationSettingRow {
   child_id: string;
@@ -45,11 +45,25 @@ export async function getSetting(
     .first<NotificationSettingRow>();
 }
 
+/**
+ * Upsert settings only when `childId` belongs to `familyId`.
+ * Returns false when the child is not in the family (no write).
+ */
 export async function upsertSetting(
   db: D1Database,
+  familyId: string,
   childId: string,
   values: { enabled: boolean; quietStart: string | null; quietEnd: string | null },
-): Promise<void> {
+): Promise<boolean> {
+  const member = await db
+    .prepare(
+      `SELECT id FROM users
+       WHERE id = ? AND family_id = ? AND role = 'child' AND deleted_at IS NULL`,
+    )
+    .bind(childId, familyId)
+    .first();
+  if (!member) return false;
+
   await db
     .prepare(
       `INSERT INTO notification_settings (child_id, enabled, quiet_start, quiet_end, updated_at)
@@ -62,4 +76,5 @@ export async function upsertSetting(
     )
     .bind(childId, values.enabled ? 1 : 0, values.quietStart, values.quietEnd)
     .run();
+  return true;
 }

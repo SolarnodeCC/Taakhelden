@@ -1,7 +1,7 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "TaakHelden core API",
+    "title": "Wispel core API",
     "version": "0.1.0",
     "description": "Generated core contract snapshot from packages/shared. Covers web dashboard and iOS Phase 1 endpoints."
   },

@@ -14,7 +14,7 @@ function LoginScreen({ onLogin }) {
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}>
         <main style={{ width: '100%', maxWidth: 360 }}>
           <div style={{ width: 40, height: 4, borderRadius: 999, background: 'var(--color-accent)', marginBottom: 20 }} />
-          <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-accent)', margin: 0 }}>TaakHelden</h1>
+          <h1 style={{ fontSize: 'var(--text-2xl)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-accent)', margin: 0 }}>Wispel</h1>
           <p style={{ marginTop: 4, fontSize: 'var(--text-sm)', color: 'var(--color-text-muted)' }}>Log in om het dashboard van je gezin te bekijken.</p>
           <form onSubmit={submit} style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
             <Field label="E-mailadres"><Input type="email" placeholder="jij@gezin.nl" value={email} onChange={(e) => setEmail(e.target.value)} /></Field>

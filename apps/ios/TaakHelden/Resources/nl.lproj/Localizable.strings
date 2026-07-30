@@ -2,7 +2,7 @@
 "welcome.child" = "Ik heb al een gezinscode";
 "child.pin.visible" = "Gebruik pincode";
 "child.offline.safe" = "Wordt bewaard - sturen we zo.";
-"child.all.done" = "Alles gedaan - je bent vandaag al een TaakHeld!";
+"child.all.done" = "Alles gedaan - je bent een ster vandaag!";
 
 /* Parent gate */
 "parent.gate.title" = "Ouderpoort";
@@ -11,7 +11,7 @@
 "parent.gate.behind.detail" = "Vandaag per kind, goedkeuren met veilige fotoweergave, rustige instellingen en privacy-acties zoals export of verwijderen.";
 "parent.gate.child.pin.blocked" = "Kind-pincode opent dit bewust niet";
 "parent.gate.la.button" = "Ontgrendel met Face ID of toestelcode";
-"parent.gate.la.reason" = "Ontgrendel de oudermodus van TaakHelden";
+"parent.gate.la.reason" = "Ontgrendel de oudermodus van Wispel";
 "parent.gate.la.failed" = "De authenticatie is niet gelukt. Probeer het nog eens of gebruik je ouderaccount.";
 "parent.gate.account.button" = "Gebruik ouderaccount";
 "parent.gate.cancel" = "Toch terug";
@@ -76,7 +76,7 @@
 
 /* Photo viewer */
 "parent.photo.safe.title" = "Veilige fotoweergave";
-"parent.photo.safe.detail" = "TaakHelden laat hier bewust geen EXIF-, locatie- of cameragegevens zien. Alleen de foto zelf telt mee voor de beoordeling.";
+"parent.photo.safe.detail" = "Wispel laat hier bewust geen EXIF-, locatie- of cameragegevens zien. Alleen de foto zelf telt mee voor de beoordeling.";
 "parent.photo.close" = "Sluiten";
 
 /* Sync status */
@@ -131,7 +131,7 @@
 "child.young.pin.retry" = "Die code klopt nog niet — probeer het rustig opnieuw.";
 "child.unlock.pin.alternative" = "Of gebruik je pincode";
 "child.unlock.pin.alternative.hint" = "Pincode is altijd beschikbaar naast Face ID";
-"child.push.primer.title" = "Mag TaakHelden je een seintje geven?";
+"child.push.primer.title" = "Mag Wispel je een seintje geven?";
 "child.push.primer.body" = "Alleen korte, vriendelijke herinneringen — zonder taaknamen of foto’s op je vergrendelscherm. Je kunt dit later uitzetten.";
 "child.push.primer.accept" = "Ja, mag";
 "child.push.primer.decline" = "Nu niet";
@@ -144,8 +144,8 @@
 "child.tab.day.young" = "Dag";
 "child.tab.shop" = "Winkel";
 "child.tab.shop.young" = "Shop";
-"child.tab.hero" = "Mijn Held";
-"child.tab.hero.young" = "Held";
+"child.tab.hero" = "Mijn Ster";
+"child.tab.hero.young" = "Ster";
 "child.day.loading" = "Even je heldendag laden…";
 "child.day.title" = "Vandaag";
 "child.day.progress" = "%d van %d klaar";
@@ -174,8 +174,8 @@
 "child.shop.affordable.teen" = "Past bij je saldo";
 "child.shop.need.more" = "Nog %d punten tot %@";
 
-/* Phase 3 — Mijn Held / avatar */
-"held.fallback.name" = "Held";
+/* Phase 3 — Mijn Ster / avatar */
+"held.fallback.name" = "Ster";
 "held.level.format" = "Level %d";
 "held.level.speak" = "Je bent op level %d";
 "held.lifetime.format" = "Alles bij elkaar: %d punten · streak %d";
@@ -212,6 +212,16 @@
 "goal.parent.created" = "Gezinsdoel staat klaar — de kinderen zien de voortgang op Mijn Dag.";
 "goal.parent.error" = "Dat lukte niet. Misschien is er al een actief doel.";
 "child.shop.load.error" = "De winkel konden we even niet laden — probeer zo opnieuw.";
+"child.shop.redeem" = "Kopen!";
+"child.shop.redeem.young" = "Kopen";
+"child.shop.pin" = "Spaardoel";
+"child.shop.pinned" = "Je spaardoel";
+"child.shop.goal.progress" = "Nog %d punten tot %@ — je komt eraan!";
+"child.shop.goal.progress.teen" = "Nog %d punten tot %@";
+"child.shop.redeem.success" = "Netjes! Papa of mama kijkt zo of het mag.";
+"child.shop.insufficient" = "Bijna! Spaar nog even door — je kunt het.";
+"child.shop.pending" = "Wacht op papa of mama…";
+"child.shop.pin.error" = "Spaardoel lukte niet — probeer zo opnieuw.";
 "child.photo.upload.error" = "Foto lukte niet — je mag het nog een keer proberen.";
 "goal.parent.default.title" = "Samen pizza-avond";
 "held.parent.gate.action" = "Open ouderpoort";

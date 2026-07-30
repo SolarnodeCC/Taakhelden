@@ -122,7 +122,7 @@ exportDownload.get("/export/:id/file", async (c) => {
   if (!object) {
     throw new ApiException(404, ErrorCodes.NOT_FOUND, "Export niet gevonden.");
   }
-  const filename = `taakhelden-export-${exportId}.zip`;
+  const filename = `wispel-export-${exportId}.zip`;
   return c.body(object.body, 200, {
     "Content-Type": "application/zip",
     "Content-Disposition": `attachment; filename="${filename}"`,

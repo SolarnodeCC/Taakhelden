@@ -28,6 +28,7 @@
     "components",
     "i18n",
     "lib",
+    "messages",
     "middleware.ts",
     "tailwind.config.ts",
     "next-env.d.ts",

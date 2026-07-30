@@ -58,6 +58,6 @@ Bij een vermoed datalek:
   ouder-eigen testfoto's gebruiken.
 - Productiegebruik met echte kinderfoto's blijft geblokkeerd totdat:
   - dit privacy minimum bestaat,
-  - de privacyverklaring de foto-retentie noemt,
-  - de subprocessors-lijst publiek beschikbaar is,
+  - de privacyverklaring de foto-retentie noemt (**publiek:** `/privacy` in `apps/web`),
+  - de subprocessors-lijst publiek beschikbaar is (zie `/privacy`),
   - en de DPIA is afgerond.

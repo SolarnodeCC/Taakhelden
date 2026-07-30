@@ -26,7 +26,7 @@ const config: Config = {
           DEFAULT: "var(--color-success)",
           bg: "var(--color-success-bg)",
         },
-        // Kid + teen palettes — inferred/placeholder (see globals.css).
+        // Kid + teen palettes — shipping brand v1 (see docs/brand/wispel-brand-v1.md).
         kid: {
           coral: "var(--kid-coral)",
           "coral-soft": "var(--kid-coral-soft)",
@@ -54,6 +54,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: "var(--font-sans)",
+        display: "var(--font-display)",
         rounded: "var(--font-rounded)",
       },
       fontSize: {
