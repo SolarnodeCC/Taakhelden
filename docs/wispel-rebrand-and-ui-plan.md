@@ -11,7 +11,8 @@
 
 These supersede the freemium/premium sketch in `docs/taakhelden-productvoorstel.md` §7 for Wispel direction.
 
-**Executable build plan:** [`wispel-build-plan-workstreams.md`](./wispel-build-plan-workstreams.md) — horizons, workstreams, PR sequence, anti-goals.
+**Executable build plan:** [`wispel-build-plan-workstreams.md`](./wispel-build-plan-workstreams.md) — horizons, workstreams, PR sequence, anti-goals.  
+**Open points (canonical):** [`wispel-build-plan-workstreams.md` §13](./wispel-build-plan-workstreams.md#13-open-points-register-canonical) — locked L1–L6, open O1–O34.
 
 ---
 
