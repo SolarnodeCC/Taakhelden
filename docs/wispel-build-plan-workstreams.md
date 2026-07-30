@@ -421,15 +421,88 @@ If a workstream PR includes any of the above “for convenience,” reject it.
 
 ---
 
-## 13. Open decisions still blocking specific streams
+## 13. Open points register (canonical)
 
-| Decision | Blocks |
-| --- | --- |
-| Wispel-native vocabulary | WS-STRINGS, all copy |
-| Marketing in same Next app vs separate | WS-WEB-MKT structure |
-| Bundle ID keep vs new | WS-INFRA / App Store |
-| Donation provider + entity | WS-DONATE only |
-| Temp mark acceptable for A? | Whether BRAND gates MKT thin |
+Track decisions here. Strategy doc §14 points here so we do not maintain two lists.
+
+### 13.1 Locked (do not reopen without ADR)
+
+| ID | Decision | Locked as |
+| --- | --- | --- |
+| L1 | Product name | **Wispel** (not “wispel.cc” in chrome) |
+| L2 | Primary domain | **wispel.cc** |
+| L3 | Privacy posture | **Privacy first** — no ads, no child tracking, EU hosting, plain-language privacy |
+| L4 | Pricing model | **Free for families**; optional **donations** (parent-only, never child-facing) |
+| L5 | Anti-positioning | Not an English ChoreHero / “Hero” clone |
+| L6 | Child motivation rules | No negatives, no sibling ranking (unchanged product rules) |
+
+### 13.2 Open — decide before / during Gate G0 (brand lock)
+
+| ID | Open point | Options / recommendation | Blocks | Owner |
+| --- | --- | --- | --- | --- |
+| O1 | **Vocabulary** replacing “TaakHeld(en)” | Wispel-native term(s) NL+EN; **ban Held/Hero** | WS-STRINGS, all copy, Store listing | PO + Marketing + `@dutch-child-copy` |
+| O2 | **Parent / kid / teen palette** final hex | Sign off hex; reject cream+#blue ChoreHero twin | WS-BRAND, MKT full, iOS age | Design |
+| O3 | **Wordmark / mark** | Temp SVG OK for Horizon A; final mark for B | MKT thin (temp) / WS-BRAND (final) | Design |
+| O4 | **Temp mark acceptable for Horizon A?** | **Recommend yes** — don’t block thin landing | Whether BRAND gates MKT thin | PO + Design |
+| O5 | **Privacy one-liner + free one-liner** | NL+EN, marketing-ready | WS-PRIVACY-PUB, MKT, Store | PO + Marketing |
+| O6 | **Tagline** (one parent promise) | Playful Dutch; not “tired of reminding” | MKT hero | Marketing |
+| O7 | **Mascot** | Keep Vinkie / redesign / **postpone** (recommend postpone past A) | WS-BRAND optional; not Horizon A | PO + Design |
+| O8 | **Marketing hosting** | **A:** same Next `(marketing)` group (**recommend**) · **B:** separate Worker | WS-WEB-MKT structure | Architect + Web |
+| O9 | **Subdomain map** | Confirm `www` / `app` / `api` on wispel.cc | WS-INFRA, MKT links | DevOps + Architect |
+| O10 | **Bundle ID** | Keep `nl.taakhelden.*` if App Store record exists; else `cc.wispel.family` | WS-INFRA, SIWA, Store | PO + iOS |
+| O11 | **App Store display name** | Wispel (confirm) | Store metadata | PO |
+| O12 | **Illustration / avatar v1 scope** | Emoji subset vs commissioned art for B | WS-BRAND, WS-IOS-AGE | Design + PO |
+
+### 13.3 Open — needed for Horizon A engineering (can use defaults)
+
+| ID | Open point | Default if undecided | Blocks hard? | Owner |
+| --- | --- | --- | --- | --- |
+| O13 | **Staging hostname** | Keep `*.workers.dev` until prod cutover | No — INFRA later | DevOps |
+| O14 | **Interactive demo** on marketing | **Defer** to Horizon C / WS-CROSS (anti-goal for A) | No | Marketing |
+| O15 | **Inzichten** | **Hide from nav** until real Insights ships | No — WS-WEB-CRAFT | PO + Web |
+| O16 | **Auth on web:** forgot-password / Google | Backlog after A; email/password + iOS SIWA stay | No for A | Web + Security |
+| O17 | **Token ownership** during parallel UI | Appoint **one** editor for `globals.css` + DS tokens | Merge hell if skipped | Tech lead |
+
+### 13.4 Open — only block WS-DONATE / Horizon C sustain
+
+| ID | Open point | Options / recommendation | Blocks | Owner |
+| --- | --- | --- | --- | --- |
+| O18 | **Donation provider** | Stripe / Mollie / iDEAL / bunq / other — pick NL-friendly | WS-DONATE | Business + Backend |
+| O19 | **Legal entity** receiving funds | Stichting / eenmanszaak / etc. | WS-DONATE | Business / legal |
+| O20 | **Donation UX amounts** | Suggested €3/€5/€10 vs open amount only | `/steun` UI | Marketing + PO |
+| O21 | **Donate via Apple IAP?** | **Recommend no** — external `/steun` link + App Store disclosure | Complexity; avoid unless required | PO + iOS |
+| O22 | **Steun placeholder until live** | Mailto or “binnenkort” on thin landing (**yes**) | Nothing if placeholder used | Web |
+
+### 13.5 Open — infra cutover only (Horizon C)
+
+| ID | Open point | Options / recommendation | Blocks | Owner |
+| --- | --- | --- | --- | --- |
+| O23 | **Worker / D1 / R2 display names** | `wispel-api`, `wispel-web`, `wispel-db`, … | WS-INFRA | DevOps |
+| O24 | **Keep old workers.dev aliases** | Recommend 48h+ rollback window | Cutover runbook | DevOps |
+| O25 | **iOS folder rename** `TaakHelden` → `Wispel` | **Defer** after strings stable (anti-goal for A) | High-conflict path rename | iOS |
+| O26 | **Doc filename mass rename** `taakhelden-*.md` | **Defer**; update content first | Cosmetic | Knowledge |
+| O27 | **Email from** `@wispel.cc` | SPF/DKIM/DMARC ready before cutover | Prod email | DevOps |
+| O28 | **SIWA Services ID / redirect URLs** | Point at `app.wispel.cc` / `wispel.cc` | Auth after DNS | iOS + Security |
+
+### 13.6 Open — product / marketing depth (post-A backlog)
+
+| ID | Open point | Recommendation | Horizon |
+| --- | --- | --- | --- |
+| O29 | SEO comparison / guide articles (NL) | After full landing; don’t block A/B | C+ |
+| O30 | Young-mode “near-textless” completeness | Cap B1; market 4–7 only after QA pass | B2 |
+| O31 | Shared design-token npm package | **Do not** extract mid-rebrand | Later |
+| O32 | Cursor agent id rename `taakhelden-*` | Optional; not user-facing | Later |
+| O33 | Pedagogical expert review as marketing claim | Strong trust story; schedule outside eng critical path | B/C |
+| O34 | Co-ouderschap / Watch / focustimer | Existing product backlog — out of Wispel rebrand scope | Out of scope |
+
+### 13.7 Decision log (fill as answers land)
+
+| ID | Decision taken | Date | ADR / link |
+| --- | --- | --- | --- |
+| L1–L6 | See §13.1 | 2026-07-30 | This plan + strategy doc |
+| O1–O34 | *Pending* | — | — |
+
+**Rule:** When an O* is decided, move a one-liner into §13.7 and strike the row or mark ✅ — do not delete history without an ADR if it affects bundle ID, donations, or privacy.
 
 ---
 

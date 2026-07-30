@@ -402,16 +402,30 @@ Maps to review recommendations **16–18**.
 
 ---
 
-## 14. Open questions (block Phase 0)
+## 14. Open questions → canonical register
 
-1. Exact vocabulary replacing “TaakHeld” — **prefer fully Wispel-native** (avoid EN/NL “Hero/Held” near ChoreHero; see Appendix C).
-2. Bundle ID: new `cc.wispel.*` vs keep `nl.taakhelden.*`?
-3. Mascot: keep Vinkie, redesign, or postpone?
-4. Marketing on same Next.js app (`apps/web`) vs separate marketing Worker/Pages project?
-5. Staging hostname: `staging.wispel.cc` vs keep `*.workers.dev` until prod?
-6. ~~Monetization: freemium vs trial~~ → **Locked: free + donations.** Remaining: donation provider (Stripe/iDEAL/bunq/etc.) and legal entity for receiving funds?
-7. Interactive demo on `wispel.cc` in Phase 4 or defer to Phase 7?
-8. Donation amounts / suggested tiers on `/steun` (e.g. €3 / €5 / €10) — or open amount only?
+Open points are maintained in **[`wispel-build-plan-workstreams.md` §13](./wispel-build-plan-workstreams.md#13-open-points-register-canonical)** (locked L1–L6, open O1–O34, decision log).
+
+Summary of what still needs an owner answer before coding spreads:
+
+| Priority | IDs | Theme |
+| --- | --- | --- |
+| Gate G0 | O1–O12 | Vocab, palette, mark, mascot postpone?, marketing hosting, bundle ID, taglines |
+| Horizon A defaults OK | O13–O17 | Staging host, hide Inzichten, token owner, defer demo |
+| Donate only | O18–O22 | Provider, legal entity, amounts, no IAP, placeholder OK |
+| Cutover only | O23–O28 | Workers rename, aliases, folder/doc rename defer, email/SIWA |
+| Backlog | O29–O34 | SEO, young polish, token package, agent renames, pedagogy review |
+
+Historical list (superseded by the register above):
+
+1. Exact vocabulary replacing “TaakHeld” — see **O1**
+2. Bundle ID — **O10**
+3. Mascot — **O7**
+4. Marketing same Next vs separate — **O8**
+5. Staging hostname — **O13**
+6. ~~Freemium vs trial~~ → locked **L4**; provider/entity → **O18–O19**
+7. Interactive demo — **O14**
+8. Donation amounts — **O20**
 
 ---
 
