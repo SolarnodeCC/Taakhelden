@@ -214,6 +214,16 @@
 "goal.parent.created" = "Family goal is ready — children see progress on My Day.";
 "goal.parent.error" = "That didn't work. Maybe a goal is already active.";
 "child.shop.load.error" = "We couldn't load the shop — try again soon.";
+"child.shop.redeem" = "Redeem!";
+"child.shop.redeem.young" = "Buy";
+"child.shop.pin" = "Save for this";
+"child.shop.pinned" = "Your savings goal";
+"child.shop.goal.progress" = "%d more points until %@ — you've got this!";
+"child.shop.goal.progress.teen" = "%d more points until %@";
+"child.shop.redeem.success" = "Nice! A parent will check this soon.";
+"child.shop.insufficient" = "Almost! Keep earning — you can do it.";
+"child.shop.pending" = "Waiting on a parent…";
+"child.shop.pin.error" = "Couldn't set your savings goal — try again soon.";
 "child.photo.upload.error" = "Photo didn't work — you can try again.";
 "goal.parent.default.title" = "Pizza night together";
 "held.parent.gate.action" = "Open parent gate";

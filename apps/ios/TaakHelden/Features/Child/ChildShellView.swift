@@ -30,6 +30,8 @@ struct ChildShellView: View {
                 isTeen: isTeen,
                 isYoung: isYoung,
                 reduceMotion: reduceMotion,
+                avatar: session?.avatar ?? "🦊",
+                displayName: session?.displayName ?? String(localized: "held.fallback.name"),
                 viewModel: dayViewModel,
                 goalViewModel: goalViewModel
             )
@@ -41,7 +43,13 @@ struct ChildShellView: View {
             }
             .tag(ChildTab.mijnDag)
 
-            WinkelTabView(palette: palette, isTeen: isTeen, isYoung: isYoung, viewModel: shopViewModel)
+            WinkelTabView(
+                palette: palette,
+                isTeen: isTeen,
+                isYoung: isYoung,
+                reduceMotion: reduceMotion,
+                viewModel: shopViewModel
+            )
                 .tabItem {
                     Label(
                         isYoung ? String(localized: "child.tab.shop.young") : String(localized: "child.tab.shop"),
@@ -77,7 +85,12 @@ struct ChildShellView: View {
                 )
             }
             if shopViewModel == nil {
-                shopViewModel = ChildShopViewModel(apiClient: appState.apiClient)
+                shopViewModel = ChildShopViewModel(
+                    apiClient: appState.apiClient,
+                    mutationQueue: appState.mutationQueue,
+                    syncEngine: appState.syncEngine,
+                    celebrationService: appState.celebrationService
+                )
             }
             if goalViewModel == nil {
                 goalViewModel = FamilyGoalViewModel(apiClient: appState.apiClient)
@@ -194,6 +207,8 @@ private struct MijnDagTabView: View {
     let isTeen: Bool
     let isYoung: Bool
     let reduceMotion: Bool
+    let avatar: String
+    let displayName: String
     let viewModel: ChildDayViewModel?
     let goalViewModel: FamilyGoalViewModel?
 
@@ -279,8 +294,12 @@ private struct MijnDagTabView: View {
     @ViewBuilder
     private func header(balance: TodayBalanceDTO) -> some View {
         THCard(palette: palette) {
-            HStack {
-                VStack(alignment: .leading) {
+            HStack(alignment: .center, spacing: THSpacing.md) {
+                Text(avatar)
+                    .font(.system(size: isYoung ? 56 : 44))
+                    .accessibilityLabel(Text(displayName))
+
+                VStack(alignment: .leading, spacing: THSpacing.xs) {
                     Text(LocalizedStringKey("child.day.title"))
                         .font(.system(size: isYoung ? 32 : 28, weight: .bold, design: .rounded))
                         .foregroundStyle(palette.text.color)
@@ -291,24 +310,32 @@ private struct MijnDagTabView: View {
                     ))
                     .foregroundStyle(palette.mutedText.color)
                 }
-                Spacer()
-                THBadge(
-                    text: String(format: String(localized: "child.points.badge"), balance.balance),
-                    palette: palette
-                )
-                if isYoung {
-                    YoungSpeakButton(
-                        text: String(format: String(localized: "child.day.speak"), balance.todayCompleted, balance.todayTotal),
+
+                Spacer(minLength: THSpacing.sm)
+
+                VStack(alignment: .trailing, spacing: THSpacing.sm) {
+                    THBadge(
+                        text: String(format: String(localized: "child.points.badge"), balance.balance),
                         palette: palette
                     )
+                    THBadge(
+                        text: isTeen
+                            ? String(format: String(localized: "child.streak.teen"), balance.streakDays)
+                            : String(format: String(localized: "child.streak"), balance.streakDays),
+                        palette: palette
+                    )
+                    if isYoung {
+                        YoungSpeakButton(
+                            text: String(
+                                format: String(localized: "child.day.speak"),
+                                balance.todayCompleted,
+                                balance.todayTotal
+                            ),
+                            palette: palette
+                        )
+                    }
                 }
             }
-            THBadge(
-                text: isTeen
-                    ? String(format: String(localized: "child.streak.teen"), balance.streakDays)
-                    : String(format: String(localized: "child.streak"), balance.streakDays),
-                palette: palette
-            )
         }
     }
 
@@ -375,6 +402,7 @@ private struct WinkelTabView: View {
     let palette: THPalette
     let isTeen: Bool
     let isYoung: Bool
+    let reduceMotion: Bool
     let viewModel: ChildShopViewModel?
 
     var body: some View {
@@ -391,13 +419,52 @@ private struct WinkelTabView: View {
                                     .foregroundStyle(palette.text.color)
                                 if isYoung {
                                     YoungSpeakButton(
-                                        text: String(format: String(localized: "child.shop.balance.speak"), rewards.balance),
+                                        text: String(
+                                            format: String(localized: "child.shop.balance.speak"),
+                                            rewards.balance
+                                        ),
                                         palette: palette
                                     )
                                 }
                             }
                             Text(String(format: String(localized: "child.shop.balance"), rewards.balance))
                                 .foregroundStyle(palette.mutedText.color)
+                        }
+
+                        if let status = viewModel?.statusMessage {
+                            Text(status)
+                                .font(.footnote)
+                                .foregroundStyle(palette.mutedText.color)
+                        }
+
+                        if let goal = rewards.savingsGoal {
+                            SavingsGoalCard(goal: goal, balance: rewards.balance, palette: palette, isTeen: isTeen)
+                        }
+
+                        if let pending = viewModel?.pendingRedemptions, !pending.isEmpty {
+                            ForEach(pending) { redemption in
+                                THCard(palette: palette) {
+                                    HStack {
+                                        Text(redemption.icon ?? "🎁")
+                                            .font(.system(size: 28))
+                                        VStack(alignment: .leading, spacing: THSpacing.xs) {
+                                            Text(redemption.title)
+                                                .foregroundStyle(palette.text.color)
+                                            Text(LocalizedStringKey("child.shop.pending"))
+                                                .font(.footnote)
+                                                .foregroundStyle(palette.mutedText.color)
+                                        }
+                                        Spacer()
+                                        THBadge(
+                                            text: String(
+                                                format: String(localized: "child.points.badge"),
+                                                redemption.price
+                                            ),
+                                            palette: palette
+                                        )
+                                    }
+                                }
+                            }
                         }
 
                         if rewards.rewards.isEmpty {
@@ -407,41 +474,21 @@ private struct WinkelTabView: View {
                             }
                         } else {
                             ForEach(rewards.rewards) { reward in
-                                THCard(palette: palette) {
-                                    HStack {
-                                        if isTeen {
-                                            Image(systemName: "gift")
-                                                .font(.system(size: 24, weight: .semibold))
-                                                .foregroundStyle(palette.accent.color)
-                                        } else {
-                                            Text(reward.icon ?? "🎁")
-                                                .font(.system(size: isYoung ? 36 : 28))
-                                        }
-                                        VStack(alignment: .leading) {
-                                            Text(reward.title)
-                                                .foregroundStyle(palette.text.color)
-                                            if reward.affordable {
-                                                Text(LocalizedStringKey(isTeen ? "child.shop.affordable.teen" : "child.shop.affordable"))
-                                                    .font(.footnote)
-                                                    .foregroundStyle(palette.mutedText.color)
-                                            } else {
-                                                Text(String(
-                                                    format: String(localized: "child.shop.need.more"),
-                                                    max(0, reward.price - rewards.balance),
-                                                    reward.title
-                                                ))
-                                                .font(.footnote)
-                                                .foregroundStyle(palette.mutedText.color)
-                                            }
-                                        }
-                                        Spacer()
-                                        THBadge(
-                                            text: String(format: String(localized: "child.points.badge"), reward.price),
-                                            palette: palette
-                                        )
+                                RewardShopCard(
+                                    reward: reward,
+                                    balance: rewards.balance,
+                                    palette: palette,
+                                    isTeen: isTeen,
+                                    isYoung: isYoung,
+                                    isRedeeming: viewModel?.redeemingRewardID == reward.id,
+                                    isPinning: viewModel?.pinningRewardID == reward.id
+                                ) {
+                                    Task {
+                                        await viewModel?.redeem(rewardID: reward.id, reduceMotion: reduceMotion)
                                     }
+                                } onPin: {
+                                    Task { await viewModel?.pin(rewardID: reward.id) }
                                 }
-                                .opacity(reward.affordable ? 1 : 0.75)
                             }
                         }
                     } else if let error = viewModel?.errorMessage {
@@ -461,6 +508,132 @@ private struct WinkelTabView: View {
             .background(palette.background.color.ignoresSafeArea())
             .refreshable { await viewModel?.load() }
         }
+    }
+}
+
+private struct SavingsGoalCard: View {
+    let goal: SavingsGoalViewDTO
+    let balance: Int
+    let palette: THPalette
+    let isTeen: Bool
+
+    private var remaining: Int {
+        max(0, goal.price - balance)
+    }
+
+    var body: some View {
+        THCard(palette: palette) {
+            HStack(alignment: .top, spacing: THSpacing.md) {
+                Text(goal.icon ?? "🎯")
+                    .font(.system(size: 28))
+                    .accessibilityHidden(true)
+                VStack(alignment: .leading, spacing: THSpacing.sm) {
+                    Text(LocalizedStringKey("child.shop.pinned"))
+                        .font(.headline)
+                        .foregroundStyle(palette.text.color)
+                    Text(goal.title)
+                        .foregroundStyle(palette.text.color)
+                    ProgressView(value: min(1, max(0, goal.progress)))
+                        .tint(palette.accent.color)
+                        .accessibilityHidden(true)
+                    Text(String(
+                        format: String(localized: isTeen ? "child.shop.goal.progress.teen" : "child.shop.goal.progress"),
+                        remaining,
+                        goal.title
+                    ))
+                    .font(.footnote)
+                    .foregroundStyle(palette.mutedText.color)
+                }
+            }
+        }
+    }
+}
+
+private struct RewardShopCard: View {
+    let reward: ChildRewardViewDTO
+    let balance: Int
+    let palette: THPalette
+    let isTeen: Bool
+    let isYoung: Bool
+    let isRedeeming: Bool
+    let isPinning: Bool
+    let onRedeem: () -> Void
+    let onPin: () -> Void
+
+    var body: some View {
+        THCard(palette: palette) {
+            HStack(alignment: .top) {
+                if isTeen {
+                    Image(systemName: "gift")
+                        .font(.system(size: 24, weight: .semibold))
+                        .foregroundStyle(palette.accent.color)
+                } else {
+                    Text(reward.icon ?? "🎁")
+                        .font(.system(size: isYoung ? 36 : 28))
+                }
+                VStack(alignment: .leading, spacing: THSpacing.xs) {
+                    Text(reward.title)
+                        .foregroundStyle(palette.text.color)
+                    if reward.pinned {
+                        Text(LocalizedStringKey("child.shop.pinned"))
+                            .font(.footnote)
+                            .foregroundStyle(palette.accent.color)
+                    } else if reward.affordable {
+                        Text(LocalizedStringKey(isTeen ? "child.shop.affordable.teen" : "child.shop.affordable"))
+                            .font(.footnote)
+                            .foregroundStyle(palette.mutedText.color)
+                    } else {
+                        Text(String(
+                            format: String(localized: "child.shop.need.more"),
+                            max(0, reward.price - balance),
+                            reward.title
+                        ))
+                        .font(.footnote)
+                        .foregroundStyle(palette.mutedText.color)
+                    }
+                }
+                Spacer()
+                THBadge(
+                    text: String(format: String(localized: "child.points.badge"), reward.price),
+                    palette: palette
+                )
+            }
+
+            HStack(spacing: THSpacing.sm) {
+                if !reward.pinned {
+                    Button(String(localized: "child.shop.pin")) {
+                        onPin()
+                    }
+                    .buttonStyle(.bordered)
+                    .disabled(isPinning || isRedeeming)
+                    .frame(minHeight: isYoung ? YoungModeSupport.minTapTarget : 44)
+                }
+
+                Spacer(minLength: 0)
+
+                if reward.affordable {
+                    if isYoung {
+                        YoungPrimaryButton(
+                            titleKey: "child.shop.redeem.young",
+                            systemImage: "cart.fill",
+                            palette: palette
+                        ) {
+                            onRedeem()
+                        }
+                        .disabled(isRedeeming || isPinning)
+                    } else {
+                        Button(String(localized: "child.shop.redeem")) {
+                            onRedeem()
+                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(palette.accent.color)
+                        .disabled(isRedeeming || isPinning)
+                        .frame(minHeight: 44)
+                    }
+                }
+            }
+        }
+        .opacity(reward.affordable || reward.pinned ? 1 : 0.75)
     }
 }
 

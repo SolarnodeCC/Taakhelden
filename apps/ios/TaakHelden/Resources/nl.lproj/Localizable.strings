@@ -212,6 +212,16 @@
 "goal.parent.created" = "Gezinsdoel staat klaar — de kinderen zien de voortgang op Mijn Dag.";
 "goal.parent.error" = "Dat lukte niet. Misschien is er al een actief doel.";
 "child.shop.load.error" = "De winkel konden we even niet laden — probeer zo opnieuw.";
+"child.shop.redeem" = "Kopen!";
+"child.shop.redeem.young" = "Kopen";
+"child.shop.pin" = "Spaardoel";
+"child.shop.pinned" = "Je spaardoel";
+"child.shop.goal.progress" = "Nog %d punten tot %@ — je komt eraan!";
+"child.shop.goal.progress.teen" = "Nog %d punten tot %@";
+"child.shop.redeem.success" = "Netjes! Papa of mama kijkt zo of het mag.";
+"child.shop.insufficient" = "Bijna! Spaar nog even door — je kunt het.";
+"child.shop.pending" = "Wacht op papa of mama…";
+"child.shop.pin.error" = "Spaardoel lukte niet — probeer zo opnieuw.";
 "child.photo.upload.error" = "Foto lukte niet — je mag het nog een keer proberen.";
 "goal.parent.default.title" = "Samen pizza-avond";
 "held.parent.gate.action" = "Open ouderpoort";

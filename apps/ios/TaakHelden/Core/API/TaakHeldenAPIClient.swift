@@ -153,6 +153,14 @@ final class TaakHeldenAPIClient {
         return try decoder.decode(RedeemResultDTO.self, from: response.data)
     }
 
+    /// Pin a reward as the child's spaardoel (online-only; not a sync mutation).
+    func pinReward(id: String) async throws -> PinRewardResultDTO {
+        let response = try await sendAuthorized(
+            HTTPRequest(path: "/rewards/\(id)/pin", method: .post, requiresAuth: true)
+        )
+        return try decoder.decode(PinRewardResultDTO.self, from: response.data)
+    }
+
     func sync(since: String?, mutations: [SyncMutationDTO]) async throws -> SyncResponseDTO {
         let body = try encoder.encode(SyncBodyDTO(since: since, mutations: mutations))
         let response = try await sendAuthorized(
@@ -334,6 +342,14 @@ struct AnyEncodable: Encodable {
 enum OptionalNullString: Equatable {
     case omit
     case value(String?)
+}
+
+/// Response from `POST /rewards/{id}/pin` (not yet in OpenAPI snapshot).
+struct PinRewardResultDTO: Codable, Equatable {
+    let rewardId: String
+    let title: String
+    let price: Int
+    let progress: Double
 }
 
 struct EquipAvatarPayload: Encodable, Equatable {

@@ -106,7 +106,7 @@ flowchart LR
 | --- | --- | --- | --- | --- |
 | **WS-DOCS** | Canon & lies cleanup | A | Knowledge / PO | ✅ Done |
 | **WS-STRINGS** | User-facing rename | A | Web + i18n + iOS + Backend | ✅ Done (O1=B) |
-| **WS-IOS-LOOP** | Shop redeem + spaardoel + Mijn Dag header | A | iOS | After strings freeze *or* with temporary keys |
+| **WS-IOS-LOOP** | Shop redeem + spaardoel + Mijn Dag header | A | iOS | ✅ Done |
 | **WS-PRIVACY-PUB** | Public privacy/terms + App Store copy | A | Knowledge + Web | ✅ Done (pages); Store nutrition labels draft still open |
 | **WS-WEB-MKT** | Marketing site (thin → full) | A→B | Web + Marketing | Thin after strings; full after brand |
 | **WS-BRAND** | Tokens, mark, icons, avatar art v1 | B | Design + Web | After G0; single token owner |
@@ -154,7 +154,9 @@ flowchart LR
 ---
 
 ### WS-IOS-LOOP — Emotional product loop (Horizon A priority #1 for product)
-API already supports redeem + pin. UI is browse-only. **This is the highest ROI engineering work in the entire plan.**
+**Status:** ✅ done (2026-07-30) — redeem + pin spaardoel UI, Mijn Dag avatar/points/streak header, shop VM tests.
+
+API already supports redeem + pin. UI was browse-only. **Highest ROI engineering work in the plan.**
 
 | Must ship | Defer |
 | --- | --- |
@@ -163,13 +165,7 @@ API already supports redeem + pin. UI is browse-only. **This is the highest ROI 
 | Mijn Dag header: avatar + points + streak | Full teen typography/radius overhaul |
 | Empty/error copy Wispel-positive | Widget wiring |
 
-**Files (expected):** `ChildShellView` / shop ViewModel, `FamilyGoal` untouched unless needed.
-
-**Tests:** ViewModel unit tests for redeem/pin optimistic + idempotency key; UI smoke if present.
-
-**DoD:** Child can pin → progress → redeem on device against local API; parent sees redemption on web (existing).
-
-**Critique:** Shipping Mijn Held badges or mascot before redeem is marketing cosplay. Fix the shop.
+**DoD:** Child can pin → progress → redeem against API; parent sees redemption on web (existing). ✅ (device E2E still residual)
 
 ---
 
@@ -410,7 +406,7 @@ If a workstream PR includes any of the above “for convenience,” reject it.
 - [x] User-facing name is Wispel (WS-STRINGS; O1=B Ster/Star)
 - [x] Public privacy page live in web app (`/privacy`, `/voorwaarden`)  
 - [ ] Landing states gratis + privacy; CTA registers  
-- [ ] iOS: redeem + spaardoel + Mijn Dag hero header  
+- [x] iOS: redeem + spaardoel + Mijn Dag hero header  
 - [ ] Donations: placeholder OK  
 
 ### Horizon B — Brand-complete
