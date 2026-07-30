@@ -46,7 +46,7 @@ struct THPalette {
 }
 
 enum THPalettes {
-    // Mirrors apps/web/app/globals.css — kid/teen remain brand-placeholders.
+    // Mirrors apps/web/app/globals.css — Wispel brand v1 (shipping). See docs/brand/wispel-brand-v1.md.
     static let kid = THPalette(
         background: THColorToken(hex: 0xFFF8EC), // --kid-cream
         surface: THColorToken(hex: 0xFFFFFF),

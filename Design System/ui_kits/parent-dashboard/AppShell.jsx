@@ -10,7 +10,10 @@ function AppShell({ active, onNavigate, children }) {
   return (
     <div style={{ display: 'flex', minHeight: '100vh', fontFamily: 'var(--font-sans)' }}>
       <aside style={{ width: 240, flexShrink: 0, display: 'flex', flexDirection: 'column', borderRight: '1px solid var(--color-border)', background: 'var(--color-surface)' }}>
-        <div style={{ padding: '20px 20px', fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-accent)' }}>Wispel</div>
+        <div style={{ padding: '20px 20px', display: 'flex', alignItems: 'center', gap: 10, fontSize: 'var(--text-lg)', fontWeight: 'var(--weight-semibold)', color: 'var(--color-accent)' }}>
+          <img src="../../brand/mark.svg" width="24" height="24" alt="" />
+          Wispel
+        </div>
         <SidebarNav items={items} activeKey={active} onNavigate={onNavigate} />
       </aside>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', minWidth: 0 }}>

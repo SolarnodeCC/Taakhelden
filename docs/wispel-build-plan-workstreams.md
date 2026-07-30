@@ -109,7 +109,7 @@ flowchart LR
 | **WS-IOS-LOOP** | Shop redeem + spaardoel + Mijn Dag header | A | iOS | ✅ Done |
 | **WS-PRIVACY-PUB** | Public privacy/terms + App Store copy | A | Knowledge + Web | ✅ Done (pages); Store nutrition labels draft still open |
 | **WS-WEB-MKT** | Marketing site (thin → full) | A→B | Web + Marketing | ✅ Thin done; full after brand |
-| **WS-BRAND** | Tokens, mark, icons, avatar art v1 | B | Design + Web | After G0; single token owner |
+| **WS-BRAND** | Tokens, mark, icons, avatar art v1 | B | Design + Web | ✅ Done (v1 sheet + mark + chrome icons) |
 | **WS-WEB-CRAFT** | Parent dashboard craft | B | Web | After brand tokens stable |
 | **WS-IOS-AGE** | Teen + young pass; Mijn Held badges | B | iOS | After loop; needs brand art ideally |
 | **WS-DONATE** | `/steun` + parent settings donate | C | Web + Backend (+ legal) | After provider decision |
@@ -219,15 +219,17 @@ API already supports redeem + pin. UI was browse-only. **Highest ROI engineering
 ---
 
 ### WS-BRAND — Foundation (Horizon B; design-led)
+**Status:** ✅ done v1 (2026-07-30) — shipping hex locked (O2); Ster+wisp mark (O3); Outfit display; parent `NavIcon` chrome; brand sheet `docs/brand/wispel-brand-v1.md`. Avatar art remains emoji subset (O12). Mascot postponed (O7). App Store PNG icon set still residual (SVG icon shipped).
+
 | In | Out |
 | --- | --- |
 | Final hex in `globals.css` **and** Design System tokens (one PR, one owner) | Shared token npm package extraction mid-flight |
 | SVG wordmark + app icon set | Full avatar shop art (v1 subset OK) |
 | Chrome icon set (replace emoji in parent chrome first) | Lottie library |
 
-**DoD:** Placeholder comments removed; kits + shipping share same hex; mark used on web auth + marketing + iOS.
+**DoD:** Placeholder comments removed; kits + shipping share same hex; mark used on web auth + marketing + iOS. ✅
 
-**Critique:** Parallel “everyone edits tokens” will thrash. Appoint **one** token owner.
+**Critique:** Parallel “everyone edits tokens” will thrash. Appoint **one** token owner. → O17 locked to brand sheet.
 
 ---
 
@@ -411,10 +413,10 @@ If a workstream PR includes any of the above “for convenience,” reject it.
 - [x] Donations: placeholder OK (Steun mailto on thin landing)  
 
 ### Horizon B — Brand-complete
-- [ ] Final mark + palettes shipping  
+- [x] Final mark + palettes shipping (v1 sheet; PNG App Icon residual)
 - [ ] Full landing passes brand test  
 - [ ] Parent web: no Inzichten stub; craft pass  
-- [ ] Teen/young checklist; Held badges v1  
+- [ ] Teen/young checklist; Ster badges v1  
 
 ### Horizon C — Cutover & sustain
 - [ ] `wispel.cc` / `app` / `api` serving prod  
@@ -443,17 +445,17 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | ID | Open point | Options / recommendation | Blocks | Owner |
 | --- | --- | --- | --- | --- |
 | O1 | **Vocabulary** replacing “TaakHeld(en)” | ✅ **Option B — Ster / Star** (see §13.8) | WS-STRINGS | Locked 2026-07-30 |
-| O2 | **Parent / kid / teen palette** final hex | Sign off hex; reject cream+#blue ChoreHero twin | WS-BRAND, MKT full, iOS age | Design |
-| O3 | **Wordmark / mark** | Temp SVG OK for Horizon A; final mark for B | MKT thin (temp) / WS-BRAND (final) | Design |
-| O4 | **Temp mark acceptable for Horizon A?** | **Recommend yes** — don’t block thin landing | Whether BRAND gates MKT thin | PO + Design |
-| O5 | **Privacy one-liner + free one-liner** | NL+EN, marketing-ready | WS-PRIVACY-PUB, MKT, Store | PO + Marketing |
-| O6 | **Tagline** (one parent promise) | Playful Dutch; not “tired of reminding” | MKT hero | Marketing |
-| O7 | **Mascot** | Keep Vinkie / redesign / **postpone** (recommend postpone past A) | WS-BRAND optional; not Horizon A | PO + Design |
+| O2 | **Parent / kid / teen palette** final hex | ✅ Shipping v1 hex locked in brand sheet (reject cream+#blue) | WS-BRAND | Locked 2026-07-30 |
+| O3 | **Wordmark / mark** | ✅ Ster+wisp SVG v1 (`public/brand`, `WispelMark`) | WS-BRAND | Locked 2026-07-30 |
+| O4 | **Temp mark acceptable for Horizon A?** | ✅ Yes — thin landed; replaced by v1 in BRAND | — | Locked 2026-07-30 |
+| O5 | **Privacy one-liner + free one-liner** | ✅ In brand sheet + marketing messages | MKT, Store | Locked 2026-07-30 |
+| O6 | **Tagline** (one parent promise) | ✅ “Huiswerk en klusjes die wél lukken” / EN equiv | MKT hero | Locked 2026-07-30 |
+| O7 | **Mascot** | ✅ **Postpone** past B foundation | optional later | Locked 2026-07-30 |
 | O8 | **Marketing hosting** | ✅ **A:** same Next `(marketing)` group | WS-WEB-MKT structure | Locked with privacy pages |
 | O9 | **Subdomain map** | Confirm `www` / `app` / `api` on wispel.cc | WS-INFRA, MKT links | DevOps + Architect |
 | O10 | **Bundle ID** | Keep `nl.taakhelden.*` if App Store record exists; else `cc.wispel.family` | WS-INFRA, SIWA, Store | PO + iOS |
 | O11 | **App Store display name** | Wispel (confirm) | Store metadata | PO |
-| O12 | **Illustration / avatar v1 scope** | Emoji subset vs commissioned art for B | WS-BRAND, WS-IOS-AGE | Design + PO |
+| O12 | **Illustration / avatar v1 scope** | ✅ Emoji subset for v1; commissioned art later | WS-IOS-AGE | Locked 2026-07-30 |
 
 ### 13.3 Open — needed for Horizon A engineering (can use defaults)
 
@@ -463,7 +465,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O14 | **Interactive demo** on marketing | **Defer** to Horizon C / WS-CROSS (anti-goal for A) | No | Marketing |
 | O15 | **Inzichten** | **Hide from nav** until real Insights ships | No — WS-WEB-CRAFT | PO + Web |
 | O16 | **Auth on web:** forgot-password / Google | Backlog after A; email/password + iOS SIWA stay | No for A | Web + Security |
-| O17 | **Token ownership** during parallel UI | Appoint **one** editor for `globals.css` + DS tokens | Merge hell if skipped | Tech lead |
+| O17 | **Token ownership** during parallel UI | ✅ One editor: globals.css + DS tokens + THPalettes (brand sheet) | — | Locked 2026-07-30 |
 
 ### 13.4 Open — only block WS-DONATE / Horizon C sustain
 
@@ -509,7 +511,8 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O15 | Hide Inzichten from nav until real Insights | 2026-07-30 | WS-WEB-CRAFT default |
 | O21 | Prefer external `/steun`, not IAP (unless Apple forces) | 2026-07-30 | ADR-0005 §3 |
 | O22 | Steun placeholder OK on thin landing | 2026-07-30 | ADR-0005 §3 |
-| O2–O7, O11–O13, O16–O20, O23–O34 | *Pending* | — | — |
+| **O2–O7, O12, O17** | Brand v1 sheet + Ster+wisp mark + chrome icons; mascot postpone; emoji avatars v1; token owner | 2026-07-30 | `docs/brand/wispel-brand-v1.md` / WS-BRAND |
+| O11, O13, O16, O18–O20, O23–O34 | *Pending* | — | — |
 
 **Rule:** When an O* is decided, move a one-liner into §13.7 and strike the row or mark ✅ — do not delete history without an ADR if it affects bundle ID, donations, or privacy.
 

@@ -1,0 +1,26 @@
+import type { SVGProps } from "react";
+
+/** Wispel mark v1 — soft Ster + trailing wisp. Uses `currentColor`. */
+export function WispelMark({ className = "h-7 w-7", ...rest }: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 48 48"
+      fill="none"
+      aria-hidden="true"
+      className={className}
+      {...rest}
+    >
+      <path
+        fill="currentColor"
+        d="M24 5c.72 0 1.36.42 1.62 1.1l3.55 9.05 9.65.5c1.5.08 2.12 1.98.98 2.9l-7.35 5.95 2.5 9.4c.37 1.42-1.2 2.55-2.45 1.8L24 30.35l-8.5 5.35c-1.25.75-2.82-.38-2.45-1.8l2.5-9.4-7.35-5.95c-1.14-.92-.52-2.82.98-2.9l9.65-.5 3.55-9.05C22.64 5.42 23.28 5 24 5z"
+      />
+      <path
+        stroke="currentColor"
+        strokeWidth="2.75"
+        strokeLinecap="round"
+        d="M36.5 34.5c3.2 1.8 5.6 5.1 6.2 9"
+      />
+    </svg>
+  );
+}

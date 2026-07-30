@@ -1,5 +1,6 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "../../../i18n/navigation";
+import { WispelWordmark } from "../../../components/brand";
 import LanguageSwitcher from "../LanguageSwitcher";
 
 /**
@@ -14,8 +15,8 @@ export default async function MarketingLayout({ children }: { children: React.Re
     <div className="min-h-screen bg-bg text-text">
       <header className="border-b border-border bg-bg/90 backdrop-blur-sm">
         <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
-          <Link href="/" className="text-lg font-semibold text-accent">
-            Wispel
+          <Link href="/" className="text-lg font-semibold">
+            <WispelWordmark markClassName="h-6 w-6" />
           </Link>
           <div className="flex items-center gap-3 sm:gap-4">
             <nav className="hidden gap-3 text-sm sm:flex">

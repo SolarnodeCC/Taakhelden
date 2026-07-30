@@ -1,11 +1,22 @@
+import { Outfit } from "next/font/google";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "../../i18n/routing";
 import "../globals.css";
 
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+  weight: ["500", "600", "700"],
+});
+
 export const metadata = {
   title: { default: "Wispel", template: "%s — Wispel" },
+  icons: {
+    icon: "/brand/icon.svg",
+  },
 };
 
 export function generateStaticParams() {
@@ -28,7 +39,7 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
-    <html lang={locale}>
+    <html lang={locale} className={outfit.variable}>
       <body className="min-h-screen bg-bg font-sans text-text antialiased">
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>

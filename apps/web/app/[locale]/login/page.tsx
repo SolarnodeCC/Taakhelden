@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link, redirect } from "../../../i18n/navigation";
+import { WispelWordmark } from "../../../components/brand";
 import { isAuthenticated } from "../../../lib/auth/session";
 import AuthLegalLinks from "../AuthLegalLinks";
 import LoginForm from "./LoginForm";
@@ -17,7 +18,9 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-16">
-      <h1 className="text-2xl font-semibold text-accent">Wispel</h1>
+      <h1 className="text-2xl font-semibold">
+        <WispelWordmark markClassName="h-7 w-7" />
+      </h1>
       <p className="mt-1 text-sm text-muted">{t("loginIntro")}</p>
       <Suspense fallback={null}>
         <LoginForm />

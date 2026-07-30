@@ -54,6 +54,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: "var(--font-sans)",
+        display: "var(--font-display)",
         rounded: "var(--font-rounded)",
       },
       fontSize: {

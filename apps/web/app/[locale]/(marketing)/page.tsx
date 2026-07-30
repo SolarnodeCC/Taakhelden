@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link, redirect } from "../../../i18n/navigation";
+import { WispelMark, WispelWordmark } from "../../../components/brand";
 import { isAuthenticated } from "../../../lib/auth/session";
 
 export async function generateMetadata({
@@ -43,8 +44,13 @@ export default async function MarketingHomePage({
         <div className="mkt-hero-wash pointer-events-none absolute inset-0 opacity-90" aria-hidden />
         <div className="relative mx-auto grid max-w-5xl items-center gap-10 px-6 py-16 md:grid-cols-2 md:gap-12 md:py-24">
           <div className="mkt-rise">
-            <p className="text-4xl font-bold tracking-tight text-accent md:text-5xl">{t("brand")}</p>
-            <h1 className="mkt-rise mkt-rise-delay-1 mt-6 text-3xl font-semibold leading-tight text-text md:text-4xl">
+            <p className="font-display text-4xl font-bold tracking-tight text-accent md:text-5xl">
+              <WispelWordmark
+                className="inline-flex items-center gap-3 text-accent"
+                markClassName="h-10 w-10 md:h-12 md:w-12"
+              />
+            </p>
+            <h1 className="mkt-rise mkt-rise-delay-1 mt-6 font-display text-3xl font-semibold leading-tight text-text md:text-4xl">
               {t("headline")}
             </h1>
             <p className="mkt-rise mkt-rise-delay-2 mt-4 max-w-md text-base leading-relaxed text-muted md:text-lg">
@@ -81,7 +87,9 @@ export default async function MarketingHomePage({
                   <p className="text-3xl font-bold text-accent">12</p>
                   <p className="text-sm text-muted">{t("visual.pointsLabel")}</p>
                 </div>
-                <div className="h-16 w-16 rounded-full bg-kid-turquoise-soft" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-kid-turquoise-soft text-accent">
+                  <WispelMark className="h-8 w-8" />
+                </div>
               </div>
             </div>
           </div>
