@@ -512,7 +512,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O15 | Hide Inzichten from nav until real Insights | 2026-07-30 | WS-WEB-CRAFT default |
 | O21 | Prefer external `/steun`, not IAP (unless Apple forces) | 2026-07-30 | ADR-0005 §3 |
 | O22 | Steun placeholder OK on thin landing | 2026-07-30 | ADR-0005 §3 |
-| O2–O8, O11–O13, O16–O20, O23–O34 | *Pending* | — | — |
+| O2–O7, O11–O13, O16–O20, O23–O34 | *Pending* | — | — |
 
 **Rule:** When an O* is decided, move a one-liner into §13.7 and strike the row or mark ✅ — do not delete history without an ADR if it affects bundle ID, donations, or privacy.
 
