@@ -441,7 +441,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 
 | ID | Open point | Options / recommendation | Blocks | Owner |
 | --- | --- | --- | --- | --- |
-| O1 | **Vocabulary** replacing “TaakHeld(en)” | Wispel-native term(s) NL+EN; **ban Held/Hero** | WS-STRINGS, all copy, Store listing | PO + Marketing + `@dutch-child-copy` |
+| O1 | **Vocabulary** replacing “TaakHeld(en)” | See **§13.8 options** — pick one package | WS-STRINGS, all copy, Store listing | PO + Marketing + `@dutch-child-copy` |
 | O2 | **Parent / kid / teen palette** final hex | Sign off hex; reject cream+#blue ChoreHero twin | WS-BRAND, MKT full, iOS age | Design |
 | O3 | **Wordmark / mark** | Temp SVG OK for Horizon A; final mark for B | MKT thin (temp) / WS-BRAND (final) | Design |
 | O4 | **Temp mark acceptable for Horizon A?** | **Recommend yes** — don’t block thin landing | Whether BRAND gates MKT thin | PO + Design |
@@ -510,6 +510,88 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O1–O8, O11–O13, O16–O20, O23–O34 | *Pending* | — | — |
 
 **Rule:** When an O* is decided, move a one-liner into §13.7 and strike the row or mark ✅ — do not delete history without an ADR if it affects bundle ID, donations, or privacy.
+
+### 13.8 O1 vocabulary options (blocker for WS-STRINGS)
+
+Must replace three slots (product name is already **Wispel**):
+
+| Slot | Today NL | Today EN | Notes |
+| --- | --- | --- | --- |
+| Celebration noun | “je bent … een **TaakHeld**!” | (hero implied) | `child.all.done` |
+| Profile tab | **Mijn Held** | **My Hero** | Avatar / level / badges |
+| Young tab (short) | **Held** | **Hero** | 4–7 label |
+
+Hard constraint: **no Held / Hero** (ChoreHero collision). Must work spoken aloud by a child and a parent.
+
+#### Option A — **Wispelaar** (brand-native) — *recommended*
+
+| Slot | NL | EN |
+| --- | --- | --- |
+| Celebration | “Alles gedaan — je bent vandaag een **Wispelaar**!” | “All done — you’re a real **Wispler** today!” |
+| Tab | **Mijn Wispel** | **My Wispel** |
+| Young | **Wispel** | **Wispel** |
+
+- **Pros:** Unique, owns the brand, escapes Hero lane, teachable in one line (“wie wispelt, is een Wispelaar”).
+- **Cons:** Invented word; EN “Wispler” is also coined (acceptable for brand apps).
+- **Teen fit:** OK if tab stays “Mijn Wispel” without baby-talk.
+
+#### Option B — **Ster** (warm, plain)
+
+| Slot | NL | EN |
+| --- | --- | --- |
+| Celebration | “Alles gedaan — je bent een **ster** vandaag!” | “All done — you’re a **star** today!” |
+| Tab | **Mijn Ster** | **My Star** |
+| Young | **Ster** | **Star** |
+
+- **Pros:** Instantly clear; positive; easy EN.
+- **Cons:** Generic kids-app language; weaker brand lock-in; easy to confuse with other apps.
+
+#### Option C — **Kanjer** (Dutch school-positive)
+
+| Slot | NL | EN |
+| --- | --- | --- |
+| Celebration | “Alles gedaan — wat een **kanjer**!” | “All done — what a **champ**!” |
+| Tab | **Mijn Kanjer** | **My Champ** |
+| Young | **Kanjer** | **Champ** |
+
+- **Pros:** Very Dutch, warm, familiar to NL parents.
+- **Cons:** Slightly “rapport”-tone; EN “Champ” drifts toward sports/Hero-adjacent; teen may reject “Kanjer”.
+
+#### Option D — **Descriptive profile** (no mythic noun)
+
+| Slot | NL | EN |
+| --- | --- | --- |
+| Celebration | “Alles gedaan — je hebt vandaag **super gewispeld**!” | “All done — you **wispeld** through today!” |
+| Tab | **Mijn Avatar** | **My Avatar** |
+| Young | **Ik** | **Me** |
+
+- **Pros:** Honest about the tab; zero Hero overlap; verb “wispelen” carries brand energy in celebration.
+- **Cons:** Less magical for 4–7; EN past-tense “wispeld” is awkward; “Avatar” is techy for young kids.
+
+#### Option E — **Hybrid** (A celebration + D honesty)
+
+| Slot | NL | EN |
+| --- | --- | --- |
+| Celebration | “… een **Wispelaar**!” | “… a **Wispler**!” |
+| Tab | **Mijn Avatar** | **My Avatar** |
+| Young | **Ik** | **Me** |
+
+- **Pros:** Brand noun where emotion peaks; tab stays literal.
+- **Cons:** Two metaphors; slightly inconsistent system.
+
+#### Decision guide
+
+| If you want… | Pick |
+| --- | --- |
+| Strongest brand differentiation | **A** |
+| Safest clarity for grandparents | **B** |
+| Maximum NL warmth | **C** |
+| Minimal invented language | **D** |
+| Brand punch without renaming the tab myth | **E** |
+
+**Engineering recommendation:** **Option A**. One noun system, brand-native, unblocks WS-STRINGS immediately, and marketing can teach it in a single line on `wispel.cc`.
+
+Reply with `A` / `B` / `C` / `D` / `E` (or a tweak) to lock O1 in §13.7 and start WS-STRINGS.
 
 ---
 
