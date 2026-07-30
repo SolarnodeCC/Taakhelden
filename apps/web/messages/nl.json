@@ -467,46 +467,119 @@
     "support": "Kids verdienen sterren met taken. Jij houdt het overzicht. Gratis voor je gezin — privacy first, zonder advertenties.",
     "ctaPrimary": "Start met je gezin — gratis",
     "ctaSecondary": "Inloggen",
+    "ctaSteun": "Steun Wispel (binnenkort)",
     "nav": {
       "login": "Inloggen",
       "cta": "Gratis starten"
+    },
+    "auth": {
+      "login": "Log in op het ouderdashboard — kalm overzicht voor je gezin.",
+      "register": "Maak een account en start je gezin. Gratis, privacy first.",
+      "accept": "Accepteer je uitnodiging en help mee in het gezin."
     },
     "visual": {
       "dayLabel": "Mijn dag",
       "starLabel": "Mijn Ster",
       "pointsLabel": "punten"
     },
+    "howItWorks": {
+      "title": "Zo werkt Wispel",
+      "support": "Eén lus voor het hele gezin — positief voor kids, rustig voor jou.",
+      "steps": [
+        {
+          "title": "Jij plant taken",
+          "body": "Huiswerk en klusjes in één plek. Kids zien wat er vandaag speelt."
+        },
+        {
+          "title": "Kids verdienen sterren",
+          "body": "Afvinken voelt goed. Geen schuldgevoel-taal, geen ranglijst tussen broers en zussen."
+        },
+        {
+          "title": "Goedkeuren en inwisselen",
+          "body": "Jij houdt de regie. Kids sparen naar een beloning in de winkel."
+        }
+      ]
+    },
+    "preview": {
+      "title": "Warm voor kids, kalm voor ouders",
+      "support": "Zelfde merk, twee registers — zo blijft de kind-app speels zonder dat jouw dashboard schreeuwt.",
+      "kidLabel": "Kind-app",
+      "kidLine": "Alles gedaan — wat een ster vandaag!",
+      "kidTask1": "Kamer opruimen · +10",
+      "kidTask2": "Rekenen afmaken · +15",
+      "parentLabel": "Ouderdashboard",
+      "parentLine": "Vandaag: 2 te goedkeuren",
+      "parentItem1": "Lisa · Kamer opruimen",
+      "parentItem2": "Noah · Rekenen afmaken"
+    },
     "privacy": {
       "title": "Privacy first",
-      "body": "Geen advertenties. Geen tracking van kinderen. Hosting met EU-first keuzes. We vragen zo weinig mogelijk — en leggen het uit in gewone taal.",
+      "body": "We bouwen voor Nederlandse gezinnen: zo weinig mogelijk gegevens, en alles uitgelegd in gewone taal.",
+      "points": [
+        "Geen advertenties en geen verkoop van gezinsdata",
+        "Geen tracking van kinderen; geen kind-e-mailaccount",
+        "EU-first hosting; taakfoto’s maximaal 30 dagen"
+      ],
       "link": "Lees de privacyverklaring"
+    },
+    "gratis": {
+      "title": "Gratis voor gezinnen",
+      "body": "Kernfuncties zijn gratis. Geen proefperiode, geen abonnementstabel, geen betaalmuur voor ‘full household access’."
     },
     "faq": {
       "title": "Veelgestelde vragen",
       "items": [
         {
           "q": "Is Wispel echt gratis?",
-          "a": "Ja. Kernfuncties zijn gratis voor gezinnen. Optionele steun (donaties) volgt later — alleen voor ouders, nooit op kind-tabbladen."
+          "a": "Ja. Kernfuncties zijn gratis voor gezinnen. Optionele steun (donaties) is alleen voor ouders — nooit op kind-tabbladen."
         },
         {
           "q": "Wat betekent privacy first?",
           "a": "Geen ads, geen kindtracking, geen verkoop van gezinsdata. Kinderen hebben geen eigen e-mailaccount bij ons."
         },
         {
+          "q": "Werkt het voor huiswerk én klusjes?",
+          "a": "Ja. Beide horen bij de dagelijkse lus — plannen, afvinken, goedkeuren, sterren sparen."
+        },
+        {
+          "q": "Zijn er ranglijsten tussen kids?",
+          "a": "Nee. Wispel viert wat goed ging. Geen individuele leaderboards die een kind onderaan zetten."
+        },
+        {
           "q": "Voor wie is Wispel?",
-          "a": "Voor Nederlandse gezinnen die huiswerk en klusjes positief willen organiseren — zonder schuldgevoel-taal of ranglijsten tussen kids."
+          "a": "Voor Nederlandse gezinnen die huiswerk en klusjes positief willen organiseren — zonder schuldgevoel-taal."
         }
+      ]
+    },
+    "audience": {
+      "title": "Wel of niet voor jullie?",
+      "forTitle": "Wel voor",
+      "forItems": [
+        "Gezinnen in NL die huiswerk en klusjes samen willen aanpakken",
+        "Ouders die rust willen zonder te controleren als een scorebord",
+        "Kids die aanmoediging verdienen — sterren, niet strafpunten"
+      ],
+      "notForTitle": "Niet voor",
+      "notForItems": [
+        "Wie een abonnement of trial nodig heeft om ‘volledig’ te werken",
+        "Wie kids tegen elkaar wil laten scoren",
+        "Wie kindtracking of ads oké vindt in een gezinsapp"
       ]
     },
     "steun": {
       "title": "Steun Wispel",
-      "body": "Wispel blijft gratis. Optionele donaties komen binnenkort — tot die tijd kun je ons een mailtje sturen.",
+      "body": "Als Wispel jullie helpt, mag je ons steunen. Donaties komen binnenkort — tot die tijd kun je een mailtje sturen. Nooit verplicht, nooit op kind-tabbladen.",
       "link": "Mail steun@wispel.cc"
+    },
+    "finalCta": {
+      "title": "Klaar om te starten?",
+      "support": "Maak je gezin aan — gratis. Privacy first vanaf de eerste klik."
     },
     "footer": {
       "tagline": "Gratis voor gezinnen · Privacy first",
       "privacy": "Privacy",
-      "terms": "Voorwaarden"
+      "terms": "Voorwaarden",
+      "steun": "Steun"
     }
   },
   "legal": {

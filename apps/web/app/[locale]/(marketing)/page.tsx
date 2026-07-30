@@ -15,12 +15,20 @@ export async function generateMetadata({
   return {
     title: t("metaTitle"),
     description: t("metaDescription"),
+    openGraph: {
+      title: t("metaTitle"),
+      description: t("metaDescription"),
+      images: [{ url: "/brand/icon.svg", width: 128, height: 128, alt: "Wispel" }],
+    },
   };
 }
 
+type Step = { title: string; body: string };
+type AudienceList = string[];
+
 /**
- * Thin public landing (WS-WEB-MKT Horizon A). Authenticated parents skip to the
- * dashboard — this route owns `/[locale]` after removing the dashboard index.
+ * Full marketing landing (WS-WEB-MKT Horizon B) — acquisition depth in Wispel voice.
+ * Authenticated parents skip to the dashboard.
  */
 export default async function MarketingHomePage({
   params,
@@ -35,11 +43,15 @@ export default async function MarketingHomePage({
   }
 
   const t = await getTranslations("marketing");
+  const steps = t.raw("howItWorks.steps") as Step[];
+  const forItems = t.raw("audience.forItems") as AudienceList;
+  const notForItems = t.raw("audience.notForItems") as AudienceList;
   const faq = t.raw("faq.items") as { q: string; a: string }[];
+  const privacyPoints = t.raw("privacy.points") as string[];
 
   return (
     <div>
-      {/* Hero — one composition: brand, promise, CTA, dominant visual plane */}
+      {/* Hero — one composition only */}
       <section className="relative overflow-hidden border-b border-border bg-surface">
         <div className="mkt-hero-wash pointer-events-none absolute inset-0 opacity-90" aria-hidden />
         <div className="relative mx-auto grid max-w-5xl items-center gap-10 px-6 py-16 md:grid-cols-2 md:gap-12 md:py-24">
@@ -70,17 +82,21 @@ export default async function MarketingHomePage({
                 {t("ctaSecondary")}
               </Link>
             </div>
+            <p className="mkt-rise mkt-rise-delay-3 mt-4">
+              <a href="mailto:steun@wispel.cc" className="text-sm text-muted hover:text-accent hover:underline">
+                {t("ctaSteun")}
+              </a>
+            </p>
           </div>
 
-          {/* Temp product visual — not a card; edge-to-edge plane on small screens */}
           <div
-            className="mkt-rise mkt-rise-delay-2 relative min-h-[16rem] rounded-xl bg-kid-cream md:min-h-[20rem]"
+            className="mkt-rise mkt-rise-delay-2 relative min-h-[16rem] overflow-hidden rounded-xl bg-kid-cream md:min-h-[20rem]"
             aria-hidden
           >
             <div className="absolute inset-6 flex flex-col justify-between rounded-lg bg-bg/80 p-5 md:inset-8 md:p-6">
               <div>
                 <p className="text-xs font-medium uppercase tracking-wide text-muted">{t("visual.dayLabel")}</p>
-                <p className="mt-2 text-xl font-semibold text-text">{t("visual.starLabel")}</p>
+                <p className="mt-2 font-display text-xl font-semibold text-text">{t("visual.starLabel")}</p>
               </div>
               <div className="flex items-end justify-between gap-4">
                 <div>
@@ -96,9 +112,64 @@ export default async function MarketingHomePage({
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-6 py-14">
-        <h2 className="text-xl font-semibold text-text">{t("privacy.title")}</h2>
+      {/* How it works */}
+      <section className="mx-auto max-w-5xl px-6 py-12">
+        <h2 className="font-display text-2xl font-semibold text-text">{t("howItWorks.title")}</h2>
+        <p className="mt-2 max-w-2xl text-sm text-muted md:text-base">{t("howItWorks.support")}</p>
+        <ol className="mt-10 grid gap-10 md:grid-cols-3 md:gap-8">
+          {steps.map((step, i) => (
+            <li key={step.title}>
+              <p className="font-display text-sm font-semibold text-accent">{String(i + 1).padStart(2, "0")}</p>
+              <h3 className="mt-2 text-base font-semibold text-text">{step.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      {/* Product kinship: kid warmth + parent calm */}
+      <section className="border-t border-border bg-surface">
+        <div className="mx-auto max-w-5xl px-6 py-12">
+          <h2 className="font-display text-2xl font-semibold text-text">{t("preview.title")}</h2>
+          <p className="mt-2 max-w-2xl text-sm text-muted md:text-base">{t("preview.support")}</p>
+          <div className="mt-10 grid gap-8 md:grid-cols-2">
+            <div className="rounded-xl bg-kid-cream p-6" aria-hidden>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted">{t("preview.kidLabel")}</p>
+              <p className="mt-3 font-rounded text-lg font-semibold text-kid-text">{t("preview.kidLine")}</p>
+              <div className="mt-6 space-y-3">
+                <div className="rounded-lg bg-bg/90 px-4 py-3 text-sm text-kid-text shadow-kid">
+                  {t("preview.kidTask1")}
+                </div>
+                <div className="rounded-lg bg-bg/90 px-4 py-3 text-sm text-kid-text shadow-kid">
+                  {t("preview.kidTask2")}
+                </div>
+              </div>
+            </div>
+            <div className="rounded-xl border border-border bg-bg p-6" aria-hidden>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted">{t("preview.parentLabel")}</p>
+              <p className="mt-3 text-lg font-semibold text-text">{t("preview.parentLine")}</p>
+              <div className="mt-6 space-y-3">
+                <div className="rounded border border-border px-4 py-3 text-sm text-text">
+                  {t("preview.parentItem1")}
+                </div>
+                <div className="rounded border border-border px-4 py-3 text-sm text-text">
+                  {t("preview.parentItem2")}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Privacy */}
+      <section className="mx-auto max-w-5xl px-6 py-12">
+        <h2 className="font-display text-2xl font-semibold text-text">{t("privacy.title")}</h2>
         <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted md:text-base">{t("privacy.body")}</p>
+        <ul className="mt-6 max-w-2xl list-disc space-y-2 pl-5 text-sm text-muted">
+          {privacyPoints.map((point) => (
+            <li key={point}>{point}</li>
+          ))}
+        </ul>
         <p className="mt-4">
           <Link href="/privacy" className="text-sm font-medium text-accent hover:underline">
             {t("privacy.link")}
@@ -106,9 +177,48 @@ export default async function MarketingHomePage({
         </p>
       </section>
 
+      {/* Gratis + steun — not a price table */}
       <section className="border-t border-border bg-surface">
-        <div className="mx-auto max-w-5xl px-6 py-14">
-          <h2 className="text-xl font-semibold text-text">{t("faq.title")}</h2>
+        <div className="mx-auto max-w-5xl px-6 py-12">
+          <h2 className="font-display text-2xl font-semibold text-text">{t("gratis.title")}</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted md:text-base">{t("gratis.body")}</p>
+          <h3 className="mt-10 text-base font-semibold text-text">{t("steun.title")}</h3>
+          <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted md:text-base">{t("steun.body")}</p>
+          <p className="mt-4">
+            <a href="mailto:steun@wispel.cc" className="text-sm font-medium text-accent hover:underline">
+              {t("steun.link")}
+            </a>
+          </p>
+        </div>
+      </section>
+
+      {/* For / not for */}
+      <section className="mx-auto max-w-5xl px-6 py-12">
+        <h2 className="font-display text-2xl font-semibold text-text">{t("audience.title")}</h2>
+        <div className="mt-8 grid gap-10 md:grid-cols-2">
+          <div>
+            <h3 className="text-base font-semibold text-text">{t("audience.forTitle")}</h3>
+            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted">
+              {forItems.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h3 className="text-base font-semibold text-text">{t("audience.notForTitle")}</h3>
+            <ul className="mt-3 list-disc space-y-2 pl-5 text-sm text-muted">
+              {notForItems.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      {/* FAQ */}
+      <section className="border-t border-border bg-surface">
+        <div className="mx-auto max-w-5xl px-6 py-12">
+          <h2 className="font-display text-2xl font-semibold text-text">{t("faq.title")}</h2>
           <dl className="mt-8 max-w-2xl space-y-6">
             {faq.map((item) => (
               <div key={item.q}>
@@ -120,28 +230,41 @@ export default async function MarketingHomePage({
         </div>
       </section>
 
+      {/* Final CTA */}
       <section className="border-t border-border">
-        <div className="mx-auto max-w-5xl px-6 py-14">
-          <h2 className="text-xl font-semibold text-text">{t("steun.title")}</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted md:text-base">{t("steun.body")}</p>
-          <p className="mt-4">
-            <a href="mailto:steun@wispel.cc" className="text-sm font-medium text-accent hover:underline">
-              {t("steun.link")}
-            </a>
-          </p>
+        <div className="mx-auto max-w-5xl px-6 py-16 text-center">
+          <h2 className="font-display text-2xl font-semibold text-text md:text-3xl">{t("finalCta.title")}</h2>
+          <p className="mx-auto mt-3 max-w-lg text-sm text-muted md:text-base">{t("finalCta.support")}</p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <Link
+              href="/register"
+              className="inline-flex items-center justify-center rounded border border-accent bg-accent px-6 py-3 text-base font-semibold text-accent-fg transition-colors hover:bg-accent-hover"
+            >
+              {t("ctaPrimary")}
+            </Link>
+            <Link
+              href="/login"
+              className="inline-flex items-center justify-center rounded border border-border bg-bg px-6 py-3 text-base font-semibold text-text transition-colors hover:bg-surface"
+            >
+              {t("ctaSecondary")}
+            </Link>
+          </div>
         </div>
       </section>
 
       <footer className="border-t border-border bg-surface">
         <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-3 px-6 py-6 text-sm text-muted">
           <p>{t("footer.tagline")}</p>
-          <nav className="flex gap-4">
+          <nav className="flex flex-wrap gap-4">
             <Link href="/privacy" className="hover:text-text">
               {t("footer.privacy")}
             </Link>
             <Link href="/voorwaarden" className="hover:text-text">
               {t("footer.terms")}
             </Link>
+            <a href="mailto:steun@wispel.cc" className="hover:text-text">
+              {t("footer.steun")}
+            </a>
           </nav>
         </div>
       </footer>

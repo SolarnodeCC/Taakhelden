@@ -467,46 +467,119 @@
     "support": "Kids earn stars with tasks. You keep a calm overview. Free for your family — privacy first, no ads.",
     "ctaPrimary": "Start your family — free",
     "ctaSecondary": "Sign in",
+    "ctaSteun": "Support Wispel (coming soon)",
     "nav": {
       "login": "Sign in",
       "cta": "Start free"
+    },
+    "auth": {
+      "login": "Sign in to the parent dashboard — a calm overview for your family.",
+      "register": "Create an account and start your family. Free, privacy first.",
+      "accept": "Accept your invite and join the family."
     },
     "visual": {
       "dayLabel": "My day",
       "starLabel": "My Star",
       "pointsLabel": "points"
     },
+    "howItWorks": {
+      "title": "How Wispel works",
+      "support": "One loop for the whole family — positive for kids, calm for you.",
+      "steps": [
+        {
+          "title": "You plan tasks",
+          "body": "Homework and chores in one place. Kids see what’s on for today."
+        },
+        {
+          "title": "Kids earn stars",
+          "body": "Checking off feels good. No guilt language, no sibling rankings."
+        },
+        {
+          "title": "Approve and redeem",
+          "body": "You stay in control. Kids save toward a reward in the shop."
+        }
+      ]
+    },
+    "preview": {
+      "title": "Warm for kids, calm for parents",
+      "support": "One brand, two registers — so the kid app stays playful without making your dashboard shout.",
+      "kidLabel": "Kid app",
+      "kidLine": "All done — what a star today!",
+      "kidTask1": "Tidy room · +10",
+      "kidTask2": "Finish maths · +15",
+      "parentLabel": "Parent dashboard",
+      "parentLine": "Today: 2 to approve",
+      "parentItem1": "Lisa · Tidy room",
+      "parentItem2": "Noah · Finish maths"
+    },
     "privacy": {
       "title": "Privacy first",
-      "body": "No ads. No child tracking. EU-first hosting choices. We ask for as little as possible — and explain it in plain language.",
+      "body": "We build for Dutch families: as little data as possible, explained in plain language.",
+      "points": [
+        "No ads and no selling family data",
+        "No child tracking; no child email accounts",
+        "EU-first hosting; task photos kept at most 30 days"
+      ],
       "link": "Read the privacy notice"
+    },
+    "gratis": {
+      "title": "Free for families",
+      "body": "Core features are free. No trial countdown, no subscription table, no paywall for ‘full household access’."
     },
     "faq": {
       "title": "FAQ",
       "items": [
         {
           "q": "Is Wispel really free?",
-          "a": "Yes. Core features are free for families. Optional support (donations) comes later — parent-only, never on child tabs."
+          "a": "Yes. Core features are free for families. Optional support (donations) is parent-only — never on child tabs."
         },
         {
           "q": "What does privacy first mean?",
           "a": "No ads, no child tracking, no selling family data. Children don’t get their own email account with us."
         },
         {
+          "q": "Does it cover homework and chores?",
+          "a": "Yes. Both belong in the daily loop — plan, check off, approve, save stars."
+        },
+        {
+          "q": "Are there rankings between kids?",
+          "a": "No. Wispel celebrates what went well. No individual leaderboards that put a child last."
+        },
+        {
           "q": "Who is Wispel for?",
-          "a": "Dutch families who want to organise homework and chores positively — without guilt language or sibling rankings."
+          "a": "Dutch families who want to organise homework and chores positively — without guilt language."
         }
+      ]
+    },
+    "audience": {
+      "title": "Is it for you?",
+      "forTitle": "A good fit if",
+      "forItems": [
+        "You’re a NL family tackling homework and chores together",
+        "You want calm oversight without a scoreboard vibe",
+        "Your kids deserve encouragement — stars, not penalties"
+      ],
+      "notForTitle": "Not a fit if",
+      "notForItems": [
+        "You need a subscription or trial to unlock ‘full’ access",
+        "You want kids competing on a leaderboard",
+        "You’re fine with child tracking or ads in a family app"
       ]
     },
     "steun": {
       "title": "Support Wispel",
-      "body": "Wispel stays free. Optional donations are coming soon — until then you can email us.",
+      "body": "If Wispel helps your family, you’re welcome to support us. Donations are coming soon — until then you can email. Never required, never on child tabs.",
       "link": "Email steun@wispel.cc"
+    },
+    "finalCta": {
+      "title": "Ready to start?",
+      "support": "Create your family — free. Privacy first from the first click."
     },
     "footer": {
       "tagline": "Free for families · Privacy first",
       "privacy": "Privacy",
-      "terms": "Terms"
+      "terms": "Terms",
+      "steun": "Support"
     }
   },
   "legal": {
