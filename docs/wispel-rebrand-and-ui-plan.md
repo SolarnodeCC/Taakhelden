@@ -11,6 +11,8 @@
 
 These supersede the freemium/premium sketch in `docs/taakhelden-productvoorstel.md` §7 for Wispel direction.
 
+**Executable build plan:** [`wispel-build-plan-workstreams.md`](./wispel-build-plan-workstreams.md) — horizons, workstreams, PR sequence, anti-goals.
+
 ---
 
 ## 0. Brand decisions to lock before coding
