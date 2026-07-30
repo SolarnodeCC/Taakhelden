@@ -108,7 +108,7 @@ struct ChildUnlockView: View {
     private func unlockWithBiometrics() async {
         do {
             let success = try await appState.localAuth.evaluateBiometrics(
-                reason: "Ontgrendel TaakHelden om verder te gaan."
+                reason: "Ontgrendel Wispel om verder te gaan."
             )
             if success {
                 errorMessage = nil

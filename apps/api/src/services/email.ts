@@ -18,8 +18,8 @@ export async function sendParentInvite(
     ? `${env.APP_BASE_URL}/nl/uitnodiging?token=${inviteToken}`
     : null;
   const text = link
-    ? `Je bent uitgenodigd als medeverzorger in TaakHelden. Accepteer je uitnodiging via: ${link}`
-    : `Je bent uitgenodigd als medeverzorger in TaakHelden. Gebruik deze uitnodigingscode in de app: ${inviteToken}`;
+    ? `Je bent uitgenodigd als medeverzorger in Wispel. Accepteer je uitnodiging via: ${link}`
+    : `Je bent uitgenodigd als medeverzorger in Wispel. Gebruik deze uitnodigingscode in de app: ${inviteToken}`;
 
   try {
     await fetch("https://api.resend.com/emails", {
@@ -31,7 +31,7 @@ export async function sendParentInvite(
       body: JSON.stringify({
         from: env.EMAIL_FROM,
         to: email,
-        subject: "Je bent uitgenodigd voor TaakHelden",
+        subject: "Je bent uitgenodigd voor Wispel",
         text,
       }),
     });

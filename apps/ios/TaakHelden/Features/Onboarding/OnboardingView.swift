@@ -12,7 +12,7 @@ struct WelcomeHubView: View {
             VStack(spacing: THSpacing.xl) {
                 Spacer()
 
-                Text("TaakHelden")
+                Text("Wispel")
                     .font(.system(size: 34, weight: .bold, design: .rounded))
                     .foregroundStyle(palette.accent.color)
                     .accessibilityAddTraits(.isHeader)

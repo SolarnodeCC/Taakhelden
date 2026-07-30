@@ -17,7 +17,7 @@ export default async function UitnodigingPage({
 
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-16">
-      <h1 className="text-2xl font-semibold text-accent">TaakHelden</h1>
+      <h1 className="text-2xl font-semibold text-accent">Wispel</h1>
       <p className="mt-1 text-sm text-muted">{t("intro")}</p>
       <Suspense fallback={<p className="mt-6 text-sm text-muted">{t("loading")}</p>}>
         <AcceptForm />

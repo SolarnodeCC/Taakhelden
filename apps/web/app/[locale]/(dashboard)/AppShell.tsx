@@ -98,7 +98,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <aside className="flex w-60 shrink-0 flex-col border-r border-border bg-surface">
-        <div className="px-5 py-5 text-lg font-semibold text-accent">TaakHelden</div>
+        <div className="px-5 py-5 text-lg font-semibold text-accent">Wispel</div>
         <nav className="flex flex-col gap-1 px-2">
           {visibleNav.map((item) => {
             const active = pathname === item.href;

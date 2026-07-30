@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { routing } from "../../i18n/routing";
 import "../globals.css";
 
-export const metadata = { title: "TaakHelden — Ouderdashboard" };
+export const metadata = { title: "Wispel — Ouderdashboard" };
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));

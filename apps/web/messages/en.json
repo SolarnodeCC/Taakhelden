@@ -16,7 +16,7 @@
     },
     "deletedFamily": "Your family is marked for deletion. Everything will be permanently removed around {purgeAfter}.",
     "register": {
-      "intro": "Create an account and start your family on TaakHelden.",
+      "intro": "Create an account and start your family on Wispel.",
       "displayName": "Your first name",
       "familyName": "Family name",
       "passwordHint": "At least 10 characters.",
@@ -261,7 +261,7 @@
     },
     "invite": {
       "title": "Family code",
-      "hint": "Open the TaakHelden app on the child's device and enter this code.",
+      "hint": "Open the Wispel app on the child's device and enter this code.",
       "copy": "Copy",
       "copied": "Copied",
       "regenerate": "Create new code",
@@ -311,7 +311,7 @@
       "copy": "Copy link",
       "copied": "Copied",
       "errors": {
-        "EMAIL_IN_USE": "This email is already in use on TaakHelden.",
+        "EMAIL_IN_USE": "This email is already in use on Wispel.",
         "VALIDATION_FAILED": "Please enter a valid email address.",
         "FORBIDDEN": "Only parents with full access can invite.",
         "generic": "Couldn't send the invitation. Please try again."

@@ -105,7 +105,7 @@ flowchart LR
 | ID | Name | Horizon | Owner archetype | Parallel? |
 | --- | --- | --- | --- | --- |
 | **WS-DOCS** | Canon & lies cleanup | A | Knowledge / PO | ✅ Done |
-| **WS-STRINGS** | User-facing rename | A | Web + i18n + iOS + Backend | After G0 vocab |
+| **WS-STRINGS** | User-facing rename | A | Web + i18n + iOS + Backend | ✅ Done (O1=B) |
 | **WS-IOS-LOOP** | Shop redeem + spaardoel + Mijn Dag header | A | iOS | After strings freeze *or* with temporary keys |
 | **WS-PRIVACY-PUB** | Public privacy/terms + App Store copy | A | Knowledge + Web | Parallel with strings |
 | **WS-WEB-MKT** | Marketing site (thin → full) | A→B | Web + Marketing | Thin after strings; full after brand |
@@ -135,17 +135,19 @@ flowchart LR
 ---
 
 ### WS-STRINGS — User-facing rename (Horizon A)
+**Status:** ✅ done (2026-07-30) — O1 Option B (Ster/Star); product name Wispel in shipping UI  
 **Critical rule:** Rename **what parents/kids see** before renaming folders/Workers.
 
 | In | Out |
 | --- | --- |
 | `messages/{nl,en}.json`, iOS Localizable, email/push subjects, metadata titles | `apps/ios/TaakHelden/` path rename |
-| OpenAPI `info.title` → Wispel (regen Swift) | Wrangler worker name change |
-| Login/AppShell wordmark text | Design System kit visual redesign |
+| OpenAPI `info.title` → Wispel (regen) | Wrangler worker name change |
+| Login/AppShell wordmark; iOS `CFBundleDisplayName` / `PRODUCT_NAME` | Class names (`TaakHeldenAPIClient`, etc.) |
+| Celebration + tabs per O1 **B** (Ster / Star) | JS Design System global id |
 
 **Conflict control:** One PR series owns message keys; other streams rebase.
 
-**DoD:** `rg -i 'TaakHelden|TaakHeld'` has zero hits in user-facing string files.
+**DoD:** `rg -i 'TaakHelden|TaakHeld'` has zero hits in user-facing string files. ✅
 
 **Critique:** Doing folder/Worker rename in the same PRs is how CI stays red for a week. Don’t.
 
@@ -403,7 +405,7 @@ If a workstream PR includes any of the above “for convenience,” reject it.
 
 ### Horizon A — Credible Wispel
 - [x] Canon docs: no freemium; Wispel + privacy first + free/donations (WS-DOCS / ADR-0005)
-- [ ] User-facing name is Wispel  
+- [x] User-facing name is Wispel (WS-STRINGS; O1=B Ster/Star)
 - [ ] Public privacy page live (staging/prod)  
 - [ ] Landing states gratis + privacy; CTA registers  
 - [ ] iOS: redeem + spaardoel + Mijn Dag hero header  
@@ -441,7 +443,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 
 | ID | Open point | Options / recommendation | Blocks | Owner |
 | --- | --- | --- | --- | --- |
-| O1 | **Vocabulary** replacing “TaakHeld(en)” | See **§13.8 options** — pick one package | WS-STRINGS, all copy, Store listing | PO + Marketing + `@dutch-child-copy` |
+| O1 | **Vocabulary** replacing “TaakHeld(en)” | ✅ **Option B — Ster / Star** (see §13.8) | WS-STRINGS | Locked 2026-07-30 |
 | O2 | **Parent / kid / teen palette** final hex | Sign off hex; reject cream+#blue ChoreHero twin | WS-BRAND, MKT full, iOS age | Design |
 | O3 | **Wordmark / mark** | Temp SVG OK for Horizon A; final mark for B | MKT thin (temp) / WS-BRAND (final) | Design |
 | O4 | **Temp mark acceptable for Horizon A?** | **Recommend yes** — don’t block thin landing | Whether BRAND gates MKT thin | PO + Design |
@@ -501,13 +503,14 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | ID | Decision taken | Date | ADR / link |
 | --- | --- | --- | --- |
 | L1–L6 | See §13.1 | 2026-07-30 | Strategy doc + ADR-0005 |
+| **O1** | **Option B — Ster / Star** (celebration + Mijn Ster / My Star tab; product Wispel) | 2026-07-30 | Build plan §13.8 |
 | O9 | Subdomain map confirmed as intent: www / app / api on wispel.cc | 2026-07-30 | ADR-0005 §1 |
 | O10 | **Policy** locked (keep `nl.taakhelden.*` if ASC exists; else prefer `cc.wispel.family`); concrete ID pending ASC check | 2026-07-30 | ADR-0005 §4 |
 | O14 | Interactive demo deferred past Horizon A | 2026-07-30 | Build plan anti-goals |
 | O15 | Hide Inzichten from nav until real Insights | 2026-07-30 | WS-WEB-CRAFT default |
 | O21 | Prefer external `/steun`, not IAP (unless Apple forces) | 2026-07-30 | ADR-0005 §3 |
 | O22 | Steun placeholder OK on thin landing | 2026-07-30 | ADR-0005 §3 |
-| O1–O8, O11–O13, O16–O20, O23–O34 | *Pending* | — | — |
+| O2–O8, O11–O13, O16–O20, O23–O34 | *Pending* | — | — |
 
 **Rule:** When an O* is decided, move a one-liner into §13.7 and strike the row or mark ✅ — do not delete history without an ADR if it affects bundle ID, donations, or privacy.
 
@@ -535,7 +538,7 @@ Hard constraint: **no Held / Hero** (ChoreHero collision). Must work spoken alou
 - **Cons:** Invented word; EN “Wispler” is also coined (acceptable for brand apps).
 - **Teen fit:** OK if tab stays “Mijn Wispel” without baby-talk.
 
-#### Option B — **Ster** (warm, plain)
+#### Option B — **Ster** (warm, plain) — ✅ **LOCKED 2026-07-30**
 
 | Slot | NL | EN |
 | --- | --- | --- |

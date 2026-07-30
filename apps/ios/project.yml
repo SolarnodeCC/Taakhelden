@@ -43,7 +43,7 @@ targets:
       path: TaakHelden/TaakHelden.Debug.entitlements
     settings:
       base:
-        PRODUCT_NAME: TaakHelden
+        PRODUCT_NAME: Wispel
         GENERATE_INFOPLIST_FILE: NO
       configs:
         Debug:

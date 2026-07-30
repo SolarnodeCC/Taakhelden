@@ -16,7 +16,7 @@
     },
     "deletedFamily": "Je gezin is gemarkeerd voor verwijdering. Alles wordt definitief verwijderd rond {purgeAfter}.",
     "register": {
-      "intro": "Maak een account aan en start je gezin op TaakHelden.",
+      "intro": "Maak een account aan en start je gezin op Wispel.",
       "displayName": "Jouw roepnaam",
       "familyName": "Naam van je gezin",
       "passwordHint": "Minstens 10 tekens.",
@@ -261,7 +261,7 @@
     },
     "invite": {
       "title": "Gezinscode",
-      "hint": "Open de TaakHelden-app op het kindertoestel en vul deze code in.",
+      "hint": "Open de Wispel-app op het kindertoestel en vul deze code in.",
       "copy": "Kopiëren",
       "copied": "Gekopieerd",
       "regenerate": "Nieuwe code maken",
@@ -311,7 +311,7 @@
       "copy": "Link kopiëren",
       "copied": "Gekopieerd",
       "errors": {
-        "EMAIL_IN_USE": "Dit e-mailadres is al in gebruik in TaakHelden.",
+        "EMAIL_IN_USE": "Dit e-mailadres is al in gebruik in Wispel.",
         "VALIDATION_FAILED": "Vul een geldig e-mailadres in.",
         "FORBIDDEN": "Alleen ouders met volledig beheer kunnen uitnodigen.",
         "generic": "Uitnodigen lukte niet. Probeer het nog eens."
