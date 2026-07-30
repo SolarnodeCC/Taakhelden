@@ -1,7 +1,9 @@
 # TaakHelden — Productvoorstel
 ### Gamification-app voor huiswerk & huishoudelijke taken (iOS + Web)
 
-*Werktitel: "TaakHelden" (alternatieven: KlusKids, PuntjePunt, HeldenHuis)*
+*Werktitel historisch: "TaakHelden". **Productnaam (besloten):** [Wispel](./wispel-rebrand-and-ui-plan.md) op domein `wispel.cc`. Alternatieven uit eerdere brainstorm (KlusKids, …) zijn vervallen.*
+
+> **Canon-update (WS-DOCS, 2026-07-30):** verdienmodel = **gratis + donaties** (geen freemium). Privacy first. Zie [ADR-0005](./adr/ADR-0005-wispel-privacy-free-donations.md) en [build plan](./wispel-build-plan-workstreams.md).
 
 ---
 
@@ -205,10 +207,11 @@ Een **grootboek (ledger)** i.p.v. één saldoveld voorkomt sync-conflicten en ma
 - **Broer/zus-dynamiek**: bewust géén individuele ranglijst; wel optioneel coöperatief gezinsdoel.
 - **Huiswerk-specifiek**: terugkerende vakken, toetsdatum-taken ("elke dag 15 min Frans tot de toets"), timer/focus-modus (fase 2).
 - **Widget & Apple Watch** (fase 2): "vandaag nog 2 taken" op het homescreen — laagdrempelig zonder de app te openen.
-- **Verdienmodel**: freemium — gratis: 1 gezin, 2 kinderen, basistemplates; premium-gezinsabonnement (€3–4/mnd): onbeperkt kinderen, foto-bonus, inzichten, web-dashboard. Nooit betaalmuren die het kind ziet.
-- **Naam/merk-check**: handelsnaam en domein vroeg vastleggen.
+- **Verdienmodel**: **gratis voor gezinnen** — alle kernfuncties zonder abonnement of trial-paywall. Duurzaamheid via **optionele donaties** (alleen ouder-facing: marketing `/steun` en ouder-instellingen; nooit zichtbaar op kind-tabbladen). Geen feature-gates gekoppeld aan donatiebedrag. Geen betaalmuren die het kind ziet. (Vervangt eerdere freemium-schets; zie ADR-0005.)
+- **Naam/merk**: productnaam **Wispel**, domein **wispel.cc** (zie rebrand-plan). Handelsmerk/App Store-display volgen die naam.
 - **Pedagogische toets**: laat het beloningsontwerp reviewen door een kinderpsycholoog/pedagoog (extrinsieke vs. intrinsieke motivatie is een bekend risico van puntensystemen — de dag/weekbonus en autonomie-features dempen dit, maar expert-review is een sterk marketingpunt: "ontwikkeld met pedagogen").
 - **Meertaligheid**: NL eerst, EN erbij voor bereik.
+- **Privacy first**: geen advertenties, geen child-tracking SDK’s, EU-hosting, plain-language privacy op de publieke site (naast bestaande AVG-eisen in §6).
 
 ---
 
@@ -233,6 +236,7 @@ Een **grootboek (ledger)** i.p.v. één saldoveld voorkomt sync-conflicten en ma
 ## 9. Openstaande beslissingen
 
 1. Kids Category vs. familie-app-positionering in de App Store (juridisch/strategisch).
-2. Supabase vs. Firebase vs. eigen backend (afhankelijk van teamkennis en groeiverwachting).
-3. Verdienmodel-timing: premium vanaf launch of eerst gratis groeien.
-4. Mascotte en merknaam.
+2. ~~Supabase vs. Firebase vs. eigen backend~~ — besloten: Cloudflare Workers/D1 (architectuurdoc).
+3. ~~Verdienmodel-timing: premium~~ — besloten: **gratis + donaties** (ADR-0005); open: donatieprovider + juridische entiteit (build plan O18–O19).
+4. ~~Mascotte en merknaam~~ — merknaam **Wispel** besloten; mascotte open (build plan O7, aanbevolen: uitstellen tot na Horizon A).
+5. Overige open punten: [build plan §13](./wispel-build-plan-workstreams.md#13-open-points-register-canonical) (O1–O34).

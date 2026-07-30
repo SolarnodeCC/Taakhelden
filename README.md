@@ -1,4 +1,7 @@
-# TaakHelden
+# Wispel
+
+> Historische reponaam/codepaden: TaakHelden / `taakhelden`. **Productnaam:** Wispel (`wispel.cc`).  
+> Privacy first · gratis voor gezinnen · optionele donaties (ouder-only) — zie `docs/adr/ADR-0005-wispel-privacy-free-donations.md`.
 
 Gamification-app voor huiswerk en huishoudelijke taken van kinderen.
 iOS (SwiftUI) + ouderdashboard (Next.js) op Cloudflare (Workers/D1/R2).
@@ -6,12 +9,16 @@ iOS (SwiftUI) + ouderdashboard (Next.js) op Cloudflare (Workers/D1/R2).
 ## Structuur
 ```
 apps/api          Cloudflare Worker — Hono API (zie docs/taakhelden-api-specificatie.md)
-apps/web          Next.js ouderdashboard
+apps/web          Next.js ouderdashboard (+ marketing via WS-WEB-MKT)
 apps/ios          SwiftUI-app (Xcode-project, zie apps/ios/README.md)
 packages/shared   Zod-schemas + foutcodes — het API-contract
-docs/             productvoorstel · architectuur · API-spec
+docs/             productvoorstel · architectuur · API-spec · Wispel build plan
 CLAUDE.md         projectcontext + architectuurregels (leest Claude Code automatisch)
 ```
+
+## Plannen (Wispel)
+- `docs/wispel-build-plan-workstreams.md` — build / workstreams / open points
+- `docs/wispel-rebrand-and-ui-plan.md` — rebrand-strategie
 
 ## Eerste keer opzetten
 ```bash

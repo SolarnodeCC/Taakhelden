@@ -9,7 +9,7 @@
 - **Privacy first** — EU hosting, minimal data, no ads, no child tracking, plain-language privacy on marketing and in-app.
 - **Free for families** — no subscription paywall; sustain via **donations** (optional, parent-only, never shown to children).
 
-These supersede the freemium/premium sketch in `docs/taakhelden-productvoorstel.md` §7 for Wispel direction.
+These supersede the freemium/premium sketch in `docs/taakhelden-productvoorstel.md` §7 for Wispel direction. **WS-DOCS (2026-07-30):** productvoorstel patched; see [ADR-0005](./adr/ADR-0005-wispel-privacy-free-donations.md).
 
 **Executable build plan:** [`wispel-build-plan-workstreams.md`](./wispel-build-plan-workstreams.md) — horizons, workstreams, PR sequence, anti-goals.  
 **Open points (canonical):** [`wispel-build-plan-workstreams.md` §13](./wispel-build-plan-workstreams.md#13-open-points-register-canonical) — locked L1–L6, open O1–O34.

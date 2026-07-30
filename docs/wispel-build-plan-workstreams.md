@@ -20,7 +20,7 @@ The strategy plan is directionally right. As a **build** plan it is still too wi
 | Brand assets do not exist | You cannot parallelize “final” marketing + iOS chrome until Phase 0 artifacts exist |
 | Token files are duplicated (`globals.css` ↔ Design System) | One owner for brand tokens or every UI PR conflicts |
 | Worker/D1 rename touches CI hardcodes | Infra rename is a **cutover weekend**, not a parallel stream |
-| Productvoorstel still says freemium | Docs lie until updated — fix in WS-DOCS early or marketing will copy wrong model |
+| Productvoorstel freemium language | ✅ Fixed in WS-DOCS (ADR-0005); keep watch for regressions |
 
 **Ship philosophy:** three horizons, not one mega-release.
 
@@ -104,7 +104,7 @@ flowchart LR
 
 | ID | Name | Horizon | Owner archetype | Parallel? |
 | --- | --- | --- | --- | --- |
-| **WS-DOCS** | Canon & lies cleanup | A | Knowledge / PO | Start immediately |
+| **WS-DOCS** | Canon & lies cleanup | A | Knowledge / PO | ✅ Done |
 | **WS-STRINGS** | User-facing rename | A | Web + i18n + iOS + Backend | After G0 vocab |
 | **WS-IOS-LOOP** | Shop redeem + spaardoel + Mijn Dag header | A | iOS | After strings freeze *or* with temporary keys |
 | **WS-PRIVACY-PUB** | Public privacy/terms + App Store copy | A | Knowledge + Web | Parallel with strings |
@@ -121,15 +121,16 @@ flowchart LR
 ## 5. Workstream specs (critical scope)
 
 ### WS-DOCS — Canon cleanup
-**Why first:** Productvoorstel still sells freemium; agents will implement the wrong model.
+**Status:** ✅ done (2026-07-30) — productvoorstel, CLAUDE/AGENTS/README, ADR-0005  
+**Why first:** Productvoorstel still sold freemium; agents would implement the wrong model.
 
 | In | Out |
 | --- | --- |
 | Patch productvoorstel §7 → free + donations | Rewriting all historical batch plans |
-| Point CLAUDE.md / AGENTS.md at Wispel plan | Mass-renaming every `taakhelden-*.md` filename (defer) |
-| ADR: free+donations + privacy-first + bundle ID | Full DPIA completion (track separately) |
+| Point CLAUDE.md / AGENTS.md / README at Wispel plan | Mass-renaming every `taakhelden-*.md` filename (defer) |
+| ADR-0005: free+donations + privacy-first + domain / bundle policy | Full DPIA completion (track separately) |
 
-**DoD:** A new agent reading CLAUDE.md cannot conclude Wispel is freemium.
+**DoD:** A new agent reading CLAUDE.md cannot conclude Wispel is freemium. ✅
 
 ---
 
@@ -401,11 +402,11 @@ If a workstream PR includes any of the above “for convenience,” reject it.
 ## 12. Definition of “done” per horizon
 
 ### Horizon A — Credible Wispel
+- [x] Canon docs: no freemium; Wispel + privacy first + free/donations (WS-DOCS / ADR-0005)
 - [ ] User-facing name is Wispel  
 - [ ] Public privacy page live (staging/prod)  
 - [ ] Landing states gratis + privacy; CTA registers  
 - [ ] iOS: redeem + spaardoel + Mijn Dag hero header  
-- [ ] No freemium language in canon docs  
 - [ ] Donations: placeholder OK  
 
 ### Horizon B — Brand-complete
@@ -499,8 +500,14 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 
 | ID | Decision taken | Date | ADR / link |
 | --- | --- | --- | --- |
-| L1–L6 | See §13.1 | 2026-07-30 | This plan + strategy doc |
-| O1–O34 | *Pending* | — | — |
+| L1–L6 | See §13.1 | 2026-07-30 | Strategy doc + ADR-0005 |
+| O9 | Subdomain map confirmed as intent: www / app / api on wispel.cc | 2026-07-30 | ADR-0005 §1 |
+| O10 | **Policy** locked (keep `nl.taakhelden.*` if ASC exists; else prefer `cc.wispel.family`); concrete ID pending ASC check | 2026-07-30 | ADR-0005 §4 |
+| O14 | Interactive demo deferred past Horizon A | 2026-07-30 | Build plan anti-goals |
+| O15 | Hide Inzichten from nav until real Insights | 2026-07-30 | WS-WEB-CRAFT default |
+| O21 | Prefer external `/steun`, not IAP (unless Apple forces) | 2026-07-30 | ADR-0005 §3 |
+| O22 | Steun placeholder OK on thin landing | 2026-07-30 | ADR-0005 §3 |
+| O1–O8, O11–O13, O16–O20, O23–O34 | *Pending* | — | — |
 
 **Rule:** When an O* is decided, move a one-liner into §13.7 and strike the row or mark ✅ — do not delete history without an ADR if it affects bundle ID, donations, or privacy.
 

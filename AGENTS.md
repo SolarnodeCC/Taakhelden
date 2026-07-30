@@ -3,6 +3,14 @@
 Project context, architecture rules, stack, and standard commands live in `CLAUDE.md`
 and `docs/`. Read those first. This file only adds environment/runtime notes.
 
+**Wispel canon (read before product/pricing/privacy work):**
+- `docs/wispel-build-plan-workstreams.md` — workstreams + open points §13
+- `docs/wispel-rebrand-and-ui-plan.md` — rebrand strategy
+- `docs/adr/ADR-0005-wispel-privacy-free-donations.md` — privacy first, free + donations
+
+Product name is **Wispel** (`wispel.cc`). Do **not** implement freemium, trial paywalls,
+or child-facing donation UI. Code paths may still say `taakhelden` until rename workstreams.
+
 ## Cursor Cloud specific instructions
 
 Standard commands (`dev:api`, `dev:web`, `test`, `typecheck`, migrations) are documented
