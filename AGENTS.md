@@ -8,8 +8,9 @@ and `docs/`. Read those first. This file only adds environment/runtime notes.
 - `docs/wispel-rebrand-and-ui-plan.md` — rebrand strategy
 - `docs/adr/ADR-0005-wispel-privacy-free-donations.md` — privacy first, free + donations
 
-Product name is **Wispel** (`wispel.cc`). Do **not** implement freemium, trial paywalls,
-or child-facing donation UI. Code paths may still say `taakhelden` until rename workstreams.
+Product name is **Wispel** (`wispel.cc`). Child vocabulary is **Ster / Star** (never Held/Hero).
+Do **not** implement freemium, trial paywalls, or child-facing donation UI. Code paths may
+still say `taakhelden` until rename workstreams.
 
 ## Cursor Cloud specific instructions
 

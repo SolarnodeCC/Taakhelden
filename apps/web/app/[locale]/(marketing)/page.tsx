@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link, redirect } from "../../../i18n/navigation";
 import { WispelMark, WispelWordmark } from "../../../components/brand";
+import { ButtonLink } from "../../../components/ui";
 import { isAuthenticated } from "../../../lib/auth/session";
 
 export async function generateMetadata({
@@ -69,29 +70,24 @@ export default async function MarketingHomePage({
               {t("support")}
             </p>
             <div className="mkt-rise mkt-rise-delay-3 mt-8 flex flex-wrap items-center gap-3">
-              <Link
-                href="/register"
-                className="inline-flex items-center justify-center rounded border border-accent bg-accent px-6 py-3 text-base font-semibold text-accent-fg transition-colors hover:bg-accent-hover"
-              >
+              <ButtonLink href="/register" size="lg">
                 {t("ctaPrimary")}
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex items-center justify-center rounded border border-border bg-bg px-6 py-3 text-base font-semibold text-text transition-colors hover:bg-surface"
-              >
+              </ButtonLink>
+              <ButtonLink href="/login" variant="secondary" size="lg">
                 {t("ctaSecondary")}
-              </Link>
+              </ButtonLink>
             </div>
             <p className="mkt-rise mkt-rise-delay-3 mt-4">
-              <a href="mailto:steun@wispel.cc" className="text-sm text-muted hover:text-accent hover:underline">
+              <Link href="/steun" className="text-sm text-muted hover:text-accent hover:underline">
                 {t("ctaSteun")}
-              </a>
+              </Link>
             </p>
           </div>
 
           <div
-            className="mkt-rise mkt-rise-delay-2 relative min-h-[16rem] overflow-hidden rounded-xl bg-kid-cream md:min-h-[20rem]"
-            aria-hidden
+            className="mkt-rise mkt-rise-delay-2 relative min-h-64 overflow-hidden rounded-xl bg-kid-cream md:min-h-80"
+            role="img"
+            aria-label={t("visual.starLabel")}
           >
             <div className="absolute inset-6 flex flex-col justify-between rounded-lg bg-bg/80 p-5 md:inset-8 md:p-6">
               <div>
@@ -133,7 +129,7 @@ export default async function MarketingHomePage({
           <h2 className="font-display text-2xl font-semibold text-text">{t("preview.title")}</h2>
           <p className="mt-2 max-w-2xl text-sm text-muted md:text-base">{t("preview.support")}</p>
           <div className="mt-10 grid gap-8 md:grid-cols-2">
-            <div className="rounded-xl bg-kid-cream p-6" aria-hidden>
+            <div className="rounded-xl bg-kid-cream p-6" role="img" aria-label={t("preview.kidLabel")}>
               <p className="text-xs font-medium uppercase tracking-wide text-muted">{t("preview.kidLabel")}</p>
               <p className="mt-3 font-rounded text-lg font-semibold text-kid-text">{t("preview.kidLine")}</p>
               <div className="mt-6 space-y-3">
@@ -145,7 +141,7 @@ export default async function MarketingHomePage({
                 </div>
               </div>
             </div>
-            <div className="rounded-xl border border-border bg-bg p-6" aria-hidden>
+            <div className="rounded-xl border border-border bg-bg p-6" role="img" aria-label={t("preview.parentLabel")}>
               <p className="text-xs font-medium uppercase tracking-wide text-muted">{t("preview.parentLabel")}</p>
               <p className="mt-3 text-lg font-semibold text-text">{t("preview.parentLine")}</p>
               <div className="mt-6 space-y-3">
@@ -184,7 +180,10 @@ export default async function MarketingHomePage({
           <p className="mt-3 max-w-2xl text-sm leading-relaxed text-muted md:text-base">{t("gratis.body")}</p>
           <h3 className="mt-10 text-base font-semibold text-text">{t("steun.title")}</h3>
           <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted md:text-base">{t("steun.body")}</p>
-          <p className="mt-4">
+          <p className="mt-4 flex flex-wrap gap-4">
+            <Link href="/steun" className="text-sm font-medium text-accent hover:underline">
+              {t("steun.title")}
+            </Link>
             <a href="mailto:steun@wispel.cc" className="text-sm font-medium text-accent hover:underline">
               {t("steun.link")}
             </a>
@@ -236,18 +235,12 @@ export default async function MarketingHomePage({
           <h2 className="font-display text-2xl font-semibold text-text md:text-3xl">{t("finalCta.title")}</h2>
           <p className="mx-auto mt-3 max-w-lg text-sm text-muted md:text-base">{t("finalCta.support")}</p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
-            <Link
-              href="/register"
-              className="inline-flex items-center justify-center rounded border border-accent bg-accent px-6 py-3 text-base font-semibold text-accent-fg transition-colors hover:bg-accent-hover"
-            >
+            <ButtonLink href="/register" size="lg">
               {t("ctaPrimary")}
-            </Link>
-            <Link
-              href="/login"
-              className="inline-flex items-center justify-center rounded border border-border bg-bg px-6 py-3 text-base font-semibold text-text transition-colors hover:bg-surface"
-            >
+            </ButtonLink>
+            <ButtonLink href="/login" variant="secondary" size="lg">
               {t("ctaSecondary")}
-            </Link>
+            </ButtonLink>
           </div>
         </div>
       </section>
@@ -262,9 +255,9 @@ export default async function MarketingHomePage({
             <Link href="/voorwaarden" className="hover:text-text">
               {t("footer.terms")}
             </Link>
-            <a href="mailto:steun@wispel.cc" className="hover:text-text">
+            <Link href="/steun" className="hover:text-text">
               {t("footer.steun")}
-            </a>
+            </Link>
           </nav>
         </div>
       </footer>

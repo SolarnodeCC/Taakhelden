@@ -11,6 +11,7 @@ import {
 import { useRouter } from "../../../../i18n/navigation";
 import NotificationSettingsSection from "./NotificationSettingsSection";
 import PrivacySection from "./PrivacySection";
+import SteunSection from "./SteunSection";
 
 export default function InstellingenClient() {
   const t = useTranslations("instellingen");
@@ -68,6 +69,8 @@ export default function InstellingenClient() {
         familyQuietStart={family.quietStart}
         familyQuietEnd={family.quietEnd}
       />
+
+      <SteunSection />
 
       <PrivacySection />
     </div>

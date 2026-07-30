@@ -111,7 +111,7 @@ flowchart LR
 | **WS-WEB-MKT** | Marketing site (thin → full) | A→B | Web + Marketing | ✅ Thin + full done |
 | **WS-BRAND** | Tokens, mark, icons, avatar art v1 | B | Design + Web | ✅ Done (v1 sheet + mark + chrome icons) |
 | **WS-WEB-CRAFT** | Parent dashboard craft | B | Web | After brand tokens stable |
-| **WS-IOS-AGE** | Teen + young pass; Mijn Held badges | B | iOS | After loop; needs brand art ideally |
+| **WS-IOS-AGE** | Teen + young pass; Mijn Ster badges | B | iOS | After loop; needs brand art ideally |
 | **WS-DONATE** | `/steun` + parent settings donate | C | Web + Backend (+ legal) | After provider decision |
 | **WS-INFRA** | DNS, Workers, bindings rename | C | DevOps | Serialized cutover |
 | **WS-CROSS** | Kits sync, celebration echo, QA | C | Web + iOS + DS | After B surfaces exist |
@@ -249,12 +249,12 @@ API already supports redeem + pin. UI was browse-only. **Highest ROI engineering
 
 ---
 
-### WS-IOS-AGE — Age modes + Held (Horizon B)
+### WS-IOS-AGE — Age modes + Ster (Horizon B)
 | In | Out |
 | --- | --- |
 | Teen: radius/type/confetti differentiation | Separate TeenMode screen duplicate |
 | Young: enlarge targets, TTS coverage for primary actions | Perfect near-textless (can be B2) |
-| Mijn Held: badges/level story | Parent-gate as hero content |
+| Mijn Ster: badges/level story | Parent-gate as hero content |
 
 **DoD:** Visual QA checklist signed for mid vs teen; young not marketed until checklist pass.
 
@@ -319,7 +319,7 @@ API already supports redeem + pin. UI was browse-only. **Highest ROI engineering
 | 9 | Brand tokens + mark | WS-BRAND |
 | 10 | Marketing full + branded auth | WS-WEB-MKT |
 | 11 | Parent web craft + hide Inzichten | WS-WEB-CRAFT |
-| 12 | iOS teen/young + Held v1 | WS-IOS-AGE |
+| 12 | iOS teen/young + Ster v1 | WS-IOS-AGE |
 | 13 | Donate `/steun` + parent links | WS-DONATE |
 | 14 | Infra cutover | WS-INFRA |
 | 15 | Kits + screenshots sync | WS-CROSS |
@@ -524,7 +524,7 @@ Must replace three slots (product name is already **Wispel**):
 | Slot | Today NL | Today EN | Notes |
 | --- | --- | --- | --- |
 | Celebration noun | “je bent … een **TaakHeld**!” | (hero implied) | `child.all.done` |
-| Profile tab | **Mijn Held** | **My Hero** | Avatar / level / badges |
+| Profile tab | **Mijn Ster** | **My Hero** | Avatar / level / badges |
 | Young tab (short) | **Held** | **Hero** | 4–7 label |
 
 Hard constraint: **no Held / Hero** (ChoreHero collision). Must work spoken aloud by a child and a parent.

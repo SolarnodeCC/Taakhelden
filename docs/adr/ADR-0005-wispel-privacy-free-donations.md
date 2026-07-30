@@ -25,7 +25,7 @@ Leaving freemium language in the productvoorstel causes agents and marketers to 
 | Product name | **Wispel** (not “wispel.cc” in app chrome) |
 | Primary domain | **wispel.cc** |
 | Intended hosts | `www.wispel.cc` marketing · `app.wispel.cc` parent dashboard · `api.wispel.cc` API |
-| Anti-positioning | Not a ChoreHero / “Hero” clone; avoid Held/Hero vocabulary in new copy (open point O1 for exact replacement terms) |
+| Anti-positioning | Not a ChoreHero / “Hero” clone; **no Held/Hero** in user-facing copy. Replacement vocabulary locked as **Ster / Star** (O1 Option B — build plan §13.8) |
 
 Codebase folder names, Worker names, and historical doc filenames may still say `taakhelden` until workstreams WS-STRINGS / WS-INFRA; **user-facing and canon docs must say Wispel**.
 
@@ -47,7 +47,7 @@ Codebase folder names, Worker names, and historical doc filenames may still say 
 | Feature gates tied to payment | Forbidden |
 | Sustainability | Optional **donations** (one-time and/or monthly) |
 | Where donations appear | Marketing `/steun`, parent web settings, iOS **parent mode** settings only |
-| Child surfaces | **Never** show donation UI or copy (Mijn Dag / Winkel / Mijn Held) |
+| Child surfaces | **Never** show donation UI or copy (Mijn Dag / Winkel / **Mijn Ster**) |
 | Copy tone | Gratitude, not guilt |
 | In-app purchase donations | Prefer **external** `/steun` checkout; IAP only if Apple policy forces it (open O21 — recommend no) |
 

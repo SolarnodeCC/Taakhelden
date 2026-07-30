@@ -6,7 +6,6 @@ import AuthLegalLinks from "./AuthLegalLinks";
 
 type AuthShellProps = {
   children: React.ReactNode;
-  /** Optional line under the wordmark (defaults to marketing auth promise). */
   promiseKey?: "login" | "register" | "accept";
 };
 
@@ -16,21 +15,28 @@ type AuthShellProps = {
  */
 export default async function AuthShell({ children, promiseKey = "login" }: AuthShellProps) {
   const t = await getTranslations("marketing.auth");
+  const titleKey =
+    promiseKey === "login"
+      ? "loginTitle"
+      : promiseKey === "register"
+        ? "registerTitle"
+        : "acceptTitle";
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-surface text-text">
       <div className="mkt-hero-wash pointer-events-none absolute inset-0 opacity-80" aria-hidden />
       <header className="relative z-10 mx-auto flex max-w-lg items-center justify-between gap-4 px-6 py-4">
-        <Link href="/" className="text-base font-semibold">
-          <WispelWordmark markClassName="h-5 w-5" />
+        <Link href="/" className="text-base font-semibold" aria-label="Wispel">
+          <WispelWordmark markClassName="h-5 w-5" markOnly />
         </Link>
         <LanguageSwitcher />
       </header>
       <main className="relative z-10 mx-auto flex max-w-sm flex-col px-6 pb-16 pt-8">
-        <h1 className="font-display text-2xl font-semibold">
+        <p className="font-display text-2xl font-semibold">
           <WispelWordmark markClassName="h-7 w-7" />
-        </h1>
-        <p className="mt-2 text-sm leading-relaxed text-muted">{t(promiseKey)}</p>
+        </p>
+        <h1 className="mt-4 text-lg font-semibold text-text">{t(titleKey)}</h1>
+        <p className="mt-1 text-sm leading-relaxed text-muted">{t(promiseKey)}</p>
         <div className="mt-8">{children}</div>
         <AuthLegalLinks />
       </main>

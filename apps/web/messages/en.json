@@ -374,7 +374,7 @@
   },
   "instellingen": {
     "title": "Settings",
-    "subtitle": "Notifications and privacy for your family.",
+    "subtitle": "Notifications, privacy, and support for your family.",
     "loading": "Loading…",
     "loadError": "Couldn't load settings.",
     "notifications": {
@@ -417,6 +417,12 @@
       "deleteWorking": "Working…",
       "deleteFailed": "Couldn't delete. Please try again.",
       "errorForbidden": "Only full access can delete the family."
+    },
+    "steun": {
+      "title": "Support Wispel",
+      "body": "Wispel stays free. Optional donations are coming soon — until then you can email us. Never shown to children.",
+      "link": "Email steun@wispel.cc",
+      "pageLink": "More about support"
     }
   },
   "punten": {
@@ -475,7 +481,10 @@
     "auth": {
       "login": "Sign in to the parent dashboard — a calm overview for your family.",
       "register": "Create an account and start your family. Free, privacy first.",
-      "accept": "Accept your invite and join the family."
+      "accept": "Accept your invite and join the family.",
+      "loginTitle": "Sign in",
+      "registerTitle": "Start family",
+      "acceptTitle": "Invitation"
     },
     "visual": {
       "dayLabel": "My day",
@@ -580,6 +589,14 @@
       "privacy": "Privacy",
       "terms": "Terms",
       "steun": "Support"
+    },
+    "steunPage": {
+      "metaTitle": "Support Wispel",
+      "title": "Support Wispel",
+      "intro": "Wispel is free for families. Optional support helps us keep building — parent-only, never on child tabs.",
+      "status": "Donations via iDEAL or card are coming soon. Until then: send us an email.",
+      "link": "Email steun@wispel.cc",
+      "back": "Back to home"
     }
   },
   "legal": {
@@ -623,11 +640,11 @@
         },
         {
           "heading": "Your rights",
-          "body": "You can export family data and delete the family from Settings in the parent dashboard. After deletion there is a short retention window before final purge (as shown in the app). For questions or GDPR requests, use the contact on wispel.cc when live, or the contact in the App Store listing."
+          "body": "You can export family data and delete the family via Settings in the parent dashboard. After deletion there is a short retention window before final purge (as shown in the app). For questions or GDPR requests: email steun@wispel.cc (or the App Store listing contact once that is live)."
         },
         {
           "heading": "Donations",
-          "body": "Wispel is free for families. Optional donations use a separate parent-only flow (never on child tabs). A payment provider then processes only what is needed for the donation — that is not shared with the child profile."
+          "body": "Wispel is free for families. Optional donations will later use a separate, parent-only flow (never on child tabs). Until then you can email steun@wispel.cc. A payment provider is not active yet."
         },
         {
           "heading": "Changes",
@@ -678,9 +695,10 @@
         },
         {
           "heading": "Law and contact",
-          "body": "Dutch law applies to these terms, unless mandatory law says otherwise. Contact details will be published on wispel.cc and in the App Store listing."
+          "body": "Dutch law applies to these terms, unless mandatory law says otherwise. Contact: steun@wispel.cc — and later via the App Store listing when that is live."
         }
       ]
-    }
+    },
+    "backHome": "Back to home"
   }
 }

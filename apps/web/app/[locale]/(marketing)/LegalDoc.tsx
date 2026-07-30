@@ -33,7 +33,10 @@ export default async function LegalDoc({ namespace }: LegalDocProps) {
         ))}
       </div>
 
-      <p className="mt-12 text-sm text-muted">
+      <p className="mt-12 flex flex-wrap gap-4 text-sm text-muted">
+        <Link href="/" className="font-medium text-accent hover:underline">
+          {links("backHome")}
+        </Link>
         <Link href="/login" className="font-medium text-accent hover:underline">
           {links("backToLogin")}
         </Link>

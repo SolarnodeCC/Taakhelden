@@ -44,7 +44,7 @@
   /* Typography — system (dashboard), Outfit (marketing display), Fredoka (kid web) */
   --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-display: var(--font-outfit, "Outfit"), var(--font-sans);
-  --font-rounded: "Fredoka", var(--font-sans);
+  --font-rounded: var(--font-fredoka, "Fredoka"), var(--font-sans);
   --text-xs: 0.75rem;
   --text-sm: 0.875rem;
   --text-base: 1rem;
@@ -114,15 +114,15 @@
 }
 
 .mkt-rise-delay-1 {
-  animation-delay: 80ms;
+  animation-delay: calc(var(--transition-fast) * 0.5);
 }
 
 .mkt-rise-delay-2 {
-  animation-delay: 160ms;
+  animation-delay: var(--transition-fast);
 }
 
 .mkt-rise-delay-3 {
-  animation-delay: 240ms;
+  animation-delay: calc(var(--transition-fast) + 90ms);
 }
 
 @media (prefers-reduced-motion: reduce) {

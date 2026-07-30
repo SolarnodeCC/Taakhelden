@@ -92,7 +92,7 @@ Toon-richtlijnen (opnemen in een "content style guide"):
 |---|---|---|
 | Taak staat open | "Je bent vergeten je kamer op te ruimen" | "Je kamer wacht op je superkrachten! 💪 (+10 punten)" |
 | Dag bijna om | "Laatste kans!" | "Nog 1 taakje en je hebt je dagbonus binnen! 🌟" |
-| Week gehaald | — | "WAUW! Weekbonus verdiend — je bent een echte TaakHeld! 🏆" |
+| Week gehaald | — | "WAUW! Weekbonus verdiend — wat een ster vandaag! 🌟" |
 | Taak afgekeurd | "Afgekeurd" | "Bijna! Papa vraagt of je nog even naar de hoekjes wil kijken 😉" |
 | Kind was inactief | "Je hebt 3 dagen niets gedaan" | (géén notificatie naar kind; alleen zachte melding naar ouder) |
 
@@ -107,7 +107,7 @@ Regels: max. 2 notificaties per dag naar een kind, nooit na bedtijd (instelbaar)
 - **Visuele stijl**: warme, ronde vormen; vrolijk maar niet schreeuwerig kleurenpalet (bijv. koraal, turquoise, zonnig geel op crème); dikke afgeronde typografie (SF Rounded); confetti/animaties bij afronden (Lottie).
 - **Tienermodus**: zelfde structuur, gedempt palet (donkerblauw/mint), minder emoji, "punten" i.p.v. mascotte-taal.
 - **Jonge-kind-modus**: bijna tekstloos, alles met iconen + voorleesknop (AVSpeechSynthesizer), extra grote tap-targets.
-- **Tabbladen kind**: Mijn Dag · Winkel · Mijn Held (avatar/badges/level).
+- **Tabbladen kind**: Mijn Dag · Winkel · Mijn Ster (avatar/badges/level).
 - Toegankelijkheid: Dynamic Type, VoiceOver-labels, kleurenblind-veilige statuskleuren (niet alleen rood/groen — gebruik vorm + kleur).
 
 ### 4.2 Ouder-app & website
@@ -239,4 +239,4 @@ Een **grootboek (ledger)** i.p.v. één saldoveld voorkomt sync-conflicten en ma
 2. ~~Supabase vs. Firebase vs. eigen backend~~ — besloten: Cloudflare Workers/D1 (architectuurdoc).
 3. ~~Verdienmodel-timing: premium~~ — besloten: **gratis + donaties** (ADR-0005); open: donatieprovider + juridische entiteit (build plan O18–O19).
 4. ~~Mascotte en merknaam~~ — merknaam **Wispel** besloten; mascotte open (build plan O7, aanbevolen: uitstellen tot na Horizon A).
-5. Overige open punten: [build plan §13](./wispel-build-plan-workstreams.md#13-open-points-register-canonical) (O1–O34).
+5. Overige open punten: [build plan §13](./wispel-build-plan-workstreams.md#13-open-points-register-canonical). **O1 = Ster/Star** (locked).

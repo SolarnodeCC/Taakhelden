@@ -1,6 +1,7 @@
 // Barrel export for the app's UI primitives, ported from the root
 // `Design System/` folder. Import from "@/components/ui" (or a relative path).
 export { Button } from "./Button";
+export { ButtonLink } from "./ButtonLink";
 export { Card } from "./Card";
 export { Field, Input } from "./Field";
 export { Badge } from "./Badge";

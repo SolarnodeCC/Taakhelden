@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "../../../i18n/navigation";
 import { WispelWordmark } from "../../../components/brand";
+import { ButtonLink } from "../../../components/ui";
 import LanguageSwitcher from "../LanguageSwitcher";
 
 /**
@@ -26,16 +27,16 @@ export default async function MarketingLayout({ children }: { children: React.Re
               <Link href="/voorwaarden" className="text-muted hover:text-text">
                 {t("links.terms")}
               </Link>
+              <Link href="/steun" className="text-muted hover:text-text">
+                {m("footer.steun")}
+              </Link>
             </nav>
             <Link href="/login" className="text-sm font-medium text-muted hover:text-text">
               {m("nav.login")}
             </Link>
-            <Link
-              href="/register"
-              className="hidden rounded border border-accent bg-accent px-3 py-1.5 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover sm:inline-flex"
-            >
+            <ButtonLink href="/register" size="sm" className="hidden sm:inline-flex">
               {m("nav.cta")}
-            </Link>
+            </ButtonLink>
             <LanguageSwitcher />
           </div>
         </div>

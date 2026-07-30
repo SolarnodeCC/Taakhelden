@@ -45,8 +45,8 @@
 		<string>remote-notification</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>TaakHelden gebruikt de camera alleen als je een foto voor een bonusmoment wilt maken.</string>
+	<string>Wispel gebruikt de camera alleen als je een foto voor een bonusmoment wilt maken.</string>
 	<key>NSFaceIDUsageDescription</key>
-	<string>TaakHelden gebruikt Face ID om een gekoppeld profiel snel en veilig te ontgrendelen.</string>
+	<string>Wispel gebruikt Face ID om een gekoppeld profiel snel en veilig te ontgrendelen.</string>
 </dict>
 </plist>

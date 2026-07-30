@@ -30,23 +30,26 @@ Codebase-paden en Worker-namen kunnen nog `taakhelden` heten tot WS-STRINGS / WS
 1. **Routes praten nooit rechtstreeks met D1.** Alle SQL leeft in `apps/api/src/repo/`;
    elke repo-functie heeft `familyId` als verplicht eerste argument. Dit is de
    security-grens (D1 heeft geen row-level security).
-2. **Alle mutatie-endpoints zijn idempotent** via de `Idempotency-Key` header.
-   Dubbel afvinken mag nooit dubbele punten opleveren.
+2. **Ledger-affecting mutaties zijn idempotent** via de `Idempotency-Key` header
+   (approve/complete/redeem/adjust/cancel/goals/sync e.d.). Dubbel afvinken mag
+   nooit dubbele punten opleveren. Overige mutaties cachen optioneel op die header
+   (KV-middleware na auth); ledger-routes **vereisen** de header.
 3. **Puntensaldo = som van het ledger** (`points_ledger`), nooit een los saldoveld.
    Ledger-writes lopen via de FamilyRoom-DO.
 4. **Geen negatieve mechanieken**: nooit punten afboeken behalve bij het inwisselen
    van beloningen (redemption) of annulering daarvan.
 5. **Privacy**: geen e-mail/PII van kinderen; foto's krijgen EXIF-strip vóór ze
    zichtbaar worden; log nooit namen of foto-URLs. **Geen ads / geen child-tracking SDK’s.**
-6. **Requests/responses valideren met de Zod-schemas uit `packages/shared`** —
-   nieuwe velden eerst daar toevoegen.
+6. **Requests/responses valideren met Zod** — canonieke schemas in `packages/shared`.
+   Nieuwe request/response-velden eerst daar toevoegen. Legacy mirrors in
+   `apps/web/lib/api/types.ts` mogen tijdelijk bestaan; geen nieuwe drift.
 7. **Geen betaalmuur op kernfuncties**; donatie-UI nooit op kind-tabbladen (ADR-0005).
 
 ## Taal & toon
 - Code, identifiers en commits: Engels. Gebruikersgerichte strings: Nederlands.
 - Notificatie- en fouttekst voor kinderen: altijd positief geformuleerd
   (zie stijlgids in het productvoorstel, §3.7). Nooit schuldgevoel-taal.
-- Nieuwe copy: productnaam **Wispel**; vermijd Held/Hero-vocabulaire tot O1 is gekozen.
+- Nieuwe copy: productnaam **Wispel**; kindvocabulaire **Ster / Star** (O1); nooit Held/Hero.
 
 ## UI & Design
 - **`Design System/`** (repo-root) is leidend voor alle visuele keuzes: tokens,
@@ -57,8 +60,8 @@ Codebase-paden en Worker-namen kunnen nog `taakhelden` heten tot WS-STRINGS / WS
 - **`apps/web/app/globals.css` is de token-bron** voor de web-app (gespiegeld in
   `Design System/tokens/`). Gebruik altijd de token-variabelen / Tailwind-utilities
   (`bg-accent`, `rounded-xl`, `shadow-kid`); **nooit ruwe hex/px** hardcoderen.
-- Kid/teen-paletten zijn **inferred/placeholder** tot echte branding er is — zie de
-  vlaggen in `globals.css` en de readme (WS-BRAND).
+- Kid/teen-paletten zijn **shipping brand v1** — zie `docs/brand/wispel-brand-v1.md`
+  en `apps/web/app/globals.css` (gespiegeld in Design System tokens + `THPalettes`).
 - Herbruik de primitives in `apps/web/components/ui/` i.p.v. ad-hoc markup.
 - Bij UI-werk: gebruik de **`design-system`**-skill; check de diff met **`/design-check`**
   (`@ui-design-reviewer`). Kindgerichte tekst blijft via `@dutch-child-copy`.

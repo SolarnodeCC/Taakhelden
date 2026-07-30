@@ -12,7 +12,7 @@ import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
-import { idempotency, requireIdempotencyKey } from "../middleware/idempotency";
+import { requireIdempotencyKey } from "../middleware/idempotency";
 import { isContractV2 } from "../services/contract";
 import { callFamilyRoom } from "../services/familyRoom";
 import { newId } from "../services/ids";
@@ -117,7 +117,7 @@ rewards.delete("/:id", async (c) => {
 });
 
 /** Kopen (kind) — ledger-afboeking via de FamilyRoom-DO, Idempotency-Key verplicht. */
-rewards.post("/:id/redeem", requireIdempotencyKey, idempotency, async (c) => {
+rewards.post("/:id/redeem", requireIdempotencyKey, async (c) => {
   const { role } = c.get("auth");
   if (role !== "child") {
     throw new ApiException(403, ErrorCodes.FORBIDDEN, "Alleen kinderen kunnen beloningen kopen.");

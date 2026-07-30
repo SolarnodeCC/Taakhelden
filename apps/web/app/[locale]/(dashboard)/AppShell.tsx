@@ -10,7 +10,7 @@ import {
   SessionInfo,
   type MemberView,
 } from "../../../lib/api/types";
-import { NavIcon, WispelWordmark, type NavIconName } from "../../../components/brand";
+import { NavIcon, WispelWordmark } from "../../../components/brand";
 import {
   FamilyRealtimeProvider,
   useFamilyRealtime,
@@ -117,7 +117,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
                     : "text-text hover:bg-border/50")
                 }
               >
-                <NavIcon name={item.key as NavIconName} />
+                <NavIcon name={item.key} />
                 {tNav(item.key)}
               </Link>
             );

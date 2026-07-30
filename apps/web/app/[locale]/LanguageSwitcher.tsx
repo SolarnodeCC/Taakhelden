@@ -11,12 +11,14 @@ export default function LanguageSwitcher() {
   const router = useRouter();
 
   return (
-    <nav className="flex gap-1">
+    <nav className="flex gap-1" aria-label="Language">
       {routing.locales.map((locale) => (
         <button
           key={locale}
           type="button"
           disabled={locale === active}
+          aria-current={locale === active ? "true" : undefined}
+          aria-label={locale === "nl" ? "Nederlands" : "English"}
           onClick={() => router.replace(pathname, { locale })}
           className={
             "rounded px-2 py-1 text-xs font-medium transition-colors " +
