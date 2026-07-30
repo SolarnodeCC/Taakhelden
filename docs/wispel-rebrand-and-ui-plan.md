@@ -35,7 +35,7 @@ These supersede the freemium/premium sketch in `docs/taakhelden-productvoorstel.
 | --- | --- |
 | TaakHelden | Wispel |
 | taakhelden.nl / workers.dev staging hosts | wispel.cc (+ staging hosts) |
-| “TaakHeld” (level / celebration copy) | New Wispel term (e.g. “Wispelaar” / “Held van vandaag” — **pick one** in Phase 0) |
+| “TaakHeld” (level / celebration copy) | New **Wispel-native** term — avoid “Held/Hero” (see Appendix C); pick one in Phase 0 |
 | Email from / legal entity strings | `@wispel.cc` |
 
 ### What does *not* need to rename on day one
@@ -436,6 +436,7 @@ Maps to review recommendations **16–18**.
 | 17 Shared celebration language | 7 |
 | 18 Pedagogical trust in Inzichten UI | 7 (+ later Insights build) |
 | Rename product → Wispel / wispel.cc | 0–2 (+1 infra) |
+| Privacy-first + free / donations model | 0 + 4 + 6A (cross-cutting) |
 
 ## Appendix B — Current footprint (for eng)
 
