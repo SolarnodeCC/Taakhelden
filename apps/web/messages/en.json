@@ -459,6 +459,56 @@
       "body": "Coming soon: weekly trends to support the conversation — never as a monitoring tool."
     }
   },
+  "marketing": {
+    "metaTitle": "Wispel — free for families",
+    "metaDescription": "Wispel helps families with homework and chores — privacy first, free for your family. Positive for kids, calm for parents.",
+    "brand": "Wispel",
+    "headline": "Homework and chores that actually stick",
+    "support": "Kids earn stars with tasks. You keep a calm overview. Free for your family — privacy first, no ads.",
+    "ctaPrimary": "Start your family — free",
+    "ctaSecondary": "Sign in",
+    "nav": {
+      "login": "Sign in",
+      "cta": "Start free"
+    },
+    "visual": {
+      "dayLabel": "My day",
+      "starLabel": "My Star",
+      "pointsLabel": "points"
+    },
+    "privacy": {
+      "title": "Privacy first",
+      "body": "No ads. No child tracking. EU-first hosting choices. We ask for as little as possible — and explain it in plain language.",
+      "link": "Read the privacy notice"
+    },
+    "faq": {
+      "title": "FAQ",
+      "items": [
+        {
+          "q": "Is Wispel really free?",
+          "a": "Yes. Core features are free for families. Optional support (donations) comes later — parent-only, never on child tabs."
+        },
+        {
+          "q": "What does privacy first mean?",
+          "a": "No ads, no child tracking, no selling family data. Children don’t get their own email account with us."
+        },
+        {
+          "q": "Who is Wispel for?",
+          "a": "Dutch families who want to organise homework and chores positively — without guilt language or sibling rankings."
+        }
+      ]
+    },
+    "steun": {
+      "title": "Support Wispel",
+      "body": "Wispel stays free. Optional donations are coming soon — until then you can email us.",
+      "link": "Email steun@wispel.cc"
+    },
+    "footer": {
+      "tagline": "Free for families · Privacy first",
+      "privacy": "Privacy",
+      "terms": "Terms"
+    }
+  },
   "legal": {
     "backToLogin": "Back to sign in",
     "links": {

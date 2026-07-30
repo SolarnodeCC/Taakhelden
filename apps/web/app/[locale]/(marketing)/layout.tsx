@@ -8,16 +8,17 @@ import LanguageSwitcher from "../LanguageSwitcher";
  */
 export default async function MarketingLayout({ children }: { children: React.ReactNode }) {
   const t = await getTranslations("legal");
+  const m = await getTranslations("marketing");
 
   return (
     <div className="min-h-screen bg-bg text-text">
-      <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-2xl items-center justify-between gap-4 px-6 py-4">
-          <Link href="/login" className="text-lg font-semibold text-accent">
+      <header className="border-b border-border bg-bg/90 backdrop-blur-sm">
+        <div className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-6 py-4">
+          <Link href="/" className="text-lg font-semibold text-accent">
             Wispel
           </Link>
-          <div className="flex items-center gap-4">
-            <nav className="flex gap-3 text-sm">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <nav className="hidden gap-3 text-sm sm:flex">
               <Link href="/privacy" className="text-muted hover:text-text">
                 {t("links.privacy")}
               </Link>
@@ -25,6 +26,15 @@ export default async function MarketingLayout({ children }: { children: React.Re
                 {t("links.terms")}
               </Link>
             </nav>
+            <Link href="/login" className="text-sm font-medium text-muted hover:text-text">
+              {m("nav.login")}
+            </Link>
+            <Link
+              href="/register"
+              className="hidden rounded border border-accent bg-accent px-3 py-1.5 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover sm:inline-flex"
+            >
+              {m("nav.cta")}
+            </Link>
             <LanguageSwitcher />
           </div>
         </div>

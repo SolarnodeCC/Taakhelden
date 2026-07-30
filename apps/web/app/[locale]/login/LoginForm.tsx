@@ -44,7 +44,7 @@ export default function LoginForm() {
     setBusy(true);
     try {
       await apiClient.post("/api/auth/login", parsed.data);
-      router.push("/");
+      router.push("/vandaag");
       router.refresh();
     } catch (err) {
       const code = err instanceof ApiClientError ? err.code : null;

@@ -459,6 +459,56 @@
       "body": "Binnenkort: trends per week als hulp voor het gesprek — nooit als controlemiddel."
     }
   },
+  "marketing": {
+    "metaTitle": "Wispel — gratis voor gezinnen",
+    "metaDescription": "Wispel helpt gezinnen met huiswerk en klusjes — privacy first, gratis voor je gezin. Positief voor kids, rustig voor ouders.",
+    "brand": "Wispel",
+    "headline": "Huiswerk en klusjes die wél lukken",
+    "support": "Kids verdienen sterren met taken. Jij houdt het overzicht. Gratis voor je gezin — privacy first, zonder advertenties.",
+    "ctaPrimary": "Start met je gezin — gratis",
+    "ctaSecondary": "Inloggen",
+    "nav": {
+      "login": "Inloggen",
+      "cta": "Gratis starten"
+    },
+    "visual": {
+      "dayLabel": "Mijn dag",
+      "starLabel": "Mijn Ster",
+      "pointsLabel": "punten"
+    },
+    "privacy": {
+      "title": "Privacy first",
+      "body": "Geen advertenties. Geen tracking van kinderen. Hosting met EU-first keuzes. We vragen zo weinig mogelijk — en leggen het uit in gewone taal.",
+      "link": "Lees de privacyverklaring"
+    },
+    "faq": {
+      "title": "Veelgestelde vragen",
+      "items": [
+        {
+          "q": "Is Wispel echt gratis?",
+          "a": "Ja. Kernfuncties zijn gratis voor gezinnen. Optionele steun (donaties) volgt later — alleen voor ouders, nooit op kind-tabbladen."
+        },
+        {
+          "q": "Wat betekent privacy first?",
+          "a": "Geen ads, geen kindtracking, geen verkoop van gezinsdata. Kinderen hebben geen eigen e-mailaccount bij ons."
+        },
+        {
+          "q": "Voor wie is Wispel?",
+          "a": "Voor Nederlandse gezinnen die huiswerk en klusjes positief willen organiseren — zonder schuldgevoel-taal of ranglijsten tussen kids."
+        }
+      ]
+    },
+    "steun": {
+      "title": "Steun Wispel",
+      "body": "Wispel blijft gratis. Optionele donaties komen binnenkort — tot die tijd kun je ons een mailtje sturen.",
+      "link": "Mail steun@wispel.cc"
+    },
+    "footer": {
+      "tagline": "Gratis voor gezinnen · Privacy first",
+      "privacy": "Privacy",
+      "terms": "Voorwaarden"
+    }
+  },
   "legal": {
     "backToLogin": "Terug naar inloggen",
     "links": {

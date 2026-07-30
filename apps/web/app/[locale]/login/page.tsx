@@ -9,7 +9,7 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
   const { locale } = await params;
   // Already signed in? Skip the form and go straight to the dashboard.
   if (await isAuthenticated()) {
-    redirect({ href: "/", locale });
+    redirect({ href: "/vandaag", locale });
   }
 
   setRequestLocale(locale);

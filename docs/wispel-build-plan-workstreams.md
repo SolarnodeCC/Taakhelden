@@ -108,7 +108,7 @@ flowchart LR
 | **WS-STRINGS** | User-facing rename | A | Web + i18n + iOS + Backend | ✅ Done (O1=B) |
 | **WS-IOS-LOOP** | Shop redeem + spaardoel + Mijn Dag header | A | iOS | ✅ Done |
 | **WS-PRIVACY-PUB** | Public privacy/terms + App Store copy | A | Knowledge + Web | ✅ Done (pages); Store nutrition labels draft still open |
-| **WS-WEB-MKT** | Marketing site (thin → full) | A→B | Web + Marketing | Thin after strings; full after brand |
+| **WS-WEB-MKT** | Marketing site (thin → full) | A→B | Web + Marketing | ✅ Thin done; full after brand |
 | **WS-BRAND** | Tokens, mark, icons, avatar art v1 | B | Design + Web | After G0; single token owner |
 | **WS-WEB-CRAFT** | Parent dashboard craft | B | Web | After brand tokens stable |
 | **WS-IOS-AGE** | Teen + young pass; Mijn Held badges | B | iOS | After loop; needs brand art ideally |
@@ -185,6 +185,7 @@ API already supports redeem + pin. UI was browse-only. **Highest ROI engineering
 ---
 
 ### WS-WEB-MKT — Marketing (thin → full)
+**Status (thin):** ✅ done (2026-07-30) — `/[locale]` landing owns home; dashboard index removed; authed → `/vandaag`; gratis CTA → register; privacy blurb + FAQ stub + Steun placeholder (mailto).
 
 #### Thin (Horizon A) — unblock trust + conversion
 | In | Out |
@@ -210,7 +211,7 @@ API already supports redeem + pin. UI was browse-only. **Highest ROI engineering
 
 **Recommendation:** Option A for Horizon A/B; revisit B only if www/app split becomes operationally painful.
 
-**DoD thin:** `wispel.cc` (or staging) shows gratis + privacy; CTA registers.  
+**DoD thin:** `wispel.cc` (or staging) shows gratis + privacy; CTA registers. ✅ (in-app; DNS cutover = WS-INFRA)  
 **DoD full:** Passes brand test; no ChoreHero twin look.
 
 **Critique:** Do not wait for mascot to ship a landing. A thin honest landing beats a blank login-as-homepage.
@@ -405,9 +406,9 @@ If a workstream PR includes any of the above “for convenience,” reject it.
 - [x] Canon docs: no freemium; Wispel + privacy first + free/donations (WS-DOCS / ADR-0005)
 - [x] User-facing name is Wispel (WS-STRINGS; O1=B Ster/Star)
 - [x] Public privacy page live in web app (`/privacy`, `/voorwaarden`)  
-- [ ] Landing states gratis + privacy; CTA registers  
+- [x] Landing states gratis + privacy; CTA registers  
 - [x] iOS: redeem + spaardoel + Mijn Dag hero header  
-- [ ] Donations: placeholder OK  
+- [x] Donations: placeholder OK (Steun mailto on thin landing)  
 
 ### Horizon B — Brand-complete
 - [ ] Final mark + palettes shipping  
