@@ -5,6 +5,12 @@
 **Inputs:** UI review (web + iOS), productvoorstel §4, Design System kits, current `apps/web` + `apps/ios` shipping UI  
 **Goal:** Rename the product from **TaakHelden** to **Wispel** on domain **wispel.cc**, and execute the critical UI recommendations so brand, marketing, and emotional product loops match the promise.
 
+**Locked product principles (2026-07-30):**
+- **Privacy first** — EU hosting, minimal data, no ads, no child tracking, plain-language privacy on marketing and in-app.
+- **Free for families** — no subscription paywall; sustain via **donations** (optional, parent-only, never shown to children).
+
+These supersede the freemium/premium sketch in `docs/taakhelden-productvoorstel.md` §7 for Wispel direction.
+
 ---
 
 ## 0. Brand decisions to lock before coding
@@ -20,6 +26,8 @@
 | **Mascot** | Decide: revive “Vinkie” under Wispel, or design a new Wispel mascot — do not ship emoji-as-mascot | Confirm |
 | **Tagline direction** | Playful Dutch fit (“wispelen” = fidget/play) — one short parent promise, not a slogan pile | Marketing |
 | **Anti-positioning** | Explicitly **not** an English “ChoreHero” clone — see Appendix C | Product + Marketing |
+| **Privacy** | **Privacy first** — locked. No ads; no third-party trackers in child surfaces; EU data; plain-language privacy as a marketing pillar | Locked |
+| **Pricing / sustain** | **Free for families**; optional **donations** (parent-only). No freemium tiers, no timed trial paywall | Locked |
 
 ### Naming glossary (use everywhere user-facing)
 
@@ -83,11 +91,12 @@ Do **not** polish bordered lists before Phase 0–3. Identity first, then loops,
 ## 2. Phase 0 — Brand lock (design + product, little code)
 
 ### 2.1 Deliverables
-1. **One-pager brand sheet:** name, pronunciation, do/don’t, parent promise (1 sentence), child promise (1 sentence).
+1. **One-pager brand sheet:** name, pronunciation, do/don’t, parent promise (1 sentence), child promise (1 sentence), **privacy promise (1 sentence)**, **free + donations line (1 sentence)**.
 2. **Visual brief:** final kid / teen / parent hex; when yellow is used; shared kinship rule (same mark + family accent across registers).
 3. **Logo brief:** wordmark + optional mark; light/dark; app icon variants.
 4. **Vocabulary table:** replace every “TaakHeld(en)” string with Wispel equivalents (NL + EN).
 5. **Illustration brief:** avatar system (not emoji), task category icons, optional mascot.
+6. **Donation UX brief:** where parents can support Wispel (marketing `/steun`, in-app settings only); copy that never guilt-trips; never visible on child tabs.
 
 ### 2.2 Hard rules from the UI review (carry into the brief)
 - Parent register stays calm (no coral chrome, no confetti in dashboard chrome).
@@ -95,10 +104,13 @@ Do **not** polish bordered lists before Phase 0–3. Identity first, then loops,
 - No purple-on-white / cream-serif terracotta clichés on marketing.
 - Landing first viewport: brand + one headline + one sentence + CTA + one dominant product visual — nothing else.
 - **Do not mirror ChoreHero’s English “Hero” chore-SaaS pattern** (see Appendix C): avoid EN hero-noun branding, cream+#blue generic family-SaaS look, and a marketing site that only sells parent pain with zero kid warmth.
+- **Privacy-first and free** are brand pillars, not footnotes — say them early on marketing; never hide a paywall behind “full household access.”
+- Donations are **opt-in gratitude**, never a feature gate; children never see donation UI.
 
 ### 2.3 Exit criteria
 - Stakeholders signed off on glossary + palette + logo direction.
 - Copy spreadsheet ready for eng to find-replace user strings.
+- Donation + privacy promises signed off for marketing and App Store listing.
 
 ---
 
@@ -217,9 +229,10 @@ Maps to review recommendations **4–6**.
 | Route | Purpose |
 | --- | --- |
 | `/` (or locale `/nl`, `/en`) | Landing — brand-first hero |
-| `/privacy`, `/voorwaarden` | Legal (App Store + AVG) |
+| `/privacy`, `/voorwaarden` | Legal (App Store + AVG) — **plain-language privacy** is a product pillar, not legalese-only |
 | `/login` → `app.wispel.cc/...` | Deep link / redirect to dashboard |
-| `/prijzen` | Pricing / freemium — **required once pricing is locked** (ChoreHero proves parents expect this on the marketing site) |
+| `/gratis` or in-page “Gratis & steun” | **Free forever** story + optional donations (replaces pricing/freemium page) |
+| `/steun` | Donation landing (parent-facing; Stripe/iDEAL or similar — no child surface) |
 | Optional `/demo` or in-page interactive | Parent↔child loop walkthrough (learn from ChoreHero; do not clone their copy) |
 | Optional SEO guides (NL) | Later: “klusjes-app”, “beloningssysteem kinderen” — after core landing ships |
 
@@ -227,10 +240,10 @@ Maps to review recommendations **4–6**.
 - **One composition** in first viewport: Wispel mark (hero-level) + one headline + one supporting sentence + CTA group + **one full-bleed product visual** (child phone / family moment).
 - No cards in hero; no stat strips; no pill clusters; no overlay badges on hero media.
 - Expressive type (not Inter/system for marketing); atmosphere via gradient/pattern/image — not flat white.
-- CTA: “Start met je gezin” → register on `app.wispel.cc` (or trial if monetization locked).
-- Secondary: App Store badge when iOS build is public.
-- **Below the fold (Phase 4 completeness — ChoreHero parity, Wispel voice):** how-it-works in **our** loop language; real product screenshots; plain-language privacy; pricing; short FAQ; who it’s for / not for; final CTA. Do not ship a hero-only brochure.
-- **Differentiation vs ChoreHero:** show kid delight *and* parent calm; NL-first; homework + huiswerk as first-class; no “tired of reminding” clone headline; marketing↔app brand kinship (they fail this).
+- Primary CTA: “Start met je gezin — gratis” → register on `app.wispel.cc`.
+- Secondary: App Store badge when iOS build is public; tertiary soft link “Steun Wispel” (never competing with primary).
+- **Below the fold (Phase 4 completeness — acquisition depth, Wispel voice):** how-it-works in **our** loop language; real product screenshots; **privacy-first** section; **gratis + donaties** section (not a price table); short FAQ; who it’s for / not for; final CTA. Do not ship a hero-only brochure.
+- **Differentiation vs ChoreHero:** show kid delight *and* parent calm; NL-first; homework + huiswerk as first-class; no “tired of reminding” clone headline; marketing↔app brand kinship; **free + privacy** instead of trial + subscription.
 
 ### 6.3 Auth upgrade
 - Replace flat centered form with branded entry (atmosphere + mark + one promise line).
@@ -244,9 +257,38 @@ Maps to review recommendations **4–6**.
 - `wispel.cc` loads landing on mobile + desktop.
 - Auth no longer fails the brand test.
 - SEO basics: title/description NL+EN, OG image with mark.
+- Landing states clearly: **gratis**, **privacy first**, optional **steun/donatie** (parent-only).
+- No pricing table, trial countdown, or freemium feature matrix on the site.
 
 ---
 
+## 6A. Privacy-first & donations (cross-cutting)
+
+Applies to Phases 0, 1, 4, 6, and App Store listing.
+
+### Privacy-first rules
+1. No ads; no ad SDKs; no child-facing third-party analytics.
+2. Parent analytics only if privacy-friendly, EU-hosted, anonymised (existing productvoorstel direction).
+3. Marketing and App Store lead with plain-language privacy (what we collect / don’t; photo expiry; EU hosting).
+4. Child PII rules unchanged (no child email; EXIF strip; never log names/photo URLs).
+5. Donation providers must not inject trackers into child surfaces (donate only from marketing or parent settings).
+
+### Free + donations rules
+1. **All core family features free** — no child caps that unlock behind payment; no “Family plan” paywall.
+2. Optional donations: one-time and/or monthly; NL-friendly payment (e.g. iDEAL) preferred.
+3. Donation entry points: `wispel.cc/steun`, parent web settings, iOS parent mode settings — **never** Mijn Dag / Winkel / Mijn Held.
+4. Copy: gratitude, not guilt (“Als Wispel jullie helpt, mag je ons steunen” — never “Anders verdwijnt de app”).
+5. Update product docs: replace freemium § in productvoorstel with this model when implementation starts.
+6. App Store: list as Free; use External Link / donation disclosure per Apple guidelines if linking out to donate.
+
+### Work items to schedule
+| Item | Where |
+| --- | --- |
+| Donation provider choice + legal (stichting/eenmanszaak) | Phase 0 / business |
+| `/steun` + footer link | Phase 4 |
+| Parent settings “Steun Wispel” | Phase 6 (web) + iOS parent mode |
+| App Store privacy nutrition labels + free listing copy | Phase 1–4 |
+| Kill freemium language in docs/messages | Phase 2 |
 ## 7. Phase 5 — iOS emotional loops (P2)
 
 Maps to review recommendations **7–11**.
@@ -352,6 +394,9 @@ Maps to review recommendations **16–18**.
 | Parent trust | No stub nav items; calm register intact |
 | Name consistency | Zero user-facing “TaakHelden” in app/web/email |
 | Store / web first impression | Wispel mark + promise readable in &lt;3s |
+| Privacy promise findable | Plain-language privacy on landing + App Store without hunting |
+| Pricing confusion | Zero subscription/trial CTAs; “gratis” is unambiguous |
+| Donation hygiene | No donation UI on child tabs; parent-only paths only |
 
 ---
 
@@ -362,8 +407,9 @@ Maps to review recommendations **16–18**.
 3. Mascot: keep Vinkie, redesign, or postpone?
 4. Marketing on same Next.js app (`apps/web`) vs separate marketing Worker/Pages project?
 5. Staging hostname: `staging.wispel.cc` vs keep `*.workers.dev` until prod?
-6. Monetization on marketing: freemium CTA vs timed trial (ChoreHero leads with 14-day trial + $6.99)?
+6. ~~Monetization: freemium vs trial~~ → **Locked: free + donations.** Remaining: donation provider (Stripe/iDEAL/bunq/etc.) and legal entity for receiving funds?
 7. Interactive demo on `wispel.cc` in Phase 4 or defer to Phase 7?
+8. Donation amounts / suggested tiers on `/steun` (e.g. €3 / €5 / €10) — or open amount only?
 
 ---
 
@@ -447,15 +493,16 @@ Use `rg -i 'taakhelden|TaakHelden|TaakHeld'` as the living checklist until Phase
 | Positive copy / no negative mechanics | Pedagogical wedge they don’t own (and some competitors explicitly deduct points) |
 | NL-first + homework | Geographic + use-case wedge (huiswerk), not US chore-SaaS |
 | Age modes (young/mid/teen) | Deeper kid UX than “one simplified child view” marketing |
+| **Privacy first + free / donations** | Hard contrast to trial + $6.99 Family subscription; trust wedge for NL parents |
 
 ### C.4 Gaps in our plan that ChoreHero exposes
 
 | Gap | Plan amendment |
 | --- | --- |
-| Phase 4 under-scoped (hero + auth only) | Add pricing, FAQ, for/not-for, privacy blurb, real screenshots, final CTA as **Phase 4 must-haves** |
+| Phase 4 under-scoped (hero + auth only) | Add FAQ, for/not-for, **privacy-first**, **gratis + steun**, real screenshots, final CTA as **Phase 4 must-haves** |
 | No interactive demo | Add optional `/demo` or in-page loop walkthrough |
 | Weak SEO / comparison content | Schedule NL SEO guides *after* core landing — don’t skip forever |
-| CTA monetization unclear | Lock trial vs freemium before landing ships |
+| CTA monetization unclear | **Locked: free + donations** — do not add trial/price table |
 | “Held” still listed as vocab option | **Deprecate hero-noun options**; prefer Wispel-native terms |
 | Cream marketing risk | Kid cream `#FFF8EC` ≈ their marketing cream — do **not** use near-identical cream+blue as the public brand field |
 | Auth parity | They have forgot-password + Google/Apple on web login — track as web backlog (not only SIWA on iOS) |
@@ -468,17 +515,19 @@ Use `rg -i 'taakhelden|TaakHelden|TaakHeld'` as the living checklist until Phase
 4. Marketing that never shows the joyful kid surface.
 5. Feature laundry lists (AI, Alexa) as the hero story — we win on trust, tone, and NL family fit first.
 6. Their brand split (calm site / cartoon app) — our kinship rule forbids it.
+7. **Subscription pricing tables and “Start 14-day trial” as the primary CTA** — Wispel is free; donations are optional gratitude.
 
 ### C.6 Recommended Wispel wedge (use in Phase 0 one-pager)
 
-> **Wispel** is the Dutch family app where kids *want* to finish huiswerk and klusjes — warm, playful, age-aware — while parents keep calm control. Not another English chore chart with a hero sticker.
+> **Wispel** is the free, privacy-first Dutch family app where kids *want* to finish huiswerk and klusjes — warm, playful, age-aware — while parents keep calm control. Not another English chore chart with a hero sticker and a monthly bill.
 
 Proof points to emphasise on `wispel.cc`:
-1. NL-first / EU privacy posture  
-2. Positive-only motivation (no deductions, no sibling ranking)  
-3. Homework + chores as one game  
-4. Real kid celebration (confetti/haptics) *shown* on the marketing surface  
-5. Age modes (4–7 / 8–12 / teen)  
+1. **Gratis voor gezinnen** — optional donations only; never a child-facing paywall  
+2. **Privacy first** — EU, no ads, no child tracking; plain language  
+3. Positive-only motivation (no deductions, no sibling ranking)  
+4. Homework + chores as one game  
+5. Real kid celebration (confetti/haptics) *shown* on the marketing surface  
+6. Age modes (4–7 / 8–12 / teen)  
 
 ### C.7 Plan score vs ChoreHero readiness
 
@@ -487,8 +536,9 @@ Proof points to emphasise on `wispel.cc`:
 | Name escape from “Hero” lane | Strong — if Phase 0 kills “Held” too | Wispel rename is strategic, not cosmetic |
 | Domain split www/app/api | Aligned | Match their pattern; fine |
 | Brand foundation | Strong in plan | Must avoid cream+blue twin |
-| Marketing completeness | Was weak → amended above | Need ChoreHero’s *depth*, not their *voice* |
+| Marketing completeness | Was weak → amended above | Need their *depth*, not their *voice* or *pricing* |
 | Product emotional loops (iOS) | Strong in plan | Our actual differentiator if shipped |
-| Monetization story on site | Weak until pricing locked | Parents compare trial/price early |
+| Monetization story on site | **Locked free + donations** | Contrast their trial/$6.99; make “gratis” unmistakable |
+| Privacy story on site | Must be first-class | Stronger trust wedge than feature parity |
 
-**Bottom line:** Keep the phase order. Tighten Phase 0 vocabulary away from Hero/Held. Expand Phase 4 to acquisition parity. Use ChoreHero as a checklist for *what a serious family-chore marketing site contains*, and as a foil for *what Wispel must never sound or look like*.
+**Bottom line:** Keep the phase order. Tighten Phase 0 vocabulary away from Hero/Held. Expand Phase 4 to acquisition parity **without** copying subscription conversion. Lead with **privacy first** and **gratis + steun**. Use ChoreHero as a checklist for *what a serious family-chore marketing site contains*, and as a foil for *what Wispel must never sound, look, or charge like*.
