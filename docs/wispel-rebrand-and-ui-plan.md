@@ -281,7 +281,7 @@ Applies to Phases 0, 1, 4, 6, and App Store listing.
 2. Optional donations: one-time and/or monthly; NL-friendly payment (e.g. iDEAL) preferred.
 3. Donation entry points: `wispel.cc/steun`, parent web settings, iOS parent mode settings — **never** Mijn Dag / Winkel / Mijn Held.
 4. Copy: gratitude, not guilt (“Als Wispel jullie helpt, mag je ons steunen” — never “Anders verdwijnt de app”).
-5. Update product docs: replace freemium § in productvoorstel with this model when implementation starts.
+5. Update product docs: ~~replace freemium §~~ → **done in WS-DOCS / ADR-0005**.
 6. App Store: list as Free; use External Link / donation disclosure per Apple guidelines if linking out to donate.
 
 ### Work items to schedule
