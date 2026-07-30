@@ -54,9 +54,9 @@ export default async function MarketingHomePage({
       {/* Hero — one composition only */}
       <section className="relative overflow-hidden border-b border-border bg-surface">
         <div className="mkt-hero-wash pointer-events-none absolute inset-0 opacity-90" aria-hidden />
-        <div className="relative mx-auto grid max-w-5xl items-center gap-10 px-6 py-16 md:grid-cols-2 md:gap-12 md:py-24">
+        <div className="relative mx-auto grid max-w-5xl items-center gap-10 px-6 py-16 md:grid-cols-2 md:gap-12 md:py-16">
           <div className="mkt-rise">
-            <p className="font-display text-4xl font-bold tracking-tight text-accent md:text-5xl">
+            <p className="font-display text-4xl font-bold tracking-tight text-accent">
               <WispelWordmark
                 className="inline-flex items-center gap-3 text-accent"
                 markClassName="h-10 w-10 md:h-12 md:w-12"
