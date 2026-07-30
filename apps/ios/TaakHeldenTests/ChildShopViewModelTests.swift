@@ -70,8 +70,6 @@ final class ChildShopViewModelTests: XCTestCase {
     }
 
     func testPendingRedemptionsFilter() {
-        let queue = MutationQueue(store: InMemoryMutationQueueStore())
-        // ViewModel pending filter is a computed property; exercise via DTO filter semantics.
         let pending = RedemptionViewDTO(
             id: "rd_1",
             rewardId: "rw_ice",
@@ -96,6 +94,5 @@ final class ChildShopViewModelTests: XCTestCase {
         )
         let filtered = [pending, fulfilled].filter { $0.status == "pending" }
         XCTAssertEqual(filtered.map(\.id), ["rd_1"])
-        XCTAssertTrue(queue.pending.isEmpty)
     }
 }
