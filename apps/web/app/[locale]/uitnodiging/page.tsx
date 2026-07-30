@@ -1,5 +1,6 @@
 import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import AuthLegalLinks from "../AuthLegalLinks";
 import AcceptForm from "./AcceptForm";
 
 /**
@@ -22,6 +23,7 @@ export default async function UitnodigingPage({
       <Suspense fallback={<p className="mt-6 text-sm text-muted">{t("loading")}</p>}>
         <AcceptForm />
       </Suspense>
+      <AuthLegalLinks />
     </main>
   );
 }

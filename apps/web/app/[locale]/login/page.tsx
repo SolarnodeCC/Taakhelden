@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Link, redirect } from "../../../i18n/navigation";
 import { isAuthenticated } from "../../../lib/auth/session";
+import AuthLegalLinks from "../AuthLegalLinks";
 import LoginForm from "./LoginForm";
 
 export default async function LoginPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -27,6 +28,7 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
           {t("registerLink")}
         </Link>
       </p>
+      <AuthLegalLinks />
     </main>
   );
 }

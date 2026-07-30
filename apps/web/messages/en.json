@@ -458,5 +458,106 @@
       "title": "Insights",
       "body": "Coming soon: weekly trends to support the conversation — never as a monitoring tool."
     }
+  },
+  "legal": {
+    "backToLogin": "Back to sign in",
+    "links": {
+      "privacy": "Privacy",
+      "terms": "Terms"
+    },
+    "privacy": {
+      "title": "Privacy",
+      "updated": "Last updated: 30 July 2026",
+      "intro": "Wispel is privacy first. We build for families: collect as little as we can, no ads, and no tracking of children. Below is what we do and don’t do — in plain language.",
+      "sections": [
+        {
+          "heading": "Who this is for",
+          "body": "Parents/caregivers who manage a Wispel family, and anyone visiting our website. Children use Wispel through a parent-linked profile — they do not have their own email account with us."
+        },
+        {
+          "heading": "What data we use",
+          "body": "Parent account: email, display name, password (hashed) or Sign in with Apple.\nFamily: family name, child profiles (display name, birth year, avatar), tasks, rewards, points ledger, approvals.\nOptional: task photos uploaded as proof.\nDevices: session/device tokens to stay signed in and (if you allow it) push notifications."
+        },
+        {
+          "heading": "What we don’t do",
+          "body": "No advertising.\nNo selling family data.\nNo third-party tracking or ad SDKs in the child experience.\nNo child email addresses.\nWe do not log child names or photo URLs in application logs."
+        },
+        {
+          "heading": "Why we need it",
+          "body": "To run the family loop: plan tasks, check them off, approve, track points and redeem rewards. Without account data we cannot sign you in safely. Photos are optional and only for parent review."
+        },
+        {
+          "heading": "Photos",
+          "body": "Task photos are kept for at most 30 days, then deleted. We strip EXIF/location data before display. Production use with real child photos follows our privacy minimum and DPIA track; until that is complete, photo use may be limited."
+        },
+        {
+          "heading": "Where data lives",
+          "body": "We host on Cloudflare (Workers, D1, R2) with EU-first location choices (including D1 weur, R2 eu). Apple may be involved for Sign in with Apple and push (APNs). An email provider may send co-parent invites — only to parent emails."
+        },
+        {
+          "heading": "Who can access it",
+          "body": "Only members of your family (parents/caregivers and linked child profiles) inside the app. There is no default support tool that can browse family data or child photos."
+        },
+        {
+          "heading": "Your rights",
+          "body": "You can export family data and delete the family from Settings in the parent dashboard. After deletion there is a short retention window before final purge (as shown in the app). For questions or GDPR requests, use the contact on wispel.cc when live, or the contact in the App Store listing."
+        },
+        {
+          "heading": "Donations",
+          "body": "Wispel is free for families. Optional donations use a separate parent-only flow (never on child tabs). A payment provider then processes only what is needed for the donation — that is not shared with the child profile."
+        },
+        {
+          "heading": "Changes",
+          "body": "If we change something material, we update this page and the date above. For major changes we inform parents as clearly as we can."
+        }
+      ]
+    },
+    "terms": {
+      "title": "Terms",
+      "updated": "Last updated: 30 July 2026",
+      "intro": "These terms apply to Wispel (app and parent dashboard) on wispel.cc and related services. Wispel is free for families; donations are optional.",
+      "sections": [
+        {
+          "heading": "The service",
+          "body": "Wispel helps families organise homework and chores positively with tasks, approvals, points and rewards. We may improve, maintain or temporarily interrupt parts of the service (for example for security or outages)."
+        },
+        {
+          "heading": "Accounts and responsibility",
+          "body": "A parent/caregiver creates the family and is responsible for child profiles, settings and approvals. Keep your credentials private. Do not use Wispel to harm others, bully, or break the law."
+        },
+        {
+          "heading": "Children",
+          "body": "Child profiles belong to the parent account. There is no standalone child email account. Parents decide what children may do in the app and remain responsible for supervision."
+        },
+        {
+          "heading": "Free and donations",
+          "body": "Core features are free. No subscription is required to use Wispel. Optional donations support development; they do not unlock paywalls and are never shown on child tabs."
+        },
+        {
+          "heading": "Content and photos",
+          "body": "You keep ownership of what you upload. You grant us permission to process that content to provide the service (for example showing a task photo to a parent). Do not upload unlawful or harmful content. Photos may be deleted after 30 days."
+        },
+        {
+          "heading": "Availability",
+          "body": "We aim for a stable service but do not guarantee uninterrupted availability. Do not rely on Wispel alone for critical family processes without your own backup."
+        },
+        {
+          "heading": "Liability",
+          "body": "Wispel is provided “as is” for personal family use. To the extent permitted by law we are not liable for indirect or consequential damage. Mandatory consumer law still applies."
+        },
+        {
+          "heading": "Termination",
+          "body": "You can delete your family via privacy settings. We may limit or end access in case of abuse, security risk, or breach of these terms."
+        },
+        {
+          "heading": "Privacy",
+          "body": "How we handle data is described in our Privacy notice. It forms part of these terms."
+        },
+        {
+          "heading": "Law and contact",
+          "body": "Dutch law applies to these terms, unless mandatory law says otherwise. Contact details will be published on wispel.cc and in the App Store listing."
+        }
+      ]
+    }
   }
 }

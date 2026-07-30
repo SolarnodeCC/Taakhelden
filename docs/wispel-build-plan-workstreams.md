@@ -107,7 +107,7 @@ flowchart LR
 | **WS-DOCS** | Canon & lies cleanup | A | Knowledge / PO | ✅ Done |
 | **WS-STRINGS** | User-facing rename | A | Web + i18n + iOS + Backend | ✅ Done (O1=B) |
 | **WS-IOS-LOOP** | Shop redeem + spaardoel + Mijn Dag header | A | iOS | After strings freeze *or* with temporary keys |
-| **WS-PRIVACY-PUB** | Public privacy/terms + App Store copy | A | Knowledge + Web | Parallel with strings |
+| **WS-PRIVACY-PUB** | Public privacy/terms + App Store copy | A | Knowledge + Web | ✅ Done (pages); Store nutrition labels draft still open |
 | **WS-WEB-MKT** | Marketing site (thin → full) | A→B | Web + Marketing | Thin after strings; full after brand |
 | **WS-BRAND** | Tokens, mark, icons, avatar art v1 | B | Design + Web | After G0; single token owner |
 | **WS-WEB-CRAFT** | Parent dashboard craft | B | Web | After brand tokens stable |
@@ -174,13 +174,15 @@ API already supports redeem + pin. UI is browse-only. **This is the highest ROI 
 ---
 
 ### WS-PRIVACY-PUB — Public privacy (Horizon A)
+**Status:** ✅ done for web pages (2026-07-30) — `/privacy` + `/voorwaarden` NL+EN; auth footers linked. App Store nutrition-label draft still open.
+
 | In | Out |
 | --- | --- |
 | `/privacy`, `/voorwaarden` NL+EN plain language | Full DPIA sign-off (parallel legal track) |
-| Marketing privacy section on landing (thin) | New analytics product |
-| App Store privacy nutrition labels draft | Changing photo retention policy |
+| Auth-page legal links + marketing layout | New analytics product |
+| States no ads, no child tracking, EU hosting, free/donations | Changing photo retention policy |
 
-**DoD:** URLs exist on staging; copy states no ads, no child tracking, EU hosting, free/donations.
+**DoD:** URLs exist in the web app; copy states no ads, no child tracking, EU hosting, free/donations. ✅
 
 **Critique:** “Privacy first” without a public page is a slogan. This is cheaper than brand illustration — do it early.
 
@@ -406,7 +408,7 @@ If a workstream PR includes any of the above “for convenience,” reject it.
 ### Horizon A — Credible Wispel
 - [x] Canon docs: no freemium; Wispel + privacy first + free/donations (WS-DOCS / ADR-0005)
 - [x] User-facing name is Wispel (WS-STRINGS; O1=B Ster/Star)
-- [ ] Public privacy page live (staging/prod)  
+- [x] Public privacy page live in web app (`/privacy`, `/voorwaarden`)  
 - [ ] Landing states gratis + privacy; CTA registers  
 - [ ] iOS: redeem + spaardoel + Mijn Dag hero header  
 - [ ] Donations: placeholder OK  
@@ -450,7 +452,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O5 | **Privacy one-liner + free one-liner** | NL+EN, marketing-ready | WS-PRIVACY-PUB, MKT, Store | PO + Marketing |
 | O6 | **Tagline** (one parent promise) | Playful Dutch; not “tired of reminding” | MKT hero | Marketing |
 | O7 | **Mascot** | Keep Vinkie / redesign / **postpone** (recommend postpone past A) | WS-BRAND optional; not Horizon A | PO + Design |
-| O8 | **Marketing hosting** | **A:** same Next `(marketing)` group (**recommend**) · **B:** separate Worker | WS-WEB-MKT structure | Architect + Web |
+| O8 | **Marketing hosting** | ✅ **A:** same Next `(marketing)` group | WS-WEB-MKT structure | Locked with privacy pages |
 | O9 | **Subdomain map** | Confirm `www` / `app` / `api` on wispel.cc | WS-INFRA, MKT links | DevOps + Architect |
 | O10 | **Bundle ID** | Keep `nl.taakhelden.*` if App Store record exists; else `cc.wispel.family` | WS-INFRA, SIWA, Store | PO + iOS |
 | O11 | **App Store display name** | Wispel (confirm) | Store metadata | PO |
@@ -506,7 +508,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | **O1** | **Option B — Ster / Star** (celebration + Mijn Ster / My Star tab; product Wispel) | 2026-07-30 | Build plan §13.8 |
 | O9 | Subdomain map confirmed as intent: www / app / api on wispel.cc | 2026-07-30 | ADR-0005 §1 |
 | O10 | **Policy** locked (keep `nl.taakhelden.*` if ASC exists; else prefer `cc.wispel.family`); concrete ID pending ASC check | 2026-07-30 | ADR-0005 §4 |
-| O14 | Interactive demo deferred past Horizon A | 2026-07-30 | Build plan anti-goals |
+| O8 | Marketing in same Next `(marketing)` group (implemented with privacy pages) | 2026-07-30 | WS-PRIVACY-PUB |
 | O15 | Hide Inzichten from nav until real Insights | 2026-07-30 | WS-WEB-CRAFT default |
 | O21 | Prefer external `/steun`, not IAP (unless Apple forces) | 2026-07-30 | ADR-0005 §3 |
 | O22 | Steun placeholder OK on thin landing | 2026-07-30 | ADR-0005 §3 |
