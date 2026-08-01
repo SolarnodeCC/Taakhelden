@@ -29,6 +29,7 @@ describe("co-ouder accept-flow", () => {
     const invite = await api("/families/me/parents", {
       token: parentTok,
       body: { email: "co@test.local", permissions: "approve_only" },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(invite.status).toBe(201);
     const inviteBody = (await invite.json()) as Record<string, unknown>;
@@ -71,6 +72,7 @@ describe("co-ouder accept-flow", () => {
     const invite = await api("/families/me/parents", {
       token: parentTok,
       body: { email: "co2@test.local", permissions: "full" },
+      idempotencyKey: crypto.randomUUID(),
     });
     const { userId } = (await invite.json()) as { userId: string };
     const inviteToken = await getInviteToken(userId, parentTok);

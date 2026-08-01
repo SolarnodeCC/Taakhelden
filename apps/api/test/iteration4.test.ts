@@ -18,6 +18,7 @@ describe("POST /families/me/parents", () => {
     const res = await api("/families/me/parents", {
       token: parentTok,
       body: { email: "mede@ouder.nl", permissions: "approve_only" },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(201);
     const body = (await res.json()) as { userId: string; status: string; permissions: string };
@@ -45,8 +46,8 @@ describe("POST /families/me/parents", () => {
   it("dubbel e-mailadres → 409", async () => {
     const fam = await seedFamily("inv2");
     const token = await parentToken(fam.parentId, fam.familyId);
-    await api("/families/me/parents", { token, body: { email: "dubbel@ouder.nl" } });
-    const again = await api("/families/me/parents", { token, body: { email: "dubbel@ouder.nl" } });
+    await api("/families/me/parents", { token, body: { email: "dubbel@ouder.nl" }, idempotencyKey: crypto.randomUUID() });
+    const again = await api("/families/me/parents", { token, body: { email: "dubbel@ouder.nl" }, idempotencyKey: crypto.randomUUID() });
     expect(again.status).toBe(409);
   });
 
@@ -61,6 +62,7 @@ describe("POST /families/me/parents", () => {
     const res = await api("/families/me/parents", {
       token: await parentToken(fam.parentId, fam.familyId),
       body: { email: row!.email },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(409);
   });
@@ -70,6 +72,7 @@ describe("POST /families/me/parents", () => {
     const res = await api("/families/me/parents", {
       token: await parentToken(fam.parentId, fam.familyId, { perm: "approve_only" }),
       body: { email: "x@ouder.nl" },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(403);
   });
@@ -79,6 +82,7 @@ describe("POST /families/me/parents", () => {
     const res = await api("/families/me/parents", {
       token: await childToken(fam.childA, fam.familyId),
       body: { email: "x@ouder.nl" },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(403);
   });

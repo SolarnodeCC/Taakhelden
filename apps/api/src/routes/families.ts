@@ -6,6 +6,7 @@ import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
 import { rateLimit } from "../middleware/ratelimit";
+import { requireIdempotencyKey } from "../middleware/idempotency";
 import { isContractV2 } from "../services/contract";
 import { newFamilyCode, newId, newToken } from "../services/ids";
 import { hashSecret } from "../services/passwords";
@@ -87,7 +88,7 @@ families.post("/me/invite-code", async (c) => {
  * Het token zit NIET in de response (P1-locked, WS-TRUST-API).
  * Gebruik GET /families/me/invites/:userId/link voor de kopieerbare URL.
  */
-families.post("/me/parents", validate("json", InviteParentBody), async (c) => {
+families.post("/me/parents", requireIdempotencyKey, validate("json", InviteParentBody), async (c) => {
   const { familyId } = requireParent(c, { full: true });
   const body = c.req.valid("json");
 
