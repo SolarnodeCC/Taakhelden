@@ -459,7 +459,7 @@ Proof points sourced in this research:
 
 | Finding | Backlog implication | Priority signal |
 |---|---|---|
-| Android absence is noted gap | Android app (WS-ANDROID or similar) | Medium — blocked by iOS not yet on App Store |
+| Android absence is noted gap | Android app (`WS-ANDROID`) — **PARKED until Gate G5 (iOS App Store live)**. iOS-first is an intentional PO lock 2026-08-01. No Android scaffolding until G5 passes. | Parked — unblocked only after G5; do not promise an Android date |
 | NL bank open-banking (Gimi differentiator) | Evaluate iDEAL/open-banking integration | Medium — after core launch |
 | S'moresUp price increase churn (active 2026) | **Time-sensitive**: position "always free" prominently on wispel.cc | High — acquisition opportunity now |
 | OurHome data loss trauma | Emphasise ledger durability + data export on marketing | Medium |
@@ -473,7 +473,7 @@ Proof points sourced in this research:
 
 → **PO** (E1): Pulse digest — S'moresUp July 2026 price increase is creating active switcher demand; time to accelerate wispel.cc launch and "always free" messaging.  
 → **Marketing** (E15): Positioning input — homework category + free-forever + EU privacy are the three unclaimed wedges. No competitor owns all three. Positioning one-pager in §Positioning opportunity above; do not copy ICP table, reference this doc.  
-→ **PO** (E1): Backlog annotation — Android gap is medium-priority; open-banking (Gimi-parity) is worth O-register entry; young-mode acceleration is high priority given Gimi's 8–13 floor.
+→ **PO** (E1): Backlog annotation — Android gap is **PARKED until Gate G5 (iOS App Store live); PO lock 2026-08-01**. iOS-first is intentional and non-negotiable until the Wispel iPhone app is publicly available on the App Store. Open-banking (Gimi-parity) is worth an O-register entry; young-mode acceleration is high priority given Gimi's 8–13 floor.
 
 ---
 

@@ -499,6 +499,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O32 | Cursor agent id rename `taakhelden-*` | Optional; not user-facing | Later |
 | O33 | Pedagogical expert review as marketing claim | Strong trust story; schedule outside eng critical path | B/C |
 | O34 | Co-ouderschap / focustimer / Taakvraag | **Now scoped** in the post-review catalog (`wispel-post-review-workstreams.md`): WS-COPARENT (design-gated, G4), WS-FOCUS, WS-PROPOSAL — all behind Gate G3. Apple Watch remains out of scope. | Post-review streams |
+| O35 | **Android deferral — PO lock 2026-08-01** | **PARKED until Gate G5** (iOS App Store live). No `WS-ANDROID` coding, no Android project scaffolding, no "Android soon" eng spikes, until G5 passes. Cite P8 in the post-review catalog (`wispel-post-review-workstreams.md` §7). Marketing may say iOS-first; do not promise an Android date. | Post-G5 only |
 
 ### 13.7 Decision log (fill as answers land)
 
@@ -521,6 +522,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | **P5** | **Focusmodus scope** — client-only timer v1; aggregate focus-badge deferred | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
 | **P6** | **Co-ouderschap model** — ADR-0004 Option A + per-family ledger (still behind G4) | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
 | **P7** | **Taakvraag approve push** — yes, positive push notification to teen on approval | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
+| **P8** | **Android deferral** — PARKED until Gate G5 (iOS App Store live); no `WS-ANDROID` coding until then | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) — O35 above |
 
 **Rule:** When an O* is decided, move a one-liner into §13.7 and strike the row or mark ✅ — do not delete history without an ADR if it affects bundle ID, donations, or privacy.
 
@@ -622,8 +624,8 @@ Reply with `A` / `B` / `C` / `D` / `E` (or a tweak) to lock O1 in §13.7 and sta
 | Phase 6A Privacy/donate | WS-PRIVACY-PUB + WS-DONATE |
 | Phase 7 Cross-surface | WS-CROSS |
 
-**Companion — Horizon B.5 trust + feature streams:**
-[`docs/wispel-post-review-workstreams.md`](./wispel-post-review-workstreams.md) — post-review catalog covering the Critical/High defect fixes (B.5 trust gate) and the five feature workstreams (WS-INSIGHTS, WS-PAUSE, WS-PROPOSAL, WS-FOCUS, WS-COPARENT) that follow. Gates G3 (trust) and G4 (co-parent ADR) are defined there. Open product decisions P1–P7 were locked 2026-08-01 (see §13.7 below).
+**Companion — Horizon B.5 trust + feature streams + competitive execution sequence:**
+[`docs/wispel-post-review-workstreams.md`](./wispel-post-review-workstreams.md) — post-review catalog and **canonical competitive execution sequence** (updated 2026-08-01). Covers the Critical/High defect fixes (B.5 trust gate), the feature workstreams (WS-INSIGHTS, WS-PAUSE, WS-PROPOSAL, WS-FOCUS, WS-COPARENT, WS-AUTH-WEB, WS-ROTATE, WS-IOS-STORE, WS-ANDROID), and Gates G3 (trust), G4 (co-parent ADR), G5 (iOS App Store live — blocks Android). Open product decisions P1–P8 were locked 2026-08-01 (see §13.7 below). **Android (WS-ANDROID) is parked until G5** — see P8 and O35.
 
 ---
 
