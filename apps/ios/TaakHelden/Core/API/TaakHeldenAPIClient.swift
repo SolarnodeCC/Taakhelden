@@ -237,15 +237,15 @@ final class TaakHeldenAPIClient {
     // MARK: - WS-PAUSE: per-child rest state (v1 read-only)
 
     /// Fetches the active pause for the signed-in child.
-    /// Returns `nil` when no pause is active today (404 or empty active field).
-    /// Stub against the WS-PAUSE contract (`GET /members/:id/pause`).
+    /// Returns `nil` when no pause is active today (404 or no active pause in the list).
+    /// Matches the WS-PAUSE contract (`GET /members/:id/pause` → `{ pauses: [...] }`).
     func fetchChildPause(memberID: String) async throws -> ChildPauseDTO? {
         do {
             let response = try await sendAuthorized(
                 HTTPRequest(path: "/members/\(memberID)/pause", method: .get, requiresAuth: true)
             )
             let dto = try decoder.decode(ChildPauseResponseDTO.self, from: response.data)
-            return dto.active ? dto.pause : nil
+            return dto.pauses.first(where: { $0.active })
         } catch HTTPTransportError.httpStatus(404, _) {
             return nil
         }
@@ -419,7 +419,7 @@ struct PinRewardResultDTO: Codable, Equatable {
 
 // MARK: - WS-PAUSE DTOs (contract: GET /members/:id/pause)
 
-/// Thin DTO for the active pause returned from `GET /members/:id/pause`.
+/// Thin DTO for a pause entry returned from `GET /members/:id/pause`.
 /// Matches the WS-PAUSE `ChildPause` Zod schema in `packages/shared`.
 struct ChildPauseDTO: Codable, Equatable {
     let id: String
@@ -431,9 +431,10 @@ struct ChildPauseDTO: Codable, Equatable {
 }
 
 /// Envelope for the pause endpoint response.
+/// The API returns `{ "pauses": [ ChildPause ] }` — an array of pauses,
+/// each with its own `active` flag. This matches `GET /members/:id/pause`.
 struct ChildPauseResponseDTO: Codable {
-    let active: Bool
-    let pause: ChildPauseDTO?
+    let pauses: [ChildPauseDTO]
 }
 
 // MARK: - WS-PROPOSAL DTOs (contract: POST /tasks/proposals, GET /tasks/proposals)
