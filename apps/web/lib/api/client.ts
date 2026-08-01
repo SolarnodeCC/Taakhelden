@@ -66,6 +66,8 @@ export const apiClient = {
   get: <T>(path: string) => request<T>("GET", path),
   post: <T>(path: string, body?: unknown, opts?: { idempotencyKey?: string }) =>
     request<T>("POST", path, body, opts),
+  put: <T>(path: string, body?: unknown, opts?: { idempotencyKey?: string }) =>
+    request<T>("PUT", path, body, opts),
   patch: <T>(path: string, body?: unknown, opts?: { idempotencyKey?: string }) =>
     request<T>("PATCH", path, body, opts),
   delete: <T>(path: string, body?: unknown, opts?: { idempotencyKey?: string }) =>

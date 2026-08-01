@@ -14,3 +14,5 @@ export * from "./schemas/notification";
 export * from "./schemas/ws";
 export * from "./schemas/avatar";
 export * from "./schemas/familyGoal";
+export * from "./schemas/insights";
+export * from "./schemas/pause";

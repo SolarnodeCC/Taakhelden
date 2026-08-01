@@ -20,6 +20,7 @@ import familyGoalsRoutes from "./routes/familyGoals";
 import accountRoutes, { exportDownload } from "./routes/account";
 import notificationRoutes from "./routes/notifications";
 import wsRoutes, { handleWsUpgrade } from "./routes/ws";
+import insightsRoutes from "./routes/insights";
 
 const app = new Hono<AppBindings>().basePath("/v1");
 
@@ -73,6 +74,7 @@ app.route("/sync", syncRoutes);
 app.route("/badges", badgeRoutes);
 app.route("/avatar", avatarRoutes);
 app.route("/families/me/goals", familyGoalsRoutes);
+app.route("/families/me/insights", insightsRoutes);
 app.route("/account", accountRoutes);
 app.route("/notification-settings", notificationRoutes);
 app.route("/ws", wsRoutes);

@@ -16,6 +16,6 @@ export const NAV_ITEMS: NavItem[] = [
   { key: "taken", href: "/taken", requiresFull: true },
   { key: "winkel", href: "/winkel", requiresFull: true },
   { key: "gezin", href: "/gezin", requiresFull: true },
+  { key: "inzichten", href: "/inzichten", requiresFull: true },
   { key: "instellingen", href: "/instellingen", requiresFull: true },
-  // Inzichten hidden until real Insights ships (O15).
 ];

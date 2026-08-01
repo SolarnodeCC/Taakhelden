@@ -38,6 +38,11 @@ function shiftDate(dateStr: string, days: number): string {
   return d.toISOString().slice(0, 10);
 }
 
+/** Verschuif een YYYY-MM-DD-datum met `days` (positief of negatief). */
+export function addDays(dateStr: string, days: number): string {
+  return shiftDate(dateStr, days);
+}
+
 /** Alle 7 datums (ma t/m zo) van de week waar `dateStr` in valt. */
 export function weekDates(dateStr: string): string[] {
   const dow = new Date(`${dateStr}T12:00:00Z`).getUTCDay(); // 0=zo

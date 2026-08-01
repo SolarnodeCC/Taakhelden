@@ -87,6 +87,9 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 | `POST /members/{id}/photo` | parent | Profielfoto via presigned-flow (§3.6). |
 | `POST /members/{id}/pincode` | parent | Pincode resetten. |
 | `DELETE /members/{id}` | parent | Kindprofiel verwijderen (soft delete 7 d, daarna cascade — zie /account). |
+| `GET /members/{childId}/pause` | parent / kind-zelf | Actieve en toekomstige pauzes voor dit kind. Response: `{ pauses: ChildPause[] }`. |
+| `PUT /members/{childId}/pause` | parent (`full`) | Rustschild instellen: `{ startsOn, endsOn?, reason? }`. Stopt instance-generatie en streak-gaten voor dit kind in het opgegeven bereik. **Geen ledger-effect.** `Idempotency-Key` aanbevolen (niet verplicht). |
+| `DELETE /members/{childId}/pause/{pauseId}` | parent (`full`) | Pauze beëindigen (cleared_at zetten). 404 als al beëindigd. |
 
 ### 3.4 Tasks (definities)
 
@@ -155,7 +158,44 @@ Limieten: max 10 MB, alleen `image/jpeg|heic|png`, max 20 uploads/kind/dag. R2-l
 
 Saldo = som van de ledger, berekend in de Durable Object van het gezin (serialisatie voorkomt race conditions bij simultaan afvinken). Dag- en weekbonussen worden **transactioneel bij de laatste kwalificerende `complete`** geboekt, niet door een aparte cron — directe feedback in de app.
 
-**Streak (`streakDays`)** = aaneengesloten dagen met dagbonus, t/m vandaag of gisteren (een nog open dag vandaag breekt niets). Streakbescherming, conform de productbelofte: **per ISO-kalenderweek (ma t/m zo) mag één dag zonder dagbonus overgeslagen worden** zonder dat de streak breekt; een tweede gemiste dag in diezelfde week stopt de streak. Een overgeslagen dag telt zelf niet mee als streakdag (hij is vergeven, niet verdiend), en "vandaag nog niet verdiend" kost géén weekvergeving. Vakantiemodus staat hier los van.
+**Streak (`streakDays`)** = aaneengesloten dagen met dagbonus, t/m vandaag of gisteren (een nog open dag vandaag breekt niets). Streakbescherming, conform de productbelofte: **per ISO-kalenderweek (ma t/m zo) mag één dag zonder dagbonus overgeslagen worden** zonder dat de streak breekt; een tweede gemiste dag in diezelfde week stopt de streak. Een overgeslagen dag telt zelf niet mee als streakdag (hij is vergeven, niet verdiend), en "vandaag nog niet verdiend" kost géén weekvergeving. **Rustschild-pauze (WS-PAUSE):** een gepauzeerde dag is transparant — telt noch als verdiend, noch als gemiste dag, en verbruikt het weekvergevingsbudget niet. Vakantiemodus staat hier los van.
+
+### 3.14 Inzichten / Gesprekskaart (WS-INSIGHTS)
+
+**Endpoint:** `GET /families/me/insights?range=week&weekOf=YYYY-MM-DD&childId=<optioneel>`
+- Rol: parent only. Read-only; geen DO, geen ledger-write.
+- `range`: alleen `week` ondersteund.
+- `weekOf`: ISO-datum van de maandag van de gewenste week (default: huidige week).
+- `childId`: optioneel; filtert op één kind.
+
+**Response (WeeklyInsightsResponse):**
+```json
+{
+  "weekOf": "2026-07-27",
+  "range": "week",
+  "children": [
+    {
+      "childId": "ch_noor",
+      "displayName": "Noor",
+      "earned": 90,
+      "spent": 15,
+      "net": 75,
+      "tasksApproved": 6,
+      "tasksTotal": 7,
+      "completionRate": 0.857,
+      "streakDays": 5,
+      "slippingTasks": [
+        { "taskId": "tsk_abc", "title": "Huiswerk", "icon": "📚", "missed": 2 }
+      ]
+    }
+  ]
+}
+```
+- `earned` = som van positieve ledger-bedragen die week (excl. `redemption_cancel`).
+- `spent` = magnitude van `redemption`-bedragen die week.
+- `net = earned − spent` (nooit als schuld geframed).
+- `slippingTasks` = top-5 taken met de meeste `open`/`open_redo`-instances die week; kinderen worden nooit onderling gerangschikt.
+- Endpoint is parent-only (403 voor kindtokens) en levert nooit kind-PII buiten `displayName`.
 
 ### 3.8 Rewards
 

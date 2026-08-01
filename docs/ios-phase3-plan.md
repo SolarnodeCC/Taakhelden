@@ -430,38 +430,50 @@ Geen aparte Watch-endpoints. Hergebruik `GET /instances/today` (child viewer) vi
 
 > *“Grote datamodel-breuk — niet half voorbereiden”* (bouwvoorstel §11, risico §13).
 
-Geen `family_id` foreign keys “even uitbreiden” zonder volledig ontwerp. **Geen Phase 3-code** tot ADR-0004 (concept) is goedgekeurd.
+Geen `family_id` foreign keys “even uitbreiden” zonder volledig ontwerp. **Geen Phase 3-code** tot ADR-0004 sign-off-gereed is.
 
-### 9.2 Productvraag
+### 9.2 Gekozen model (PO-besluit P6, 2026-08-01)
 
-Kind leeft in twee huishoudens (NL co-ouderschap). Ouders willen:
+**Optie A — Eén kind-identiteit, meerdere gezinslidmaatschappen, per-family ledger.**
 
-- Gedeeld of gescheiden puntenbeleid
-- Taken/beloningen per huis of gespiegeld
-- Geen dubbele controle over hetzelfde kindprofiel
+| Concept | Geïmplementeerd als |
+|---|---|
+| Kanonieke kindidentiteit | `child_identities` (roepnaam, geboortejaar, age_mode, avatar) |
+| Gezinslidmaatschap | `family_memberships(child_identity_id, family_id, pin_hash, status)` |
+| Punten | Per-family ledger: saldo huis A is onzichtbaar in huis B |
+| Taken / beloningen | Per `family_id` — zoals vandaag |
+| JWT kind | `sub=fm_id, cid=child_identity_id, fam=active_family_id` |
 
-### 9.3 Ontwerpopties (ADR-0004)
+Opties B (gespiegelde profielen) en C (primair + gast) zijn afgewezen — zie ADR-0004 §“Opties afgewezen”.
 
-| Optie | Beschrijving | Pro | Con |
-|---|---|---|---|
-| **A. Child-link** | Eén `child_identity`; twee `family_memberships` | Eén ledger per kind | Complexe autorisatie |
-| **B. Gespiegelde profielen** | Twee child records gekoppeld via `linked_child_id` | Eenvoudiger per gezin | Sync-conflicten, dubbele avatar |
-| **C. Primair + gast** | Primair gezin + read-only secundair | Minder backend | Tweede huis frustratie |
+Volledig datamodel, migratiesketch (0009–0013) en rollback-strategie: **`docs/adr/ADR-0004-coparenting-data-model.md`**.
 
-**Aanbeveling voor PO-workshop:** optie A met één ledger en `household_id` op instances — maar alleen na juridisch/AVG-review (DPIA § co-ouderschap).
+### 9.3 Authz-testmatrix
 
-### 9.4 iOS-impact (na ADR)
+Zie **`docs/adr/ADR-0004-authz-matrix.md`** voor alle verplichte autorisatie-tests.
+Kerngaranties:
 
-- Profielkiezer toont “bij mama” / “bij papa” als twee memberships
-- Onboarding: uitnodiging tweede ouder via bestaande invite-flow uitgebreid
-- Geen Phase 3 UI-mockups in code tot ADR vastligt
+- Kind met sessie in huis A ziet nooit ledger of taken van huis B.
+- Ouder A kan geen memberships, punten of taken van huis B lezen of schrijven.
+- Context-switch vereist PIN van het doellidmaatschap.
+
+### 9.4 iOS-impact (na ADR sign-off)
+
+- **Gezinspicker** vóór PIN-invoer: toont “bij mama” / “bij papa” wanneer `child_identity` meerdere actieve memberships heeft.
+- **Context-switch** (`POST /auth/child-session/switch-family`): PIN van doelhuis; afzonderlijke sessie per actieve context.
+- **Onboarding tweede huis**: uitnodigingsflow uitgebreid met `invite-child-identity`; tweede ouder neemt bestaand `child_identity` op in zijn gezin.
+- **FamilyRoomClient**: `activeFamily`-state; switch sluit huidige WS-verbinding en opent nieuwe voor het doelgezin.
+- **Geen Phase 3 iOS-UI of API-stubs** vóór PO + security sign-off op ADR-0004.
 
 ### 9.5 Exit-criteria (epic)
 
-- [ ] ADR-0004 goedgekeurd
-- [ ] D1-migratie + authz-tests
-- [ ] iOS + web + API gelijktijdige release
-- [ ] DPIA-update met co-ouderschap-verwerking
+- [ ] ADR-0004 PO + security sign-off ontvangen
+- [ ] D1-migraties 0009–0013 aangemaakt en gereviewed
+- [ ] Authz-tests (alle rijen in `ADR-0004-authz-matrix.md`) groen in CI
+- [ ] DPIA §5a review door DPO/FG + juridisch advies verwerkersovereenkomst
+- [ ] iOS gezinspicker + context-switch E2E (twee TestFlight-accounts)
+- [ ] Web uitnodigingsflow tweede ouder
+- [ ] iOS + web + API gelijktijdige release (feature-flag aan/uit tot go-live)
 
 ---
 
