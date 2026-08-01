@@ -232,7 +232,7 @@ export default function GoedkeurenClient() {
   }, []);
 
   return (
-    <div className="max-w-2xl">
+    <div>
       <h1 className="text-xl font-semibold text-text">{t("title")}</h1>
 
       {failed && <p className="mt-4 text-sm text-danger">{t("loadError")}</p>}

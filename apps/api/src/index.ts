@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth";
 import familyRoutes, { parentAccept } from "./routes/families";
 import memberRoutes from "./routes/members";
 import taskRoutes from "./routes/tasks";
+import proposalRoutes from "./routes/proposals";
 import instanceRoutes from "./routes/instances";
 import pointsRoutes from "./routes/points";
 import rewardRoutes from "./routes/rewards";
@@ -63,6 +64,8 @@ app.use("*", async (c, next) => {
 });
 app.route("/families", familyRoutes);
 app.route("/members", memberRoutes);
+// Vóór /tasks gemount: /tasks/proposals is een eigen resource (WS-PROPOSAL).
+app.route("/tasks/proposals", proposalRoutes);
 app.route("/tasks", taskRoutes);
 app.route("/instances", instanceRoutes);
 app.route("/points", pointsRoutes);

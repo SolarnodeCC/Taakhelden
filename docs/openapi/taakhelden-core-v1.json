@@ -160,6 +160,333 @@
         }
       }
     },
+    "/auth/forgot-password": {
+      "post": {
+        "summary": "Request a password-reset email (always 200; no email enumeration)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ForgotPasswordBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "summary": "Reset password with a one-time token",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "ok"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/me/insights": {
+      "get": {
+        "summary": "Weekly parent gesprekskaart insights (read-only)",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WeeklyInsightsResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/members/{id}/pause": {
+      "get": {
+        "summary": "Read active Rustschild pause for a child",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildPause"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Set or replace a per-child pause (parent full)",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetChildPauseBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChildPause"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/proposals": {
+      "get": {
+        "summary": "List Taakvraag proposals (parent: all; child: own)",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskProposalListResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Teen proposes a task (no ledger write)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateProposalBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskProposal"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/proposals/{id}/approve": {
+      "post": {
+        "summary": "Parent approves a Taakvraag into a real task",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveProposalBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskProposal"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tasks/proposals/{id}/decline": {
+      "post": {
+        "summary": "Parent declines a Taakvraag with a friendly note",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeclineProposalBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TaskProposal"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/family-code": {
       "post": {
         "summary": "Resolve a family code to child profiles",
@@ -4612,6 +4939,470 @@
             },
             "required": [
               "items"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "WeeklyInsightsResponse": {
+        "$ref": "#/definitions/WeeklyInsightsResponse",
+        "definitions": {
+          "WeeklyInsightsResponse": {
+            "type": "object",
+            "properties": {
+              "weekOf": {
+                "type": "string"
+              },
+              "range": {
+                "type": "string",
+                "enum": [
+                  "week"
+                ]
+              },
+              "children": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "childId": {
+                      "type": "string"
+                    },
+                    "displayName": {
+                      "type": "string"
+                    },
+                    "earned": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "spent": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "net": {
+                      "type": "integer"
+                    },
+                    "tasksApproved": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "tasksTotal": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "completionRate": {
+                      "type": "number",
+                      "minimum": 0,
+                      "maximum": 1
+                    },
+                    "streakDays": {
+                      "type": "integer",
+                      "minimum": 0
+                    },
+                    "slippingTasks": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "taskId": {
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "icon": {
+                            "type": "string"
+                          },
+                          "missed": {
+                            "type": "integer",
+                            "exclusiveMinimum": true,
+                            "minimum": 0
+                          }
+                        },
+                        "required": [
+                          "taskId",
+                          "title",
+                          "icon",
+                          "missed"
+                        ],
+                        "additionalProperties": false
+                      },
+                      "maxItems": 5
+                    }
+                  },
+                  "required": [
+                    "childId",
+                    "displayName",
+                    "earned",
+                    "spent",
+                    "net",
+                    "tasksApproved",
+                    "tasksTotal",
+                    "completionRate",
+                    "streakDays",
+                    "slippingTasks"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "weekOf",
+              "range",
+              "children"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "ChildPause": {
+        "$ref": "#/definitions/ChildPause",
+        "definitions": {
+          "ChildPause": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "childId": {
+                "type": "string"
+              },
+              "startsOn": {
+                "type": "string"
+              },
+              "endsOn": {
+                "type": "string",
+                "nullable": true
+              },
+              "reason": {
+                "type": "string",
+                "maxLength": 140,
+                "nullable": true
+              },
+              "active": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "childId",
+              "startsOn",
+              "endsOn",
+              "reason",
+              "active"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "SetChildPauseBody": {
+        "$ref": "#/definitions/SetChildPauseBody",
+        "definitions": {
+          "SetChildPauseBody": {
+            "type": "object",
+            "properties": {
+              "startsOn": {
+                "type": "string",
+                "format": "date"
+              },
+              "endsOn": {
+                "type": "string",
+                "format": "date",
+                "nullable": true
+              },
+              "reason": {
+                "type": "string",
+                "maxLength": 140
+              }
+            },
+            "required": [
+              "startsOn"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "CreateProposalBody": {
+        "$ref": "#/definitions/CreateProposalBody",
+        "definitions": {
+          "CreateProposalBody": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 80
+              },
+              "category": {
+                "type": "string",
+                "enum": [
+                  "household",
+                  "homework",
+                  "selfcare",
+                  "custom"
+                ],
+                "default": "household"
+              },
+              "icon": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 24,
+                "default": "star"
+              },
+              "suggestedPoints": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "note": {
+                "type": "string",
+                "maxLength": 200
+              }
+            },
+            "required": [
+              "title",
+              "suggestedPoints"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "ApproveProposalBody": {
+        "$ref": "#/definitions/ApproveProposalBody",
+        "definitions": {
+          "ApproveProposalBody": {
+            "type": "object",
+            "properties": {
+              "points": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 100
+              },
+              "approvalRequired": {
+                "type": "boolean",
+                "default": false
+              },
+              "assignees": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                },
+                "default": []
+              }
+            },
+            "required": [
+              "points"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "DeclineProposalBody": {
+        "$ref": "#/definitions/DeclineProposalBody",
+        "definitions": {
+          "DeclineProposalBody": {
+            "type": "object",
+            "properties": {
+              "note": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 200
+              }
+            },
+            "required": [
+              "note"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "TaskProposal": {
+        "$ref": "#/definitions/TaskProposal",
+        "definitions": {
+          "TaskProposal": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string"
+              },
+              "childId": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              },
+              "icon": {
+                "type": "string"
+              },
+              "suggestedPoints": {
+                "type": "integer"
+              },
+              "note": {
+                "type": "string",
+                "nullable": true
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "pending",
+                  "approved",
+                  "declined"
+                ]
+              },
+              "decisionNote": {
+                "type": "string",
+                "nullable": true
+              },
+              "decidedAt": {
+                "type": "string",
+                "nullable": true
+              },
+              "createdTaskId": {
+                "type": "string",
+                "nullable": true
+              },
+              "createdAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "childId",
+              "title",
+              "category",
+              "icon",
+              "suggestedPoints",
+              "note",
+              "status",
+              "decisionNote",
+              "decidedAt",
+              "createdTaskId",
+              "createdAt"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "TaskProposalListResponse": {
+        "$ref": "#/definitions/TaskProposalListResponse",
+        "definitions": {
+          "TaskProposalListResponse": {
+            "type": "object",
+            "properties": {
+              "proposals": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "childId": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "category": {
+                      "type": "string"
+                    },
+                    "icon": {
+                      "type": "string"
+                    },
+                    "suggestedPoints": {
+                      "type": "integer"
+                    },
+                    "note": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "pending",
+                        "approved",
+                        "declined"
+                      ]
+                    },
+                    "decisionNote": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "decidedAt": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdTaskId": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "createdAt": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "childId",
+                    "title",
+                    "category",
+                    "icon",
+                    "suggestedPoints",
+                    "note",
+                    "status",
+                    "decisionNote",
+                    "decidedAt",
+                    "createdTaskId",
+                    "createdAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "proposals"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "ForgotPasswordBody": {
+        "$ref": "#/definitions/ForgotPasswordBody",
+        "definitions": {
+          "ForgotPasswordBody": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email"
+              }
+            },
+            "required": [
+              "email"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "ResetPasswordBody": {
+        "$ref": "#/definitions/ResetPasswordBody",
+        "definitions": {
+          "ResetPasswordBody": {
+            "type": "object",
+            "properties": {
+              "token": {
+                "type": "string",
+                "minLength": 1
+              },
+              "password": {
+                "type": "string",
+                "minLength": 10
+              }
+            },
+            "required": [
+              "token",
+              "password"
             ],
             "additionalProperties": false
           }

@@ -13,7 +13,6 @@ import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
 import {
   seedFamily,
-  seedTask,
   parentToken,
   childToken,
   api,
@@ -60,17 +59,6 @@ async function seedPause(
     .bind(id, familyId, childId, startsOn, endsOn, createdBy)
     .run();
   return id;
-}
-
-// --- Helper: seed dagbonus in het ledger ---
-async function seedDayBonus(familyId: string, childId: string, date: string) {
-  await env.DB
-    .prepare(
-      `INSERT INTO points_ledger (id, family_id, child_id, type, amount, ref_id)
-       VALUES (?, ?, ?, 'day_bonus', 20, ?)`,
-    )
-    .bind(`pl_pb${Math.random().toString(36).slice(2)}`, familyId, childId, date)
-    .run();
 }
 
 // ============================================================

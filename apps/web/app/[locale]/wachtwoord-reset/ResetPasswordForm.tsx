@@ -3,40 +3,49 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { LoginBody, ErrorCodes, type ErrorCode } from "@taakhelden/shared";
+import { ResetPasswordBody, ErrorCodes, type ErrorCode } from "@taakhelden/shared";
 import { apiClient, ApiClientError } from "../../../lib/api/client";
 import { useRouter } from "../../../i18n/navigation";
 import { Field, Input, Alert, Button } from "../../../components/ui";
 
-// Server-round-trip errors we surface with tailored copy; anything else (incl.
-// 5xx/network with no code) falls back to the generic message. Bad input is
-// caught client-side below before we ever call the server.
-const KNOWN_ERRORS: ErrorCode[] = [
-  ErrorCodes.INVALID_CREDENTIALS,
-  ErrorCodes.RATE_LIMITED,
-];
+const KNOWN_ERRORS: ErrorCode[] = [ErrorCodes.VALIDATION_FAILED, ErrorCodes.RATE_LIMITED];
 
-export default function LoginForm() {
-  const t = useTranslations("auth");
+export default function ResetPasswordForm() {
+  const t = useTranslations("auth.resetPassword");
   const router = useRouter();
   const searchParams = useSearchParams();
-  const deletedNotice =
-    searchParams.get("deleted") === "1"
-      ? t("deletedFamily", {
-          purgeAfter: decodeURIComponent(searchParams.get("purgeAfter") ?? ""),
-        })
-      : null;
-  const resetNotice = searchParams.get("reset") === "1" ? t("passwordResetSuccess") : null;
-  const [email, setEmail] = useState("");
+  const token = searchParams.get("token") ?? "";
+
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
+
+  if (!token) {
+    return (
+      <div className="flex flex-col gap-4">
+        <Alert tone="danger">{t("missingToken")}</Alert>
+        <Button
+          type="button"
+          variant="secondary"
+          onClick={() => router.push("/wachtwoord-vergeten")}
+        >
+          {t("requestNewLink")}
+        </Button>
+      </div>
+    );
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
-    const parsed = LoginBody.safeParse({ email, password });
+    if (password !== confirm) {
+      setError(t("errors.passwordMismatch"));
+      return;
+    }
+
+    const parsed = ResetPasswordBody.safeParse({ token, password });
     if (!parsed.success) {
       setError(t("errors.VALIDATION_FAILED"));
       return;
@@ -44,9 +53,8 @@ export default function LoginForm() {
 
     setBusy(true);
     try {
-      await apiClient.post("/api/auth/login", parsed.data);
-      router.push("/vandaag");
-      router.refresh();
+      await apiClient.post("/api/auth/reset-password", parsed.data);
+      router.push("/login?reset=1");
     } catch (err) {
       const code = err instanceof ApiClientError ? err.code : null;
       const key = code && KNOWN_ERRORS.includes(code) ? code : "generic";
@@ -57,29 +65,29 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4">
-      <Field label={t("email")}>
-        <Input
-          type="email"
-          name="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-        />
-      </Field>
       <Field label={t("password")}>
         <Input
           type="password"
           name="password"
-          autoComplete="current-password"
+          autoComplete="new-password"
           required
+          minLength={10}
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
       </Field>
+      <Field label={t("confirmPassword")}>
+        <Input
+          type="password"
+          name="confirmPassword"
+          autoComplete="new-password"
+          required
+          minLength={10}
+          value={confirm}
+          onChange={(e) => setConfirm(e.target.value)}
+        />
+      </Field>
 
-      {resetNotice && <Alert tone="success">{resetNotice}</Alert>}
-      {deletedNotice && <Alert tone="success">{deletedNotice}</Alert>}
       {error && <Alert tone="danger">{error}</Alert>}
 
       <Button type="submit" disabled={busy} className="mt-1">

@@ -231,3 +231,60 @@
 /* Undo affordance — warm, positive, no guilt (§3.7) */
 "child.task.undo.button" = "Oeps, toch niet";
 "child.task.undo.expired" = "Je was net iets te laat — maar je hebt het goed gedaan!";
+
+/* WS-PAUSE — child rest state (§3.7: positive, no guilt) */
+"child.pause.title" = "Je hebt even rust";
+"child.pause.detail" = "Geen taken vandaag — geniet van je vrije tijd!";
+
+/* WS-PROPOSAL — teen task proposal (§3.7: positive, agency-giving) */
+"proposal.title" = "Vraag een taak aan";
+"proposal.close" = "Sluiten";
+"proposal.button" = "Vraag een taak aan";
+"proposal.form.title" = "Nieuw voorstel";
+"proposal.form.detail" = "Heb je een idee voor een taak? Stuur het door — papa of mama beslist en stelt de punten in.";
+"proposal.field.title" = "Taaknaam";
+"proposal.field.title.placeholder" = "Bijv. ramen lappen";
+"proposal.field.category" = "Soort";
+"proposal.category.homework" = "Huiswerk";
+"proposal.category.household" = "Huishouden";
+"proposal.category.selfcare" = "Zelfzorg";
+"proposal.category.custom" = "Anders";
+"proposal.field.points.label" = "Stel je voor: %d punten";
+"proposal.field.points.stepper" = "%d punten";
+"proposal.field.note" = "Toelichting (optioneel)";
+"proposal.field.note.placeholder" = "Leg uit waarom deze taak handig is";
+"proposal.submit" = "Stuur voorstel in";
+"proposal.submit.success" = "Voorstel verstuurd — papa of mama kijkt er naar!";
+"proposal.submit.error" = "Dat lukte even niet — probeer het straks opnieuw.";
+"proposal.list.title" = "Jouw aanvragen";
+"proposal.list.loading" = "Aanvragen laden…";
+"proposal.list.empty" = "Nog geen aanvragen — doe gerust een voorstel!";
+"proposal.load.error" = "Aanvragen konden we niet laden — probeer zo opnieuw.";
+"proposal.suggested.points" = "Jij stelde %d punten voor";
+"proposal.status.pending" = "Wacht op papa of mama";
+"proposal.status.approved" = "Goedgekeurd!";
+"proposal.status.declined" = "Laten we iets anders proberen";
+
+/* WS-FOCUS — focus timer (§3.7: warm, positive, no guilt) */
+"focus.title" = "Focustijd";
+"focus.close" = "Sluiten";
+"focus.ready" = "Klaar om te beginnen";
+"focus.running" = "Bezig…";
+"focus.paused" = "Even pauze";
+"focus.done" = "Goed gedaan!";
+"focus.start" = "Begin!";
+"focus.pause" = "Pauze";
+"focus.resume" = "Doorgaan";
+"focus.stop" = "Stoppen";
+"focus.duration.format" = "%d min";
+"focus.duration.pick" = "Hoelang wil je focussen?";
+"focus.button.inline" = "Focus starten";
+"focus.button.inline.a11y" = "Focustimer starten voor deze taak";
+"focus.complete.offer.title" = "Taak ook afvinken?";
+"focus.complete.offer.detail" = "Je hebt lekker hard gewerkt — wil je de taak ook als klaar markeren?";
+"focus.complete.offer.yes" = "Ja, klaar!";
+"focus.complete.offer.later" = "Misschien later";
+"focus.a11y.idle" = "Focustimer, nog niet gestart";
+"focus.a11y.running" = "Focustimer actief, %@ over";
+"focus.a11y.paused" = "Focustimer gepauzeerd, %@ over";
+"focus.a11y.done" = "Focustimer klaar — goed gedaan!";

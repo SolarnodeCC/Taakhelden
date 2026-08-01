@@ -9,18 +9,21 @@ import {
   RefreshBody,
   LogoutBody,
   ChildSessionResult,
+  ForgotPasswordBody,
+  ResetPasswordBody,
   ErrorCodes,
 } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { validate } from "../middleware/validate";
 import { rateLimit } from "../middleware/ratelimit";
-import { newId, newFamilyCode } from "../services/ids";
+import { newId, newFamilyCode, newToken } from "../services/ids";
 import { issueChildTokens, issueParentTokens } from "../services/session";
-import { hashSecret, verifySecret } from "../services/passwords";
+import { hashSecret, verifySecret, sha256Hex } from "../services/passwords";
 import { verifyTurnstile } from "../services/turnstile";
 import { verifyAppleIdentityToken } from "../services/apple";
 import { notifyParents, parentCopy } from "../services/notifier";
+import { sendPasswordResetEmail } from "../services/email";
 import * as repo from "../repo/auth";
 
 const PIN_MAX_ATTEMPTS = 5;
@@ -242,6 +245,69 @@ auth.post("/child-session/refresh", validate("json", ChildSessionRefreshBody), a
     avatar_id: (child.avatar_id as string | null) ?? null,
     age_mode: (child.age_mode as string | null) ?? null,
   })));
+});
+
+const RESET_TTL_SECONDS = 3600; // 1 uur
+
+/**
+ * Wachtwoord vergeten: genereert een reset-token en stuurt een e-mail.
+ * Antwoordt altijd 200 zodat het e-mailadres niet uitgelekt kan worden
+ * (geen email-enumeration). De token wordt in KV opgeslagen (1 uur TTL).
+ */
+auth.post("/forgot-password", validate("json", ForgotPasswordBody), async (c) => {
+  await rateLimit(c, "forgot-password", 5);
+  const { email } = c.req.valid("json");
+
+  const user = await repo.getParentByEmail(c.env.DB, email);
+  if (user) {
+    const token = newToken();
+    const hash = await sha256Hex(token);
+    const kvKey = `pwreset:${hash}`;
+    await c.env.KV.put(kvKey, String(user.id), { expirationTtl: RESET_TTL_SECONDS });
+    // best-effort — mag niet blokkeren
+    c.executionCtx.waitUntil(
+      sendPasswordResetEmail(c.env, email, token).catch(() => {}),
+    );
+  }
+
+  // Altijd dezelfde respons — geen PII lekken via timing of inhoud.
+  return c.json({ ok: true });
+});
+
+/**
+ * Wachtwoord opnieuw instellen via het reset-token uit de e-mail.
+ * Verwijdert het token atomair zodra het gebruikt is (single-use).
+ */
+auth.post("/reset-password", validate("json", ResetPasswordBody), async (c) => {
+  await rateLimit(c, "reset-password", 10);
+  const { token, password } = c.req.valid("json");
+
+  const hash = await sha256Hex(token);
+  const kvKey = `pwreset:${hash}`;
+  const userId = await c.env.KV.get(kvKey);
+  if (!userId) {
+    throw new ApiException(
+      400,
+      ErrorCodes.VALIDATION_FAILED,
+      "Deze link is verlopen of al gebruikt. Vraag een nieuwe aan.",
+    );
+  }
+
+  // Atomair verwijderen vóór het updaten van het wachtwoord — voorkomt hergebruik
+  // bij gelijktijdige requests.
+  await c.env.KV.delete(kvKey);
+
+  const user = await repo.getUserById(c.env.DB, userId);
+  if (!user) {
+    throw new ApiException(
+      400,
+      ErrorCodes.VALIDATION_FAILED,
+      "Deze link is verlopen of al gebruikt. Vraag een nieuwe aan.",
+    );
+  }
+
+  await repo.updatePasswordHash(c.env.DB, userId, await hashSecret(password));
+  return c.json({ ok: true });
 });
 
 export default auth;

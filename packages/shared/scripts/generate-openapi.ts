@@ -55,6 +55,16 @@ import {
   InviteLinkResponse,
   PendingApprovalResponse,
   InviteParentBody,
+  WeeklyInsightsResponse,
+  ChildPause,
+  SetChildPauseBody,
+  CreateProposalBody,
+  ApproveProposalBody,
+  DeclineProposalBody,
+  TaskProposal,
+  TaskProposalListResponse,
+  ForgotPasswordBody,
+  ResetPasswordBody,
 } from "../src/index";
 
 type JsonSchema = Record<string, unknown>;
@@ -121,6 +131,16 @@ const schemas: Record<string, JsonSchema> = {
   InviteResponse: schemaFor("InviteResponse", InviteResponse),
   InviteLinkResponse: schemaFor("InviteLinkResponse", InviteLinkResponse),
   PendingApprovalResponse: schemaFor("PendingApprovalResponse", PendingApprovalResponse),
+  WeeklyInsightsResponse: schemaFor("WeeklyInsightsResponse", WeeklyInsightsResponse),
+  ChildPause: schemaFor("ChildPause", ChildPause),
+  SetChildPauseBody: schemaFor("SetChildPauseBody", SetChildPauseBody),
+  CreateProposalBody: schemaFor("CreateProposalBody", CreateProposalBody),
+  ApproveProposalBody: schemaFor("ApproveProposalBody", ApproveProposalBody),
+  DeclineProposalBody: schemaFor("DeclineProposalBody", DeclineProposalBody),
+  TaskProposal: schemaFor("TaskProposal", TaskProposal),
+  TaskProposalListResponse: schemaFor("TaskProposalListResponse", TaskProposalListResponse),
+  ForgotPasswordBody: schemaFor("ForgotPasswordBody", ForgotPasswordBody),
+  ResetPasswordBody: schemaFor("ResetPasswordBody", ResetPasswordBody),
 };
 
 function json(schemaName: string) {
@@ -171,6 +191,66 @@ const spec = {
         summary: "Rotate a parent refresh token",
         requestBody: { required: true, ...json("RefreshBody") },
         responses: { "200": json("ParentSessionResult"), "401": json("ApiError") },
+      },
+    },
+    "/auth/forgot-password": {
+      post: {
+        summary: "Request a password-reset email (always 200; no email enumeration)",
+        requestBody: { required: true, ...json("ForgotPasswordBody") },
+        responses: { "200": { description: "ok" } },
+      },
+    },
+    "/auth/reset-password": {
+      post: {
+        summary: "Reset password with a one-time token",
+        requestBody: { required: true, ...json("ResetPasswordBody") },
+        responses: { "200": { description: "ok" }, "400": json("ApiError") },
+      },
+    },
+    "/families/me/insights": {
+      get: {
+        summary: "Weekly parent gesprekskaart insights (read-only)",
+        responses: { "200": json("WeeklyInsightsResponse"), "403": json("ApiError") },
+      },
+    },
+    "/members/{id}/pause": {
+      get: {
+        summary: "Read active Rustschild pause for a child",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": json("ChildPause"), "403": json("ApiError"), "404": json("ApiError") },
+      },
+      put: {
+        summary: "Set or replace a per-child pause (parent full)",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        requestBody: { required: true, ...json("SetChildPauseBody") },
+        responses: { "201": json("ChildPause"), "403": json("ApiError") },
+      },
+    },
+    "/tasks/proposals": {
+      get: {
+        summary: "List Taakvraag proposals (parent: all; child: own)",
+        responses: { "200": json("TaskProposalListResponse"), "403": json("ApiError") },
+      },
+      post: {
+        summary: "Teen proposes a task (no ledger write)",
+        requestBody: { required: true, ...json("CreateProposalBody") },
+        responses: { "201": json("TaskProposal"), "403": json("ApiError") },
+      },
+    },
+    "/tasks/proposals/{id}/approve": {
+      post: {
+        summary: "Parent approves a Taakvraag into a real task",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        requestBody: { required: true, ...json("ApproveProposalBody") },
+        responses: { "200": json("TaskProposal"), "403": json("ApiError"), "409": json("ApiError") },
+      },
+    },
+    "/tasks/proposals/{id}/decline": {
+      post: {
+        summary: "Parent declines a Taakvraag with a friendly note",
+        parameters: [{ name: "id", in: "path", required: true, schema: { type: "string" } }],
+        requestBody: { required: true, ...json("DeclineProposalBody") },
+        responses: { "200": json("TaskProposal"), "403": json("ApiError"), "409": json("ApiError") },
       },
     },
     "/auth/family-code": {

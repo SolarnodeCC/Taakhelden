@@ -39,6 +39,7 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 /families      gezin, instellingen, uitnodigingscode
 /members       ouder- en kindprofielen, avatars
 /tasks         taakdefinities + templates
+/tasks/proposals taakvragen van tieners (WS-PROPOSAL): indienen, goedkeuren, afwijzen
 /instances     dagelijkse taak-instanties: afvinken, goedkeuren
 /photos        presigned upload + bevestiging
 /points        saldo, ledger, bonusstatus
@@ -116,6 +117,39 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
   "daypart": "evening",               // morning | afternoon | evening | null
   "activeFrom": "2026-08-01",
   "activeUntil": null                 // bijv. toetsdatum bij huiswerk
+}
+```
+
+#### 3.4a Taakvragen — Taakvraag (WS-PROPOSAL)
+
+Een tiener stelt een taak voor; een ouder maakt er een echte taak van of wijst hem vriendelijk af. **Een taakvraag raakt het ledger nooit** — punten stromen pas via de normale taak → afvinken → goedkeuren-route, nadat de ouder de vraag heeft goedgekeurd. Geen FamilyRoom-DO in het pad.
+
+| Methode & pad | Rol | Beschrijving |
+|---|---|---|
+| `POST /tasks/proposals` | child (tienerregister) | Taakvraag indienen: `{title, category?, icon?, suggestedPoints, note?}`. **`Idempotency-Key` verplicht.** Levert geen punten en geen taak op. 403 als het kind niet in het tienerregister zit. |
+| `GET /tasks/proposals?status=` | beide | Ouder ziet alle taakvragen van het gezin, kind alleen zijn eigen. Optioneel filter `status=pending\|approved\|declined`. Response: `{ proposals: TaskProposal[] }`. |
+| `POST /tasks/proposals/{id}/approve` | parent (`full`) | `{points, approvalRequired?, assignees?}` → maakt een echte taak via de gewone `createTask`-route en koppelt `createdTaskId`. De ouder bepaalt de punten; die mogen afwijken van `suggestedPoints`. Lege `assignees` = alleen de indiener. **`Idempotency-Key` verplicht.** **Geen ledger-boeking.** Response: `{ proposal, taskId }`. |
+| `POST /tasks/proposals/{id}/decline` | parent (`full`) | `{note}`: verplichte, vriendelijke toelichting; status wordt `declined`. **`Idempotency-Key` verplicht.** Geen puntenaftrek — nooit een negatieve mechaniek. |
+
+**Leeftijdsgrens (serverside).** Indienen mag alleen vanuit het tienerregister: `users.age_mode = 'teen'` **of** een `birth_year` waaruit leeftijd ≥ 13 volgt. Die tweede voorwaarde vangt op dat `age_mode` bij het aanmaken van het profiel wordt afgeleid en daarna niet meebeweegt met de leeftijd. iOS toont de affordance al alleen in teen mode; de servercheck is de tweede grendel.
+
+**Idempotentie.** De KV-middleware dedupt op (user, `Idempotency-Key`) en geeft de eerdere response terug. Daarnaast is de beslissing zelf een atomaire claim (`UPDATE … WHERE status = 'pending'`): een tweede goedkeuring met een *nieuwe* key krijgt `409 INVALID_STATUS` en er ontstaat nooit een tweede taak.
+
+**Taakvraag-schema (`TaskProposal`):**
+```json
+{
+  "id": "prp_…",
+  "childId": "ch_noor",
+  "title": "Auto wassen",
+  "category": "household",            // household | homework | selfcare | custom
+  "icon": "star",
+  "suggestedPoints": 25,              // suggestie van het kind, 1–100
+  "note": "Ik wil sparen voor de bioscoop",
+  "status": "pending",                // pending | approved | declined
+  "decisionNote": null,               // vriendelijke toelichting van de ouder bij afwijzen
+  "decidedAt": null,
+  "createdTaskId": null,              // gevuld na goedkeuren
+  "createdAt": "2026-08-01T09:12:33.412Z"
 }
 ```
 
@@ -281,6 +315,8 @@ Regels: mutaties worden in volgorde toegepast in de Family-DO; `key` = idempoten
 | Eigen taken zien/afvinken | ✅ | ✅ (zien) | ✅ |
 | Foto uploaden bij taak | ✅ | — | — |
 | Goedkeuren/redo | — | ✅ | ✅ |
+| Taakvraag indienen | ✅ (alleen teen) | — | — |
+| Taakvraag goedkeuren/afwijzen | — | — | ✅ |
 | Taken/beloningen beheren | — | — | ✅ |
 | Beloning kopen | ✅ | — | — |
 | Inlossing afhandelen | — | ✅ | ✅ |

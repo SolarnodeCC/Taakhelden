@@ -48,6 +48,37 @@
         "VALIDATION_FAILED": "Check your password (at least 8 characters) and try again.",
         "generic": "Something went wrong. Please try again in a bit."
       }
+    },
+    "forgotPasswordLink": "Forgot password?",
+    "passwordResetSuccess": "Your password has been reset. Sign in below.",
+    "forgotPassword": {
+      "email": "Email address",
+      "submit": "Send reset link",
+      "submitting": "Sending…",
+      "successMessage": "If this email address is in our system, we'll send you a link to reset your password.",
+      "backToLogin": "Remembered it?",
+      "loginLink": "Back to sign in",
+      "errors": {
+        "RATE_LIMITED": "Just a moment — please try again in a minute.",
+        "VALIDATION_FAILED": "Please enter a valid email address.",
+        "generic": "Something went wrong. Please try again in a bit."
+      }
+    },
+    "resetPassword": {
+      "password": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Save password",
+      "submitting": "Saving…",
+      "missingToken": "This link is missing a reset code. Please request a new one.",
+      "requestNewLink": "Request new link",
+      "backToLogin": "Rather sign in?",
+      "loginLink": "Go to sign in",
+      "errors": {
+        "VALIDATION_FAILED": "This link has expired or already been used. Please request a new one.",
+        "RATE_LIMITED": "Just a moment — please try again in a minute.",
+        "passwordMismatch": "The passwords don't match.",
+        "generic": "Something went wrong. Please try again in a bit."
+      }
     }
   },
   "guards": {
@@ -105,7 +136,27 @@
     "cancel": "Cancel",
     "actionError": "Something went wrong. Please try again.",
     "photoAlt": "Photo of the finished task",
-    "photoUnavailable": "Photo isn't available yet."
+    "photoUnavailable": "Photo isn't available yet.",
+    "proposals": {
+      "sectionLabel": "Task requests",
+      "sectionHint": "Your child proposed a task — approve it or send a friendly reply.",
+      "requestedBy": "Requested by {name}",
+      "suggestedPoints": "{points} pts requested",
+      "approve": "Approve",
+      "approveConfirm": "Create task",
+      "approving": "Working…",
+      "pointsLabel": "Final points",
+      "decline": "Decline",
+      "declineConfirm": "Send reply",
+      "declining": "Working…",
+      "declineLabel": "What's your reply?",
+      "declinePlaceholder": "Good idea, but not right now — maybe later!",
+      "cancel": "Cancel",
+      "actionError": "Something went wrong. Please try again.",
+      "loadError": "Couldn't load task requests.",
+      "declineNoteRequired": "Add a reply — kids appreciate a message.",
+      "approveValidationError": "Points must be greater than zero."
+    }
   },
   "taken": {
     "title": "Tasks",
@@ -550,7 +601,11 @@
       "accept": "Accept your invite and join the family.",
       "loginTitle": "Sign in",
       "registerTitle": "Start family",
-      "acceptTitle": "Invitation"
+      "acceptTitle": "Invitation",
+      "forgotPasswordTitle": "Forgot password",
+      "forgotPassword": "Enter your email address and we'll send you a link to reset your password.",
+      "resetPasswordTitle": "New password",
+      "resetPassword": "Choose a new password for your Wispel account."
     },
     "visual": {
       "dayLabel": "My day",
