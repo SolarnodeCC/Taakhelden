@@ -55,21 +55,48 @@ export async function listProposals(
   familyId: string,
   filter: { status?: ProposalStatus; childId?: string } = {},
 ): Promise<ProposalRow[]> {
-  const clauses = ["family_id = ?"];
-  const values: unknown[] = [familyId];
+  // Four static SQL strings (no `${…}` interpolation) so scanners don't treat
+  // this as string-built SQL. Filter values are still bound parameters only.
+  if (filter.status && filter.childId) {
+    const { results } = await db
+      .prepare(
+        `SELECT * FROM task_proposals
+         WHERE family_id = ? AND status = ? AND child_id = ?
+         ORDER BY created_at DESC, id DESC`,
+      )
+      .bind(familyId, filter.status, filter.childId)
+      .all<ProposalRow>();
+    return results;
+  }
   if (filter.status) {
-    clauses.push("status = ?");
-    values.push(filter.status);
+    const { results } = await db
+      .prepare(
+        `SELECT * FROM task_proposals
+         WHERE family_id = ? AND status = ?
+         ORDER BY created_at DESC, id DESC`,
+      )
+      .bind(familyId, filter.status)
+      .all<ProposalRow>();
+    return results;
   }
   if (filter.childId) {
-    clauses.push("child_id = ?");
-    values.push(filter.childId);
+    const { results } = await db
+      .prepare(
+        `SELECT * FROM task_proposals
+         WHERE family_id = ? AND child_id = ?
+         ORDER BY created_at DESC, id DESC`,
+      )
+      .bind(familyId, filter.childId)
+      .all<ProposalRow>();
+    return results;
   }
   const { results } = await db
     .prepare(
-      `SELECT * FROM task_proposals WHERE ${clauses.join(" AND ")} ORDER BY created_at DESC, id DESC`,
+      `SELECT * FROM task_proposals
+       WHERE family_id = ?
+       ORDER BY created_at DESC, id DESC`,
     )
-    .bind(...values)
+    .bind(familyId)
     .all<ProposalRow>();
   return results;
 }
