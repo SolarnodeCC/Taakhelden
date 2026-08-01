@@ -307,6 +307,8 @@ auth.post("/reset-password", validate("json", ResetPasswordBody), async (c) => {
   }
 
   await repo.updatePasswordHash(c.env.DB, userId, await hashSecret(password));
+  // Revoke all active refresh tokens so any compromised session can no longer be used.
+  await repo.revokeAllRefreshTokensForUser(c.env.DB, userId);
   return c.json({ ok: true });
 });
 
