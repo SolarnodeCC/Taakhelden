@@ -416,7 +416,7 @@ If a workstream PR includes any of the above “for convenience,” reject it.
 ### Horizon B — Brand-complete
 - [x] Final mark + palettes shipping (v1 sheet; PNG App Icon residual)
 - [x] Full landing passes brand test (CSS product preview; photo screenshots residual)
-- [ ] Parent web: no Inzichten stub; craft pass  
+- [ ] Parent web: no Inzichten stub; craft pass (Inzichten ships as a real read-only Gesprekskaart via WS-INSIGHTS in the post-review catalog, after Gate G3)  
 - [ ] Teen/young checklist; Ster badges v1  
 
 ### Horizon C — Cutover & sustain
@@ -464,7 +464,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | --- | --- | --- | --- | --- |
 | O13 | **Staging hostname** | Keep `*.workers.dev` until prod cutover | No — INFRA later | DevOps |
 | O14 | **Interactive demo** on marketing | **Defer** to Horizon C / WS-CROSS (anti-goal for A) | No | Marketing |
-| O15 | **Inzichten** | **Hide from nav** until real Insights ships | No — WS-WEB-CRAFT | PO + Web |
+| O15 | **Inzichten** | Ships as a real read-only "Gesprekskaart" via **WS-INSIGHTS** in the post-review catalog, after Gate G3 — the stub is removed then; hide from nav until that workstream merges | No — WS-INSIGHTS (post-review) | PO + Web |
 | O16 | **Auth on web:** forgot-password / Google | Backlog after A; email/password + iOS SIWA stay | No for A | Web + Security |
 | O17 | **Token ownership** during parallel UI | ✅ One editor: globals.css + DS tokens + THPalettes (brand sheet) | — | Locked 2026-07-30 |
 
@@ -498,7 +498,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O31 | Shared design-token npm package | **Do not** extract mid-rebrand | Later |
 | O32 | Cursor agent id rename `taakhelden-*` | Optional; not user-facing | Later |
 | O33 | Pedagogical expert review as marketing claim | Strong trust story; schedule outside eng critical path | B/C |
-| O34 | Co-ouderschap / Watch / focustimer | Existing product backlog — out of Wispel rebrand scope | Out of scope |
+| O34 | Co-ouderschap / focustimer / Taakvraag | **Now scoped** in the post-review catalog (`wispel-post-review-workstreams.md`): WS-COPARENT (design-gated, G4), WS-FOCUS, WS-PROPOSAL — all behind Gate G3. Apple Watch remains out of scope. | Post-review streams |
 
 ### 13.7 Decision log (fill as answers land)
 
@@ -513,7 +513,14 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O21 | Prefer external `/steun`, not IAP (unless Apple forces) | 2026-07-30 | ADR-0005 §3 |
 | O22 | Steun placeholder OK on thin landing | 2026-07-30 | ADR-0005 §3 |
 | **O2–O7, O12, O17** | Brand v1 sheet + Ster+wisp mark + chrome icons; mascot postpone; emoji avatars v1; token owner | 2026-07-30 | `docs/brand/wispel-brand-v1.md` / WS-BRAND |
-| O11, O13, O16, O18–O20, O23–O34 | *Pending* | — | — |
+| O11, O13, O16, O18–O20, O23–O33 | *Pending* | — | — |
+| **P1** | **Invite-token fix shape** — Option A: separate reveal endpoint; `inviteToken` never echoed in create response | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
+| **P2** | **Insights slipping-tasks signal** — both `open` + `open_redo`, top 5, no sibling ranking | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
+| **P3** | **Rustschild pause shape** — open-ended pause allowed + easy parent clear | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
+| **P4** | **Taakvraag audience** — teen only for v1 | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
+| **P5** | **Focusmodus scope** — client-only timer v1; aggregate focus-badge deferred | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
+| **P6** | **Co-ouderschap model** — ADR-0004 Option A + per-family ledger (still behind G4) | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
+| **P7** | **Taakvraag approve push** — yes, positive push notification to teen on approval | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
 
 **Rule:** When an O* is decided, move a one-liner into §13.7 and strike the row or mark ✅ — do not delete history without an ADR if it affects bundle ID, donations, or privacy.
 
@@ -614,6 +621,9 @@ Reply with `A` / `B` / `C` / `D` / `E` (or a tweak) to lock O1 in §13.7 and sta
 | Phase 6 Web craft | WS-WEB-CRAFT |
 | Phase 6A Privacy/donate | WS-PRIVACY-PUB + WS-DONATE |
 | Phase 7 Cross-surface | WS-CROSS |
+
+**Companion — Horizon B.5 trust + feature streams:**
+[`docs/wispel-post-review-workstreams.md`](./wispel-post-review-workstreams.md) — post-review catalog covering the Critical/High defect fixes (B.5 trust gate) and the five feature workstreams (WS-INSIGHTS, WS-PAUSE, WS-PROPOSAL, WS-FOCUS, WS-COPARENT) that follow. Gates G3 (trust) and G4 (co-parent ADR) are defined there. Open product decisions P1–P7 were locked 2026-08-01 (see §13.7 below).
 
 ---
 

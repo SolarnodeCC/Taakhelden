@@ -1,6 +1,6 @@
 # Wispel — post-review workstreams (Horizon B.5 + feature streams)
 
-**Status:** planning — companion to [`wispel-build-plan-workstreams.md`](./wispel-build-plan-workstreams.md)
+**Status:** design locked — Horizon B.5 build open — companion to [`wispel-build-plan-workstreams.md`](./wispel-build-plan-workstreams.md)
 **Audience:** eng + design + PO leads
 **Origin:** product/security review 2026-07-31 (7 web bugs, 3 API security highs, 5 iOS safety/a11y items, 5 proposed features)
 **Stance:** critical. Earn trust before adding surface. A wrong point balance or a leaked invite token costs more goodwill than any new feature buys.
@@ -596,19 +596,19 @@ After **design lock of this document**, these can start **coding now, in paralle
 
 ---
 
-## 7. Open decisions needing product/PO lock (keep short)
+## 7. Open decisions — ✅ ALL LOCKED 2026-08-01
 
-| ID | Decision needed | Recommendation | Blocks |
-| --- | --- | --- | --- |
-| P1 | Invite-token fix shape (A separate reveal endpoint vs B sensitive link field) | **A** — never echo the secret in create | WS-TRUST-API |
-| P2 | Insights: which "slipping tasks" signal (open vs open_redo vs both) | Both open + redo, top 5, no ranking | WS-INSIGHTS |
-| P3 | Rustschild: open-ended pause allowed, or require an end date? | Allow open-ended + easy clear | WS-PAUSE |
-| P4 | Taakvraag audience (teen only vs mid+teen) | Teen only for v1 | WS-PROPOSAL |
-| P5 | Focus: client-only, or ship the aggregate focus-badge? | Client-only v1; badge later | WS-FOCUS |
-| P6 | Co-parent option + ledger scoping | Option A + **per-family** ledger | WS-COPARENT / G4 |
-| P7 | Does approving a Taakvraag notify the teen (push)? | Yes, positive push | WS-PROPOSAL |
+| ID | Decision | Locked option | Rationale | Blocks |
+| --- | --- | --- | --- | --- |
+| P1 | ✅ LOCKED | **Option A** — separate `GET /families/me/invites/:userId/link` reveal endpoint; `inviteToken` is never echoed in the create response | A bare secret in a response body reaches logs, proxies, and BFF caches; a rate-limited reveal endpoint is safer and auditable | WS-TRUST-API |
+| P2 | ✅ LOCKED | **Both `open` + `open_redo` count as "slipping"**, top 5 per child, no ranking between children | Counting only one status misses the redo-loop signal; ranking children violates the no-sibling-ranking hard rule | WS-INSIGHTS |
+| P3 | ✅ LOCKED | **Open-ended pause is allowed** with an easy parent-facing "Rustschild uitzetten" clear action | Illness and extended holidays have no fixed end date; forcing one adds friction and introduces guilt pressure on the parent | WS-PAUSE |
+| P4 | ✅ LOCKED | **Teen only** for Taakvraag v1 | Task negotiation is developmentally appropriate for teens; extending to mid-children in v1 adds scope and copy complexity without evidence of demand | WS-PROPOSAL |
+| P5 | ✅ LOCKED | **Client-only timer for v1**; aggregate focus-badge is explicitly deferred | A client-side timer needs no server state; per-session logging is a privacy liability (dataminimalisatie); badge can be scoped once usage data warrants it | WS-FOCUS |
+| P6 | ✅ LOCKED | **ADR-0004 Option A** (one child identity, multiple family memberships) + **per-family ledger** (balance is always scoped to one `family_id`) | Option A matches the product promise of a single point history; per-family ledger preserves the `familyId` security boundary and matches hard rule 3 — still behind G4 | WS-COPARENT / G4 |
+| P7 | ✅ LOCKED | **Yes — send a positive push notification** to the teen when a parent approves their Taakvraag | Immediate positive feedback completes the agency loop and is consistent with the positive-only push stance; copy must pass `@dutch-child-copy` | WS-PROPOSAL |
 
-Lock P1–P7 at design review; log each in the base build plan §13.7 decision log when decided.
+All seven decisions logged in `wispel-build-plan-workstreams.md` §13.7 (2026-08-01).
 
 ---
 
