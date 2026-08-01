@@ -52,7 +52,9 @@
   },
   "guards": {
     "forbidden": "This page is only for parents with full access.",
-    "backToToday": "Back to Today"
+    "backToToday": "Back to Today",
+    "upstreamUnavailable": "The server is temporarily unavailable. Please try again.",
+    "retry": "Try again"
   },
   "nav": {
     "vandaag": "Today",
@@ -67,6 +69,9 @@
     "loading": "Loading…",
     "loadError": "Couldn't load family details.",
     "greeting": "Hi {name}",
+    "nav": "Navigation",
+    "menuOpen": "Open menu",
+    "menuClose": "Close menu",
     "realtime": {
       "connecting": "Connecting live updates…",
       "offline": "Live connection lost — data may be out of date"
@@ -231,6 +236,12 @@
     "delete": "Delete",
     "deleteConfirm": "Delete this reward? Its history is kept.",
     "limitPerWeek": "max {count}x per week",
+    "errors": {
+      "INSUFFICIENT_POINTS": "Not enough points to redeem this.",
+      "REWARD_LIMIT_REACHED": "This reward has already been redeemed the maximum times this week.",
+      "fulfillFailed": "Couldn't fulfil the request. Please try again.",
+      "cancelFailed": "Couldn't cancel the request. Please try again."
+    },
     "form": {
       "createTitle": "New reward",
       "editTitle": "Edit reward",
@@ -309,12 +320,14 @@
       "success": "Invitation ready for {name}.",
       "shareHint": "Share this link if the email doesn't arrive:",
       "copy": "Copy link",
+      "copyLinkBusy": "Getting link…",
       "copied": "Copied",
       "errors": {
         "EMAIL_IN_USE": "This email is already in use on Wispel.",
         "VALIDATION_FAILED": "Please enter a valid email address.",
         "FORBIDDEN": "Only parents with full access can invite.",
-        "generic": "Couldn't send the invitation. Please try again."
+        "generic": "Couldn't send the invitation. Please try again.",
+        "copyLinkFailed": "Couldn't get the link. Please try again."
       }
     },
     "settings": {

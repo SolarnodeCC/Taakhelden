@@ -350,6 +350,119 @@
         }
       }
     },
+    "/instances/pending-approval": {
+      "get": {
+        "summary": "Parent approval queue across dates (submitted instances, oldest first)",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PendingApprovalResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/me/parents": {
+      "post": {
+        "summary": "Invite a co-parent (token delivered by email; not echoed in body)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteParentBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/families/me/invites/{userId}/link": {
+      "get": {
+        "summary": "Mint a copyable invite URL (parent-only, rate-limited reveal)",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InviteLinkResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/instances/{id}/complete": {
       "post": {
         "summary": "Complete a task instance",
@@ -4308,6 +4421,198 @@
                 "maxLength": 8
               }
             },
+            "additionalProperties": false
+          }
+        }
+      },
+      "InviteParentBody": {
+        "$ref": "#/definitions/InviteParentBody",
+        "definitions": {
+          "InviteParentBody": {
+            "type": "object",
+            "properties": {
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "permissions": {
+                "type": "string",
+                "enum": [
+                  "full",
+                  "approve_only"
+                ],
+                "default": "approve_only"
+              }
+            },
+            "required": [
+              "email"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "InviteResponse": {
+        "$ref": "#/definitions/InviteResponse",
+        "definitions": {
+          "InviteResponse": {
+            "type": "object",
+            "properties": {
+              "userId": {
+                "type": "string"
+              },
+              "email": {
+                "type": "string",
+                "format": "email"
+              },
+              "permissions": {
+                "type": "string",
+                "enum": [
+                  "full",
+                  "approve_only"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "invited"
+                ]
+              }
+            },
+            "required": [
+              "userId",
+              "email",
+              "permissions",
+              "status"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "InviteLinkResponse": {
+        "$ref": "#/definitions/InviteLinkResponse",
+        "definitions": {
+          "InviteLinkResponse": {
+            "type": "object",
+            "properties": {
+              "copyableUrl": {
+                "type": "string",
+                "format": "uri"
+              },
+              "expiresAt": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "copyableUrl",
+              "expiresAt"
+            ],
+            "additionalProperties": false
+          }
+        }
+      },
+      "PendingApprovalResponse": {
+        "$ref": "#/definitions/PendingApprovalResponse",
+        "definitions": {
+          "PendingApprovalResponse": {
+            "type": "object",
+            "properties": {
+              "items": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "open",
+                        "completed",
+                        "submitted",
+                        "open_redo",
+                        "approved"
+                      ]
+                    },
+                    "childId": {
+                      "type": "string"
+                    },
+                    "childName": {
+                      "type": "string"
+                    },
+                    "date": {
+                      "type": "string"
+                    },
+                    "title": {
+                      "type": "string"
+                    },
+                    "icon": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "points": {
+                      "type": "integer"
+                    },
+                    "photoBonusPoints": {
+                      "type": "integer"
+                    },
+                    "approvalRequired": {
+                      "type": "boolean"
+                    },
+                    "daypart": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "photoId": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "photoStatus": {
+                      "type": "string",
+                      "enum": [
+                        "processing",
+                        "ready"
+                      ],
+                      "nullable": true
+                    },
+                    "pointsEarned": {
+                      "type": "integer",
+                      "nullable": true
+                    },
+                    "redoNote": {
+                      "type": "string",
+                      "nullable": true
+                    },
+                    "completedAt": {
+                      "type": "string",
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status",
+                    "childId",
+                    "childName",
+                    "date",
+                    "title",
+                    "icon",
+                    "points",
+                    "photoBonusPoints",
+                    "approvalRequired",
+                    "daypart",
+                    "photoId",
+                    "photoStatus",
+                    "pointsEarned",
+                    "redoNote",
+                    "completedAt"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "items"
+            ],
             "additionalProperties": false
           }
         }

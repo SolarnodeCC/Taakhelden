@@ -52,7 +52,9 @@
   },
   "guards": {
     "forbidden": "Deze pagina is alleen voor ouders met volledig beheer.",
-    "backToToday": "Terug naar Vandaag"
+    "backToToday": "Terug naar Vandaag",
+    "upstreamUnavailable": "De server is even niet bereikbaar. Probeer het opnieuw.",
+    "retry": "Opnieuw proberen"
   },
   "nav": {
     "vandaag": "Vandaag",
@@ -67,6 +69,9 @@
     "loading": "Laden…",
     "loadError": "Kon gezinsgegevens niet laden.",
     "greeting": "Hoi {name}",
+    "nav": "Navigatie",
+    "menuOpen": "Menu openen",
+    "menuClose": "Menu sluiten",
     "realtime": {
       "connecting": "Live verbinding maken…",
       "offline": "Live verbinding verbroken — gegevens kunnen verouderd zijn"
@@ -231,6 +236,12 @@
     "delete": "Verwijderen",
     "deleteConfirm": "Deze beloning verwijderen? De historie blijft bewaard.",
     "limitPerWeek": "max {count}x per week",
+    "errors": {
+      "INSUFFICIENT_POINTS": "Niet genoeg punten om dit in te wisselen.",
+      "REWARD_LIMIT_REACHED": "Deze beloning is deze week al vaker ingewisseld.",
+      "fulfillFailed": "Inwisselen lukte niet. Probeer het nog eens.",
+      "cancelFailed": "Annuleren lukte niet. Probeer het nog eens."
+    },
     "form": {
       "createTitle": "Nieuwe beloning",
       "editTitle": "Beloning bewerken",
@@ -309,12 +320,14 @@
       "success": "Uitnodiging klaar voor {name}.",
       "shareHint": "Deel deze link als de mail niet aankomt:",
       "copy": "Link kopiëren",
+      "copyLinkBusy": "Link ophalen…",
       "copied": "Gekopieerd",
       "errors": {
         "EMAIL_IN_USE": "Dit e-mailadres is al in gebruik in Wispel.",
         "VALIDATION_FAILED": "Vul een geldig e-mailadres in.",
         "FORBIDDEN": "Alleen ouders met volledig beheer kunnen uitnodigen.",
-        "generic": "Uitnodigen lukte niet. Probeer het nog eens."
+        "generic": "Uitnodigen lukte niet. Probeer het nog eens.",
+        "copyLinkFailed": "Link ophalen lukte niet. Probeer het nog eens."
       }
     },
     "settings": {

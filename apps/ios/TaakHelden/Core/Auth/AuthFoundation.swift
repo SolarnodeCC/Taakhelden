@@ -132,9 +132,8 @@ final class AuthStore {
         if let data = try? encoder.encode(stored) {
             keychain.saveValue(data, for: .childSession)
         }
-        if let pinData = pin.data(using: .utf8) {
-            keychain.saveValue(pinData, for: .childPIN)
-        }
+        // Never store the raw PIN — persist only the salted SHA-256 hash.
+        keychain.saveValue(PINHasher.makeStored(pin: pin), for: .childPIN)
     }
 
     func updateChildTokens(accessToken: String, refreshToken: String) {
@@ -148,11 +147,17 @@ final class AuthStore {
     }
 
     func verifyPIN(_ pin: String) -> Bool {
-        guard let stored = keychain.loadValue(for: .childPIN),
-              let storedPIN = String(data: stored, encoding: .utf8) else {
+        guard let stored = keychain.loadValue(for: .childPIN) else {
             return false
         }
-        return storedPIN == pin
+        // Legacy check: if the stored blob is not the 64-byte hash format (salt + hash),
+        // it is an old plaintext PIN.  Delete it so the next pairing upgrades to hashed
+        // storage, and reject the attempt.
+        guard stored.count == PINHasher.saltLength + PINHasher.hashLength else {
+            keychain.deleteValue(for: .childPIN)
+            return false
+        }
+        return PINHasher.verify(pin: pin, stored: stored)
     }
 
     func lockChildSession() {

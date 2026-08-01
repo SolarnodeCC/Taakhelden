@@ -6,6 +6,7 @@ import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { FamilyView, MemberList, MemberView } from "../../../../lib/api/types";
 import {
   FullParentForbidden,
+  FullParentUpstreamError,
   useRequireFullParent,
 } from "../../../../lib/auth/RequireFullParent";
 import { useRouter } from "../../../../i18n/navigation";
@@ -45,9 +46,8 @@ export default function InstellingenClient() {
     void load();
   }, [gate, load]);
 
-  if (gate === "forbidden") {
-    return <FullParentForbidden />;
-  }
+  if (gate === "forbidden") return <FullParentForbidden />;
+  if (gate === "upstream_error") return <FullParentUpstreamError />;
 
   if (gate === "loading" || (!family && !failed)) {
     return <p className="text-sm text-muted">{t("loading")}</p>;

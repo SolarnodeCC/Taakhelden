@@ -102,7 +102,17 @@ final class AppState {
         pendingParentDeepLinkSurface = nil
     }
 
-    func returnToWelcome() {
+    /// Logs out the current user and navigates to the welcome screen.
+    ///
+    /// Deregisters the device push token for the **departing** user before
+    /// clearing sessions.  On a shared iPad, only the acting user's
+    /// (apnsToken, user_id) row is removed; other profiles remain intact.
+    @MainActor
+    func returnToWelcome() async {
+        if let token = APNSTokenStore.shared.apnsToken,
+           authStore.childSession != nil || authStore.parentSession != nil {
+            try? await apiClient.deregisterDevice(apnsToken: token)
+        }
         authStore.clearAllSessions()
         route = .welcome
     }

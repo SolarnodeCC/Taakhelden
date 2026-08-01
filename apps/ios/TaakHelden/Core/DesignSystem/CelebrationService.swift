@@ -7,6 +7,7 @@ final class CelebrationService {
     private(set) var confettiToken = 0
 
     func celebrateTaskCompleted(reduceMotion: Bool) {
+        // Haptic and sound celebrate the completion regardless of motion preference.
         let generator = UINotificationFeedbackGenerator()
         generator.notificationOccurred(.success)
 
@@ -14,7 +15,11 @@ final class CelebrationService {
             sound.playTaskCompleteChime()
         }
 
-        _ = reduceMotion
-        confettiToken += 1
+        // Only trigger confetti / motion overlay when Reduce Motion is off.
+        // ConfettiOverlay already shows a static glow when reduceMotion is true,
+        // but we must not increment the token at all so no animation fires.
+        if !reduceMotion {
+            confettiToken += 1
+        }
     }
 }

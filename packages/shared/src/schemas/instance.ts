@@ -117,3 +117,34 @@ export const CompleteResult = z.object({
   newBalance: z.number().int(),
 });
 export type CompleteResult = z.infer<typeof CompleteResult>;
+
+/**
+ * Één item in de ouder-goedkeuringsrij (GET /instances/pending-approval).
+ * Bevat de instance-info + taakinfo + roepnaam van het kind.
+ * WS-TRUST-API: lost het overnight-verdwijnen op van submitted instances (§WS-TRUST-WEB).
+ */
+export const PendingApprovalItem = z.object({
+  id: z.string(),
+  status: InstanceStatus,
+  childId: z.string(),
+  childName: z.string(),
+  date: z.string(),
+  title: z.string(),
+  icon: z.string().nullable(),
+  points: z.number().int(),
+  photoBonusPoints: z.number().int(),
+  approvalRequired: z.boolean(),
+  daypart: z.string().nullable(),
+  photoId: z.string().nullable(),
+  photoStatus: z.enum(["processing", "ready"]).nullable(),
+  pointsEarned: z.number().int().nullable(),
+  redoNote: z.string().nullable(),
+  completedAt: z.string().nullable(),
+});
+export type PendingApprovalItem = z.infer<typeof PendingApprovalItem>;
+
+/** Response van GET /instances/pending-approval — parent-only. */
+export const PendingApprovalResponse = z.object({
+  items: z.array(PendingApprovalItem),
+});
+export type PendingApprovalResponse = z.infer<typeof PendingApprovalResponse>;

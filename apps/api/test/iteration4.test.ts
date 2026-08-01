@@ -12,15 +12,18 @@ import { generateWeekAheadForFamily } from "../src/services/taskEngine";
 import { weekDates } from "../src/services/time";
 
 describe("POST /families/me/parents", () => {
-  it("full-ouder nodigt een tweede verzorger uit (201 + pending profiel + token)", async () => {
+  it("full-ouder nodigt een tweede verzorger uit (201 + pending profiel)", async () => {
     const fam = await seedFamily("inv");
+    const parentTok = await parentToken(fam.parentId, fam.familyId);
     const res = await api("/families/me/parents", {
-      token: await parentToken(fam.parentId, fam.familyId),
+      token: parentTok,
       body: { email: "mede@ouder.nl", permissions: "approve_only" },
     });
     expect(res.status).toBe(201);
-    const body = (await res.json()) as { userId: string; inviteToken: string; permissions: string };
-    expect(body.inviteToken).toBeTruthy();
+    const body = (await res.json()) as { userId: string; status: string; permissions: string };
+    // inviteToken is NIET meer aanwezig in de response (P1-locked, WS-TRUST-API).
+    expect((body as Record<string, unknown>).inviteToken).toBeUndefined();
+    expect(body.status).toBe("invited");
     expect(body.permissions).toBe("approve_only");
 
     const row = await env.DB
@@ -30,7 +33,13 @@ describe("POST /families/me/parents", () => {
     expect(row?.role).toBe("parent");
     expect(row?.email).toBe("mede@ouder.nl");
     expect(row?.password_hash).toBeNull(); // pending tot de uitnodiging geaccepteerd is
-    expect(await env.KV.get(`parentinvite:${body.inviteToken}`)).toBeTruthy();
+
+    // KV-token is opgeslagen (via de link-endpoint opvraagbaar, niet via de create-response).
+    const linkRes = await api(`/families/me/invites/${body.userId}/link`, { token: parentTok });
+    expect(linkRes.status).toBe(200);
+    const { copyableUrl } = (await linkRes.json()) as { copyableUrl: string };
+    const kvToken = new URL(copyableUrl).searchParams.get("token");
+    expect(await env.KV.get(`parentinvite:${kvToken}`)).toBeTruthy();
   });
 
   it("dubbel e-mailadres → 409", async () => {

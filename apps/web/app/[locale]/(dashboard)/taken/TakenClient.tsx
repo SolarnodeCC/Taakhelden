@@ -15,6 +15,7 @@ import {
 import { useRouter } from "../../../../i18n/navigation";
 import {
   FullParentForbidden,
+  FullParentUpstreamError,
   useRequireFullParent,
 } from "../../../../lib/auth/RequireFullParent";
 import { Button } from "../../../../components/ui";
@@ -176,13 +177,9 @@ export default function TakenClient() {
     [children],
   );
 
-  if (gate === "forbidden") {
-    return <FullParentForbidden />;
-  }
-
-  if (gate === "loading") {
-    return <p className="text-sm text-muted">{t("loading")}</p>;
-  }
+  if (gate === "forbidden") return <FullParentForbidden />;
+  if (gate === "upstream_error") return <FullParentUpstreamError />;
+  if (gate === "loading") return <p className="text-sm text-muted">{t("loading")}</p>;
 
   async function submit(payload: TaskFormPayload) {
     if (form?.mode === "edit") {

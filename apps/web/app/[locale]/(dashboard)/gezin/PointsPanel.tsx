@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { AdjustBody, type Balance } from "@taakhelden/shared";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
+import { formatLedgerAmount } from "../../../../lib/format";
 import {
   LedgerPage,
   MemberView,
@@ -167,7 +168,14 @@ export default function PointsPanel({ child, onClose }: Props) {
                   {entry.note && <p className="mt-0.5 text-muted">{entry.note}</p>}
                   <p className="mt-0.5 text-xs text-muted">{dateFmt.format(new Date(entry.at))}</p>
                 </div>
-                <span className="shrink-0 font-semibold text-accent">+{entry.amount}</span>
+                <span
+                  className={
+                    "shrink-0 font-semibold " +
+                    (entry.amount >= 0 ? "text-accent" : "text-muted")
+                  }
+                >
+                  {formatLedgerAmount(entry.amount)}
+                </span>
               </li>
             ))}
           </ul>

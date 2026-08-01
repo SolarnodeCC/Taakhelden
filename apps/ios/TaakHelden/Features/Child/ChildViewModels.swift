@@ -21,6 +21,22 @@ final class ChildDayViewModel {
     var state: ChildDayLoadState = .loading
     var optimisticCompletedIDs: Set<String> = []
 
+    /// Timestamps of completions made in this session, keyed by instance ID.
+    /// Used to determine whether the 5-minute undo window is still open.
+    private(set) var completionTimestamps: [String: Date] = [:]
+
+    /// Friendly status message shown when an undo is rejected (e.g. window expired).
+    var undoStatusMessage: String?
+
+    /// Matches the server-side undo window (POST /instances/:id/undo — 5 min).
+    private let undoWindowSeconds: TimeInterval = 300
+
+    /// Returns true if the undo button should be offered for `instanceID`.
+    func isInUndoWindow(_ instanceID: String) -> Bool {
+        guard let stamp = completionTimestamps[instanceID] else { return false }
+        return Date().timeIntervalSince(stamp) < undoWindowSeconds
+    }
+
     init(
         apiClient: TaakHeldenAPIClient,
         mutationQueue: MutationQueue,
@@ -37,6 +53,7 @@ final class ChildDayViewModel {
 
     @MainActor
     func load() async {
+        undoStatusMessage = nil
         state = .loading
         do {
             let today = try await apiClient.fetchChildToday()
@@ -59,9 +76,29 @@ final class ChildDayViewModel {
         let mutation = QueuedMutation(kind: .complete, targetID: instanceID)
         mutationQueue.enqueue(mutation)
         optimisticCompletedIDs.insert(instanceID)
+        completionTimestamps[instanceID] = Date()
         celebrationService.celebrateTaskCompleted(reduceMotion: reduceMotion)
 
         _ = await syncEngine.syncNow()
+        await load()
+    }
+
+    /// Undoes a just-completed task within the 5-minute server window.
+    ///
+    /// Uses a deterministic idempotency key so a retry after a dropped response
+    /// never sends two undo ops for the same instance.
+    @MainActor
+    func undo(instanceID: String) async {
+        let undoKey = "undo:\(instanceID)"
+        let mutation = QueuedMutation(kind: .undo, targetID: instanceID, key: undoKey)
+        mutationQueue.enqueue(mutation)
+        optimisticCompletedIDs.remove(instanceID)
+        completionTimestamps[instanceID] = nil
+
+        let outcomes = await syncEngine.syncNow()
+        if outcomes.contains(.undoWindowExpired) {
+            undoStatusMessage = String(localized: "child.task.undo.expired")
+        }
         await load()
     }
 

@@ -109,9 +109,9 @@ flowchart LR
 
 | ID | Name | Horizon | Owner archetype | Parallel? | Gate |
 | --- | --- | --- | --- | --- | --- |
-| **WS-TRUST-WEB** | Critical parent-web defects | B.5 | Web | ✅ start now | — |
-| **WS-TRUST-API** | Security highs (rate limit, export, invite token) | B.5 | Backend + Security | ✅ start now | — |
-| **WS-TRUST-IOS** | iOS safety + a11y + device hygiene | B.5 | iOS | ✅ start now | — |
+| **WS-TRUST-WEB** | Critical parent-web defects | B.5 | Web | ✅ in this PR | — |
+| **WS-TRUST-API** | Security highs (rate limit, export, invite token) | B.5 | Backend + Security | ✅ in this PR | — |
+| **WS-TRUST-IOS** | iOS safety + a11y + device hygiene | B.5 | iOS | ✅ in this PR (multi-child picker deferred) | — |
 | **WS-INSIGHTS** | Inzichten Gesprekskaart (replace stub) | Feature | Web + Backend | After G3 | G3 |
 | **WS-PAUSE** | Rustschild — per-child pause | Feature | Backend + Web + iOS | After G3 | G3 |
 | **WS-PROPOSAL** | Taakvraag — teen task proposal | Feature | Backend + iOS + Web | After G3 | G3 |

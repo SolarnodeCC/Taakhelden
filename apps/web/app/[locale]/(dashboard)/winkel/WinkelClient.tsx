@@ -17,9 +17,10 @@ import { SHOP_REALTIME_EVENTS } from "../../../../lib/realtime/events";
 import { useRouter } from "../../../../i18n/navigation";
 import {
   FullParentForbidden,
+  FullParentUpstreamError,
   useRequireFullParent,
 } from "../../../../lib/auth/RequireFullParent";
-import { Button } from "../../../../components/ui";
+import { Alert, Button } from "../../../../components/ui";
 import RewardForm from "./RewardForm";
 
 type FormState = { mode: "create" } | { mode: "edit"; reward: RewardView } | null;
@@ -37,45 +38,63 @@ function RedemptionCard({
 }) {
   const t = useTranslations("winkel");
   const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  async function run(action: () => Promise<void>) {
+  async function run(action: () => Promise<void>, errorKey: string) {
+    if (busy) return;
     setBusy(true);
+    setError(null);
     try {
       await action();
-    } finally {
+    } catch (err) {
+      const code = err instanceof ApiClientError ? err.code : null;
+      if (code === "INSUFFICIENT_POINTS") {
+        setError(t("errors.INSUFFICIENT_POINTS"));
+      } else if (code === "REWARD_LIMIT_REACHED") {
+        setError(t("errors.REWARD_LIMIT_REACHED"));
+      } else {
+        setError(t(errorKey));
+      }
       setBusy(false);
     }
   }
 
   return (
-    <li className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4">
-      <div className="min-w-0">
-        <div className="flex items-center gap-2">
-          {redemption.icon && <span aria-hidden>{redemption.icon}</span>}
-          <span className="truncate text-sm font-semibold text-text">{redemption.title}</span>
+    <li className="rounded-lg border border-border bg-surface p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            {redemption.icon && <span aria-hidden>{redemption.icon}</span>}
+            <span className="truncate text-sm font-semibold text-text">{redemption.title}</span>
+          </div>
+          <p className="mt-0.5 text-sm text-muted">
+            {t("requestedBy", { name: childName })} · {t("price", { points: redemption.price })}
+          </p>
         </div>
-        <p className="mt-0.5 text-sm text-muted">
-          {t("requestedBy", { name: childName })} · {t("price", { points: redemption.price })}
-        </p>
+        <div className="flex shrink-0 gap-2">
+          <button
+            type="button"
+            onClick={() => run(onFulfill, "errors.fulfillFailed")}
+            disabled={busy}
+            className="rounded bg-accent px-3 py-1.5 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover disabled:opacity-60"
+          >
+            {t("fulfill")}
+          </button>
+          <button
+            type="button"
+            onClick={() => run(onCancel, "errors.cancelFailed")}
+            disabled={busy}
+            className="rounded border border-border px-3 py-1.5 text-sm font-medium text-text transition-colors hover:bg-bg disabled:opacity-60"
+          >
+            {t("cancelRequest")}
+          </button>
+        </div>
       </div>
-      <div className="flex shrink-0 gap-2">
-        <button
-          type="button"
-          onClick={() => run(onFulfill)}
-          disabled={busy}
-          className="rounded bg-accent px-3 py-1.5 text-sm font-semibold text-accent-fg transition-colors hover:bg-accent-hover disabled:opacity-60"
-        >
-          {t("fulfill")}
-        </button>
-        <button
-          type="button"
-          onClick={() => run(onCancel)}
-          disabled={busy}
-          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-text transition-colors hover:bg-bg disabled:opacity-60"
-        >
-          {t("cancelRequest")}
-        </button>
-      </div>
+      {error && (
+        <div className="mt-3">
+          <Alert tone="danger">{error}</Alert>
+        </div>
+      )}
     </li>
   );
 }
@@ -170,13 +189,9 @@ export default function WinkelClient() {
     [children],
   );
 
-  if (gate === "forbidden") {
-    return <FullParentForbidden />;
-  }
-
-  if (gate === "loading") {
-    return <p className="text-sm text-muted">{t("loading")}</p>;
-  }
+  if (gate === "forbidden") return <FullParentForbidden />;
+  if (gate === "upstream_error") return <FullParentUpstreamError />;
+  if (gate === "loading") return <p className="text-sm text-muted">{t("loading")}</p>;
 
   async function submit(payload: RewardFormPayload) {
     if (form?.mode === "edit") {
@@ -200,9 +215,14 @@ export default function WinkelClient() {
 
   // Fulfil/cancel both remove the request from the pending queue; the ledger
   // effect (points spent / refunded) is handled server-side via the FamilyRoom.
+  // Idempotency keys are derived from action + id so double-taps dedup correctly.
   function resolveRequest(id: string, path: string) {
     return async () => {
-      await apiClient.post(`/api/v1/redemptions/${id}/${path}`);
+      await apiClient.post(
+        `/api/v1/redemptions/${id}/${path}`,
+        undefined,
+        { idempotencyKey: `${path}:${id}` },
+      );
       setRequests((prev) => prev.filter((r) => r.id !== id));
     };
   }

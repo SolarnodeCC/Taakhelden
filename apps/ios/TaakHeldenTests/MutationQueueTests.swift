@@ -57,4 +57,30 @@ final class MutationQueueTests: XCTestCase {
         XCTAssertEqual(queue.pending.count, 1)
         XCTAssertEqual(queue.pending.first?.key, "k-failed")
     }
+
+    func testUndoWindowExpiredMapsToCorrectOutcome() {
+        let queue = MutationQueue(store: InMemoryMutationQueueStore())
+        let outcome = queue.outcome(
+            for: SyncResultDTO(
+                key: "undo-k1",
+                status: "rejected",
+                points: nil,
+                newBalance: nil,
+                code: "UNDO_WINDOW_EXPIRED",
+                message: "Het terugdraaivenster is gesloten."
+            )
+        )
+        XCTAssertEqual(outcome, .undoWindowExpired)
+    }
+
+    func testUndoMutationUsesStableIdempotencyKey() {
+        let store = InMemoryMutationQueueStore()
+        let queue = MutationQueue(store: store)
+        let key = "undo:inst-abc"
+        queue.enqueue(QueuedMutation(kind: .undo, targetID: "inst-abc", key: key))
+
+        let reloaded = MutationQueue(store: store)
+        XCTAssertEqual(reloaded.mutation(forKey: key)?.kind, .undo)
+        XCTAssertEqual(reloaded.mutation(forKey: key)?.targetID, "inst-abc")
+    }
 }

@@ -184,7 +184,7 @@ struct ParentModeRootView: View {
                     let deleted = await store.requestDeleteAccount(appleIdentityToken: token)
                     if deleted {
                         appState.closeParentMode()
-                        appState.returnToWelcome()
+                        await appState.returnToWelcome()
                     }
                 }
             }

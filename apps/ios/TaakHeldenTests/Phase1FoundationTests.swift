@@ -81,6 +81,74 @@ final class Phase1FoundationTests: XCTestCase {
         XCTAssertEqual(store.restoredRoute, .childHome)
     }
 
+    // MARK: - PIN hash tests
+
+    func testPINHasherCorrectPINVerifies() {
+        let stored = PINHasher.makeStored(pin: "1234")
+        XCTAssertTrue(PINHasher.verify(pin: "1234", stored: stored))
+    }
+
+    func testPINHasherWrongPINFails() {
+        let stored = PINHasher.makeStored(pin: "1234")
+        XCTAssertFalse(PINHasher.verify(pin: "0000", stored: stored))
+    }
+
+    func testPINHasherStoredLengthIs64Bytes() {
+        let stored = PINHasher.makeStored(pin: "9999")
+        XCTAssertEqual(stored.count, PINHasher.saltLength + PINHasher.hashLength)
+    }
+
+    func testPINHasherTwoCallsProduceDifferentSalts() {
+        let first = PINHasher.makeStored(pin: "1234")
+        let second = PINHasher.makeStored(pin: "1234")
+        // Same PIN, different salts → different stored blobs
+        XCTAssertNotEqual(first, second)
+        // But both verify correctly
+        XCTAssertTrue(PINHasher.verify(pin: "1234", stored: first))
+        XCTAssertTrue(PINHasher.verify(pin: "1234", stored: second))
+    }
+
+    func testPINHasherLegacyPlaintextRejected() {
+        // A legacy 4-byte UTF-8 PIN blob must not verify (wrong length).
+        let legacyBlob = "1234".data(using: .utf8)!
+        XCTAssertFalse(PINHasher.verify(pin: "1234", stored: legacyBlob))
+    }
+
+    func testAuthStoreStoresHashedPINNotPlaintext() {
+        let keychain = InMemoryKeychainStore()
+        let store = AuthStore(previewKeychain: keychain)
+        let fakeSession = ChildSession(
+            childID: "c1",
+            displayName: "Sam",
+            avatar: "🦊",
+            ageBand: .mid,
+            accessToken: "tok",
+            refreshToken: "ref"
+        )
+        store.storeChildSession(fakeSession, biometricsEnabled: false, pin: "5678")
+
+        let raw = keychain.loadValue(for: .childPIN)!
+        // Must be 64 bytes (hash format), never 4 bytes (plaintext).
+        XCTAssertEqual(raw.count, PINHasher.saltLength + PINHasher.hashLength)
+        // Must not equal the raw UTF-8 bytes of the PIN.
+        XCTAssertNotEqual(raw, "5678".data(using: .utf8))
+        // Correct PIN must verify.
+        XCTAssertTrue(store.verifyPIN("5678"))
+        // Wrong PIN must not verify.
+        XCTAssertFalse(store.verifyPIN("0000"))
+    }
+
+    func testAuthStoreClearsLegacyPlaintextOnVerify() {
+        let keychain = InMemoryKeychainStore()
+        // Plant a legacy plaintext PIN directly in the keychain.
+        keychain.saveValue("4242".data(using: .utf8)!, for: .childPIN)
+
+        let store = AuthStore(previewKeychain: keychain)
+        // verifyPIN must reject AND delete the legacy blob.
+        XCTAssertFalse(store.verifyPIN("4242"))
+        XCTAssertNil(keychain.loadValue(for: .childPIN))
+    }
+
     private func contrastRatio(foreground: THColorToken, background: THColorToken) -> Double {
         let lighter = max(relativeLuminance(foreground), relativeLuminance(background))
         let darker = min(relativeLuminance(foreground), relativeLuminance(background))

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Balance, InstanceView, LedgerType } from "@taakhelden/shared";
+import { Balance, InstanceStatus, InstanceView, LedgerType } from "@taakhelden/shared";
 export {
   Balance,
   ChildToday,
@@ -47,14 +47,26 @@ export const InviteCodeResult = z.object({
 });
 export type InviteCodeResult = z.infer<typeof InviteCodeResult>;
 
-/** POST /families/me/parents — pending co-parent + shareable invite token. */
+/**
+ * POST /families/me/parents — pending co-parent invite.
+ * The `inviteToken` field is absent after WS-TRUST-API lands (Option A).
+ * Web should call GET /families/me/invites/:userId/link to get the copyable URL.
+ */
 export const InviteParentResult = z.object({
   userId: z.string(),
   email: z.string().email(),
   permissions: z.enum(["full", "approve_only"]),
-  inviteToken: z.string().min(1),
+  status: z.literal("invited").optional(),
+  inviteToken: z.string().min(1).optional(),
 });
 export type InviteParentResult = z.infer<typeof InviteParentResult>;
+
+/** GET /families/me/invites/:userId/link — short-lived tokenised URL for copying. */
+export const InviteLinkResponse = z.object({
+  copyableUrl: z.string().url(),
+  expiresAt: z.string(),
+});
+export type InviteLinkResponse = z.infer<typeof InviteLinkResponse>;
 
 export const AgeMode = z.enum(["young", "mid", "teen"]);
 export type AgeMode = z.infer<typeof AgeMode>;
@@ -249,6 +261,30 @@ export const LedgerPage = z.object({
   nextCursor: z.string().nullable(),
 });
 export type LedgerPage = z.infer<typeof LedgerPage>;
+
+/**
+ * GET /instances/pending-approval — all submitted/completed instances across dates,
+ * ordered oldest-first. Added in WS-TRUST-API / WS-TRUST-WEB to close the
+ * overnight approval-queue gap.
+ */
+export const PendingApprovalItem = z
+  .object({
+    id: z.string(),
+    status: InstanceStatus,
+    title: z.string(),
+    icon: z.string().nullable().optional(),
+    points: z.number().optional(),
+    photoId: z.string().nullable().optional(),
+    childId: z.string(),
+    childName: z.string(),
+  })
+  .passthrough();
+export type PendingApprovalItem = z.infer<typeof PendingApprovalItem>;
+
+export const PendingApprovalResponse = z.object({
+  items: z.array(PendingApprovalItem),
+});
+export type PendingApprovalResponse = z.infer<typeof PendingApprovalResponse>;
 
 /** GET /points/balance for parents — v1 `{ children }` or v2 `{ viewer, children }`. */
 export const ParentBalancesResponse = z.union([
