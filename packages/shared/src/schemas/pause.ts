@@ -10,8 +10,9 @@ export const ChildPause = z.object({
 });
 export type ChildPause = z.infer<typeof ChildPause>;
 
+/** GET /members/:id/pause — list of pauses (active + upcoming); pick `.active`. */
 export const ChildPauseResponse = z.object({
-  pause: ChildPause.nullable(),
+  pauses: z.array(ChildPause),
 });
 export type ChildPauseResponse = z.infer<typeof ChildPauseResponse>;
 

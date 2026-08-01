@@ -3,8 +3,12 @@
 import { useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
-import { ChildPauseResponse, type ChildPause } from "../../../../lib/api/types";
-import type { MemberView } from "../../../../lib/api/types";
+import {
+  ChildPause,
+  ChildPauseResponse,
+  type ChildPause as PauseView,
+  type MemberView,
+} from "../../../../lib/api/types";
 import { Alert, Badge, Button, Field, Input } from "../../../../components/ui";
 
 function todayIso(): string {
@@ -17,17 +21,22 @@ function formatDateDisplay(isoDate: string | null | undefined): string {
   return d.toLocaleDateString("nl-NL", { day: "numeric", month: "long", year: "numeric" });
 }
 
+/** Prefer the active pause; otherwise the first upcoming row. */
+function pickPause(list: PauseView[]): PauseView | null {
+  return list.find((p) => p.active) ?? list[0] ?? null;
+}
+
 interface Props {
   child: MemberView;
   /** Called after a pause is set or cleared so the parent can refresh. */
   onChanged?: () => void;
   /** Called whenever the pause state is known (null = no active pause). */
-  onPauseLoaded?: (pause: ChildPause | null) => void;
+  onPauseLoaded?: (pause: PauseView | null) => void;
 }
 
 type FormState = "idle" | "form" | "busy";
 
-export function ActivePauseBadge({ pause }: { pause: ChildPause }) {
+export function ActivePauseBadge({ pause }: { pause: PauseView }) {
   const t = useTranslations("rustschild");
   const label =
     pause.endsOn ? t("badgeActive", { date: formatDateDisplay(pause.endsOn) }) : t("badgeOpenEnded");
@@ -42,7 +51,7 @@ export default function PausePanel({ child, onChanged, onPauseLoaded }: Props) {
   const t = useTranslations("rustschild");
   const formId = useId();
 
-  const [pause, setPause] = useState<ChildPause | null | undefined>(undefined);
+  const [pause, setPause] = useState<PauseView | null | undefined>(undefined);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [formState, setFormState] = useState<FormState>("idle");
   const [actionError, setActionError] = useState<string | null>(null);
@@ -62,8 +71,9 @@ export default function PausePanel({ child, onChanged, onPauseLoaded }: Props) {
     try {
       const raw = await apiClient.get(`/api/v1/members/${child.id}/pause`);
       const parsed = ChildPauseResponse.parse(raw);
-      setPause(parsed.pause);
-      onPauseLoaded?.(parsed.pause);
+      const current = pickPause(parsed.pauses);
+      setPause(current);
+      onPauseLoaded?.(current);
     } catch {
       setLoadError(t("errorLoad"));
       setPause(null);
@@ -96,9 +106,10 @@ export default function PausePanel({ child, onChanged, onPauseLoaded }: Props) {
         endsOn: endsOn || null,
         reason: reason || undefined,
       });
-      const parsed = ChildPauseResponse.parse(raw);
-      setPause(parsed.pause);
-      onPauseLoaded?.(parsed.pause);
+      // PUT returns a single ChildPause object (not the list envelope).
+      const parsed = ChildPause.parse(raw);
+      setPause(parsed);
+      onPauseLoaded?.(parsed);
       setFormState("idle");
       onChanged?.();
     } catch (err) {

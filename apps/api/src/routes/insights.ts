@@ -1,6 +1,5 @@
 import { Hono } from "hono";
-import { z } from "zod";
-import { InsightsRange, WeeklyInsightsResponse, ErrorCodes } from "@taakhelden/shared";
+import { InsightsQuery, WeeklyInsightsResponse, ErrorCodes } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
@@ -8,12 +7,6 @@ import { validate } from "../middleware/validate";
 import { weeklyInsights } from "../repo/insights";
 
 const insights = new Hono<AppBindings>();
-
-const InsightsQuery = z.object({
-  range: InsightsRange.default("week"),
-  weekOf: z.string().date().optional(),
-  childId: z.string().optional(),
-});
 
 insights.get(
   "/",

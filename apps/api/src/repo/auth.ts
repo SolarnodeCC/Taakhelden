@@ -171,8 +171,11 @@ export async function getUserById(db: D1Database, userId: string) {
 // --- registratie: gezin + eerste ouder in één batch (atomair) ---
 
 export async function updatePasswordHash(db: D1Database, userId: string, passwordHash: string) {
+  // Parent-only: password reset must never rewrite a child profile hash.
   await db
-    .prepare("UPDATE users SET password_hash = ? WHERE id = ? AND deleted_at IS NULL")
+    .prepare(
+      "UPDATE users SET password_hash = ? WHERE id = ? AND role = 'parent' AND deleted_at IS NULL",
+    )
     .bind(passwordHash, userId)
     .run();
 }

@@ -15,7 +15,7 @@ export async function sendPasswordResetEmail(
   resetToken: string,
 ): Promise<void> {
   if (!env.EMAIL_API_KEY || !env.EMAIL_FROM) {
-    console.log("email disabled: password reset no-op");
+    // Dev/no-op path — do not log email or token (architectuurregel 5).
     return;
   }
 

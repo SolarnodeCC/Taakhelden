@@ -10,6 +10,7 @@ import {
   MemberAvatarState,
   SetChildPauseBody,
   ChildPause,
+  ChildPauseResponse,
 } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
@@ -240,7 +241,11 @@ members.get("/:id/pause", async (c) => {
   }
 
   const rows = await listPauses(c.env.DB, auth.familyId, childId);
-  return c.json({ pauses: rows.map((r) => pauseView(r as Parameters<typeof pauseView>[0])) });
+  return c.json(
+    ChildPauseResponse.parse({
+      pauses: rows.map((r) => pauseView(r as Parameters<typeof pauseView>[0])),
+    }),
+  );
 });
 
 /** PUT /members/:childId/pause — stel pauze in (ouder full). Idempotency-Key verplicht. */

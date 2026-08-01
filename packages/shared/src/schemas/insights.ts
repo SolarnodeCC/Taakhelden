@@ -31,3 +31,10 @@ export const WeeklyInsightsResponse = z.object({
   children: z.array(ChildInsights),
 });
 export type WeeklyInsightsResponse = z.infer<typeof WeeklyInsightsResponse>;
+
+export const InsightsQuery = z.object({
+  range: InsightsRange.default("week"),
+  weekOf: z.string().date().optional(),
+  childId: z.string().optional(),
+});
+export type InsightsQuery = z.infer<typeof InsightsQuery>;
