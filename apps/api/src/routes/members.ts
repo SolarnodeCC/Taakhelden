@@ -243,8 +243,8 @@ members.get("/:id/pause", async (c) => {
   return c.json({ pauses: rows.map((r) => pauseView(r as Parameters<typeof pauseView>[0])) });
 });
 
-/** PUT /members/:childId/pause — stel pauze in (ouder full). Idempotency-Key aanbevolen. */
-members.put("/:id/pause", validate("json", SetChildPauseBody), async (c) => {
+/** PUT /members/:childId/pause — stel pauze in (ouder full). Idempotency-Key verplicht. */
+members.put("/:id/pause", requireIdempotencyKey, validate("json", SetChildPauseBody), async (c) => {
   const { familyId, userId } = requireParent(c, { full: true });
   const childId = c.req.param("id");
   const body = c.req.valid("json");
@@ -279,7 +279,7 @@ members.put("/:id/pause", validate("json", SetChildPauseBody), async (c) => {
 });
 
 /** DELETE /members/:childId/pause/:pauseId — beëindig een pauze (ouder full). */
-members.delete("/:id/pause/:pauseId", async (c) => {
+members.delete("/:id/pause/:pauseId", requireIdempotencyKey, async (c) => {
   const { familyId } = requireParent(c, { full: true });
   const childId = c.req.param("id");
   const pauseId = c.req.param("pauseId");

@@ -72,6 +72,7 @@ describe("PUT /members/:id/pause — authz", () => {
       method: "PUT",
       token: await parentToken(fam.parentId, fam.familyId),
       body: { startsOn: TODAY },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(201);
     const body = (await res.json()) as { id: string; childId: string; active: boolean };
@@ -85,6 +86,7 @@ describe("PUT /members/:id/pause — authz", () => {
       method: "PUT",
       token: await childToken(fam.childA, fam.familyId),
       body: { startsOn: TODAY },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(403);
   });
@@ -95,6 +97,7 @@ describe("PUT /members/:id/pause — authz", () => {
       method: "PUT",
       token: await parentToken(fam.parentId, fam.familyId, { perm: "approve_only" }),
       body: { startsOn: TODAY },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(403);
   });
@@ -106,6 +109,7 @@ describe("PUT /members/:id/pause — authz", () => {
       method: "PUT",
       token: await parentToken(famA.parentId, famA.familyId),
       body: { startsOn: TODAY },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(404);
   });
@@ -150,6 +154,7 @@ describe("DELETE /members/:id/pause/:pauseId — authz", () => {
     const res = await api(`/members/${fam.childA}/pause/${pauseId}`, {
       method: "DELETE",
       token: await parentToken(fam.parentId, fam.familyId),
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(200);
     const body = (await res.json()) as { ok: boolean };
@@ -162,6 +167,7 @@ describe("DELETE /members/:id/pause/:pauseId — authz", () => {
     const res = await api(`/members/${fam.childA}/pause/${pauseId}`, {
       method: "DELETE",
       token: await childToken(fam.childA, fam.familyId),
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(403);
   });
@@ -173,11 +179,13 @@ describe("DELETE /members/:id/pause/:pauseId — authz", () => {
     await api(`/members/${fam.childA}/pause/${pauseId}`, {
       method: "DELETE",
       token: await parentToken(fam.parentId, fam.familyId),
+      idempotencyKey: crypto.randomUUID(),
     });
     // Tweede keer → 404
     const res = await api(`/members/${fam.childA}/pause/${pauseId}`, {
       method: "DELETE",
       token: await parentToken(fam.parentId, fam.familyId),
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(404);
   });
@@ -314,6 +322,7 @@ describe("pauze raakt het ledger niet", () => {
       method: "PUT",
       token: await parentToken(fam.parentId, familyId),
       body: { startsOn: TODAY },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(putRes.status).toBe(201);
     const { id: pauseId } = (await putRes.json()) as { id: string };
@@ -325,6 +334,7 @@ describe("pauze raakt het ledger niet", () => {
     const delRes = await api(`/members/${childId}/pause/${pauseId}`, {
       method: "DELETE",
       token: await parentToken(fam.parentId, familyId),
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(delRes.status).toBe(200);
 
@@ -346,6 +356,7 @@ describe("pause API round-trip", () => {
       method: "PUT",
       token,
       body: { startsOn: TODAY, reason: "Ziek" },
+      idempotencyKey: crypto.randomUUID(),
     });
 
     const getRes = await api(`/members/${fam.childA}/pause`, { token });
@@ -361,7 +372,11 @@ describe("pause API round-trip", () => {
     const token = await parentToken(fam.parentId, fam.familyId);
     const pauseId = await seedPause(fam.familyId, fam.childA, fam.parentId, TODAY);
 
-    await api(`/members/${fam.childA}/pause/${pauseId}`, { method: "DELETE", token });
+    await api(`/members/${fam.childA}/pause/${pauseId}`, {
+      method: "DELETE",
+      token,
+      idempotencyKey: crypto.randomUUID(),
+    });
 
     const getRes = await api(`/members/${fam.childA}/pause`, { token });
     expect(getRes.status).toBe(200);
