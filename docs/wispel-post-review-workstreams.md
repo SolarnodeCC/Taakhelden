@@ -61,6 +61,20 @@ No workstream in §5 beyond `WS-TRUST-*` may **merge to `main`** until:
 - [ ] Authz test matrix (child never sees another family; parent A never sees family B)
 - [ ] `docs/ios-phase3-plan.md` §9 updated with the final model
 
+### Gate G5 — iOS App Store live (blocks any Android workstream)
+
+`WS-ANDROID` and any Android-first or cross-platform scaffolding may **not start** until:
+
+| Must be true | Evidence |
+| --- | --- |
+| Wispel iPhone app accepted by Apple and publicly available in the NL App Store | App Store listing URL live |
+| Sign in with Apple (SIWA) + account-delete flow working on production App Store build | SIWA login + account-delete tested end-to-end |
+| Privacy nutrition labels submitted and approved by App Store Connect | App Store Connect approval confirmed |
+| ReviewNotes contain real staging credentials (parent + child accounts, not stub bypass) | Live staging credentials confirmed in App Store Connect |
+| No P0 trust blockers open at submission | Zero Critical/High issues tagged P0 in the issue tracker |
+
+**Rationale (PO lock 2026-08-01 — P8):** Android demand is real (medium demand signal in competitive research) but an unfinished iOS app costs more attention than Android can buy. Once iOS is live in the App Store with a stable API contract, Android becomes a concrete second platform — not a parallel bet that halves focus during the most critical ship window. Marketing may describe Wispel as iOS-first; do not promise an Android date.
+
 ### Gate reaffirmation — the six hard rules apply to every new endpoint
 
 No SQL in routes (all in `repo/`, `familyId` first arg) · ledger writes only via FamilyRoom DO · balance = `SUM(points_ledger)` · no negative mechanics outside redemption/cancel · no child PII/logging, EXIF-strip before visible · Zod contract in `packages/shared` first. Every new mutation route carries `Idempotency-Key`; ledger routes **require** it.
@@ -71,22 +85,29 @@ No SQL in routes (all in `repo/`, `familyId` first arg) · ledger writes only vi
 
 ```mermaid
 flowchart LR
-  subgraph B5[Horizon B.5 — Trust & craft]
+  subgraph B5[Horizon B.5 — Trust & craft · PR #83]
     TW[WS-TRUST-WEB]
     TA[WS-TRUST-API]
     TI[WS-TRUST-IOS]
   end
-  subgraph F[Feature streams]
+  subgraph W1[Wave 1 — parallel after G3]
     INS[WS-INSIGHTS]
     PAU[WS-PAUSE]
+  end
+  subgraph W2[Wave 2 — parallel after G3]
     PRO[WS-PROPOSAL]
     FOC[WS-FOCUS]
   end
   subgraph D[Design-gated]
     CO[WS-COPARENT]
   end
+  STORE[WS-IOS-STORE]
+  AUTH[WS-AUTH-WEB]
+  ROT[WS-ROTATE]
+  AND[WS-ANDROID · PARKED until G5]
   G3{{G3 trust gate}}
   G4{{G4 co-parent ADR}}
+  G5{{G5 App Store live · blocks Android}}
 
   TW --> G3
   TA --> G3
@@ -95,13 +116,18 @@ flowchart LR
   G3 --> PAU
   G3 --> PRO
   G3 --> FOC
+  G3 --> STORE
+  G3 -. capacity — does not block waves .-> AUTH
   PAU -. shares family-settings surface .-> INS
   PRO -. reuses tasks repo .-> INS
+  INS --> ROT
   CO --> G4
-  G4 -. unblocks later, own horizon .-> F
+  STORE --> G5
+  G5 -. unblocked only after G5 .-> AND
+  G4 -. unblocks later, own horizon .-> W1
 ```
 
-`WS-INSIGHTS` also finally retires the `inzichten` `SectionStub` (open point O15 in the base plan), so it doubles as the missing piece of `WS-WEB-CRAFT`.
+`WS-INSIGHTS` also finally retires the `inzichten` `SectionStub` (open point O15 in the base plan), so it doubles as the missing piece of `WS-WEB-CRAFT`. `WS-IOS-STORE` runs in parallel with feature waves as the critical path to Gate G5 (iOS App Store live), which is the sole unblock condition for `WS-ANDROID`.
 
 ---
 
@@ -117,6 +143,10 @@ flowchart LR
 | **WS-PROPOSAL** | Taakvraag — teen task proposal | Feature | Backend + iOS + Web | After G3 | G3 |
 | **WS-FOCUS** | Focusmodus — homework timer | Feature | iOS (+ thin Backend) | After G3 | G3 |
 | **WS-COPARENT** | Co-ouderschap data model (ADR-0004) | Design-gated | Architect + Backend + iOS | Design only | G4 |
+| **WS-AUTH-WEB** | Forgot-password + basic account recovery (web) | Feature | Web | After G3 or parallel with wave 1 | G3 |
+| **WS-ROTATE** | Sibling task rotation UI (uses existing rotation JSON) | Feature | Web + iOS | After wave 1 | — |
+| **WS-IOS-STORE** | App Store submission readiness (path to G5) | iOS-Ship | iOS | Parallel with feature waves | G3→G5 |
+| **WS-ANDROID** | Android app — **PARKED, not before G5** | PARKED | — | Do not start | G5 |
 
 **Owner archetype** = skill mix, not headcount. Streams marked "start now" have no cross-dependency and can run fully in parallel — they touch disjoint layers (web components / API middleware / Swift).
 
@@ -567,32 +597,153 @@ Note: even if `durationMinutes` is sent, the server stores only the **incremente
 
 ---
 
-## 6. Build-first sequence (what can start coding immediately)
+### WS-AUTH-WEB — Forgot-password + basic account recovery (web) (Feature, after G3 or parallel with wave 1)
 
-After **design lock of this document**, these can start **coding now, in parallel** (disjoint layers, no cross-deps):
+**Goal:** remove a table-stakes friction point for parents who forget their password — email-based reset flow on the web dashboard. Every competitor in the competitive research scorecard has some form of account recovery; Wispel's absence is noted as open point O16 in the base plan.
 
-| Order | Can start | Why safe now |
-| --- | --- | --- |
-| 1 | **WS-TRUST-WEB** | Web-only; highest user-trust ROI; no contract change except additive `pending-approval` |
-| 1 | **WS-TRUST-API** | Backend-only middleware + one contract change (invite token) coordinated with web |
-| 1 | **WS-TRUST-IOS** | Swift-only; Keychain fix is security-critical |
-| 1 | **WS-COPARENT** | Pure design/ADR; produces artifacts, merges nothing (G4) |
+| In scope | Out of scope |
+| --- | --- |
+| Forgot-password link on login, email → time-limited token → reset form | Social login / OAuth (Google, Apple — separate ADR) |
+| Reset token stored hashed + expiry in D1; one active token per account | Child account recovery (no child email — hard rule 5, by design) |
+| Rate-limited `POST /auth/forgot-password` + `POST /auth/reset-password` | Account merge or cross-device recovery |
+| Web UI with success/error states in NL | New transactional email template design |
 
-**Blocked until G3 (all `WS-TRUST-*` merged + trust criteria met):**
+**API/schema sketch:**
+- **Migration 0012** — add `password_reset_tokens` table:
+  ```sql
+  CREATE TABLE password_reset_tokens (
+    token_hash TEXT PRIMARY KEY,
+    user_id    TEXT NOT NULL REFERENCES users(id),
+    expires_at TEXT NOT NULL,
+    used_at    TEXT
+  );
+  CREATE INDEX idx_prt_user ON password_reset_tokens(user_id);
+  ```
+- **Endpoints (no auth required):**
+  - `POST /auth/forgot-password` → `{ email }` — rate-limited (5/hour/IP); always returns `200` (no email enumeration); enqueues reset email only if parent account exists.
+  - `POST /auth/reset-password` → `{ token, newPassword }` — validates token hash, expiry, not-used; updates password hash; marks token `used_at`.
+- **Shared schema (`schemas/auth.ts` extension):**
+  ```ts
+  export const ForgotPasswordBody = z.object({ email: z.string().email() });
+  export const ResetPasswordBody = z.object({
+    token: z.string().min(32),
+    newPassword: z.string().min(8).max(128),
+  });
+  ```
 
-| Then | Stream | Note |
-| --- | --- | --- |
-| 2 | **WS-INSIGHTS** | No migration; unblocks O15; reuses `RequireFullParent` fix |
-| 2 | **WS-PAUSE** | Migration 0009; touches engine + streak |
-| 3 | **WS-PROPOSAL** | Migration 0010; reuses `createTask` |
-| 3 | **WS-FOCUS** | Smallest; reuses reduceMotion from TRUST-IOS |
+**UI surfaces:** Login page (forgot-password link), web reset-password route. No child-facing surface (no child email by design).
 
-**Migration numbering to reserve (append-only):** `0009_child_pause`, `0010_task_proposals`, `0011_focus_count` (optional). Co-parent migration number is assigned only when G4 opens.
+**Acceptance criteria:**
+1. Parent can request a reset email and use the link to set a new password; old password no longer works (test).
+2. `POST /auth/forgot-password` returns `200` regardless of whether the email exists — no enumeration (test both cases).
+3. Reset token stored hashed; raw token is never logged (code review + test).
+4. Expired or used tokens are rejected with a clear NL error state.
+5. Endpoint is rate-limited; child accounts are ineligible (no child email — authz test).
+6. No code path writes the raw reset token to logs or response body (grep + test).
+
+**Dependencies:** G3 (or can start in parallel with wave 1 if capacity permits — it touches auth routes only and does not overlap wave 1 files). Coordinates with WS-TRUST-API rate-limit patterns.
+
+**Docs to update:** `docs/taakhelden-api-specificatie.md` (new endpoints), O16 in `docs/wispel-build-plan-workstreams.md` (mark resolved).
+
+**Build order within stream:** (1) migration + repo + token hashing → (2) endpoints + rate limit + authz test → (3) email send integration → (4) web forgot-password UI + reset form.
+
+---
+
+### WS-ROTATE — Sibling task rotation UI (Feature, after wave 1)
+
+**Goal:** surface the existing task rotation JSON model in a parent-facing UI so families can configure rotating chore assignments (e.g. "afwassen" alternates weekly between Lotte and Finn). The rotation data model already exists in `tasks.rotation_config`; this stream adds the UI to configure and visualise it.
+
+| In scope | Out of scope |
+| --- | --- |
+| Parent web UI to configure rotation pattern for a task (add/remove assignees, set frequency) | Inventing a new rotation engine (model exists) |
+| Display which child is "up next" in task detail and Mijn Dag | Complex fair-split algorithms |
+| Visualise current rotation cycle on parent task detail | Per-child task analytics (that's WS-INSIGHTS) |
+
+**API/schema sketch:** No new migration; rotation config lives in `tasks.rotation_config` (existing column). Extend `PATCH /tasks/:id` to accept a `rotationConfig` field (or add a dedicated `PUT /tasks/:id/rotation`). Ensure `RotationConfig` is defined and exported in `packages/shared`.
+
+**UI surfaces:** Parent web task-create/edit form (rotation tab), task detail "wie is nu aan de beurt", parent iOS task-edit screen. Child-facing Mijn Dag shows whose turn it is with positive copy.
+
+**Acceptance criteria:**
+1. Parent can configure a rotation schedule for a task (add members, set weekly/alternating); next assignee updates on the next generation cycle (engine test).
+2. Parent sees "nu aan de beurt: Lotte" on the task detail and it advances after each cycle (test).
+3. Rotation config persists across restarts; disabling rotation reverts to fixed assignee (test).
+4. Child sees who's up next in positive copy; no "you lost your turn" framing (`@dutch-child-copy`).
+5. No ledger entry is created or modified by changing rotation (test).
+
+**Dependencies:** G3; wave 1 (WS-INSIGHTS + WS-PAUSE) should land first so rotation can reuse any shared task-detail component patterns. Does not touch the ledger.
+
+**Docs to update:** `docs/taakhelden-api-specificatie.md` (rotation config extension), `docs/taakhelden-productvoorstel.md` (rotation feature).
+
+**Build order within stream:** (1) Confirm `RotationConfig` schema in shared → (2) extend `PATCH /tasks/:id` + repo → (3) parent web rotation UI → (4) iOS parent edit → (5) child Mijn Dag "wie is aan de beurt" display.
+
+---
+
+### WS-IOS-STORE — App Store submission readiness (path to Gate G5)
+
+**Goal:** get the Wispel iPhone app through App Store review and publicly available in the NL App Store. This is the **critical path to G5** and the sole prerequisite for any Android work.
+
+| In scope | Out of scope |
+| --- | --- |
+| App Store Connect: metadata, screenshots, privacy nutrition labels, age rating (4+) | Android Google Play submission |
+| ReviewNotes: real staging credentials (parent + child accounts) that work for Apple reviewer | New iOS features (not part of store submission) |
+| Multi-child picker on shared iPad — residual from WS-TRUST-IOS (required before review) | Marketing copy on wispel.cc (that's WS-WEB-MKT) |
+| SIWA + account-delete flow verified on production build | Full WS-IOS-AGE teen/young pass (can follow G5) |
+| Final App Store PNG icon set (residual from WS-BRAND) | |
+| TestFlight external test group → submission | |
+
+**Acceptance criteria (maps directly to G5 criteria):**
+1. App Store listing is live in NL region; Wispel iPhone app is publicly downloadable.
+2. Sign in with Apple (SIWA) works on the production App Store build; account-delete flow passes Apple's required functionality check.
+3. Privacy nutrition labels submitted match the codebase's actual data practices: no child email, EU hosting, no third-party tracking, EXIF-stripped photos.
+4. ReviewNotes contain real staging parent + child credentials that allow an Apple reviewer to fully exercise the task-creation → approval → point-award loop.
+5. Multi-child picker on shared iPad is functional and accessible (a11y bar met per WS-TRUST-IOS standards).
+6. No P0 trust blockers are open at time of submission (G3 must be satisfied).
+
+**Dependencies:** G3 must pass before submitting — a wrong balance or a leaked token in a review build is a rejection risk. WS-TRUST-IOS residual (multi-child picker). WS-BRAND residual (App Store PNG icons). Runs in **parallel** with feature waves; do not let feature-wave PRs block Store submission PRs from merging.
+
+**Docs to update:** `docs/taakhelden-ios-bouwvoorstel.md` (App Store submission checklist + G5 criteria), `docs/wispel-post-review-workstreams.md` §2 Gate G5 checkboxes when completed.
+
+**Build order within stream:** (1) Multi-child picker (TRUST-IOS residual) → (2) Final App Store PNG icon set → (3) Privacy nutrition label audit → (4) App Store Connect metadata + screenshots → (5) ReviewNotes real credentials → (6) TestFlight external test → (7) Submit → (8) Respond to any review feedback → **G5 ✅**.
+
+---
+
+### WS-ANDROID — Android app (PARKED until G5)
+
+**Status: PARKED — do not start.**
+
+Not started. Unblocked **only** when Gate G5 passes (Wispel iPhone app accepted by Apple and publicly available on the App Store).
+
+No `WS-ANDROID` coding, no Android project scaffolding, no "Android soon" eng spikes that dilute iOS ship velocity. Marketing may describe Wispel as iOS-first; do not promise an Android date.
+
+**PO lock 2026-08-01 — P8.** See §7 (P8) and Gate G5 in §2. Android demand is real (medium demand signal from competitive research) but halving focus before iOS ships is the wrong trade.
+
+---
+
+## 6. Build-first sequence (competitive-informed execution order)
+
+This is the canonical post-competitive-research execution order as of **2026-08-01**, informed by findings in `docs/market-research/competitor-scorecard-2026-08.md`. It supersedes the earlier "what can start coding immediately" table.
+
+| Step | What | Competitive / product rationale | Gate |
+| --- | --- | --- | --- |
+| **1** | **Finish + merge Horizon B.5 TRUST (PR #83)** — WS-TRUST-WEB + WS-TRUST-API + WS-TRUST-IOS (all parallel) | Nothing ships on top of a wrong balance or a leaked invite token. Earn trust before features. | → G3 |
+| **2a** | **WS-INSIGHTS** (parallel with 2b) | Gesprekskaart — no competitor has it; closes O15; reuses `RequireFullParent` fix. **Wave 1 start.** | After G3 |
+| **2b** | **WS-PAUSE** (parallel with 2a) | Rustschild — non-punitive per-child pause; differentiator vs S'moresUp's punitive chore-locking. **Wave 1.** | After G3 |
+| **3a** | **WS-PROPOSAL** (parallel with 3b) | Taakvraag — teen task proposal; beats Gimi's absent propose-chore; reuses `createTask`. **Wave 2.** | After G3 |
+| **3b** | **WS-FOCUS** (parallel with 3a) | Focusmodus — homework timer; **unique** differentiator: no competitor in the field has a homework category. **Wave 2.** | After G3 |
+| **4** | **WS-IOS-STORE + WS-IOS-AGE leftovers** (ongoing, parallel with waves) | Critical path to G5 (App Store live). Multi-child picker, nutrition labels, ReviewNotes real credentials, screenshots. Do not let feature-wave PRs block this track. | → G5 |
+| **5** | **WS-AUTH-WEB** when capacity — does not block waves | Forgot-password is table stakes; all 5 researched competitors have account recovery (O16). Can run parallel with wave 1 if capacity allows. | After G3 |
+| **6** | **WS-ROTATE** after wave 1 | Sibling rotation UI using existing data model. Wave 1 must land first to avoid shared-component conflicts. | After wave 1 |
+| **7** | **WS-COPARENT** design anytime; code only after G4 | ADR-0004 design track produces artifacts now; no migration merges until G4. | Design now; code after G4 |
+| **8** | **WS-ANDROID** — **NOT before G5** | PARKED. Android demand is real but halving focus before iOS ships is the wrong trade. **PO lock P8, 2026-08-01.** | After G5 only |
 
 **Coordination locks:**
 - One owner for the **Idempotency-Key convention** (WS-TRUST-WEB) — WS-TRUST-IOS adopts the same string format.
 - One owner for the **invite response contract** change (WS-TRUST-API ↔ web invite dialog).
 - `taskEngine` edits (WS-PAUSE, WS-PROPOSAL) touch different functions — rebase, don't co-edit.
+- `WS-IOS-STORE` runs alongside feature waves; feature-wave PRs must not block Store submission PRs from merging.
+- `WS-AUTH-WEB` and wave 1 touch disjoint files — safe to run parallel if capacity permits.
+
+**Migration numbering to reserve (append-only):** `0009_child_pause`, `0010_task_proposals`, `0011_focus_count` (optional), `0012_password_reset_tokens` (WS-AUTH-WEB). Co-parent migration number is assigned only when G4 opens.
 
 ---
 
@@ -608,7 +759,9 @@ After **design lock of this document**, these can start **coding now, in paralle
 | P6 | ✅ LOCKED | **ADR-0004 Option A** (one child identity, multiple family memberships) + **per-family ledger** (balance is always scoped to one `family_id`) | Option A matches the product promise of a single point history; per-family ledger preserves the `familyId` security boundary and matches hard rule 3 — still behind G4 | WS-COPARENT / G4 |
 | P7 | ✅ LOCKED | **Yes — send a positive push notification** to the teen when a parent approves their Taakvraag | Immediate positive feedback completes the agency loop and is consistent with the positive-only push stance; copy must pass `@dutch-child-copy` | WS-PROPOSAL |
 
-All seven decisions logged in `wispel-build-plan-workstreams.md` §13.7 (2026-08-01).
+| P8 | ✅ LOCKED | **Android is out of scope until Gate G5 (iOS App Store live)**. No `WS-ANDROID` coding, no Android project scaffolding, no "Android soon" eng spikes. Marketing may say iOS-first; do not promise an Android date. | Sequencing: iOS must ship before Android gets any eng attention. Competitive research confirms medium-priority Android demand, but an unfinished iOS costs more than Android can buy at this stage. | WS-ANDROID / G5 |
+
+All eight decisions logged in `wispel-build-plan-workstreams.md` §13.7 (2026-08-01).
 
 ---
 
@@ -625,4 +778,4 @@ All seven decisions logged in `wispel-build-plan-workstreams.md` §13.7 (2026-08
 
 ---
 
-**Bottom line:** fix the balance, the approval gap, the double-approve, and the three security highs **first** (Horizon B.5, all parallel, all startable now). Then ship Insights (closing the stub/O15), Rustschild, Taakvraag, and a privacy-safe Focus timer — each behind the trust gate. Keep co-parent as an approved-ADR gate, not a half-built schema. Earn the number before adding to the app.
+**Bottom line:** fix the balance, the approval gap, the double-approve, and the three security highs **first** (Horizon B.5, PR #83, all parallel, all startable now). Then ship Insights (closing the stub/O15), Rustschild, Taakvraag, and a privacy-safe Focus timer — each behind the trust gate. Run WS-IOS-STORE in parallel with feature waves as the critical path to Gate G5. Keep co-parent as an approved-ADR gate, not a half-built schema. **Android (WS-ANDROID) is parked until G5** — PO lock P8, 2026-08-01. The competitive wedges that matter most are NL-first, free, privacy, homework, and age modes — not an Android build that dilutes the iOS ship. Earn the number before adding to the app. Ship the iPhone before building for Android.
