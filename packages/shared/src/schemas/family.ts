@@ -87,6 +87,29 @@ export const InviteParentBody = z.object({
 export type InviteParentBody = z.infer<typeof InviteParentBody>;
 
 /**
+ * Response van POST /families/me/parents (Option A, P1-locked).
+ * Het uitnodigingstoken zit NIET in de response — dat is een veiligheidsregel.
+ * Gebruik GET /families/me/invites/:userId/link voor de kopieerbare URL.
+ */
+export const InviteResponse = z.object({
+  userId: z.string(),
+  email: z.string().email(),
+  permissions: z.enum(["full", "approve_only"]),
+  status: z.literal("invited"),
+});
+export type InviteResponse = z.infer<typeof InviteResponse>;
+
+/**
+ * Response van GET /families/me/invites/:userId/link (Option A, ouder-only).
+ * Geeft een kortlevende, kopieerbare uitnodigingslink terug.
+ */
+export const InviteLinkResponse = z.object({
+  copyableUrl: z.string().url(),
+  expiresAt: z.string(),
+});
+export type InviteLinkResponse = z.infer<typeof InviteLinkResponse>;
+
+/**
  * POST /families/parents/accept — de uitgenodigde verzorger accepteert: het
  * uitnodigingstoken uit de e-mail plus een eigen wachtwoord (en optioneel een
  * roepnaam). Publiek endpoint: de tweede ouder is nog niet ingelogd.

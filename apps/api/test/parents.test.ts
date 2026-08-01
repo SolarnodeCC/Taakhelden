@@ -2,10 +2,24 @@
  * Co-ouder-uitnodiging → accept-flow (§3.2): tweede verzorger zet met het token
  * uit de uitnodigingsmail een eigen wachtwoord en kan daarna inloggen. Het token
  * is eenmalig en dubbel-accepteren wordt atomair afgevangen.
+ *
+ * Na WS-TRUST-API (Option A, P1-locked): POST /families/me/parents retourneert
+ * GEEN inviteToken meer. Token ophalen via GET /families/me/invites/:userId/link.
  */
 import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
 import { seedFamily, parentToken, api } from "./helpers";
+
+/** Haal het invite-token op via de link-endpoint (Option A: nooit in de create-response). */
+async function getInviteToken(userId: string, parentTok: string): Promise<string> {
+  const linkRes = await api(`/families/me/invites/${userId}/link`, { token: parentTok });
+  expect(linkRes.status).toBe(200);
+  const { copyableUrl } = (await linkRes.json()) as { copyableUrl: string };
+  const url = new URL(copyableUrl);
+  const token = url.searchParams.get("token");
+  if (!token) throw new Error("Geen token in copyableUrl");
+  return token;
+}
 
 describe("co-ouder accept-flow", () => {
   it("uitnodigen → accepteren zet wachtwoord + roepnaam en logt in", async () => {
@@ -15,9 +29,18 @@ describe("co-ouder accept-flow", () => {
     const invite = await api("/families/me/parents", {
       token: parentTok,
       body: { email: "co@test.local", permissions: "approve_only" },
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(invite.status).toBe(201);
-    const { inviteToken, userId } = (await invite.json()) as { inviteToken: string; userId: string };
+    const inviteBody = (await invite.json()) as Record<string, unknown>;
+    const userId = inviteBody.userId as string;
+
+    // inviteToken is NIET meer aanwezig in de response (P1-locked, WS-TRUST-API).
+    expect(inviteBody.inviteToken).toBeUndefined();
+    expect(inviteBody.status).toBe("invited");
+
+    // Token ophalen via de link-endpoint.
+    const inviteToken = await getInviteToken(userId, parentTok);
 
     const accept = await api("/families/parents/accept", {
       body: { token: inviteToken, password: "meebeslissen1", displayName: "Opa" },
@@ -49,8 +72,10 @@ describe("co-ouder accept-flow", () => {
     const invite = await api("/families/me/parents", {
       token: parentTok,
       body: { email: "co2@test.local", permissions: "full" },
+      idempotencyKey: crypto.randomUUID(),
     });
-    const { inviteToken, userId } = (await invite.json()) as { inviteToken: string; userId: string };
+    const { userId } = (await invite.json()) as { userId: string };
+    const inviteToken = await getInviteToken(userId, parentTok);
 
     const first = await api("/families/parents/accept", {
       body: { token: inviteToken, password: "meebeslissen1" },
@@ -80,5 +105,13 @@ describe("co-ouder accept-flow", () => {
       body: { token: "bestaat-niet", password: "meebeslissen1" },
     });
     expect(res.status).toBe(400);
+  });
+
+  it("link-endpoint werkt alleen voor pending (nog niet geactiveerde) uitnodigingen", async () => {
+    const fam = await seedFamily("coaplink");
+    const parentTok = await parentToken(fam.parentId, fam.familyId);
+    // Bestaand kind: geen pending invite.
+    const notFound = await api(`/families/me/invites/${fam.childA}/link`, { token: parentTok });
+    expect(notFound.status).toBe(404);
   });
 });

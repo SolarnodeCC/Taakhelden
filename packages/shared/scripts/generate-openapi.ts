@@ -51,6 +51,10 @@ import {
   FamilyGoalProgressResponse,
   CreateFamilyGoalBody,
   PatchFamilyGoalBody,
+  InviteResponse,
+  InviteLinkResponse,
+  PendingApprovalResponse,
+  InviteParentBody,
 } from "../src/index";
 
 type JsonSchema = Record<string, unknown>;
@@ -113,6 +117,10 @@ const schemas: Record<string, JsonSchema> = {
   FamilyGoalProgressResponse: schemaFor("FamilyGoalProgressResponse", FamilyGoalProgressResponse),
   CreateFamilyGoalBody: schemaFor("CreateFamilyGoalBody", CreateFamilyGoalBody),
   PatchFamilyGoalBody: schemaFor("PatchFamilyGoalBody", PatchFamilyGoalBody),
+  InviteParentBody: schemaFor("InviteParentBody", InviteParentBody),
+  InviteResponse: schemaFor("InviteResponse", InviteResponse),
+  InviteLinkResponse: schemaFor("InviteLinkResponse", InviteLinkResponse),
+  PendingApprovalResponse: schemaFor("PendingApprovalResponse", PendingApprovalResponse),
 };
 
 function json(schemaName: string) {
@@ -203,6 +211,26 @@ const spec = {
       get: {
         summary: "Read today's instances",
         responses: { "200": json("TodayViewerResponse"), "404": json("ApiError") },
+      },
+    },
+    "/instances/pending-approval": {
+      get: {
+        summary: "Parent approval queue across dates (submitted instances, oldest first)",
+        responses: { "200": json("PendingApprovalResponse"), "403": json("ApiError") },
+      },
+    },
+    "/families/me/parents": {
+      post: {
+        summary: "Invite a co-parent (token delivered by email; not echoed in body)",
+        requestBody: { required: true, ...json("InviteParentBody") },
+        responses: { "201": json("InviteResponse"), "403": json("ApiError"), "409": json("ApiError") },
+      },
+    },
+    "/families/me/invites/{userId}/link": {
+      get: {
+        summary: "Mint a copyable invite URL (parent-only, rate-limited reveal)",
+        parameters: [{ name: "userId", in: "path", required: true, schema: { type: "string" } }],
+        responses: { "200": json("InviteLinkResponse"), "403": json("ApiError"), "404": json("ApiError") },
       },
     },
     "/instances/{id}/complete": {

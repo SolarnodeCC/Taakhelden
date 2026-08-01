@@ -8,6 +8,8 @@ import {
   HistoryCursor,
   ParentTodayView,
   TodayViewerResponse,
+  PendingApprovalItem,
+  PendingApprovalResponse,
 } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
@@ -16,7 +18,7 @@ import { validate } from "../middleware/validate";
 import { requireIdempotencyKey } from "../middleware/idempotency";
 import { callFamilyRoom } from "../services/familyRoom";
 import { getFamily, listChildren } from "../repo/families";
-import { listForDate, listHistory } from "../repo/instances";
+import { listForDate, listHistory, listPendingApproval } from "../repo/instances";
 import { isContractV2 } from "../services/contract";
 import { toInstanceView as instanceView } from "../services/instanceView";
 import { computeBalance } from "../services/pointsEngine";
@@ -112,6 +114,37 @@ instances.get("/", async (c) => {
     instances: page.map((r) => instanceView(r as Record<string, unknown>)),
     nextCursor,
   });
+});
+
+/**
+ * Ouder-goedkeuringsrij: alle instances met status `submitted` over alle datums,
+ * oudste eerst. Oplossing voor de "overnight gap" (WS-TRUST-WEB §§ 2 + 5).
+ * Alleen ouders. Geen ledger, geen DO. Zuivere repo-query.
+ */
+instances.get("/pending-approval", async (c) => {
+  const { familyId } = requireParent(c);
+  const rows = await listPendingApproval(c.env.DB, familyId);
+  const items = rows.map((r) =>
+    PendingApprovalItem.parse({
+      id: r.id,
+      status: r.status,
+      childId: r.child_id,
+      childName: r.child_name,
+      date: r.date,
+      title: r.title,
+      icon: r.icon ?? null,
+      points: r.task_points,
+      photoBonusPoints: r.photo_bonus_points,
+      approvalRequired: Boolean(r.approval_required),
+      daypart: r.daypart ?? null,
+      photoId: r.photo_id ?? null,
+      photoStatus: r.photo_status ?? null,
+      pointsEarned: r.points_earned ?? null,
+      redoNote: r.redo_note ?? null,
+      completedAt: r.completed_at ?? null,
+    }),
+  );
+  return c.json(PendingApprovalResponse.parse({ items }));
 });
 
 // Alle mutaties lopen via de FamilyRoom-DO (ledger-serialisatie per gezin).

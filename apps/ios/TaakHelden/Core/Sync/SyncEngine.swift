@@ -36,7 +36,8 @@ final class SyncEngine {
                 switch outcome {
                 case .applied, .alreadyCompleted:
                     mutationQueue.remove(key: result.key)
-                case .insufficientPoints, .dropped:
+                case .insufficientPoints, .dropped, .undoWindowExpired:
+                    // Permanent rejections: remove from queue so they are not retried.
                     mutationQueue.remove(key: result.key)
                 case .failed:
                     break

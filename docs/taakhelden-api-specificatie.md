@@ -61,9 +61,10 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 | `POST /auth/register` | — | Ouder-registratie (e-mail + wachtwoord). Maakt User + Family in één transactie. Turnstile-token verplicht. |
 | `POST /auth/login` | — | E-mail + wachtwoord → access + refresh token. |
 | `POST /auth/apple` | — | Sign in with Apple (identityToken-verificatie tegen Apple's JWKS). Nieuw of bestaand account. |
-| `POST /auth/refresh` | — | Refresh token → nieuw access token (rotatie: oude refresh vervalt). |
+| `POST /auth/refresh` | — | Refresh token → nieuw access token (rotatie: oude refresh vervalt). **Rate-limit: 30/min/IP** (WS-TRUST-API). |
 | `POST /auth/family-code` | — | Stap 1 kind-login: gezinscode (6 tekens) → lijst kindprofielen `{id, roepnaam, avatar}` van dat gezin. Geen auth, wel zwaar rate-limited. |
 | `POST /auth/child-session` | — | Stap 2: `{familyCode, childId, pincode}` → kind-JWT (24 u). 5 foutpogingen → 15 min lock + pushmelding naar ouders. |
+| `POST /auth/child-session/refresh` | — | Kind-refresh token → nieuw kind-JWT + nieuw device-refresh. **Rate-limit: 30/min/IP** (WS-TRUST-API). |
 | `POST /auth/logout` | beide | Refresh token intrekken. |
 
 ### 3.2 Families
@@ -73,7 +74,8 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 | `GET /families/me` | beide | Gezin + instellingen. Kind krijgt een uitgeklede weergave (geen uitnodigingscode, geen leden-e-mails). |
 | `PATCH /families/me` | parent | Naam, `timezone`, `quietHours` (bedtijd), `weekBonusThreshold` (default 0.8), `dayBonusPoints`, `weekBonusPoints`, `vacationMode`. |
 | `POST /families/me/invite-code` | parent | (Her)genereer gezinscode; oude vervalt direct. |
-| `POST /families/me/parents` | parent | Tweede ouder/verzorger uitnodigen per e-mail; `permissions: "full" \| "approve_only"`. |
+| `POST /families/me/parents` | parent (`full`) | Tweede ouder/verzorger uitnodigen per e-mail; `permissions: "full" \| "approve_only"`. Response: `{ userId, email, permissions, status: "invited" }` — **géén `inviteToken`** (WS-TRUST-API Option A, P1-locked). |
+| `GET /families/me/invites/:userId/link` | parent (`full`) | Geeft een kopieerbare uitnodigingslink (7 d geldig) terug voor de clipboard-fallback: `{ copyableUrl, expiresAt }`. Minst een nieuw token per aanroep. **Rate-limit: 10/min/IP.** (WS-TRUST-API) |
 
 ### 3.3 Members
 
@@ -120,6 +122,7 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 |---|---|---|
 | `GET /instances/today` | beide | Kind: eigen taken van vandaag + puntenstatus + dagbonus-voortgang. Ouder: alle kinderen gegroepeerd. |
 | `GET /instances?childId=&from=&to=` | parent | Historie (paginated). |
+| `GET /instances/pending-approval` | parent | Alle instances met status `submitted` over alle datums, oudste eerst. Oplossing voor de overnight-gap in de goedkeuringsrij (WS-TRUST-WEB/API). Response: `{ items: PendingApprovalItem[] }`. |
 | `POST /instances/{id}/complete` | child (eigen) / parent | Afvinken. `Idempotency-Key` verplicht. Response: verdiende punten, of dag/weekbonus getriggerd is, evt. nieuwe badge → app toont confetti in één roundtrip. |
 | `POST /instances/{id}/photo` | child (eigen) | Foto-bonus koppelen: `{photoId}` (na presigned upload). Status blijft `submitted` tot verwerking + evt. goedkeuring. |
 | `POST /instances/{id}/approve` | parent | Goedkeuren → punten definitief in ledger, push naar kind. |
@@ -210,8 +213,10 @@ Regels: mutaties worden in volgorde toegepast in de Family-DO; `key` = idempoten
 
 | Methode & pad | Rol | Beschrijving |
 |---|---|---|
-| `GET /account/export` | parent | Machineleesbare export (JSON, zip met foto's) — art. 20 AVG. Async: job → downloadlink per mail/push. |
-| `DELETE /account` | parent | Heel gezin: 7 d soft delete → cascade D1 + R2-prefix + KV. Bevestiging vereist (wachtwoord her-invoer). |
+| `POST /account/export` | parent | Start een asynchrone export-job (art. 20). **`Idempotency-Key` verplicht.** **Rate-limit: 3/uur/IP** (WS-TRUST-API). Als er al een `pending` export-job bestaat voor dit gezin, wordt die teruggegeven i.p.v. een nieuwe job aan te maken. Response: `{ exportId, status: "pending" }`. |
+| `GET /account/export/:id` | parent | Status van een export-job; zodra klaar een kortlevende HMAC-gesigneerde downloadlink. |
+| `GET /account/export/:id/file` | — | Publiek, HMAC-gesigneerd: download het ZIP-bestand. |
+| `DELETE /account` | parent (`full`) | Heel gezin: 7 d soft delete → cascade D1 + R2-prefix + KV. Bevestiging vereist (wachtwoord her-invoer). |
 
 ### 3.13 WebSocket
 `GET /ws?token=<short-lived ws-token>` → upgrade naar Family-DO. Server-events: `instance.updated`, `points.changed`, `redemption.created`, `redemption.updated`, `badge.earned`. Alleen ouder-dashboards hoeven te verbinden; de kind-app werkt prima met pull + push-notificaties.

@@ -138,6 +138,7 @@ auth.post("/apple", validate("json", AppleAuthBody), async (c) => {
 });
 
 auth.post("/refresh", validate("json", RefreshBody), async (c) => {
+  await rateLimit(c, "refresh", 30);
   const consumed = await repo.consumeRefreshToken(c.env.DB, c.req.valid("json").refreshToken);
   const user = consumed && (await repo.getUserById(c.env.DB, consumed.user_id as string));
   if (!user) {
@@ -224,6 +225,7 @@ auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
 });
 
 auth.post("/child-session/refresh", validate("json", ChildSessionRefreshBody), async (c) => {
+  await rateLimit(c, "child-refresh", 30);
   const consumed = await repo.consumeChildDeviceSession(c.env.DB, c.req.valid("json").refreshToken);
   const child = consumed && (await repo.getChildForLogin(
     c.env.DB,

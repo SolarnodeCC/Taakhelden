@@ -148,7 +148,7 @@ struct ChildPairingFlowView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Terug") {
-                        appState.returnToWelcome()
+                        Task { await appState.returnToWelcome() }
                     }
                 }
             }

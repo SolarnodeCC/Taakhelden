@@ -55,6 +55,24 @@ de onderstaande voorbeeldwaarden als het gezin al is ingericht):
   tracking / geen third-party analytics.
 - Camera / Face ID usage strings: productnaam **Wispel**.
 
+## WS-TRUST-IOS — deferred items (follow-up PR)
+
+### Shared-device multi-child profile picker (skipped — larger scope)
+
+The data model already supports multiple children per device: `devices` PK is
+`(apns_token, user_id)` and child sessions are per child (migration 0006).
+The gap is UI: a profile-picker screen on the shared iPad that switches the
+active child session without re-onboarding.
+
+Scope: session-management screen + picker view, no schema change, no API change.
+Track as a follow-up to `cursor/post-review-trust-b5-f6b0` once the four
+security/a11y items in this PR are validated.
+
+Reference: `docs/wispel-post-review-workstreams.md` §WS-TRUST-IOS, acceptance
+criterion 4 (multi-child per device).
+
+---
+
 ## Gerelateerde docs
 
 - E2E-checklist (2 devices): `docs/ios-phase1-e2e-checklist.md`

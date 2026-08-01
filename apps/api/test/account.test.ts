@@ -52,7 +52,7 @@ describe("account-export (async ZIP, AVG art. 20)", () => {
       .run();
 
     // Start → 202 pending
-    const start = await api("/account/export", { method: "POST", token: parentTok });
+    const start = await api("/account/export", { method: "POST", token: parentTok, idempotencyKey: crypto.randomUUID() });
     expect(start.status).toBe(202);
     const { exportId, status } = (await start.json()) as { exportId: string; status: string };
     expect(status).toBe("pending");
@@ -97,6 +97,7 @@ describe("account-export (async ZIP, AVG art. 20)", () => {
     const res = await api("/account/export", {
       method: "POST",
       token: await childToken(fam.childA, fam.familyId),
+      idempotencyKey: crypto.randomUUID(),
     });
     expect(res.status).toBe(403);
   });
@@ -104,7 +105,7 @@ describe("account-export (async ZIP, AVG art. 20)", () => {
   it("download met een geknoeide handtekening → 403", async () => {
     const fam = await seedFamily("expsig");
     const parentTok = await parentToken(fam.parentId, fam.familyId);
-    const { exportId } = (await (await api("/account/export", { method: "POST", token: parentTok })).json()) as {
+    const { exportId } = (await (await api("/account/export", { method: "POST", token: parentTok, idempotencyKey: crypto.randomUUID() })).json()) as {
       exportId: string;
     };
     await processExports(fakeExportBatch(exportId, fam.familyId), env);

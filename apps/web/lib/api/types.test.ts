@@ -199,7 +199,18 @@ describe("Batch 8 schemas", () => {
     expect(parsed.permissions).toBe("approve_only");
   });
 
-  it("parses InviteParentResult", () => {
+  it("parses InviteParentResult without inviteToken (new shape, P1-locked)", () => {
+    const parsed = InviteParentResult.parse({
+      userId: "usr_1",
+      email: "opa@example.nl",
+      permissions: "full",
+      status: "invited",
+    });
+    expect(parsed.userId).toBe("usr_1");
+    expect(parsed.inviteToken).toBeUndefined();
+  });
+
+  it("parses InviteParentResult with inviteToken (backward compat, optional)", () => {
     const parsed = InviteParentResult.parse({
       userId: "usr_1",
       email: "opa@example.nl",

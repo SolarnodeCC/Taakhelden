@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { useTranslations, useLocale } from "next-intl";
+import { useTranslations } from "next-intl";
 import { InviteParentBody, ErrorCodes, type ErrorCode } from "@taakhelden/shared";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
-import { InviteParentResult } from "../../../../lib/api/types";
+import { InviteParentResult, InviteLinkResponse } from "../../../../lib/api/types";
 import { Alert, Button, Field, Input } from "../../../../components/ui";
 
 const KNOWN_ERRORS: ErrorCode[] = [
@@ -14,25 +14,28 @@ const KNOWN_ERRORS: ErrorCode[] = [
 ];
 
 interface InviteSuccess {
-  inviteToken: string;
+  /** userId is used to call the link endpoint on demand. */
+  userId: string;
   emailLocal: string;
 }
 
 export default function InviteParentForm({ onInvited }: { onInvited: () => Promise<void> }) {
   const t = useTranslations("gezin.inviteParent");
-  const locale = useLocale();
   const [email, setEmail] = useState("");
   const [permissions, setPermissions] = useState<"approve_only" | "full">("approve_only");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<InviteSuccess | null>(null);
+  const [copyBusy, setCopyBusy] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [copyError, setCopyError] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setSuccess(null);
     setCopied(false);
+    setCopyError(false);
 
     const parsed = InviteParentBody.safeParse({ email, permissions });
     if (!parsed.success) {
@@ -46,7 +49,7 @@ export default function InviteParentForm({ onInvited }: { onInvited: () => Promi
       const result = InviteParentResult.parse(raw);
       // Never log email or token (architectuurregel 5).
       setSuccess({
-        inviteToken: result.inviteToken,
+        userId: result.userId,
         emailLocal: result.email.split("@")[0] ?? "",
       });
       setEmail("");
@@ -61,18 +64,26 @@ export default function InviteParentForm({ onInvited }: { onInvited: () => Promi
     }
   }
 
-  function inviteUrl(token: string): string {
-    if (typeof window === "undefined") return `/${locale}/uitnodiging?token=${token}`;
-    return `${window.location.origin}/${locale}/uitnodiging?token=${token}`;
-  }
-
+  /**
+   * Fetch a fresh tokenised URL from the reveal endpoint (Option A — WS-TRUST-API).
+   * The token is never stored in this component; it is only written to the clipboard.
+   */
   async function copyLink() {
-    if (!success) return;
+    if (!success || copyBusy) return;
+    setCopyBusy(true);
+    setCopied(false);
+    setCopyError(false);
     try {
-      await navigator.clipboard.writeText(inviteUrl(success.inviteToken));
+      const raw = await apiClient.get(
+        `/api/v1/families/me/invites/${success.userId}/link`,
+      );
+      const link = InviteLinkResponse.parse(raw);
+      await navigator.clipboard.writeText(link.copyableUrl);
       setCopied(true);
     } catch {
-      setCopied(false);
+      setCopyError(true);
+    } finally {
+      setCopyBusy(false);
     }
   }
 
@@ -143,13 +154,21 @@ export default function InviteParentForm({ onInvited }: { onInvited: () => Promi
           <Alert tone="success">{t("success", { name: success.emailLocal })}</Alert>
           <p className="mt-3 text-sm text-muted">{t("shareHint")}</p>
           <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
-            <code className="block min-w-0 flex-1 truncate rounded-sm border border-border bg-bg px-2 py-1.5 text-xs text-text">
-              {inviteUrl(success.inviteToken)}
-            </code>
-            <Button type="button" size="sm" variant="secondary" onClick={copyLink}>
-              {copied ? t("copied") : t("copy")}
+            <Button
+              type="button"
+              size="sm"
+              variant="secondary"
+              onClick={copyLink}
+              disabled={copyBusy}
+            >
+              {copyBusy ? t("copyLinkBusy") : copied ? t("copied") : t("copy")}
             </Button>
           </div>
+          {copyError && (
+            <p className="mt-2 text-xs text-danger" role="alert">
+              {t("errors.copyLinkFailed")}
+            </p>
+          )}
         </div>
       )}
     </div>

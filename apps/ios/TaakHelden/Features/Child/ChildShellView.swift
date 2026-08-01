@@ -224,6 +224,13 @@ private struct MijnDagTabView: View {
                             isTeen: isTeen
                         )
                     }
+                    if let msg = viewModel?.undoStatusMessage {
+                        Text(msg)
+                            .font(.footnote)
+                            .foregroundStyle(palette.mutedText.color)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+
                     switch viewModel?.state {
                     case .loading, .none:
                         ProgressView(String(localized: "child.day.loading"))
@@ -342,6 +349,12 @@ private struct MijnDagTabView: View {
     @ViewBuilder
     private func taskCard(_ instance: InstanceViewDTO) -> some View {
         let isDone = instance.status != "open" && instance.status != "open_redo"
+        // Show undo affordance only when: completed this session, within 5-min window,
+        // and not yet approved (approved instances cannot be undone server-side).
+        let canUndo = isDone
+            && instance.status != "approved"
+            && viewModel?.isInUndoWindow(instance.id) == true
+
         THCard(palette: palette) {
             HStack {
                 VStack(alignment: .leading, spacing: THSpacing.sm) {
@@ -392,6 +405,17 @@ private struct MijnDagTabView: View {
                 PhotoBonusActionsView(palette: palette) { jpegData in
                     Task { await viewModel?.uploadPhoto(for: instance.id, jpegData: jpegData) }
                 }
+            }
+
+            // "Oeps, toch niet" — undo affordance within the 5-minute server window.
+            if canUndo {
+                Button(String(localized: "child.task.undo.button")) {
+                    Task { await viewModel?.undo(instanceID: instance.id) }
+                }
+                .buttonStyle(.bordered)
+                .foregroundStyle(palette.mutedText.color)
+                .frame(maxWidth: .infinity, minHeight: isYoung ? YoungModeSupport.minTapTarget : 44)
+                .accessibilityLabel(Text("child.task.undo.button"))
             }
         }
         .opacity(isDone ? 0.85 : 1)

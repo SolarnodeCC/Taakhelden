@@ -63,6 +63,16 @@ export async function getExportJob(db: D1Database, familyId: string, exportId: s
     .first<{ id: string; status: "pending" | "ready" | "failed"; r2_key: string | null }>();
 }
 
+/** Geeft de meest recente actieve (pending) export-job terug — voor early-return / abuse defense. */
+export async function getActiveExportJob(db: D1Database, familyId: string) {
+  return db
+    .prepare(
+      "SELECT id, status FROM account_exports WHERE family_id = ? AND status = 'pending' ORDER BY created_at DESC LIMIT 1",
+    )
+    .bind(familyId)
+    .first<{ id: string; status: "pending" }>();
+}
+
 export async function setExportReady(
   db: D1Database,
   familyId: string,

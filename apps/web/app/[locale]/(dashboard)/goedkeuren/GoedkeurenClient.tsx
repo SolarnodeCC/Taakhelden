@@ -4,24 +4,21 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
-import { ParentTodayView, PhotoView, type InstanceView } from "../../../../lib/api/types";
+import {
+  PendingApprovalResponse,
+  PhotoView,
+  type PendingApprovalItem,
+} from "../../../../lib/api/types";
 import { useRealtimeRefetch } from "../../../../lib/realtime/FamilyRealtimeContext";
 import { APPROVAL_REALTIME_EVENTS } from "../../../../lib/realtime/events";
 import { useRouter } from "../../../../i18n/navigation";
 import { Button } from "../../../../components/ui";
 
-// A submitted task plus the child it belongs to — the unit of the approval queue.
-interface QueueItem extends InstanceView {
-  childName: string;
-}
+// A submitted/completed task plus its child name — the unit of the approval queue.
+type QueueItem = PendingApprovalItem;
 
-function toQueue(view: ParentTodayView): QueueItem[] {
-  return view.children.flatMap((child) =>
-    child.instances
-      .filter((inst) => inst.status === "submitted")
-      .map((inst) => ({ ...inst, childName: child.displayName })),
-  );
-}
+// Bounded retry delays for photo polling (ms): 1s, 2s, 4s, 8s, 16s.
+const PHOTO_RETRY_DELAYS = [1000, 2000, 4000, 8000, 16000] as const;
 
 function PhotoThumb({ photoId }: { photoId: string }) {
   const t = useTranslations("goedkeuren");
@@ -30,18 +27,37 @@ function PhotoThumb({ photoId }: { photoId: string }) {
 
   useEffect(() => {
     let active = true;
+
     (async () => {
-      try {
-        const raw = await apiClient.get(`/api/v1/photos/${photoId}`);
-        const photo = PhotoView.parse(raw);
-        if (active) {
-          if (photo.status === "ready" && photo.url) setUrl(photo.url);
-          else setFailed(true);
+      for (let attempt = 0; attempt <= PHOTO_RETRY_DELAYS.length; attempt++) {
+        if (!active) return;
+
+        try {
+          const raw = await apiClient.get(`/api/v1/photos/${photoId}`);
+          const photo = PhotoView.parse(raw);
+          if (!active) return;
+
+          if (photo.status === "ready" && photo.url) {
+            setUrl(photo.url);
+            return;
+          }
+          if (photo.status === "failed") {
+            setFailed(true);
+            return;
+          }
+          // status is processing/uploaded — retry after backoff unless exhausted
+        } catch {
+          // network error — retry with the same backoff
         }
-      } catch {
-        if (active) setFailed(true);
+
+        const delay = PHOTO_RETRY_DELAYS[attempt];
+        if (delay === undefined) break; // exhausted retries
+        await new Promise<void>((resolve) => setTimeout(resolve, delay));
       }
+
+      if (active) setFailed(true);
     })();
+
     return () => {
       active = false;
     };
@@ -69,11 +85,20 @@ function QueueCard({ item, onResolve }: { item: QueueItem; onResolve: (id: strin
   const [note, setNote] = useState("");
   const [error, setError] = useState<string | null>(null);
 
+  // Stable nonce for this card's lifetime — one value per mounted row, never
+  // re-generated per click. Prevents double-click from minting a second key.
+  const actionNonce = useRef(crypto.randomUUID()).current;
+
   async function approve() {
+    if (busy) return;
     setBusy(true);
     setError(null);
     try {
-      await apiClient.post(`/api/v1/instances/${item.id}/approve`);
+      await apiClient.post(
+        `/api/v1/instances/${item.id}/approve`,
+        undefined,
+        { idempotencyKey: `approve:${item.id}:${actionNonce}` },
+      );
       onResolve(item.id);
     } catch {
       setError(t("actionError"));
@@ -83,11 +108,15 @@ function QueueCard({ item, onResolve }: { item: QueueItem; onResolve: (id: strin
 
   async function submitRedo(e: React.FormEvent) {
     e.preventDefault();
-    if (note.trim().length === 0) return;
+    if (note.trim().length === 0 || busy) return;
     setBusy(true);
     setError(null);
     try {
-      await apiClient.post(`/api/v1/instances/${item.id}/redo`, { note: note.trim() });
+      await apiClient.post(
+        `/api/v1/instances/${item.id}/redo`,
+        { note: note.trim() },
+        { idempotencyKey: `redo:${item.id}:${actionNonce}` },
+      );
       onResolve(item.id);
     } catch {
       setError(t("actionError"));
@@ -178,9 +207,9 @@ export default function GoedkeurenClient() {
 
   const loadQueue = useCallback(async () => {
     try {
-      const raw = await apiClient.get("/api/v1/instances/today");
-      const view = ParentTodayView.parse(raw);
-      setQueue(toQueue(view));
+      const raw = await apiClient.get("/api/v1/instances/pending-approval");
+      const view = PendingApprovalResponse.parse(raw);
+      setQueue(view.items);
       hadDataRef.current = true;
       setFailed(false);
     } catch (err) {
@@ -215,7 +244,11 @@ export default function GoedkeurenClient() {
       )}
 
       {queue !== null && queue.length > 0 && (
-        <div className="mt-4 flex flex-col gap-4">
+        <div
+          className="mt-4 flex flex-col gap-4"
+          aria-live="polite"
+          aria-label={t("title")}
+        >
           {queue.map((item) => (
             <QueueCard key={item.id} item={item} onResolve={resolve} />
           ))}

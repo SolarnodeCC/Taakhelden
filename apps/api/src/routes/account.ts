@@ -11,6 +11,8 @@ import { AccountDeleteBody, ErrorCodes } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
+import { requireIdempotencyKey } from "../middleware/idempotency";
+import { rateLimit } from "../middleware/ratelimit";
 import { validate } from "../middleware/validate";
 import { verifySecret } from "../services/passwords";
 import { verifyAppleIdentityToken } from "../services/apple";
@@ -20,6 +22,7 @@ import {
   softDeleteFamily,
   createExportJob,
   getExportJob,
+  getActiveExportJob,
 } from "../repo/account";
 import {
   signExportDownload,
@@ -34,8 +37,16 @@ const PURGE_AFTER_DAYS = 7;
 const account = new Hono<AppBindings>();
 
 /** Start een export-job (art. 20). De ZIP wordt asynchroon door de queue gebouwd. */
-account.post("/export", async (c) => {
+account.post("/export", requireIdempotencyKey, async (c) => {
   const { familyId } = requireParent(c);
+  await rateLimit(c, "export", 3, 3600);
+
+  // Short-circuit: als er al een pending export is voor dit gezin, geef die terug.
+  const active = await getActiveExportJob(c.env.DB, familyId);
+  if (active) {
+    return c.json({ exportId: active.id, status: active.status }, 202);
+  }
+
   const exportId = newId("exp");
   await createExportJob(c.env.DB, familyId, exportId);
   await c.env.EXPORT_QUEUE.send({ exportId, familyId } satisfies ExportJob);

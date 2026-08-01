@@ -1,10 +1,12 @@
 import { Hono } from "hono";
-import { FamilyPatchBody, FamilyViewerResponse, InviteParentBody, ParentAcceptBody, ErrorCodes } from "@taakhelden/shared";
+import { FamilyPatchBody, FamilyViewerResponse, InviteParentBody, InviteResponse, InviteLinkResponse, ParentAcceptBody, ErrorCodes } from "@taakhelden/shared";
 import { z } from "zod";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
 import { validate } from "../middleware/validate";
+import { rateLimit } from "../middleware/ratelimit";
+import { requireIdempotencyKey } from "../middleware/idempotency";
 import { isContractV2 } from "../services/contract";
 import { newFamilyCode, newId, newToken } from "../services/ids";
 import { hashSecret } from "../services/passwords";
@@ -17,6 +19,7 @@ import {
   setInviteCode,
   createPendingParent,
   activatePendingParent,
+  getMember,
 } from "../repo/families";
 import { emailInUse, getUserById } from "../repo/auth";
 
@@ -81,10 +84,11 @@ families.post("/me/invite-code", async (c) => {
 /**
  * Tweede verzorger uitnodigen per e-mail. Maakt een pending parent-profiel en
  * een uitnodigingstoken (7 dagen in KV) en verstuurt de uitnodigingsmail
- * (env-guarded no-op zonder mail-secrets). Het token wordt ook teruggegeven zodat
- * de uitnodiging desnoods handmatig gedeeld kan worden.
+ * (env-guarded no-op zonder mail-secrets).
+ * Het token zit NIET in de response (P1-locked, WS-TRUST-API).
+ * Gebruik GET /families/me/invites/:userId/link voor de kopieerbare URL.
  */
-families.post("/me/parents", validate("json", InviteParentBody), async (c) => {
+families.post("/me/parents", requireIdempotencyKey, validate("json", InviteParentBody), async (c) => {
   const { familyId } = requireParent(c, { full: true });
   const body = c.req.valid("json");
 
@@ -107,7 +111,44 @@ families.post("/me/parents", validate("json", InviteParentBody), async (c) => {
   );
   await sendParentInvite(c.env, body.email, inviteToken);
 
-  return c.json({ userId, email: body.email, permissions: body.permissions, inviteToken }, 201);
+  return c.json(InviteResponse.parse({
+    userId,
+    email: body.email,
+    permissions: body.permissions,
+    status: "invited",
+  }), 201);
+});
+
+/**
+ * Kopieerbare uitnodigingslink voor de clipboard-fallback (ouder-only, rate-limited).
+ * Minst een nieuw token per aanroep en slaat het op in KV met dezelfde TTL
+ * als de e-mail-uitnodiging. Geeft de volledige URL + expiresAt terug.
+ *
+ * GET /families/me/invites/:userId/link
+ */
+families.get("/me/invites/:userId/link", async (c) => {
+  const { familyId } = requireParent(c, { full: true });
+  await rateLimit(c, "invite-link", 10);
+
+  const userId = c.req.param("userId");
+  const member = await getMember(c.env.DB, familyId, userId);
+  if (!member || member.role !== "parent" || member.password_hash !== null) {
+    // Niet gevonden OF al geactiveerd → geen actieve uitnodiging.
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Geen actieve uitnodiging gevonden.");
+  }
+
+  const inviteToken = newToken();
+  const expiresAt = new Date(Date.now() + PARENT_INVITE_TTL * 1000).toISOString();
+  await c.env.KV.put(
+    `parentinvite:${inviteToken}`,
+    JSON.stringify({ familyId, userId }),
+    { expirationTtl: PARENT_INVITE_TTL },
+  );
+
+  const base = c.env.APP_BASE_URL ?? new URL(c.req.url).origin;
+  const copyableUrl = `${base}/nl/uitnodiging?token=${inviteToken}`;
+
+  return c.json(InviteLinkResponse.parse({ copyableUrl, expiresAt }));
 });
 
 export default families;

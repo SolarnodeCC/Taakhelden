@@ -42,6 +42,8 @@ enum MutationQueueOutcome: Equatable {
     case applied(newBalance: Int?)
     case alreadyCompleted
     case insufficientPoints
+    /// Server rejected the undo because the 5-minute window has passed.
+    case undoWindowExpired
     case dropped
     case failed(message: String)
 }
@@ -119,6 +121,8 @@ final class MutationQueue {
             return .alreadyCompleted
         case "INSUFFICIENT_POINTS":
             return .insufficientPoints
+        case "UNDO_WINDOW_EXPIRED":
+            return .undoWindowExpired
         default:
             return .failed(message: result.message ?? "Er ging iets mis.")
         }

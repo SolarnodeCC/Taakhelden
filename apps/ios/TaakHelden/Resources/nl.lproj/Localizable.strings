@@ -227,3 +227,7 @@
 "held.parent.gate.action" = "Open ouderpoort";
 "child.unlock.hi" = "Hoi %@!";
 "child.unlock.hi.young" = "Hoi!";
+
+/* Undo affordance — warm, positive, no guilt (§3.7) */
+"child.task.undo.button" = "Oeps, toch niet";
+"child.task.undo.expired" = "Je was net iets te laat — maar je hebt het goed gedaan!";

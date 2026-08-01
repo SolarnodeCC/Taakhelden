@@ -244,6 +244,34 @@ export async function listOpenForDate(db: D1Database, familyId: string, date: st
   return results;
 }
 
+/**
+ * Alle instances die wachten op oudergoedkeuring — cross-date, oudste eerst.
+ * Gebruikt door GET /instances/pending-approval (WS-TRUST-API / WS-TRUST-WEB).
+ * Retourneert ook de roepnaam van het kind zodat de UI geen tweede roundtrip nodig heeft.
+ */
+export async function listPendingApproval(db: D1Database, familyId: string) {
+  const { results } = await db
+    .prepare(
+      `SELECT i.id, i.status, i.child_id, i.date, i.photo_key, i.photo_status,
+              i.points_earned, i.redo_note, i.completed_at, i.approved_at,
+              t.title, t.icon, t.points AS task_points, t.photo_bonus_points,
+              t.approval_required, t.daypart,
+              u.display_name AS child_name,
+              (SELECT p.id FROM photos p
+                 WHERE p.family_id = i.family_id AND p.ref_id = i.id
+                   AND p.purpose = 'task' AND p.status = 'ready'
+                 ORDER BY p.created_at DESC LIMIT 1) AS photo_id
+       FROM task_instances i
+       JOIN tasks t ON t.id = i.task_id
+       JOIN users u ON u.id = i.child_id
+       WHERE i.family_id = ? AND i.status = 'submitted'
+       ORDER BY i.date ASC, i.completed_at ASC, i.id ASC`,
+    )
+    .bind(familyId)
+    .all<Record<string, unknown>>();
+  return results;
+}
+
 export async function dayStats(db: D1Database, familyId: string, childId: string, date: string) {
   const row = await db
     .prepare(

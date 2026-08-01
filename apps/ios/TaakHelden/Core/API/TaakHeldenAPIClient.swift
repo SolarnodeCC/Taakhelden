@@ -226,6 +226,14 @@ final class TaakHeldenAPIClient {
         )
     }
 
+    /// Removes the (apnsToken, user_id) device registration for the **current** session user.
+    /// On a shared iPad, only the departing profile's row is deleted; other profiles are unaffected.
+    func deregisterDevice(apnsToken: String) async throws {
+        _ = try await sendAuthorized(
+            HTTPRequest(path: "/devices/\(apnsToken)", method: .delete, requiresAuth: true)
+        )
+    }
+
     // MARK: - Phase 3: avatar shop + family goals
 
     func fetchAvatarCatalog() async throws -> AvatarCatalogResponseDTO {
