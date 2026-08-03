@@ -10,7 +10,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { WsMessage } from "@taakhelden/shared";
+import { WsMessage, wsAuthSubprotocols } from "@taakhelden/shared";
 import { wsBackoffDelay } from "./backoff";
 import { isActionableRealtimeEvent, type RealtimeSignal } from "./events";
 import { WsConnectResponse } from "./types";
@@ -81,8 +81,12 @@ export function FamilyRealtimeProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        const url = `${parsed.data.wsUrl}?token=${encodeURIComponent(parsed.data.token)}`;
-        const socket = new WebSocket(url);
+        // Token in de handshake-header i.p.v. de query string: query strings
+        // belanden in browserhistorie, Referer-headers en proxy-logs.
+        const socket = new WebSocket(
+          parsed.data.wsUrl,
+          wsAuthSubprotocols(parsed.data.token),
+        );
         ws = socket;
 
         socket.onopen = () => {

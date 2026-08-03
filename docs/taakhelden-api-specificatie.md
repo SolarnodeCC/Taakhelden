@@ -222,7 +222,7 @@ Regels: mutaties worden in volgorde toegepast in de Family-DO; `key` = idempoten
 | `DELETE /account` | parent (`full`) | Heel gezin: 7 d soft delete → cascade D1 + R2-prefix + KV. Bevestiging vereist (wachtwoord her-invoer). |
 
 ### 3.13 WebSocket
-`GET /ws?token=<short-lived ws-token>` → upgrade naar Family-DO. Server-events: `instance.updated`, `points.changed`, `redemption.created`, `redemption.updated`, `badge.earned`. Alleen ouder-dashboards hoeven te verbinden; de kind-app werkt prima met pull + push-notificaties.
+`GET /ws` → upgrade naar Family-DO. Het kortlevende ws-token gaat mee als subprotocol: `Sec-WebSocket-Protocol: wispel.v1, auth.<token>` (browser: `new WebSocket(url, wsAuthSubprotocols(token))`). De server echoot `wispel.v1` terug. `?token=<ws-token>` werkt nog voor de iOS-client, maar is deprecated — query strings belanden in browserhistorie, `Referer`-headers en proxy-logs. Server-events: `instance.updated`, `points.changed`, `redemption.created`, `redemption.updated`, `badge.earned`. Alleen ouder-dashboards hoeven te verbinden; de kind-app werkt prima met pull + push-notificaties.
 
 ---
 

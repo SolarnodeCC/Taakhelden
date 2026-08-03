@@ -16,6 +16,7 @@
 import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
 import { signJwt } from "../src/services/jwt";
+import { WS_SUBPROTOCOL, wsAuthSubprotocols } from "@taakhelden/shared";
 import { hashSecret, needsRehash, sha256Hex } from "../src/services/passwords";
 import {
   seedFamily,
@@ -375,5 +376,68 @@ describe("wachtwoord-KDF", () => {
   it("markeert een verouderde hash voor migratie en blijft die verifiëren", async () => {
     const legacy = "pbkdf2$100000$c2FsdHNhbHRzYWx0c2Ex$aGFzaA==";
     expect(needsRehash(legacy)).toBe(true);
+  });
+});
+
+// ─── 8. WebSocket-token uit de query string (audit-bevinding 14) ────────────
+
+describe("ws-upgrade authenticatie", () => {
+  async function wsToken(fam: { parentId: string; familyId: string }) {
+    const res = await api("/ws/token", {
+      method: "POST",
+      token: await parentToken(fam.parentId, fam.familyId),
+    });
+    expect(res.status).toBe(200);
+    return ((await res.json()) as { token: string }).token;
+  }
+
+  it("accepteert het token uit Sec-WebSocket-Protocol", async () => {
+    const fam = await seedFamily("wssub");
+    const token = await wsToken(fam);
+    const res = await api("/ws", {
+      headers: {
+        Upgrade: "websocket",
+        "Sec-WebSocket-Protocol": wsAuthSubprotocols(token).join(", "),
+      },
+    });
+    expect(res.status).toBe(101);
+    // De server moet precies één aangeboden subprotocol teruggeven, anders
+    // breekt de browser de handshake af.
+    expect(res.headers.get("Sec-WebSocket-Protocol")).toBe(WS_SUBPROTOCOL);
+  });
+
+  it("accepteert nog steeds ?token= voor de iOS-client", async () => {
+    const fam = await seedFamily("wsq");
+    const token = await wsToken(fam);
+    const res = await api(`/ws?token=${encodeURIComponent(token)}`, {
+      headers: { Upgrade: "websocket" },
+    });
+    expect(res.status).toBe(101);
+  });
+
+  it("weigert een upgrade zonder token", async () => {
+    const res = await api("/ws", { headers: { Upgrade: "websocket" } });
+    expect(res.status).toBe(401);
+  });
+
+  it("weigert een gewone access-JWT op het ws-pad", async () => {
+    const fam = await seedFamily("wsacc");
+    const access = await parentToken(fam.parentId, fam.familyId);
+    const res = await api("/ws", {
+      headers: {
+        Upgrade: "websocket",
+        "Sec-WebSocket-Protocol": wsAuthSubprotocols(access).join(", "),
+      },
+    });
+    expect(res.status).toBe(401);
+  });
+
+  it("weigert een kind op het ws-pad", async () => {
+    const fam = await seedFamily("wskid");
+    const res = await api("/ws/token", {
+      method: "POST",
+      token: await childToken(fam.childA, fam.familyId),
+    });
+    expect(res.status).toBe(403);
   });
 });

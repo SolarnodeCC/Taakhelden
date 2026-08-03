@@ -888,6 +888,10 @@ retained for compatibility, strip `?token=` from the URL before forwarding to th
 confirm that Cloudflare Logpush is not configured to retain full request URIs for this
 route.
 
+**Status**: ✅ **Fixed for the web client; iOS on a compatibility path.** The token now travels in the handshake header as `Sec-WebSocket-Protocol: wispel.v1, auth.<token>` (`wsAuthSubprotocols` in `packages/shared`), and the FamilyRoom DO echoes `wispel.v1` back — without that echo browsers abort the handshake. The Worker also strips `?token=` before forwarding to the DO, so the token cannot reach a second log line.
+
+`?token=` is still accepted because `apps/ios/.../FamilyRoomClient.swift:144` builds the URL that way and the Swift side cannot be verified from this repo. That fallback is the remaining exposure; it can be deleted once the iOS client sends the subprotocol.
+
 **References**: OWASP ASVS 4.0 V3.5.3, V7.1.1 · CWE-598 (Information Exposure Through Query
 Strings).
 

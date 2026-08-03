@@ -11,7 +11,7 @@
  * broers/zussen meelezen (privacyregel + rollenmatrix §5).
  */
 import { Hono } from "hono";
-import { ErrorCodes, type WsTokenResponse } from "@taakhelden/shared";
+import { ErrorCodes, parseWsAuthSubprotocol, type WsTokenResponse } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { requireParent } from "../middleware/authz";
@@ -42,18 +42,33 @@ export async function handleWsUpgrade(c: {
   req: { raw: Request };
   env: AppBindings["Bindings"];
 }): Promise<Response> {
-  const url = new URL(c.req.raw.url);
-  const token = url.searchParams.get("token");
   if (c.req.raw.headers.get("Upgrade") !== "websocket") {
     throw new ApiException(426, ErrorCodes.VALIDATION_FAILED, "WebSocket-upgrade vereist.");
   }
+
+  const url = new URL(c.req.raw.url);
+  // Voorkeur: het token in de handshake-header. De query string blijft werken
+  // voor de iOS-client, die nog `?token=` stuurt; die tak kan weg zodra
+  // FamilyRoomClient.swift het subprotocol gebruikt.
+  const queryToken = url.searchParams.get("token");
+  const token =
+    parseWsAuthSubprotocol(c.req.raw.headers.get("Sec-WebSocket-Protocol")) ?? queryToken;
+
   const payload = token ? await verifyJwt(token, c.env.JWT_SECRET) : null;
   if (!payload || payload.typ !== "ws" || payload.role !== "parent") {
     throw new ApiException(401, ErrorCodes.UNAUTHORIZED, "Ongeldig of verlopen ws-token.");
   }
 
+  // Het token nooit doorgeven aan de DO: het hoeft daar niet te zijn en zou
+  // alleen maar in nog een logregel kunnen belanden.
+  let upstream = c.req.raw;
+  if (queryToken) {
+    url.searchParams.delete("token");
+    upstream = new Request(url.toString(), c.req.raw);
+  }
+
   const familyRoom = c.env.FAMILY_DO.get(c.env.FAMILY_DO.idFromName(payload.fam));
-  return familyRoom.fetch(c.req.raw);
+  return familyRoom.fetch(upstream);
 }
 
 export default wsAuthed;

@@ -6,7 +6,12 @@
  * Routes sturen mutaties als interne POST /complete|/approve|/redo|/undo|/adjust;
  * de payload bevat altijd familyId zodat elke repo-aanroep gescoped blijft.
  */
-import { ErrorCodes, type SyncMutation, type CompleteResult } from "@taakhelden/shared";
+import {
+  ErrorCodes,
+  WS_SUBPROTOCOL,
+  type SyncMutation,
+  type CompleteResult,
+} from "@taakhelden/shared";
 import type { Env } from "../types";
 import { ApiException } from "../middleware/error";
 import {
@@ -56,7 +61,15 @@ export class FamilyRoom implements DurableObject {
     if (req.headers.get("Upgrade") === "websocket") {
       const pair = new WebSocketPair();
       this.state.acceptWebSocket(pair[1]); // hibernation-API: overleeft evictions
-      return new Response(null, { status: 101, webSocket: pair[0] });
+      // Bood de client een subprotocol aan, dan moet de server er precies één
+      // van teruggeven — anders breekt de browser de handshake af.
+      const offered = (req.headers.get("Sec-WebSocket-Protocol") ?? "")
+        .split(",")
+        .map((entry) => entry.trim());
+      const headers = offered.includes(WS_SUBPROTOCOL)
+        ? { "Sec-WebSocket-Protocol": WS_SUBPROTOCOL }
+        : undefined;
+      return new Response(null, { status: 101, webSocket: pair[0], headers });
     }
     if (req.method !== "POST") {
       return new Response("not found", { status: 404 });
