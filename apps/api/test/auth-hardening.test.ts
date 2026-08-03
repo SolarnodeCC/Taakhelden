@@ -15,7 +15,8 @@
  */
 import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
-import { hashSecret, sha256Hex } from "../src/services/passwords";
+import { signJwt } from "../src/services/jwt";
+import { hashSecret, needsRehash, sha256Hex } from "../src/services/passwords";
 import {
   seedFamily,
   seedTask,
@@ -289,5 +290,90 @@ describe("HMAC_SECRET is gescheiden van JWT_SECRET", () => {
     } finally {
       env.HMAC_SECRET = previous;
     }
+  });
+});
+
+// ─── 7. Lage bevindingen 15-20 ──────────────────────────────────────────────
+
+describe("beveiligingsheaders op de API", () => {
+  it("zet nosniff en no-referrer op elk antwoord", async () => {
+    const res = await api("/health");
+    expect(res.headers.get("X-Content-Type-Options")).toBe("nosniff");
+    expect(res.headers.get("Referrer-Policy")).toBe("no-referrer");
+    expect(res.headers.get("Strict-Transport-Security")).toContain("max-age=");
+  });
+});
+
+describe("JWT-verificatie", () => {
+  it("weigert een token waarvan de claims niet kloppen", async () => {
+    // Correct ondertekend, maar `role` is geen bekende rol: de handtekening
+    // bewijst niets over de vorm van de claims waar autorisatie op steunt.
+    const bogus = await signJwt(
+      { sub: "usr_x", fam: "fam_x", role: "admin" } as unknown as Parameters<typeof signJwt>[0],
+      env.JWT_SECRET,
+      3600,
+    );
+    expect((await api("/members", { token: bogus })).status).toBe(401);
+  });
+
+  it("weigert een token zonder familie-claim", async () => {
+    const bogus = await signJwt(
+      { sub: "usr_x", role: "parent" } as unknown as Parameters<typeof signJwt>[0],
+      env.JWT_SECRET,
+      3600,
+    );
+    expect((await api("/members", { token: bogus })).status).toBe(401);
+  });
+});
+
+describe("hergebruik van een refresh token", () => {
+  it("trekt de hele keten in zodra een verbruikt token terugkomt", async () => {
+    const email = `reuse-${crypto.randomUUID()}@test.local`;
+    const reg = await api("/auth/register", {
+      body: {
+        email,
+        password: "TestPassword_NotASecret_123",
+        familyName: "Hergebruik",
+        displayName: "Ouder",
+        turnstileToken: "dev-bypass",
+      },
+      headers: { "CF-Connecting-IP": "198.51.100.70" },
+    });
+    expect(reg.status).toBe(201);
+    const first = (await reg.json()) as { refreshToken: string; accessToken: string };
+
+    // Normale rotatie: het oude token is nu verbruikt.
+    const rotated = await api("/auth/refresh", {
+      body: { refreshToken: first.refreshToken },
+      headers: { "CF-Connecting-IP": "198.51.100.70" },
+    });
+    expect(rotated.status).toBe(200);
+    const second = (await rotated.json()) as { refreshToken: string };
+
+    // Replay van het oude token → 401 én de verse keten wordt ingetrokken.
+    const replay = await api("/auth/refresh", {
+      body: { refreshToken: first.refreshToken },
+      headers: { "CF-Connecting-IP": "198.51.100.70" },
+    });
+    expect(replay.status).toBe(401);
+
+    const afterReuse = await api("/auth/refresh", {
+      body: { refreshToken: second.refreshToken },
+      headers: { "CF-Connecting-IP": "198.51.100.70" },
+    });
+    expect(afterReuse.status).toBe(401);
+  });
+});
+
+describe("wachtwoord-KDF", () => {
+  it("hasht nieuwe wachtwoorden op het huidige iteratieaantal", async () => {
+    const stored = await hashSecret("TestPassword_NotASecret_123");
+    expect(stored.startsWith("pbkdf2$600000$")).toBe(true);
+    expect(needsRehash(stored)).toBe(false);
+  });
+
+  it("markeert een verouderde hash voor migratie en blijft die verifiëren", async () => {
+    const legacy = "pbkdf2$100000$c2FsdHNhbHRzYWx0c2Ex$aGFzaA==";
+    expect(needsRehash(legacy)).toBe(true);
   });
 });

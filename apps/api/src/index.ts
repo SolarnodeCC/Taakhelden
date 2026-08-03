@@ -25,6 +25,19 @@ import wsRoutes, { handleWsUpgrade } from "./routes/ws";
 const app = new Hono<AppBindings>().basePath("/v1");
 
 app.onError(errorHandler);
+
+/**
+ * Beveiligingsheaders op élk API-antwoord. De Worker is rechtstreeks bereikbaar
+ * (iOS praat er direct mee) en serveert bij `/photos/:id/file` door gebruikers
+ * geüploade bytes, dus `nosniff` hoort hier en niet alleen op de web-app.
+ * `no-referrer` houdt de ondertekende transfer-URL's uit `Referer`-headers.
+ */
+app.use("*", async (c, next) => {
+  await next();
+  c.header("X-Content-Type-Options", "nosniff");
+  c.header("Referrer-Policy", "no-referrer");
+  c.header("Strict-Transport-Security", "max-age=63072000; includeSubDomains");
+});
 app.get("/health", async (c) => {
   // Lightweight readiness for deploy smoke tests — never expose secret values
   // or whether JWT_SECRET is configured (info disclosure).

@@ -498,6 +498,14 @@ and pass `--env production` in both the migration and deploy steps. Given the da
 children's PII, a separate production tier with restricted API-token scope should be
 treated as a launch prerequisite.
 
+**Status**: ✅ **Resolved as a documented single-environment deployment** (owner's call).
+The dead `[env.production]` block is removed, and `wrangler.toml` now states plainly that
+the top-level bindings *are* production, why wrangler would not have inherited them, and
+that there is consequently no staging tier — so any `--remote` command from a checkout
+touches live family data. This removes the footgun where adding `--env production` would
+have deployed a Worker with no database. Building a genuinely separate production tier
+remains available if the risk appetite changes; it needs new Cloudflare resources.
+
 **References**: OWASP ASVS 4.0 V14.1.1 · CWE-1188 (Insecure Default Initialization) ·
 Cloudflare Wrangler environments documentation (non-inheritable keys).
 
@@ -899,8 +907,9 @@ zone level, so this may already be covered in the dashboard — verify, and if n
 { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" }
 ```
 
-Once `wispel.cc` is live, submit it to the HSTS preload list. **References**: OWASP ASVS
-V9.1.1 · CWE-319.
+**Status**: ✅ **Fixed** — `Strict-Transport-Security: max-age=63072000; includeSubDomains; preload`
+added to `next.config.mjs`. Preload-list submission remains a manual step once `wispel.cc`
+is live. **References**: OWASP ASVS V9.1.1 · CWE-319.
 
 ### [LOW] Web server: the API Worker emits no security headers
 
@@ -921,7 +930,9 @@ app.use("*", async (c, next) => {
 });
 ```
 
-and set `Content-Disposition: inline; filename="photo"` on the photo response.
+**Status**: ✅ **Fixed** — global middleware in `index.ts` sets `X-Content-Type-Options`,
+`Referrer-Policy: no-referrer` (which also keeps signed transfer URLs out of `Referer`)
+and HSTS on every API response; the photo stream additionally sets `Content-Disposition`.
 **References**: OWASP ASVS V14.4.1 · CWE-693.
 
 ### [LOW] Authentication: inconsistent password policy between registration and invitation
@@ -933,6 +944,9 @@ A co-parent accepting an invitation may set an 8-character password, while direc
 registration requires 10. Both paths yield identical `full`/`approve_only` parent
 privileges. Align on `min(10)` in `ParentAcceptBody`, and consider checking candidate
 passwords against a breached-password list — length alone is a weak signal.
+
+**Status**: ✅ **Fixed** — `ParentAcceptBody` now requires 10 characters, matching
+`RegisterBody`. Breached-password checking remains open.
 **References**: OWASP ASVS V2.1.1 · NIST SP 800-63B §5.1.1.2.
 
 ### [LOW] Authentication: JWT verification does not pin algorithm, issuer or audience
@@ -957,8 +971,13 @@ const parsed = JwtPayloadSchema.safeParse(payload);
 return parsed.success ? parsed.data : null;
 ```
 
-Note that `services/apple.ts:22-25` already does this correctly for Apple tokens — mirror
-that pattern. **References**: OWASP ASVS V3.5.3 · CWE-347.
+**Status**: ✅ **Fixed** — `verifyJwt` pins `algorithms: ["HS256"]` and validates the
+payload with a Zod schema instead of type-asserting it, so a signature no longer implies
+anything about the shape of `role`/`fam` that authorization depends on. `issuer`/`audience`
+were deliberately **not** enforced: tokens already in circulation carry neither, so
+requiring them would log every user out on deploy. Adding them needs a transition window
+where signing emits the claims before verification demands them.
+**References**: OWASP ASVS V3.5.3 · CWE-347.
 
 ### [LOW] Session management: no refresh-token reuse detection
 
@@ -967,6 +986,12 @@ that pattern. **References**: OWASP ASVS V3.5.3 · CWE-347.
 Rotation is correctly atomic and single-use — a replayed token simply fails. But replay is
 the canonical signal that a refresh token was stolen, and it currently triggers nothing. On
 a consumed-token replay, revoke the whole token chain for that user and notify the parent.
+
+**Status**: ✅ **Fixed** — `POST /auth/refresh` now distinguishes "unknown token" from
+"already consumed". On a replay it revokes every outstanding refresh token for that user
+and bumps the revocation epoch, so both the legitimate client and the thief are forced to
+re-authenticate. Parent notification on reuse is not implemented — it needs a copy decision
+and belongs with the security-event logging in the INFO section.
 **References**: OWASP ASVS V3.3.3 · OAuth 2.0 Security BCP §4.14.2.
 
 ### [LOW] Cryptography: PBKDF2 iteration count is below current guidance
@@ -978,8 +1003,14 @@ PBKDF2-HMAC-SHA256. The comment correctly identifies the Workers CPU budget as t
 constraint. The storage format is self-describing (`pbkdf2$<iters>$<salt>$<hash>`), so
 raising the count or migrating to Argon2id later is straightforward — verification of old
 hashes keeps working. Benchmark the achievable count within the Workers CPU limit and raise
-it to that ceiling, re-hashing on next successful login. **References**: OWASP Password
-Storage Cheat Sheet (2024) · CWE-916.
+**Status**: ✅ **Fixed — and the premise in this finding was wrong.** The code comment
+claimed 100k was a Workers platform cap; measuring the runtime directly showed 600k is
+accepted (~280 ms per derivation, on login paths only). Iterations raised to 600,000, the
+OWASP figure. Because the stored format carries its own iteration count, existing hashes
+keep verifying, and `needsRehash` re-hashes them on the next successful login (off the
+response path via `waitUntil`). Child PINs migrate when a parent next sets one; for a
+4-digit PIN the lockout, not the KDF, is the meaningful control anyway.
+**References**: OWASP Password Storage Cheat Sheet (2024) · CWE-916.
 
 ### [INFO] Logging & monitoring: no security event logging
 
@@ -1100,9 +1131,12 @@ change, it affects the login UX), 14 (WebSocket subprotocol auth).
 
 ### 4. Hardening backlog
 
-Findings 15–21 and the informational items: HSTS, API security headers, password-policy
-alignment, JWT algorithm pinning, refresh reuse detection, PBKDF2 iteration count, security
-event logging, `SECURITY.md`, and the `APPLE_CLIENT_ID` audience mismatch.
+✅ Done: HSTS, API security headers, password-policy alignment, JWT algorithm pinning and
+payload validation, refresh-token reuse detection, PBKDF2 iteration count.
+
+⏳ Still open: security event logging, `SECURITY.md` / `security.txt`, the
+`APPLE_CLIENT_ID` audience mismatch, breached-password checking, JWT `iss`/`aud` (needs a
+token transition window), and moving the KV rate-limit counter to an atomic backend.
 
 ---
 
@@ -1116,8 +1150,8 @@ event logging, `SECURITY.md`, and the `APPLE_CLIENT_ID` audience mismatch.
 | SQL queries parameterised | ✅ Pass | Whitelisted columns + bound params throughout |
 | Authentication and authorisation enforced | ✅ Pass | Enforced per request and revocable since finding 3 was fixed |
 | Error messages non-verbose | ✅ Pass | `middleware/error.ts` returns generic 500s |
-| HTTPS enforced site-wide | ⚠️ Partial | TLS via Cloudflare; HSTS header missing — finding 15 |
-| Security headers configured | ⚠️ Partial | Good on web (CSP needs tightening); absent on API — findings 9, 16 |
+| HTTPS enforced site-wide | ✅ Pass | TLS via Cloudflare; HSTS set on web and API — finding 15 |
+| Security headers configured | ⚠️ Partial | Web and API both covered (finding 16); CSP still allows `'unsafe-inline'` — finding 9 |
 | CSRF protection implemented | ✅ Pass | `SameSite=Lax` plus an `Origin` check on every BFF mutation — finding 10 |
 | Rate limiting configured | ✅ Pass | Caller-, account- and user-keyed (findings 1, 13); KV counter still non-atomic under concurrency |
 | Sensitive data encrypted | ✅ Pass | PBKDF2 hashes, SHA-256 refresh tokens, R2 EU jurisdiction |

@@ -9,6 +9,12 @@ const withNextIntl = createNextIntlPlugin(); // defaults to ./i18n/request.ts
  */
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
+  // Cloudflare kan HSTS ook op zone-niveau zetten; hier expliciet zodat de
+  // garantie bij de app hoort en niet bij een dashboard-instelling.
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },

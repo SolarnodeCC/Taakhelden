@@ -8,7 +8,14 @@
  * Formaat: pbkdf2$<iteraties>$<salt b64>$<hash b64>
  */
 
-const ITERATIONS = 100_000; // Workers-limiet voor PBKDF2
+/**
+ * OWASP-richtlijn (2024) voor PBKDF2-HMAC-SHA256. Stond op 100_000 met de
+ * aanname dat dat een Workers-limiet was; de runtime accepteert 600_000 wel
+ * (~280 ms CPU per afleiding, alleen op inlogpaden). Het opslagformaat draagt
+ * het iteratieaantal, dus oude hashes blijven verifieerbaar en migreren via
+ * `needsRehash` bij de eerstvolgende geslaagde login.
+ */
+const ITERATIONS = 600_000;
 
 function toB64(buf: ArrayBuffer | Uint8Array): string {
   const bytes = buf instanceof Uint8Array ? buf : new Uint8Array(buf);
@@ -52,6 +59,18 @@ export async function verifySecret(secret: string, stored: string): Promise<bool
   let diff = 0;
   for (let i = 0; i < a.length; i++) diff |= (a[i] ?? 0) ^ (b[i] ?? 0);
   return diff === 0;
+}
+
+/**
+ * Is deze opgeslagen hash met verouderde parameters gemaakt? Zo ja, dan hoort
+ * de aanroeper hem na een geslaagde verificatie opnieuw te hashen — anders
+ * blijven bestaande accounts eeuwig op het oude iteratieaantal staan.
+ */
+export function needsRehash(stored: string): boolean {
+  const [scheme, iterStr] = stored.split("$");
+  if (scheme !== "pbkdf2") return true;
+  const iterations = Number(iterStr);
+  return !Number.isFinite(iterations) || iterations < ITERATIONS;
 }
 
 /** SHA-256-hex — voor refresh tokens (hoge entropie, geen KDF nodig). */

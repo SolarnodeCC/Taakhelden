@@ -38,6 +38,14 @@ export async function getParentByAppleSub(db: D1Database, appleSub: string) {
     .first();
 }
 
+/** Wachtwoordhash vervangen — voor migratie naar sterkere KDF-parameters. */
+export async function updatePasswordHash(db: D1Database, userId: string, passwordHash: string) {
+  await db
+    .prepare("UPDATE users SET password_hash = ? WHERE id = ? AND deleted_at IS NULL")
+    .bind(passwordHash, userId)
+    .run();
+}
+
 /** Apple-account koppelen aan een bestaand (e-mail)account met hetzelfde adres. */
 export async function linkAppleSub(db: D1Database, userId: string, appleSub: string) {
   await db
@@ -161,6 +169,30 @@ export async function consumeRefreshToken(db: D1Database, token: string) {
     .run();
   if (!res.meta.changes) return null;
   return db.prepare("SELECT * FROM refresh_tokens WHERE token_hash = ?").bind(hash).first();
+}
+
+/**
+ * Werd een al-verbruikt refresh token opnieuw aangeboden?
+ *
+ * Rotatie is single-use, dus een replay faalt sowieso. Maar een replay is óók
+ * hét signaal dat iemand anders het token in handen heeft: de legitieme client
+ * heeft het al ingewisseld. Dan is de hele keten verdacht, niet alleen dit token.
+ * Geeft de eigenaar terug zodat de aanroeper alles kan intrekken.
+ */
+export async function detectRefreshReuse(db: D1Database, token: string) {
+  return db
+    .prepare("SELECT user_id FROM refresh_tokens WHERE token_hash = ? AND revoked_at IS NOT NULL")
+    .bind(await sha256Hex(token))
+    .first<{ user_id: string }>();
+}
+
+/** Alle nog geldige refresh tokens van één gebruiker intrekken. */
+export async function revokeAllRefreshTokens(db: D1Database, userId: string): Promise<number> {
+  const res = await db
+    .prepare("UPDATE refresh_tokens SET revoked_at = datetime('now') WHERE user_id = ? AND revoked_at IS NULL")
+    .bind(userId)
+    .run();
+  return res.meta.changes ?? 0;
 }
 
 /** Geeft de ingetrokken rij terug, zodat de aanroeper ook het access-token kan intrekken. */
