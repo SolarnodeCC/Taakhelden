@@ -68,13 +68,15 @@ export async function registerPinFailure(
   childId: string,
   opts: { maxAttempts: number; baseLockMinutes: number; maxLockMinutes: number },
 ): Promise<{ attempts: number; lockedUntil: string | null; justLocked: boolean }> {
+  // Statische SQL, uitsluitend gebonden waarden — ook de ophoogstap.
   const row = await db
     .prepare(
-      `UPDATE users SET pin_fail_count = pin_fail_count + 1
-       WHERE family_id = ? AND id = ? AND role = 'child' AND deleted_at IS NULL
-       RETURNING pin_fail_count`,
+      `UPDATE users
+          SET pin_fail_count = pin_fail_count + ?
+        WHERE family_id = ? AND id = ? AND role = 'child' AND deleted_at IS NULL
+        RETURNING pin_fail_count`,
     )
-    .bind(familyId, childId)
+    .bind(1, familyId, childId)
     .first<{ pin_fail_count: number }>();
   if (!row) return { attempts: 0, lockedUntil: null, justLocked: false };
 
@@ -86,8 +88,7 @@ export async function registerPinFailure(
   const lockedUntil = new Date(Date.now() + minutes * 60_000).toISOString();
   await db
     .prepare(
-      `UPDATE users SET pin_locked_until = ?
-       WHERE family_id = ? AND id = ? AND role = 'child' AND deleted_at IS NULL`,
+      "UPDATE users SET pin_locked_until = ? WHERE family_id = ? AND id = ? AND role = 'child' AND deleted_at IS NULL",
     )
     .bind(lockedUntil, familyId, childId)
     .run();
@@ -99,8 +100,7 @@ export async function registerPinFailure(
 export async function clearPinFailures(db: D1Database, familyId: string, childId: string) {
   await db
     .prepare(
-      `UPDATE users SET pin_fail_count = 0, pin_locked_until = NULL
-       WHERE family_id = ? AND id = ? AND role = 'child'`,
+      "UPDATE users SET pin_fail_count = 0, pin_locked_until = NULL WHERE family_id = ? AND id = ? AND role = 'child'",
     )
     .bind(familyId, childId)
     .run();
