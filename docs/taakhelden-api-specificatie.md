@@ -7,7 +7,8 @@
 
 - **Base URL**: `https://api.taakhelden.nl/v1`
 - **Auth**: `Authorization: Bearer <JWT>` op alles behalve `/auth/*` en `/health`.
-- **JWT-claims**: `sub` (user_id), `fam` (family_id), `role` (`parent` | `child`), `exp`. Kind-tokens: 24 u geldig; ouder-tokens: 1 u access + 30 d refresh.
+- **JWT-claims**: `sub` (user_id), `fam` (family_id), `role` (`parent` | `child`), `iat`, `exp`. Kind- en ouder-tokens: 1 u access + 30 d refresh.
+- **Intrekking**: `iat` wordt vergeleken met een revocation epoch per gebruiker. Kind verwijderen, sessies intrekken, uitloggen en account verwijderen maken lopende access-tokens per direct ongeldig (`401`), niet pas bij `exp`.
 - **Autorisatie**: middleware bindt élke query aan `fam`; rol-checks per endpoint (matrix in §8). Cross-family toegang is per definitie onmogelijk in de repository-laag.
 - **Idempotency**: mutaties vanaf de iOS-app sturen een `Idempotency-Key` header (UUID). Essentieel voor offline sync — dubbel afvinken mag nooit dubbele punten geven.
 - **Tijd**: alles in UTC (ISO 8601); gezin heeft een `timezone` (IANA) voor dagafbakening, bedtijd en cron-logica.
@@ -63,7 +64,7 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 | `POST /auth/apple` | — | Sign in with Apple (identityToken-verificatie tegen Apple's JWKS). Nieuw of bestaand account. |
 | `POST /auth/refresh` | — | Refresh token → nieuw access token (rotatie: oude refresh vervalt). **Rate-limit: 30/min/IP** (WS-TRUST-API). |
 | `POST /auth/family-code` | — | Stap 1 kind-login: gezinscode (6 tekens) → lijst kindprofielen `{id, roepnaam, avatar}` van dat gezin. Geen auth, wel zwaar rate-limited. |
-| `POST /auth/child-session` | — | Stap 2: `{familyCode, childId, pincode}` → kind-JWT (24 u). 5 foutpogingen → 15 min lock + pushmelding naar ouders. |
+| `POST /auth/child-session` | — | Stap 2: `{familyCode, childId, pincode}` → kind-JWT (1 u). 5 foutpogingen → lock + pushmelding naar ouders; de lockduur verdubbelt per volgende ronde van 5 (15 min → max 4 u). |
 | `POST /auth/child-session/refresh` | — | Kind-refresh token → nieuw kind-JWT + nieuw device-refresh. **Rate-limit: 30/min/IP** (WS-TRUST-API). |
 | `POST /auth/logout` | beide | Refresh token intrekken. |
 

@@ -7,6 +7,12 @@ export interface JwtPayload {
   perm?: "full" | "approve_only";
   /** Tokensoort. Ontbreekt = normale access-JWT; "ws" = kortlevend WebSocket-token. */
   typ?: "ws";
+  /**
+   * Uitgiftemoment (seconden). Gezet door `signJwt`; de auth-middleware
+   * vergelijkt het met de revocation epoch (services/revocation.ts) om
+   * ingetrokken tokens te weigeren.
+   */
+  iat?: number;
 }
 
 const enc = (secret: string) => new TextEncoder().encode(secret);
@@ -14,6 +20,7 @@ const enc = (secret: string) => new TextEncoder().encode(secret);
 export async function signJwt(payload: JwtPayload, secret: string, ttlSeconds: number) {
   return new SignJWT({ ...payload })
     .setProtectedHeader({ alg: "HS256" })
+    .setIssuedAt()
     .setExpirationTime(Math.floor(Date.now() / 1000) + ttlSeconds)
     .sign(enc(secret));
 }

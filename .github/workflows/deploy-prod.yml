@@ -95,6 +95,12 @@ jobs:
             printf '::error::JWT_SECRET must be set on the GitHub Environment production.\n'
             exit 1
           fi
+          # Registration fails closed without this, so a missing value must stop
+          # the deploy rather than ship an unprotected sign-up endpoint.
+          if [ -z "${TURNSTILE_SECRET:-}" ]; then
+            printf '::error::TURNSTILE_SECRET must be set on the GitHub Environment production.\n'
+            exit 1
+          fi
           put_secret JWT_SECRET "$JWT_SECRET"
           put_secret HMAC_SECRET "${HMAC_SECRET:-}"
           put_secret TURNSTILE_SECRET "${TURNSTILE_SECRET:-}"
@@ -141,16 +147,24 @@ jobs:
           printf '%s' "$body" | grep -q '"ok":true'
           printf '%s' "$body" | grep -q '"db":true'
           # Do not assert JWT presence in the body — /health no longer exposes it.
-          # Register must succeed end-to-end (not 500). Do not log the body —
-          # a 201 response includes access/refresh tokens.
+          #
+          # The register check asserts REJECTION, not success. It used to post a
+          # placeholder Turnstile token and require 201, which could only pass
+          # while bot protection was disabled in production — so the smoke test
+          # actively held the anti-bot control open. Asserting a 400 proves
+          # routing, JSON handling, schema validation and the Turnstile path are
+          # all live, and writes nothing to the production database.
+          # Unique address per run: /auth/register is also rate-limited per
+          # e-mail address, and a fixed one would start returning 429 after a
+          # few deploys in the same hour.
           email="smoke-$(date +%s)@example.com"
           code=$(curl -sS -o /tmp/reg.json -w "%{http_code}" \
             -X POST https://taakhelden-api.oostelaar.workers.dev/v1/auth/register \
             -H "Content-Type: application/json" \
-            -d "{\"email\":\"$email\",\"password\":\"SmokeTestPassword1\",\"familyName\":\"Smoke\",\"displayName\":\"Smoke\",\"turnstileToken\":\"dev-bypass\"}")
+            -d "{\"email\":\"$email\",\"password\":\"SmokeTestPassword1\",\"familyName\":\"Smoke\",\"displayName\":\"Smoke\",\"turnstileToken\":\"invalid-smoke-token\"}")
           echo "register status=$code"
-          if [ "$code" != "201" ]; then
-            # Log error code only (no tokens).
-            python3 -c 'import json,sys; d=json.load(open("/tmp/reg.json")); print("error=", (d.get("error") or {}).get("code"))'
-          fi
-          test "$code" = "201"
+          # Log the error code only (never the body).
+          python3 -c 'import json; d=json.load(open("/tmp/reg.json")); print("error=", (d.get("error") or {}).get("code"))'
+          # 400 = Turnstile rejected the token, which is the healthy outcome.
+          # A 201 here means bot protection is off and must fail the deploy.
+          test "$code" = "400"

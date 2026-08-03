@@ -30,6 +30,8 @@ import {
   verifyExportDownload,
 } from "../services/exportService";
 import { transferHmacSecret } from "../services/secrets";
+import { revokeIssuedTokens } from "../services/revocation";
+import { getMembers } from "../repo/families";
 import type { ExportJob } from "../jobs/exportConsumer";
 
 const PURGE_AFTER_DAYS = 7;
@@ -99,7 +101,13 @@ account.delete("/", validate("json", AccountDeleteBody), async (c) => {
     );
   }
 
+  // Alle nog geldige access-tokens van het gezin intrekken; anders blijft de
+  // data tot een uur na de verwijdering leesbaar.
+  const { results: members } = await getMembers(c.env.DB, familyId);
   const deletedAt = await softDeleteFamily(c.env.DB, familyId);
+  await Promise.all(
+    members.map((m) => revokeIssuedTokens(c.env, (m as { id: string }).id)),
+  );
   const purgeAfter = new Date(
     new Date(deletedAt).getTime() + PURGE_AFTER_DAYS * 24 * 3600 * 1000,
   ).toISOString();

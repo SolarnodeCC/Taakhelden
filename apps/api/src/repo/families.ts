@@ -201,7 +201,7 @@ export async function updateMember(
 export async function setMemberPincode(db: D1Database, familyId: string, memberId: string, pincodeHash: string) {
   await db
     .prepare(
-      "UPDATE users SET pincode_hash = ?, pin_locked_until = NULL WHERE family_id = ? AND id = ? AND role = 'child'",
+      "UPDATE users SET pincode_hash = ?, pin_locked_until = NULL, pin_fail_count = 0 WHERE family_id = ? AND id = ? AND role = 'child'",
     )
     .bind(pincodeHash, familyId, memberId)
     .run();

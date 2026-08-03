@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { RegisterBody, TokenPair, ErrorCodes } from "@taakhelden/shared";
-import { apiFetch } from "../../../../lib/api/config";
+import { apiFetch, forwardHeaders } from "../../../../lib/api/config";
 import { setTokens } from "../../../../lib/auth/session";
 
 /** BFF register: creates parent + family, then stores tokens in httpOnly cookies. */
@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   try {
     res = await apiFetch("/auth/register", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: forwardHeaders(req, { "Content-Type": "application/json" }),
       body: JSON.stringify(parsed.data),
       cache: "no-store",
     });

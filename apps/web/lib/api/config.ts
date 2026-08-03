@@ -40,6 +40,32 @@ export function getApiBaseUrl(): string {
 }
 
 /**
+ * The end user's IP, to forward to the API Worker.
+ *
+ * The BFF reaches the Worker over a service binding with a freshly constructed
+ * Request, so Cloudflare does not set `CF-Connecting-IP` on it. Without this the
+ * Worker cannot identify the caller and every rate limit degrades into a single
+ * shared counter, letting one client lock everyone out.
+ *
+ * Read only from headers Cloudflare sets on the inbound edge request — never
+ * from a client-supplied value that we would then present as trusted.
+ */
+export function forwardedClientIp(req: Request): string | null {
+  const direct = req.headers.get("CF-Connecting-IP");
+  if (direct) return direct;
+  return req.headers.get("X-Forwarded-For")?.split(",")[0]?.trim() || null;
+}
+
+/** Base headers plus the forwarded client IP, for an outbound `apiFetch` call. */
+export function forwardHeaders(
+  req: Request,
+  base: Record<string, string>,
+): Record<string, string> {
+  const clientIp = forwardedClientIp(req);
+  return clientIp ? { ...base, "X-Forwarded-For": clientIp } : base;
+}
+
+/**
  * Server-side call to the API Worker.
  *
  * On Cloudflare, Workers in the same `*.workers.dev` zone cannot call each

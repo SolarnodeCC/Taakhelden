@@ -19,6 +19,15 @@ with heightened obligations because data subjects are minors (AVG art. 8, DPIA i
 
 ---
 
+## Remediation status
+
+The four HIGH findings were remediated on branch `claude/website-security-audit-5p46ws`
+(see PR #86). Each carries a **Status** line below, and regression tests live in
+`apps/api/test/auth-hardening.test.ts` — every one of them fails against the pre-fix code.
+All MEDIUM, LOW and INFO findings remain open.
+
+---
+
 ## Executive summary
 
 The application's core data-security architecture is sound: every SQL statement lives in
@@ -137,6 +146,15 @@ these limits at the WAF, as `ratelimit.ts:8-10` already anticipates. For authent
 specifically, add a second dimension keyed on the account (`rl:login:acct:<emailHash>`) so
 that credential stuffing is bounded per target regardless of source IP.
 
+**Status**: ✅ **Fixed.** `middleware/ratelimit.ts` now resolves the caller from
+`CF-Connecting-IP` or `X-Forwarded-For` and never falls back to a shared bucket; an
+unidentified caller gets its own key. The BFF forwards the client IP on every hop
+(`lib/api/config.ts` `forwardHeaders`, applied in the `/api/v1` proxy and all
+`/api/auth/*` routes). Added `rateLimitSubject` and account-keyed limits on login
+(10/15 min), registration (3/hour) and family-code lookup (20/hour), so throttling is
+bounded per target even when the source IP rotates. Subjects are SHA-256 hashed so
+e-mail addresses never appear as KV keys.
+
 **References**: OWASP ASVS 4.0 V11.1.4 · CWE-770 (Allocation Without Limits) · CWE-307
 (Improper Restriction of Excessive Authentication Attempts) · Cloudflare Workers Rate
 Limiting API.
@@ -215,6 +233,17 @@ protection under any configuration.
 
 3. Extend Turnstile to `POST /auth/login`, or gate it behind a failure counter so the
    challenge appears after the first failed attempt for an e-mail address.
+
+**Status**: ✅ **Fixed.** `verifyTurnstile` now throws when `TURNSTILE_SECRET` is unset;
+skipping the check requires the explicit `TURNSTILE_DEV_BYPASS="true"` flag, which is set
+only in `vitest.config.ts` and never by wrangler or the deploy workflow. `TURNSTILE_SECRET`
+was added to `[secrets] required` in `wrangler.toml`, and the deploy job fails with an
+explicit error when the GitHub Environment does not define it. The smoke test now asserts
+the rejection path (`400`) instead of requiring the bypass to succeed.
+
+*Not done:* extending Turnstile to `POST /auth/login` — that changes `LoginBody` and the
+iOS contract. The new account-keyed login limiter covers the brute-force gap in the
+meantime; see the note under "Deliberately out of scope".
 
 **References**: OWASP ASVS 4.0 V2.2.1 · CWE-636 (Not Failing Securely) · CWE-799
 (Improper Control of Interaction Frequency).
@@ -307,6 +336,14 @@ hour. The child device already holds a 30-day refresh token
 long access TTL buys no offline capability that rotation does not already provide, while it
 sets the floor on every revocation delay.
 
+**Status**: ✅ **Fixed.** `signJwt` now sets `iat`, and `services/revocation.ts` keeps a
+per-user revocation epoch in KV that `authMiddleware` checks on every request (one KV read,
+no D1 in the hot path). The epoch is bumped by `POST /members/:id/device-sessions/revoke`,
+`DELETE /members/:id`, `POST /auth/logout` and `DELETE /account`. A token without `iat`
+against a revoked subject is rejected — fail closed. `ACCESS_TTL_CHILD` dropped from 24 h to
+1 h; the iOS client already refreshes on 401 (`TaakHeldenAPIClient.swift:310`), so this
+costs no offline capability.
+
 **References**: OWASP ASVS 4.0 V3.3.1, V3.3.2 · CWE-613 (Insufficient Session Expiration) ·
 CWE-863 (Incorrect Authorization) · AVG art. 17.
 
@@ -383,6 +420,13 @@ Additionally: apply exponential backoff rather than a flat 15-minute window so r
 lockout cycles become progressively expensive, and consider raising the PIN to 6 digits for
 `teen` age mode where usability permits. Rate-limit `POST /auth/family-code` per family
 code (not only per IP) so child-roster enumeration cannot be automated cheaply.
+
+**Status**: ✅ **Fixed.** Migration `0009_pin_fail_count.sql` adds `users.pin_fail_count`,
+and `registerPinFailure` increments it in a single `UPDATE … RETURNING`, so concurrent
+attempts can no longer all read the same stale value. Lock duration now doubles per full
+round of five failures (15 min → 4 h cap). The KV counter is gone. Parents are notified
+once per lock round rather than on every attempt. `POST /auth/family-code` is additionally
+rate-limited per family code, so the child roster cannot be harvested from many IPs.
 
 **References**: OWASP ASVS 4.0 V2.2.1, V11.1.4 · CWE-307 · CWE-367 (TOCTOU Race Condition).
 
@@ -993,18 +1037,28 @@ protected against regression:
 
 ## Recommended remediation roadmap
 
-### 1. Release blockers — fix before public launch
+### 1. Release blockers — ✅ done
 
-| # | Finding | Effort | Notes |
-|---|---------|--------|-------|
-| 1 | Rate-limit bucket collapses to `"local"` | S | Forward client IP in BFF + fail closed in Worker. Highest impact-to-effort ratio in this report. |
-| 2 | Turnstile fails open; CI asserts the bypass | S | Requires fixing the smoke test (finding 7) in the same change. |
-| 3 | Access tokens cannot be revoked | M | Add `iat` to JWTs + KV revocation epoch; reduce `ACCESS_TTL_CHILD` to 1h. |
-| 4 | PIN lockout races on eventually-consistent KV | M | Move the counter to D1 atomic `UPDATE` or the FamilyRoom DO. |
+| # | Finding | Status |
+|---|---------|--------|
+| 1 | Rate-limit bucket collapses to `"local"` | ✅ Fixed — caller-keyed limits + BFF IP forwarding + account-keyed limits |
+| 2 | Turnstile fails open; CI asserts the bypass | ✅ Fixed — fails closed, required secret, smoke test asserts rejection |
+| 3 | Access tokens cannot be revoked | ✅ Fixed — `iat` + KV revocation epoch; `ACCESS_TTL_CHILD` 24h → 1h |
+| 4 | PIN lockout races on eventually-consistent KV | ✅ Fixed — atomic D1 counter + exponential backoff |
 
-Findings 1 and 2 are single-session changes and should go first — 1 because the DoS is
-trivially reachable by anyone who finds the login page, 2 because it is a deployment-policy
-fix as much as a code fix.
+Regression coverage: `apps/api/test/auth-hardening.test.ts` (10 tests).
+
+**Deliberately out of scope in that change**, and still open:
+
+- **Turnstile on `POST /auth/login`.** Adding it changes `LoginBody` in `packages/shared`
+  and the iOS request contract, which cannot be verified from this repo alone. The new
+  account-keyed login limiter (10 attempts / 15 min per e-mail address, independent of
+  source IP) bounds credential stuffing per target in the meantime.
+- **Workers Rate Limiting API / WAF.** The KV counter is still read-then-write and so
+  undercounts under concurrency. Now that it is correctly keyed, moving it to an atomic
+  backend is a contained follow-up.
+- **`HMAC_SECRET` in `[secrets] required`.** Belongs with finding 8, which also removes the
+  `JWT_SECRET` fallback — doing only half of it would fail deploys without adding safety.
 
 ### 2. Before scaling beyond a pilot
 
@@ -1038,16 +1092,16 @@ event logging, `SECURITY.md`, and the `APPLE_CLIENT_ID` audience mismatch.
 | All user inputs validated and sanitised | ✅ Pass | Zod at every boundary; cursors guarded |
 | All outputs properly encoded | ✅ Pass | React escaping; no HTML sinks |
 | SQL queries parameterised | ✅ Pass | Whitelisted columns + bound params throughout |
-| Authentication and authorisation enforced | ⚠️ Partial | Enforced per request, but not revocable — finding 3 |
+| Authentication and authorisation enforced | ✅ Pass | Enforced per request and revocable since finding 3 was fixed |
 | Error messages non-verbose | ✅ Pass | `middleware/error.ts` returns generic 500s |
 | HTTPS enforced site-wide | ⚠️ Partial | TLS via Cloudflare; HSTS header missing — finding 15 |
 | Security headers configured | ⚠️ Partial | Good on web (CSP needs tightening); absent on API — findings 9, 16 |
 | CSRF protection implemented | ⚠️ Partial | `SameSite=Lax` only, no `Origin` check — finding 10 |
-| Rate limiting configured | ❌ **Fail** | Global shared bucket; none on authenticated routes — findings 1, 13 |
+| Rate limiting configured | ⚠️ Partial | Caller- and account-keyed since finding 1 was fixed; still none on authenticated routes — finding 13 |
 | Sensitive data encrypted | ✅ Pass | PBKDF2 hashes, SHA-256 refresh tokens, R2 EU jurisdiction |
 | Logging excludes sensitive information | ✅ Pass | Two `console.error` calls, `err.message` only |
 | Dependencies regularly scanned and updated | ✅ Pass | `npm audit` clean; Actions SHA-pinned |
-| Least privilege access enforced | ⚠️ Partial | Roles correct; `permissions` claim is stale until token expiry — finding 3 |
+| Least privilege access enforced | ✅ Pass | Roles correct; stale claims now bounded by the 1 h TTL and the revocation epoch |
 | Audit logging enabled | ❌ **Fail** | No security event trail — finding 20 |
 
 ---

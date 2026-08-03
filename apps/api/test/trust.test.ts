@@ -11,10 +11,18 @@ import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
 import { seedFamily, seedTask, seedInstance, parentToken, childToken, api, todayAmsterdam } from "./helpers";
 
+/**
+ * Vast client-IP voor deze suite. De limiter kent geen gedeelde fallback meer:
+ * zonder identificeerbaar IP krijgt elk request een eigen sleutel (zie
+ * middleware/ratelimit.ts), dus een rate-limit test moet zelf een IP meesturen.
+ */
+const TEST_IP = "203.0.113.7";
+const ipHeaders = { "CF-Connecting-IP": TEST_IP };
+
 // Bereken de huidige KV-windowsleutel, net zoals rateLimit() dat doet.
 function rlKey(bucket: string, windowSeconds: number) {
   const window = Math.floor(Date.now() / (windowSeconds * 1000));
-  return `rl:${bucket}:local:${window}`;
+  return `rl:${bucket}:${TEST_IP}:${window}`;
 }
 
 // ─── 1. Auth refresh rate limits ─────────────────────────────────────────────
@@ -24,6 +32,7 @@ describe("POST /auth/refresh rate limit", () => {
     await env.KV.put(rlKey("refresh", 60), "30", { expirationTtl: 120 });
     const res = await api("/auth/refresh", {
       body: { refreshToken: "does-not-matter" },
+      headers: ipHeaders,
     });
     expect(res.status).toBe(429);
     const body = (await res.json()) as { error: { code: string } };
@@ -36,6 +45,7 @@ describe("POST /auth/child-session/refresh rate limit", () => {
     await env.KV.put(rlKey("child-refresh", 60), "30", { expirationTtl: 120 });
     const res = await api("/auth/child-session/refresh", {
       body: { refreshToken: "does-not-matter" },
+      headers: ipHeaders,
     });
     expect(res.status).toBe(429);
     const body = (await res.json()) as { error: { code: string } };
@@ -63,6 +73,7 @@ describe("POST /account/export rate limit + idempotency", () => {
       method: "POST",
       token: tok,
       idempotencyKey: crypto.randomUUID(),
+      headers: ipHeaders,
     });
     expect(res.status).toBe(429);
     const body = (await res.json()) as { error: { code: string } };

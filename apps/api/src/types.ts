@@ -21,8 +21,15 @@ export interface Env {
   APPLE_CLIENT_ID?: string;
   APPLE_BUNDLE_ID?: string;
 
-  // Optional secrets — features no-op or skip when unset (see services/*).
+  /** Required secret — registration fails closed without it (services/turnstile.ts). */
   TURNSTILE_SECRET?: string;
+  /**
+   * Explicit dev/test escape for the Turnstile check ("true" to skip). Never set
+   * in wrangler.toml or by the deploy workflow, so production cannot fall into it.
+   */
+  TURNSTILE_DEV_BYPASS?: string;
+
+  // Optional secrets — features no-op or skip when unset (see services/*).
   APNS_KEY?: string;
   APNS_KEY_ID?: string;
   APNS_TEAM_ID?: string;
