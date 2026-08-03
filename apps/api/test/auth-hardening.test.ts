@@ -441,3 +441,86 @@ describe("ws-upgrade authenticatie", () => {
     expect(res.status).toBe(403);
   });
 });
+
+// ─── 9. Idempotency-Key is gebonden aan de operatie (audit-bevinding 6) ──────
+
+describe("Idempotency-Key scoping", () => {
+  it("geeft bij een echte retry dezelfde response terug", async () => {
+    const fam = await seedFamily("idem");
+    const tok = await parentToken(fam.parentId, fam.familyId);
+    const key = crypto.randomUUID();
+    const body = { childId: fam.childA, amount: 5, note: "Goed gedaan" };
+
+    const first = await api("/points/adjust", { method: "POST", token: tok, idempotencyKey: key, body });
+    expect(first.status).toBe(200);
+    const second = await api("/points/adjust", { method: "POST", token: tok, idempotencyKey: key, body });
+    expect(second.status).toBe(200);
+    expect(await second.json()).toEqual(await first.json());
+
+    // Eén boeking, geen dubbele punten.
+    const row = await env.DB
+      .prepare("SELECT COUNT(*) AS n FROM points_ledger WHERE family_id = ? AND child_id = ?")
+      .bind(fam.familyId, fam.childA)
+      .first<{ n: number }>();
+    expect(row?.n).toBe(1);
+  });
+
+  it("weigert dezelfde sleutel voor een andere payload", async () => {
+    const fam = await seedFamily("idemp2");
+    const tok = await parentToken(fam.parentId, fam.familyId);
+    const key = crypto.randomUUID();
+
+    const first = await api("/points/adjust", {
+      method: "POST", token: tok, idempotencyKey: key,
+      body: { childId: fam.childA, amount: 5, note: "Eerste" },
+    });
+    expect(first.status).toBe(200);
+
+    // Ander bedrag, zelfde sleutel: vroeger kwam hier de eerste response terug
+    // met 200 — de tweede boeking verdween zonder signaal.
+    const reused = await api("/points/adjust", {
+      method: "POST", token: tok, idempotencyKey: key,
+      body: { childId: fam.childA, amount: 50, note: "Tweede" },
+    });
+    expect(reused.status).toBe(409);
+    expect(((await reused.json()) as { error: { code: string } }).error.code).toBe(
+      "IDEMPOTENCY_KEY_REUSED",
+    );
+  });
+
+  it("weigert dezelfde sleutel op een ander endpoint", async () => {
+    const fam = await seedFamily("idemp3");
+    const tok = await parentToken(fam.parentId, fam.familyId);
+    const key = crypto.randomUUID();
+
+    const adjust = await api("/points/adjust", {
+      method: "POST", token: tok, idempotencyKey: key,
+      body: { childId: fam.childA, amount: 5, note: "Punten" },
+    });
+    expect(adjust.status).toBe(200);
+
+    const reward = await api("/rewards", {
+      method: "POST", token: tok, idempotencyKey: key,
+      body: { title: "Ijsje", icon: "star", price: 10 },
+    });
+    expect(reward.status).toBe(409);
+  });
+
+  it("houdt sleutels per gebruiker gescheiden", async () => {
+    const fam = await seedFamily("idemp4");
+    const tok = await parentToken(fam.parentId, fam.familyId);
+    const key = crypto.randomUUID();
+    const body = { childId: fam.childA, amount: 5, note: "Punten" };
+
+    expect((await api("/points/adjust", { method: "POST", token: tok, idempotencyKey: key, body })).status).toBe(200);
+
+    // Andere ouder, zelfde sleutelwaarde: mag elkaar niet in de weg zitten.
+    const other = await seedFamily("idemp5");
+    const otherTok = await parentToken(other.parentId, other.familyId);
+    const res = await api("/points/adjust", {
+      method: "POST", token: otherTok, idempotencyKey: key,
+      body: { childId: other.childA, amount: 5, note: "Punten" },
+    });
+    expect(res.status).toBe(200);
+  });
+});

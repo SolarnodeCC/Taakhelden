@@ -15,10 +15,14 @@ Middleware runs on every matching request — keep it fast, side-effect aware, a
 
 ## Idempotency (`middleware/idempotency.ts`, F6)
 
-- Cache key: `(userId, Idempotency-Key)` — **not** scoped to path or body.
-- This matches common client contracts: reusing one key across different endpoints returns
-  the first cached response. Document in `docs/taakhelden-api-specificatie.md` when
-  changing behavior.
+- Cache key: `(userId, Idempotency-Key)`, plus a fingerprint over method + path + query +
+  body. Same key **and** same fingerprint → the cached response (a real retry). Same key,
+  different fingerprint → `409 IDEMPOTENCY_KEY_REUSED`.
+- It used to be key-only, so reusing one key across endpoints returned the first response
+  with HTTP 200 — the second mutation silently never ran. See audit finding 6.
+- The DO applies the same rule authoritatively (`idempotency_keys.fingerprint`, migration
+  0010); KV stays the fast path.
+- Behaviour is documented in `docs/taakhelden-api-specificatie.md` — keep them in step.
 - `requireIdempotencyKey` vs optional `idempotency`: ledger mutations must use `require`.
 
 ## Validation (`middleware/validate.ts`)

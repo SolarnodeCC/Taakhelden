@@ -21,7 +21,8 @@ with heightened obligations because data subjects are minors (AVG art. 8, DPIA i
 
 ## Remediation status
 
-The four HIGH findings and three MEDIUM findings (8, 10, 13) were remediated on branch
+The four HIGH findings and MEDIUM findings 5, 6, 7, 8, 10, 13 and 14, plus the whole
+LOW batch, were remediated on branch
 `claude/website-security-audit-5p46ws` (see PR #86). Each carries a **Status** line below.
 Regression tests live in `apps/api/test/auth-hardening.test.ts` and
 `apps/web/lib/api/crossOrigin.test.ts` — every one fails against the pre-fix code.
@@ -557,6 +558,11 @@ serialized mutation body. When a key arrives with a *different* fingerprint than
 one, return `409` rather than the cached response — that is the standard contract (IETF
 `Idempotency-Key` draft, §2.7) and turns a silent no-op into a loud client error. Update
 `docs/taakhelden-api-specificatie.md` accordingly.
+
+**Status**: ✅ **Fixed.** Both layers now bind the key to the operation. The KV entry carries a fingerprint over method + path + query + body; the DO stores one in
+`idempotency_keys.fingerprint` (migration 0010). Same key **and** same fingerprint returns the cached response — a genuine retry, unchanged. Same key with a different fingerprint returns `409 IDEMPOTENCY_KEY_REUSED`, so a client bug surfaces instead of silently dropping the second mutation.
+
+Rows written before the migration have a NULL fingerprint and are still served as replays; they age out within 48 hours via `purgeOldIdempotencyKeys`. iOS needs no change unless it deliberately reuses a key across operations, which would previously have been silently wrong.
 
 **References**: IETF draft-ietf-httpapi-idempotency-key-header §2.7 · OWASP ASVS 4.0
 V11.1.2 · CWE-840 (Business Logic Errors).
@@ -1126,7 +1132,7 @@ Regression coverage: `apps/api/test/auth-hardening.test.ts` (10 tests).
 | 10 | No CSRF defence beyond `SameSite=Lax` | ✅ Fixed — `Origin` check on every BFF mutation |
 | 13 | No rate limiting on authenticated routes | ✅ Fixed — 300 req/min per user, inherited by new routes |
 | 5 | No environment isolation; `[env.production]` is dead config | ⏳ **Open — needs an infrastructure decision.** Completing it requires real Cloudflare D1/R2/KV resources and their IDs; deleting the dead block instead is only correct if a separate production tier is not planned. |
-| 6 | `Idempotency-Key` not scoped to operation | ⏳ Open — API contract change, needs coordinated iOS update |
+| 6 | `Idempotency-Key` not scoped to operation | ✅ Fixed — fingerprint over path + payload; mismatch returns 409 |
 
 ### 3. Planned sprints
 
