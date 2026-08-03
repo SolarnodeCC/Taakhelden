@@ -1287,6 +1287,7 @@
                       "INVALID_INVITE",
                       "INSTANCE_SLOT_TAKEN",
                       "IDEMPOTENCY_REPLAY",
+                      "IDEMPOTENCY_KEY_REUSED",
                       "RATE_LIMITED",
                       "UPSTREAM_UNAVAILABLE"
                     ]
