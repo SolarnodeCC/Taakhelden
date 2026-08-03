@@ -20,6 +20,9 @@ export default defineConfig(async () => {
             TEST_MIGRATIONS: migrations,
             // Secrets die in productie via `wrangler secret` komen:
             JWT_SECRET: "test-secret-not-for-production",
+            // Distinct from JWT_SECRET on purpose — mirrors production key
+            // separation for photo/export transfer URLs.
+            HMAC_SECRET: "test-hmac-not-for-production",
             // Turnstile faalt dicht op een ontbrekend secret; tests zetten de
             // check expliciet uit (zie services/turnstile.ts).
             TURNSTILE_DEV_BYPASS: "true",

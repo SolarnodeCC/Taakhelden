@@ -58,8 +58,11 @@ APPLE_BUNDLE_ID = "nl.taakhelden.app"
 # TURNSTILE_SECRET is required: registration fails closed without it, so a
 # missing secret must break the deploy rather than silently disable bot
 # protection on the only unauthenticated account-creation endpoint.
+# HMAC_SECRET is required so photo/export URL signing never falls back to
+# JWT_SECRET — a leaked transfer URL must not become a token-forging key.
+# deploy-prod.yml generates one when the GitHub Environment has none.
 [secrets]
-required = ["JWT_SECRET", "TURNSTILE_SECRET"]
+required = ["JWT_SECRET", "TURNSTILE_SECRET", "HMAC_SECRET"]
 
 [env.production]
 name = "taakhelden-api-prod"

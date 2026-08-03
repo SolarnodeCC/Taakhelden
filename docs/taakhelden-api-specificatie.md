@@ -8,6 +8,8 @@
 - **Base URL**: `https://api.taakhelden.nl/v1`
 - **Auth**: `Authorization: Bearer <JWT>` op alles behalve `/auth/*` en `/health`.
 - **JWT-claims**: `sub` (user_id), `fam` (family_id), `role` (`parent` | `child`), `iat`, `exp`. Kind- en ouder-tokens: 1 u access + 30 d refresh.
+- **Rate limiting**: publieke routes zijn begrensd per aanroeper (IP) én per doelwit (account/gezinscode); geauthenticeerde routes hebben een basislimiet van 300 req/min per gebruiker. Overschrijding geeft `429 RATE_LIMITED`.
+- **CSRF**: state-wijzigende BFF-calls worden geweigerd (`403`) als de `Origin`-header niet de eigen origin is.
 - **Intrekking**: `iat` wordt vergeleken met een revocation epoch per gebruiker. Kind verwijderen, sessies intrekken, uitloggen en account verwijderen maken lopende access-tokens per direct ongeldig (`401`), niet pas bij `exp`.
 - **Autorisatie**: middleware bindt élke query aan `fam`; rol-checks per endpoint (matrix in §8). Cross-family toegang is per definitie onmogelijk in de repository-laag.
 - **Idempotency**: mutaties vanaf de iOS-app sturen een `Idempotency-Key` header (UUID). Essentieel voor offline sync — dubbel afvinken mag nooit dubbele punten geven.

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ParentAcceptBody, TokenPair, ErrorCodes } from "@taakhelden/shared";
-import { apiFetch, forwardHeaders } from "../../../../lib/api/config";
+import { apiFetch, crossOriginBlock, forwardHeaders } from "../../../../lib/api/config";
 import { setTokens } from "../../../../lib/auth/session";
 
 /**
@@ -9,6 +9,9 @@ import { setTokens } from "../../../../lib/auth/session";
  * Intentionally bypasses /api/v1/* which requires an existing session.
  */
 export async function POST(req: Request) {
+  const blocked = crossOriginBlock(req);
+  if (blocked) return blocked;
+
   const parsed = ParentAcceptBody.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json(

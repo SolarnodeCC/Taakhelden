@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { RegisterBody, TokenPair, ErrorCodes } from "@taakhelden/shared";
-import { apiFetch, forwardHeaders } from "../../../../lib/api/config";
+import { apiFetch, crossOriginBlock, forwardHeaders } from "../../../../lib/api/config";
 import { setTokens } from "../../../../lib/auth/session";
 
 /** BFF register: creates parent + family, then stores tokens in httpOnly cookies. */
 export async function POST(req: Request) {
+  const blocked = crossOriginBlock(req);
+  if (blocked) return blocked;
+
   const parsed = RegisterBody.safeParse(await req.json().catch(() => null));
   if (!parsed.success) {
     return NextResponse.json(

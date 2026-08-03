@@ -21,10 +21,11 @@ with heightened obligations because data subjects are minors (AVG art. 8, DPIA i
 
 ## Remediation status
 
-The four HIGH findings were remediated on branch `claude/website-security-audit-5p46ws`
-(see PR #86). Each carries a **Status** line below, and regression tests live in
-`apps/api/test/auth-hardening.test.ts` — every one of them fails against the pre-fix code.
-All MEDIUM, LOW and INFO findings remain open.
+The four HIGH findings and three MEDIUM findings (8, 10, 13) were remediated on branch
+`claude/website-security-audit-5p46ws` (see PR #86). Each carries a **Status** line below.
+Regression tests live in `apps/api/test/auth-hardening.test.ts` and
+`apps/web/lib/api/crossOrigin.test.ts` — every one fails against the pre-fix code.
+The remaining MEDIUM, LOW and INFO findings are open.
 
 ---
 
@@ -631,6 +632,12 @@ Generate it in the deploy workflow the same way `JWT_SECRET` is bootstrapped
 (`openssl rand -hex 32`), and document both in a rotation runbook. This is already flagged
 as F3 in `.claude/rules/api/services-and-do.md`; this finding confirms it remains open.
 
+**Status**: ✅ **Fixed.** `transferHmacSecret` throws when `HMAC_SECRET` is unset — the
+`JWT_SECRET` fallback is gone. Added to `[secrets] required`, and the deploy workflow
+bootstraps a random value when the GitHub Environment has none (same pattern as
+`JWT_SECRET`, generated rather than copied so the keys genuinely differ), so requiring it
+cannot break a deploy. Rotating it now only invalidates signed URLs, which live 5 minutes.
+
 **References**: OWASP ASVS 4.0 V6.4.1 · NIST SP 800-57 Part 1 §5.2 (key separation) ·
 CWE-1279 (Cryptographic Key Reuse Across Contexts).
 
@@ -720,6 +727,14 @@ if (!["GET", "HEAD"].includes(req.method)) {
 Apply the same guard to `app/api/auth/*`. Consider tightening the session cookies to
 `sameSite: "strict"`; the dashboard has no cross-site entry flow that would break, and the
 `uitnodiging` accept page uses its own token rather than the session cookie.
+
+**Status**: ✅ **Fixed.** `crossOriginBlock` (`lib/api/config.ts`) rejects any
+state-changing request whose `Origin` is not the request's own origin, applied to the
+`/api/v1` proxy and every `/api/auth/*` route plus `/api/ws/connect`. Safe methods are
+never blocked, and a missing `Origin` is allowed — non-browser clients omit it, and
+`SameSite` still covers the browser case there. Cookie `sameSite` was left at `lax`: the
+invitation-accept flow is a cross-site entry point, and `strict` would need its own
+verification.
 
 **References**: OWASP ASVS 4.0 V4.2.2 · OWASP CSRF Prevention Cheat Sheet
 (defence-in-depth) · CWE-352.
@@ -817,6 +832,13 @@ Set tighter, explicit limits on the expensive paths (`/sync`, `/points/ledger`,
 `/instances/history`, `/ws/token`). This depends on the counter fix from finding 1 to be
 meaningful; key it on `auth.userId` rather than IP, which sidesteps the missing-header
 problem entirely for authenticated traffic.
+
+**Status**: ✅ **Fixed.** A baseline limit of 300 req/min per authenticated user is applied
+as middleware in `index.ts`, directly after `authMiddleware`, so new routes inherit it
+rather than opting in. It keys on `auth.userId`, so it holds even where the client IP does
+not reach the Worker. Routes with stricter needs (export, photo quota) keep their own
+limits on top. The counter is still KV read-then-write and so undercounts under
+concurrency — see the note on the Workers Rate Limiting API below.
 
 **References**: OWASP API Security Top 10 2023 — API4:2023 (Unrestricted Resource
 Consumption) · CWE-770.
@@ -1062,19 +1084,19 @@ Regression coverage: `apps/api/test/auth-hardening.test.ts` (10 tests).
 
 ### 2. Before scaling beyond a pilot
 
-| # | Finding | Effort |
+| # | Finding | Status |
 |---|---------|--------|
-| 5 | No environment isolation; `[env.production]` is dead config | M |
-| 7 | Smoke test writes to the production database | S |
-| 8 | `HMAC_SECRET` falls back to `JWT_SECRET` | S |
-| 13 | No rate limiting on authenticated routes | S — depends on #1 |
-| 6 | `Idempotency-Key` not scoped to operation | M — API contract change |
+| 7 | Smoke test writes to the production database | ✅ Fixed with #2 — asserts rejection, writes nothing |
+| 8 | `HMAC_SECRET` falls back to `JWT_SECRET` | ✅ Fixed — fallback removed, required + auto-bootstrapped |
+| 10 | No CSRF defence beyond `SameSite=Lax` | ✅ Fixed — `Origin` check on every BFF mutation |
+| 13 | No rate limiting on authenticated routes | ✅ Fixed — 300 req/min per user, inherited by new routes |
+| 5 | No environment isolation; `[env.production]` is dead config | ⏳ **Open — needs an infrastructure decision.** Completing it requires real Cloudflare D1/R2/KV resources and their IDs; deleting the dead block instead is only correct if a separate production tier is not planned. |
+| 6 | `Idempotency-Key` not scoped to operation | ⏳ Open — API contract change, needs coordinated iOS update |
 
 ### 3. Planned sprints
 
-Findings 9 (CSP nonces), 10 (BFF `Origin` check), 12 (decouple invite code from child
-login — schedule as a product change, it affects the login UX), 14 (WebSocket subprotocol
-auth).
+Findings 9 (CSP nonces), 12 (decouple invite code from child login — schedule as a product
+change, it affects the login UX), 14 (WebSocket subprotocol auth).
 
 ### 4. Hardening backlog
 
@@ -1096,8 +1118,8 @@ event logging, `SECURITY.md`, and the `APPLE_CLIENT_ID` audience mismatch.
 | Error messages non-verbose | ✅ Pass | `middleware/error.ts` returns generic 500s |
 | HTTPS enforced site-wide | ⚠️ Partial | TLS via Cloudflare; HSTS header missing — finding 15 |
 | Security headers configured | ⚠️ Partial | Good on web (CSP needs tightening); absent on API — findings 9, 16 |
-| CSRF protection implemented | ⚠️ Partial | `SameSite=Lax` only, no `Origin` check — finding 10 |
-| Rate limiting configured | ⚠️ Partial | Caller- and account-keyed since finding 1 was fixed; still none on authenticated routes — finding 13 |
+| CSRF protection implemented | ✅ Pass | `SameSite=Lax` plus an `Origin` check on every BFF mutation — finding 10 |
+| Rate limiting configured | ✅ Pass | Caller-, account- and user-keyed (findings 1, 13); KV counter still non-atomic under concurrency |
 | Sensitive data encrypted | ✅ Pass | PBKDF2 hashes, SHA-256 refresh tokens, R2 EU jurisdiction |
 | Logging excludes sensitive information | ✅ Pass | Two `console.error` calls, `err.message` only |
 | Dependencies regularly scanned and updated | ✅ Pass | `npm audit` clean; Actions SHA-pinned |

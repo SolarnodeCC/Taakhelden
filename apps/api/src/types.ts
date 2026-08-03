@@ -10,8 +10,9 @@ export interface Env {
   // Required secret — auth fails closed without it.
   JWT_SECRET: string;
   /**
-   * Optional dedicated HMAC key for photo/export signed URLs.
-   * Falls back to JWT_SECRET when unset (see services/secrets.ts).
+   * Required secret — dedicated key for photo/export signed URLs, deliberately
+   * separate from JWT_SECRET (see services/secrets.ts). Signing fails closed
+   * without it.
    */
   HMAC_SECRET?: string;
 

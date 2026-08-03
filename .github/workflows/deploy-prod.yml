@@ -117,24 +117,36 @@ jobs:
           workingDirectory: apps/api
           command: deploy
       # Registration/login mint JWTs; without JWT_SECRET every register returns 500.
+      # Photo/export URL signing likewise fails closed without HMAC_SECRET.
       # Bootstrap once if the secret is missing. Prefer an explicit GitHub secret
       # when present; otherwise generate a random value (do not rotate an existing one).
-      - name: Ensure JWT_SECRET
+      - name: Ensure signing secrets
         working-directory: apps/api
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: "5546763229b35df670e33d9316d7f2e0"
           JWT_SECRET_FROM_GITHUB: ${{ secrets.JWT_SECRET }}
+          HMAC_SECRET_FROM_GITHUB: ${{ secrets.HMAC_SECRET }}
         run: |
           set -euo pipefail
           list=$(npx wrangler secret list)
-          if printf '%s' "$list" | grep -q '"name": "JWT_SECRET"'; then
-            exit 0
+          if ! printf '%s' "$list" | grep -q '"name": "JWT_SECRET"'; then
+            if [ -n "${JWT_SECRET_FROM_GITHUB}" ]; then
+              printf '%s' "$JWT_SECRET_FROM_GITHUB" | npx wrangler secret put JWT_SECRET
+            else
+              openssl rand -hex 32 | npx wrangler secret put JWT_SECRET
+            fi
           fi
-          if [ -n "${JWT_SECRET_FROM_GITHUB}" ]; then
-            printf '%s' "$JWT_SECRET_FROM_GITHUB" | npx wrangler secret put JWT_SECRET
-          else
-            openssl rand -hex 32 | npx wrangler secret put JWT_SECRET
+          # Same bootstrap for the transfer-signing key. Generate rather than
+          # reuse JWT_SECRET: key separation is the point. Only ever created when
+          # absent, so it stays stable across deploys (rotating it would only
+          # invalidate signed URLs, which live 5 minutes).
+          if ! printf '%s' "$list" | grep -q '"name": "HMAC_SECRET"'; then
+            if [ -n "${HMAC_SECRET_FROM_GITHUB}" ]; then
+              printf '%s' "$HMAC_SECRET_FROM_GITHUB" | npx wrangler secret put HMAC_SECRET
+            else
+              openssl rand -hex 32 | npx wrangler secret put HMAC_SECRET
+            fi
           fi
       # Smoke-test tegen de workers.dev-URL zolang api.taakhelden.nl nog niet
       # als custom domain aan de worker gekoppeld is. Zet dit terug naar

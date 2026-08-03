@@ -7,12 +7,24 @@
  *   3. Access-tokens zijn intrekbaar (kind verwijderen / sessies intrekken).
  *   4. PIN-lockout telt atomair, ook bij gelijktijdige pogingen.
  *
+ * Plus de MEDIUM-bevindingen die in dezelfde reeks zijn opgepakt:
+ *   8.  HMAC_SECRET is gescheiden van JWT_SECRET en faalt dicht.
+ *   13. Basislimiet per ingelogde gebruiker op alle geauthenticeerde routes.
+ *
  * Elk van deze tests faalt op de code van vóór de fix.
  */
 import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
-import { hashSecret } from "../src/services/passwords";
-import { seedFamily, parentToken, childToken, api } from "./helpers";
+import { hashSecret, sha256Hex } from "../src/services/passwords";
+import {
+  seedFamily,
+  seedTask,
+  seedInstance,
+  parentToken,
+  childToken,
+  api,
+  todayAmsterdam,
+} from "./helpers";
 
 // ─── 1. Rate limiting: geen gedeelde bucket ──────────────────────────────────
 
@@ -213,5 +225,69 @@ describe("PIN-lockout", () => {
       .first<{ pin_fail_count: number; pin_locked_until: string | null }>();
     expect(row?.pin_fail_count).toBe(0);
     expect(row?.pin_locked_until).toBeNull();
+  });
+});
+
+// ─── 5. Basislimiet op geauthenticeerde routes (audit-bevinding 13) ──────────
+
+describe("basislimiet per ingelogde gebruiker", () => {
+  it("geeft 429 zodra het gebruikersbudget op is", async () => {
+    const fam = await seedFamily("rluser");
+    const tok = await parentToken(fam.parentId, fam.familyId);
+    const window = Math.floor(Date.now() / 60_000);
+    await env.KV.put(`rl:user:${await sha256Hex(fam.parentId)}:${window}`, "300", {
+      expirationTtl: 120,
+    });
+
+    const res = await api("/members", { token: tok });
+    expect(res.status).toBe(429);
+  });
+
+  it("telt per gebruiker, niet per gezin", async () => {
+    const fam = await seedFamily("rlscope");
+    const child = await childToken(fam.childA, fam.familyId);
+    const window = Math.floor(Date.now() / 60_000);
+    // Budget van de ouder vol; het kind moet gewoon door kunnen.
+    await env.KV.put(`rl:user:${await sha256Hex(fam.parentId)}:${window}`, "300", {
+      expirationTtl: 120,
+    });
+
+    expect((await api("/members", { token: child })).status).toBe(200);
+  });
+});
+
+// ─── 6. Sleutelscheiding voor transfer-URL's (audit-bevinding 8) ─────────────
+
+describe("HMAC_SECRET is gescheiden van JWT_SECRET", () => {
+  it("gebruikt niet langer JWT_SECRET als terugval", async () => {
+    expect(env.HMAC_SECRET).toBeTruthy();
+    expect(env.HMAC_SECRET).not.toBe(env.JWT_SECRET);
+  });
+
+  it("faalt dicht als HMAC_SECRET ontbreekt", async () => {
+    const fam = await seedFamily("hmac");
+    const tok = await childToken(fam.childA, fam.familyId);
+    const taskId = await seedTask(fam.familyId, fam.childA);
+    const instanceId = await seedInstance(fam.familyId, taskId, fam.childA, todayAmsterdam());
+    const body = {
+      purpose: "task" as const,
+      instanceId,
+      contentType: "image/jpeg" as const,
+      bytes: 1024,
+    };
+
+    // Met sleutel: de route komt tot het ondertekenen en levert een upload-URL.
+    const ok = await api("/photos/upload-intent", { method: "POST", token: tok, body });
+    expect(ok.status).toBe(201);
+
+    const previous = env.HMAC_SECRET;
+    env.HMAC_SECRET = "";
+    try {
+      const res = await api("/photos/upload-intent", { method: "POST", token: tok, body });
+      // Geen ondertekende URL zonder sleutel — nooit stilzwijgend op JWT_SECRET.
+      expect(res.status).toBe(500);
+    } finally {
+      env.HMAC_SECRET = previous;
+    }
   });
 });

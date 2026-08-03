@@ -1,17 +1,20 @@
 import { NextResponse } from "next/server";
-import { apiFetch } from "../../../../lib/api/config";
+import { apiFetch, crossOriginBlock, forwardHeaders } from "../../../../lib/api/config";
 import { getRefreshCookie } from "../../../../lib/api/cookies";
 import { clearTokens } from "../../../../lib/auth/session";
 
 /** BFF logout: best-effort revoke on the Worker, then clear cookies. */
-export async function POST() {
+export async function POST(req: Request) {
+  const blocked = crossOriginBlock(req);
+  if (blocked) return blocked;
+
   const refreshToken = await getRefreshCookie();
 
   if (refreshToken) {
     try {
       await apiFetch("/auth/logout", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: forwardHeaders(req, { "Content-Type": "application/json" }),
         body: JSON.stringify({ refreshToken }),
         cache: "no-store",
       });

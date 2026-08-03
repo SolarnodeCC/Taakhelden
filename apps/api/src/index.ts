@@ -3,6 +3,7 @@ import type { AppBindings, Env } from "./types";
 import { errorHandler } from "./middleware/error";
 import { authMiddleware } from "./middleware/auth";
 import { idempotency } from "./middleware/idempotency";
+import { rateLimitSubject } from "./middleware/ratelimit";
 import authRoutes from "./routes/auth";
 import familyRoutes, { parentAccept } from "./routes/families";
 import memberRoutes from "./routes/members";
@@ -51,6 +52,15 @@ app.get("/ws", (c) => handleWsUpgrade(c));
 
 // Alles hieronder vereist een geldige JWT
 app.use("*", authMiddleware);
+// Basislimiet per ingelogde gebruiker. Staat hier — niet per route — zodat een
+// nieuwe route beschermd is zonder eraan te denken; routes met een strengere
+// eis (export, ws-token) zetten daar bovenop hun eigen limiet. Keyt op userId,
+// dus onafhankelijk van of het client-IP doorkomt.
+app.use("*", async (c, next) => {
+  const { userId } = c.get("auth");
+  await rateLimitSubject(c, "user", userId, 300, 60);
+  return next();
+});
 // Optional Idempotency-Key replay for authenticated mutations (CLAUDE.md §2).
 // Ledger routes still require the header via requireIdempotencyKey.
 app.use("*", async (c, next) => {

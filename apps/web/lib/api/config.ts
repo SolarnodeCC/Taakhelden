@@ -56,6 +56,37 @@ export function forwardedClientIp(req: Request): string | null {
   return req.headers.get("X-Forwarded-For")?.split(",")[0]?.trim() || null;
 }
 
+/**
+ * Reject a cross-site state-changing request.
+ *
+ * The BFF authenticates purely from the `th_at` cookie, so `SameSite=lax` is
+ * currently the only thing standing between a cross-site POST and every family
+ * mutation (create child, set PIN, adjust points, delete account). That is one
+ * control with no backstop. Comparing `Origin` to the request's own origin is
+ * stateless, needs no token plumbing, and does not depend on cookie semantics.
+ *
+ * Returns a 403 response when the request must be rejected, or `null` to
+ * continue. Safe methods are never blocked; a missing `Origin` is allowed
+ * because non-browser clients (and some same-origin navigations) omit it, and
+ * `SameSite` still covers the browser case there.
+ */
+export function crossOriginBlock(req: Request): Response | null {
+  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") return null;
+  const origin = req.headers.get("Origin");
+  if (!origin) return null;
+  let expected: string;
+  try {
+    expected = new URL(req.url).origin;
+  } catch {
+    return null;
+  }
+  if (origin === expected) return null;
+  return Response.json(
+    { error: { code: "FORBIDDEN", message: "Ongeldige herkomst." } },
+    { status: 403 },
+  );
+}
+
 /** Base headers plus the forwarded client IP, for an outbound `apiFetch` call. */
 export function forwardHeaders(
   req: Request,
