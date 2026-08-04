@@ -19,7 +19,12 @@ export default async function LoginPage({ params }: { params: Promise<{ locale: 
       <Suspense fallback={null}>
         <LoginForm />
       </Suspense>
-      <p className="mt-6 text-center text-sm text-muted">
+      <p className="mt-4 text-center text-sm text-muted">
+        <Link href="/wachtwoord-vergeten" className="font-medium text-accent hover:underline">
+          {t("forgotPasswordLink")}
+        </Link>
+      </p>
+      <p className="mt-3 text-center text-sm text-muted">
         {t("noAccount")}{" "}
         <Link href="/register" className="font-medium text-accent hover:underline">
           {t("registerLink")}

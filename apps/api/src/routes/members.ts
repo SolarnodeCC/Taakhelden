@@ -8,6 +8,9 @@ import {
   EquipAvatarBody,
   ErrorCodes,
   MemberAvatarState,
+  SetChildPauseBody,
+  ChildPause,
+  ChildPauseResponse,
 } from "@taakhelden/shared";
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
@@ -20,6 +23,7 @@ import * as repo from "../repo/families";
 import { revokeChildDeviceSessions } from "../repo/auth";
 import { getPhoto, setMemberPhotoKey } from "../repo/photos";
 import { EquipAvatarError, equipAvatarItems, getMemberAvatarState } from "../repo/avatar";
+import { listPauses, setPause, clearPause, activePauseFor } from "../repo/pauses";
 
 const members = new Hono<AppBindings>();
 
@@ -199,6 +203,102 @@ members.delete("/:id", async (c) => {
   }
   await repo.softDeleteMember(c.env.DB, familyId, memberId);
   return c.json({ ok: true, deletedAt: new Date().toISOString() });
+});
+
+// --- Rustschild (WS-PAUSE) ---
+
+function pauseView(row: {
+  id: string;
+  child_id: string;
+  starts_on: string;
+  ends_on: string | null;
+  reason: string | null;
+  cleared_at: string | null;
+}): ChildPause {
+  const today = new Date().toISOString().slice(0, 10);
+  const active =
+    row.cleared_at === null &&
+    row.starts_on <= today &&
+    (row.ends_on === null || row.ends_on >= today);
+  return ChildPause.parse({
+    id: row.id,
+    childId: row.child_id,
+    startsOn: row.starts_on,
+    endsOn: row.ends_on ?? null,
+    reason: row.reason ?? null,
+    active,
+  });
+}
+
+/** GET /members/:childId/pause — actieve + geplande pauzes (ouder of kind-zelf). */
+members.get("/:id/pause", async (c) => {
+  const childId = c.req.param("id");
+  const auth = requireSelfOrParent(c, childId);
+
+  const member = await repo.getMember(c.env.DB, auth.familyId, childId);
+  if (!member || member.role !== "child") {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
+  }
+
+  const rows = await listPauses(c.env.DB, auth.familyId, childId);
+  return c.json(
+    ChildPauseResponse.parse({
+      pauses: rows.map((r) => pauseView(r as Parameters<typeof pauseView>[0])),
+    }),
+  );
+});
+
+/** PUT /members/:childId/pause — stel pauze in (ouder full). Idempotency-Key verplicht. */
+members.put("/:id/pause", requireIdempotencyKey, validate("json", SetChildPauseBody), async (c) => {
+  const { familyId, userId } = requireParent(c, { full: true });
+  const childId = c.req.param("id");
+  const body = c.req.valid("json");
+
+  const member = await repo.getMember(c.env.DB, familyId, childId);
+  if (!member || member.role !== "child") {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
+  }
+
+  const id = await setPause(c.env.DB, familyId, {
+    childId,
+    startsOn: body.startsOn,
+    endsOn: body.endsOn ?? null,
+    reason: body.reason ?? null,
+    createdBy: userId,
+  });
+
+  const row = await activePauseFor(c.env.DB, familyId, childId, body.startsOn);
+  return c.json(
+    pauseView(
+      (row ?? {
+        id,
+        child_id: childId,
+        starts_on: body.startsOn,
+        ends_on: body.endsOn ?? null,
+        reason: body.reason ?? null,
+        cleared_at: null,
+      }) as Parameters<typeof pauseView>[0],
+    ),
+    201,
+  );
+});
+
+/** DELETE /members/:childId/pause/:pauseId — beëindig een pauze (ouder full). */
+members.delete("/:id/pause/:pauseId", requireIdempotencyKey, async (c) => {
+  const { familyId } = requireParent(c, { full: true });
+  const childId = c.req.param("id");
+  const pauseId = c.req.param("pauseId");
+
+  const member = await repo.getMember(c.env.DB, familyId, childId);
+  if (!member || member.role !== "child") {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
+  }
+
+  const cleared = await clearPause(c.env.DB, familyId, pauseId);
+  if (!cleared) {
+    throw new ApiException(404, ErrorCodes.NOT_FOUND, "Pauze niet gevonden of al beëindigd.");
+  }
+  return c.json({ ok: true, clearedAt: new Date().toISOString() });
 });
 
 export default members;

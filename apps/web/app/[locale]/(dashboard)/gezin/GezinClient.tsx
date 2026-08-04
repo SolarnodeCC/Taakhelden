@@ -30,10 +30,13 @@ import {
 } from "./ChildForms";
 import PointsPanel from "./PointsPanel";
 import DeleteChildForm from "./DeleteChildForm";
+import PausePanel from "./PausePanel";
+import { ActivePauseBadge } from "./PausePanel";
 import {
   ParentBalancesResponse,
   parentBalancesChildren,
   type Balance,
+  type ChildPause,
 } from "../../../../lib/api/types";
 
 type Panel =
@@ -42,6 +45,7 @@ type Panel =
   | { kind: "pin"; child: MemberView }
   | { kind: "points"; child: MemberView }
   | { kind: "delete"; child: MemberView }
+  | { kind: "pause"; child: MemberView }
   | null;
 
 export default function GezinClient() {
@@ -61,6 +65,7 @@ export default function GezinClient() {
   const [actionError, setActionError] = useState<string | null>(null);
   const [onboardingStep, setOnboardingStep] = useState<2 | 3>(2);
   const [balances, setBalances] = useState<Record<string, Balance>>({});
+  const [pauses, setPauses] = useState<Record<string, ChildPause | null>>({});
   const codeRef = useRef<HTMLElement | null>(null);
 
   const load = useCallback(async () => {
@@ -276,7 +281,9 @@ export default function GezinClient() {
               const emoji = avatarEmoji(child.avatarId);
               const childBalance = balances[child.id];
               const isActivePanel =
-                panel?.kind === "points" || panel?.kind === "delete"
+                panel?.kind === "points" ||
+                panel?.kind === "delete" ||
+                panel?.kind === "pause"
                   ? panel.child.id === child.id
                   : false;
               return (
@@ -286,7 +293,7 @@ export default function GezinClient() {
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         {emoji && (
                           <span className="text-xl" aria-hidden>
                             {emoji}
@@ -295,6 +302,9 @@ export default function GezinClient() {
                         <h3 className="truncate text-base font-semibold text-text">
                           {child.displayName}
                         </h3>
+                        {pauses[child.id] && (
+                          <ActivePauseBadge pause={pauses[child.id]!} />
+                        )}
                       </div>
                       <p className="mt-0.5 text-sm text-muted">
                         {child.birthYear != null && t("children.born", { year: child.birthYear })}
@@ -335,6 +345,20 @@ export default function GezinClient() {
                       </Button>
                       <Button
                         type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() =>
+                          setPanel(
+                            panel?.kind === "pause" && panel.child.id === child.id
+                              ? null
+                              : { kind: "pause", child },
+                          )
+                        }
+                      >
+                        {t("children.pause")}
+                      </Button>
+                      <Button
+                        type="button"
                         variant="ghost"
                         size="sm"
                         onClick={() => setPanel({ kind: "delete", child })}
@@ -345,6 +369,15 @@ export default function GezinClient() {
                   </div>
                   {isActivePanel && panel?.kind === "points" && (
                     <PointsPanel child={child} onClose={() => setPanel(null)} />
+                  )}
+                  {isActivePanel && panel?.kind === "pause" && (
+                    <PausePanel
+                      child={child}
+                      onChanged={load}
+                      onPauseLoaded={(p) =>
+                        setPauses((prev) => ({ ...prev, [child.id]: p }))
+                      }
+                    />
                   )}
                   {isActivePanel && panel?.kind === "delete" && (
                     <DeleteChildForm

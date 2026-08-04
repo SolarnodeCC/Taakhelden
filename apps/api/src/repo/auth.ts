@@ -170,6 +170,30 @@ export async function getUserById(db: D1Database, userId: string) {
 
 // --- registratie: gezin + eerste ouder in één batch (atomair) ---
 
+export async function updatePasswordHash(db: D1Database, userId: string, passwordHash: string) {
+  // Parent-only: password reset must never rewrite a child profile hash.
+  await db
+    .prepare(
+      "UPDATE users SET password_hash = ? WHERE id = ? AND role = 'parent' AND deleted_at IS NULL",
+    )
+    .bind(passwordHash, userId)
+    .run();
+}
+
+/**
+ * Revoke all active refresh tokens for a user. Called after a password reset so
+ * that any session that was active before the reset (e.g. on a compromised device)
+ * can no longer be used to obtain new access tokens.
+ */
+export async function revokeAllRefreshTokensForUser(db: D1Database, userId: string): Promise<void> {
+  await db
+    .prepare(
+      "UPDATE refresh_tokens SET revoked_at = datetime('now') WHERE user_id = ? AND revoked_at IS NULL",
+    )
+    .bind(userId)
+    .run();
+}
+
 export async function createFamilyWithParent(
   db: D1Database,
   input: {

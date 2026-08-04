@@ -39,6 +39,7 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 /families      gezin, instellingen, uitnodigingscode
 /members       ouder- en kindprofielen, avatars
 /tasks         taakdefinities + templates
+/tasks/proposals taakvragen van tieners (WS-PROPOSAL): indienen, goedkeuren, afwijzen
 /instances     dagelijkse taak-instanties: afvinken, goedkeuren
 /photos        presigned upload + bevestiging
 /points        saldo, ledger, bonusstatus
@@ -87,6 +88,9 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 | `POST /members/{id}/photo` | parent | Profielfoto via presigned-flow (§3.6). |
 | `POST /members/{id}/pincode` | parent | Pincode resetten. |
 | `DELETE /members/{id}` | parent | Kindprofiel verwijderen (soft delete 7 d, daarna cascade — zie /account). |
+| `GET /members/{childId}/pause` | parent / kind-zelf | Actieve en toekomstige pauzes voor dit kind. Response: `{ pauses: ChildPause[] }`. |
+| `PUT /members/{childId}/pause` | parent (`full`) | Rustschild instellen: `{ startsOn, endsOn?, reason? }`. Stopt instance-generatie en streak-gaten voor dit kind in het opgegeven bereik. **Geen ledger-effect.** `Idempotency-Key` aanbevolen (niet verplicht). |
+| `DELETE /members/{childId}/pause/{pauseId}` | parent (`full`) | Pauze beëindigen (cleared_at zetten). 404 als al beëindigd. |
 
 ### 3.4 Tasks (definities)
 
@@ -113,6 +117,39 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
   "daypart": "evening",               // morning | afternoon | evening | null
   "activeFrom": "2026-08-01",
   "activeUntil": null                 // bijv. toetsdatum bij huiswerk
+}
+```
+
+#### 3.4a Taakvragen — Taakvraag (WS-PROPOSAL)
+
+Een tiener stelt een taak voor; een ouder maakt er een echte taak van of wijst hem vriendelijk af. **Een taakvraag raakt het ledger nooit** — punten stromen pas via de normale taak → afvinken → goedkeuren-route, nadat de ouder de vraag heeft goedgekeurd. Geen FamilyRoom-DO in het pad.
+
+| Methode & pad | Rol | Beschrijving |
+|---|---|---|
+| `POST /tasks/proposals` | child (tienerregister) | Taakvraag indienen: `{title, category?, icon?, suggestedPoints, note?}`. **`Idempotency-Key` verplicht.** Levert geen punten en geen taak op. 403 als het kind niet in het tienerregister zit. |
+| `GET /tasks/proposals?status=` | beide | Ouder ziet alle taakvragen van het gezin, kind alleen zijn eigen. Optioneel filter `status=pending\|approved\|declined`. Response: `{ proposals: TaskProposal[] }`. |
+| `POST /tasks/proposals/{id}/approve` | parent (`full`) | `{points, approvalRequired?, assignees?}` → maakt een echte taak via de gewone `createTask`-route en koppelt `createdTaskId`. De ouder bepaalt de punten; die mogen afwijken van `suggestedPoints`. Lege `assignees` = alleen de indiener. **`Idempotency-Key` verplicht.** **Geen ledger-boeking.** Response: `{ proposal, taskId }`. |
+| `POST /tasks/proposals/{id}/decline` | parent (`full`) | `{note}`: verplichte, vriendelijke toelichting; status wordt `declined`. **`Idempotency-Key` verplicht.** Geen puntenaftrek — nooit een negatieve mechaniek. |
+
+**Leeftijdsgrens (serverside).** Indienen mag alleen vanuit het tienerregister: `users.age_mode = 'teen'` **of** een `birth_year` waaruit leeftijd ≥ 13 volgt. Die tweede voorwaarde vangt op dat `age_mode` bij het aanmaken van het profiel wordt afgeleid en daarna niet meebeweegt met de leeftijd. iOS toont de affordance al alleen in teen mode; de servercheck is de tweede grendel.
+
+**Idempotentie.** De KV-middleware dedupt op (user, `Idempotency-Key`) en geeft de eerdere response terug. Daarnaast is de beslissing zelf een atomaire claim (`UPDATE … WHERE status = 'pending'`): een tweede goedkeuring met een *nieuwe* key krijgt `409 INVALID_STATUS` en er ontstaat nooit een tweede taak.
+
+**Taakvraag-schema (`TaskProposal`):**
+```json
+{
+  "id": "prp_…",
+  "childId": "ch_noor",
+  "title": "Auto wassen",
+  "category": "household",            // household | homework | selfcare | custom
+  "icon": "star",
+  "suggestedPoints": 25,              // suggestie van het kind, 1–100
+  "note": "Ik wil sparen voor de bioscoop",
+  "status": "pending",                // pending | approved | declined
+  "decisionNote": null,               // vriendelijke toelichting van de ouder bij afwijzen
+  "decidedAt": null,
+  "createdTaskId": null,              // gevuld na goedkeuren
+  "createdAt": "2026-08-01T09:12:33.412Z"
 }
 ```
 
@@ -155,7 +192,44 @@ Limieten: max 10 MB, alleen `image/jpeg|heic|png`, max 20 uploads/kind/dag. R2-l
 
 Saldo = som van de ledger, berekend in de Durable Object van het gezin (serialisatie voorkomt race conditions bij simultaan afvinken). Dag- en weekbonussen worden **transactioneel bij de laatste kwalificerende `complete`** geboekt, niet door een aparte cron — directe feedback in de app.
 
-**Streak (`streakDays`)** = aaneengesloten dagen met dagbonus, t/m vandaag of gisteren (een nog open dag vandaag breekt niets). Streakbescherming, conform de productbelofte: **per ISO-kalenderweek (ma t/m zo) mag één dag zonder dagbonus overgeslagen worden** zonder dat de streak breekt; een tweede gemiste dag in diezelfde week stopt de streak. Een overgeslagen dag telt zelf niet mee als streakdag (hij is vergeven, niet verdiend), en "vandaag nog niet verdiend" kost géén weekvergeving. Vakantiemodus staat hier los van.
+**Streak (`streakDays`)** = aaneengesloten dagen met dagbonus, t/m vandaag of gisteren (een nog open dag vandaag breekt niets). Streakbescherming, conform de productbelofte: **per ISO-kalenderweek (ma t/m zo) mag één dag zonder dagbonus overgeslagen worden** zonder dat de streak breekt; een tweede gemiste dag in diezelfde week stopt de streak. Een overgeslagen dag telt zelf niet mee als streakdag (hij is vergeven, niet verdiend), en "vandaag nog niet verdiend" kost géén weekvergeving. **Rustschild-pauze (WS-PAUSE):** een gepauzeerde dag is transparant — telt noch als verdiend, noch als gemiste dag, en verbruikt het weekvergevingsbudget niet. Vakantiemodus staat hier los van.
+
+### 3.14 Inzichten / Gesprekskaart (WS-INSIGHTS)
+
+**Endpoint:** `GET /families/me/insights?range=week&weekOf=YYYY-MM-DD&childId=<optioneel>`
+- Rol: parent only. Read-only; geen DO, geen ledger-write.
+- `range`: alleen `week` ondersteund.
+- `weekOf`: ISO-datum van de maandag van de gewenste week (default: huidige week).
+- `childId`: optioneel; filtert op één kind.
+
+**Response (WeeklyInsightsResponse):**
+```json
+{
+  "weekOf": "2026-07-27",
+  "range": "week",
+  "children": [
+    {
+      "childId": "ch_noor",
+      "displayName": "Noor",
+      "earned": 90,
+      "spent": 15,
+      "net": 75,
+      "tasksApproved": 6,
+      "tasksTotal": 7,
+      "completionRate": 0.857,
+      "streakDays": 5,
+      "slippingTasks": [
+        { "taskId": "tsk_abc", "title": "Huiswerk", "icon": "📚", "missed": 2 }
+      ]
+    }
+  ]
+}
+```
+- `earned` = som van positieve ledger-bedragen die week (excl. `redemption_cancel`).
+- `spent` = magnitude van `redemption`-bedragen die week.
+- `net = earned − spent` (nooit als schuld geframed).
+- `slippingTasks` = top-5 taken met de meeste `open`/`open_redo`-instances die week; kinderen worden nooit onderling gerangschikt.
+- Endpoint is parent-only (403 voor kindtokens) en levert nooit kind-PII buiten `displayName`.
 
 ### 3.8 Rewards
 
@@ -241,6 +315,8 @@ Regels: mutaties worden in volgorde toegepast in de Family-DO; `key` = idempoten
 | Eigen taken zien/afvinken | ✅ | ✅ (zien) | ✅ |
 | Foto uploaden bij taak | ✅ | — | — |
 | Goedkeuren/redo | — | ✅ | ✅ |
+| Taakvraag indienen | ✅ (alleen teen) | — | — |
+| Taakvraag goedkeuren/afwijzen | — | — | ✅ |
 | Taken/beloningen beheren | — | — | ✅ |
 | Beloning kopen | ✅ | — | — |
 | Inlossing afhandelen | — | ✅ | ✅ |

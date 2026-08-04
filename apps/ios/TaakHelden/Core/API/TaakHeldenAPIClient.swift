@@ -234,6 +234,63 @@ final class TaakHeldenAPIClient {
         )
     }
 
+    // MARK: - WS-PAUSE: per-child rest state (v1 read-only)
+
+    /// Fetches the active pause for the signed-in child.
+    /// Returns `nil` when no pause is active today (404 or no active pause in the list).
+    /// Matches the WS-PAUSE contract (`GET /members/:id/pause` → `{ pauses: [...] }`).
+    func fetchChildPause(memberID: String) async throws -> ChildPauseDTO? {
+        do {
+            let response = try await sendAuthorized(
+                HTTPRequest(path: "/members/\(memberID)/pause", method: .get, requiresAuth: true)
+            )
+            let dto = try decoder.decode(ChildPauseResponseDTO.self, from: response.data)
+            return dto.pauses.first(where: { $0.active })
+        } catch HTTPTransportError.httpStatus(404, _) {
+            return nil
+        }
+    }
+
+    // MARK: - WS-PROPOSAL: teen task proposals (v1 stub — API gated behind G3)
+
+    /// Creates a task proposal for a teen child.
+    /// Idempotency key must be stable across retries for the same proposal intent.
+    func createTaskProposal(
+        title: String,
+        category: String,
+        suggestedPoints: Int,
+        note: String?,
+        idempotencyKey: String
+    ) async throws -> TaskProposalDTO {
+        var payload: [String: AnyEncodable] = [
+            "title": AnyEncodable(title),
+            "category": AnyEncodable(category),
+            "suggestedPoints": AnyEncodable(suggestedPoints),
+        ]
+        if let note { payload["note"] = AnyEncodable(note) }
+        let body = try encoder.encode(payload)
+        let response = try await sendAuthorized(
+            HTTPRequest(
+                path: "/tasks/proposals",
+                method: .post,
+                body: body,
+                requiresAuth: true,
+                idempotencyKey: idempotencyKey
+            )
+        )
+        return try decoder.decode(TaskProposalDTO.self, from: response.data)
+    }
+
+    /// Returns the teen's own proposals (child token) or all pending proposals (parent token).
+    func fetchTaskProposals(status: String? = nil) async throws -> [TaskProposalDTO] {
+        var path = "/tasks/proposals"
+        if let status { path += "?status=\(status)" }
+        let response = try await sendAuthorized(
+            HTTPRequest(path: path, method: .get, requiresAuth: true)
+        )
+        return try decoder.decode(TaskProposalListDTO.self, from: response.data).proposals
+    }
+
     // MARK: - Phase 3: avatar shop + family goals
 
     func fetchAvatarCatalog() async throws -> AvatarCatalogResponseDTO {
@@ -358,6 +415,50 @@ struct PinRewardResultDTO: Codable, Equatable {
     let title: String
     let price: Int
     let progress: Double
+}
+
+// MARK: - WS-PAUSE DTOs (contract: GET /members/:id/pause)
+
+/// Thin DTO for a pause entry returned from `GET /members/:id/pause`.
+/// Matches the WS-PAUSE `ChildPause` Zod schema in `packages/shared`.
+struct ChildPauseDTO: Codable, Equatable {
+    let id: String
+    let childId: String
+    let startsOn: String
+    let endsOn: String?
+    let reason: String?
+    let active: Bool
+}
+
+/// Envelope for the pause endpoint response.
+/// The API returns `{ "pauses": [ ChildPause ] }` — an array of pauses,
+/// each with its own `active` flag. This matches `GET /members/:id/pause`.
+struct ChildPauseResponseDTO: Codable {
+    let pauses: [ChildPauseDTO]
+}
+
+// MARK: - WS-PROPOSAL DTOs (contract: POST /tasks/proposals, GET /tasks/proposals)
+
+/// Proposal status mirrors `ProposalStatus` in `packages/shared`.
+enum ProposalStatus: String, Codable, Equatable {
+    case pending, approved, declined
+}
+
+/// Matches `TaskProposal` Zod schema in `packages/shared`.
+struct TaskProposalDTO: Codable, Identifiable, Equatable {
+    let id: String
+    let childId: String
+    let title: String
+    let category: String
+    let icon: String
+    let suggestedPoints: Int
+    let note: String?
+    let status: ProposalStatus
+    let createdTaskId: String?
+}
+
+struct TaskProposalListDTO: Codable {
+    let proposals: [TaskProposalDTO]
 }
 
 struct EquipAvatarPayload: Encodable, Equatable {

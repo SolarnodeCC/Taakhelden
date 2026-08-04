@@ -26,6 +26,7 @@ export default function LoginForm() {
           purgeAfter: decodeURIComponent(searchParams.get("purgeAfter") ?? ""),
         })
       : null;
+  const resetNotice = searchParams.get("reset") === "1" ? t("passwordResetSuccess") : null;
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +78,7 @@ export default function LoginForm() {
         />
       </Field>
 
+      {resetNotice && <Alert tone="success">{resetNotice}</Alert>}
       {deletedNotice && <Alert tone="success">{deletedNotice}</Alert>}
       {error && <Alert tone="danger">{error}</Alert>}
 

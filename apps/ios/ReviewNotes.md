@@ -73,6 +73,63 @@ criterion 4 (multi-child per device).
 
 ---
 
+## App Store readiness checklist — Gate G5 (WS-IOS-STORE)
+
+Gate G5 unblocks `WS-ANDROID`. All items below must be true before submitting.
+Reference: `docs/wispel-post-review-workstreams.md` §Gate G5.
+
+### G5 criteria
+
+| # | Criterion | Status | Notes |
+|---|-----------|--------|-------|
+| G5-1 | Wispel iPhone app **accepted** by Apple and publicly live in NL App Store | ⬜ Pending | App Store listing URL: — |
+| G5-2 | Sign in with Apple (SIWA) + account-delete flow tested end-to-end on production build | ⬜ Pending | Test on real device with App Store build |
+| G5-3 | Privacy nutrition labels submitted **and** approved in App Store Connect | ⬜ Pending | Photos/Videos · Contact Info · Identifiers (see Compliance notes above) |
+| G5-4 | ReviewNotes contain **real** staging credentials (parent + child accounts, not stub bypass) | ⬜ Pending | Update "Staging demo credentials" table after prod review gezin is set up |
+| G5-5 | Zero P0 trust blockers open at submission | ⬜ Pending | All WS-TRUST-IOS items from `docs/wispel-post-review-workstreams.md` resolved |
+
+### Pre-submission checklist (per build)
+
+#### Trust & security (WS-TRUST-IOS — must be resolved)
+- [ ] No code path writes raw child PIN to Keychain or `UserDefaults`; only the device refresh token is stored (`PINHasher.makeStored` + `verify` pattern; unit test in `TaakHeldenTests`)
+- [ ] Undo ("Oeps, toch niet") affordance works within 5-min server window; `UNDO_WINDOW_EXPIRED` shows friendly copy after expiry
+- [ ] `CelebrationService.celebrateTaskCompleted(reduceMotion:)` respects `accessibilityReduceMotion` — no confetti fired when on, haptic + chime still play
+- [ ] Logout calls `DELETE /devices/:token` for the departing profile's APNs row (`deregisterDevice`)
+- [ ] Multi-child per shared iPad: each child can log in and complete their own tasks without re-onboarding (manual E2E, two profiles, one device)
+
+#### Feature parity (Wave 1–2 features — deferred items listed, not blocking G5)
+- [ ] WS-FOCUS focus timer ships in this build (client-only v1 — no server session logging)
+- [ ] WS-PAUSE rest state shows "Je hebt even rust" when `GET /members/:id/pause` returns active pause
+- [ ] WS-PROPOSAL teen "Vraag een taak aan" ships with stub fallback when API not yet live
+- [x] Multi-child picker — **deferred** (larger scope; see "Shared-device multi-child profile picker" note above). Track in follow-up PR.
+
+#### Accessibility
+- [ ] Dynamic Type: all child-facing text scales to at least XXXL without clipping
+- [ ] VoiceOver: every interactive control has a meaningful `accessibilityLabel`; no unlabeled buttons
+- [ ] Touch targets ≥ 44 pt (≥ 64 pt for Young mode); verified on iPhone SE (smallest layout)
+- [ ] Reduce Motion: celebrations, confetti, and focus timer ring animation all degrade gracefully
+
+#### Privacy & compliance
+- [ ] No child name, photo URL, or PII appears in crash reports, analytics, or console logs
+- [ ] Lockscreen push text is generic (no task name, child name, or photo details)
+- [ ] Camera / Face ID usage strings use productnaam **Wispel** (not TaakHelden)
+- [ ] DPIA starter reviewed: `docs/taakhelden-dpia-starter.md`
+
+#### Build & environment
+- [ ] Release entitlements: `aps-environment = production`
+- [ ] API base URL in Release Info.plist points to production Worker: `https://taakhelden-api.oostelaar.workers.dev/v1` (rename follows WS-INFRA)
+- [ ] `npm run openapi:check` passes (contract snapshot matches `packages/shared`)
+- [ ] No `.dev.vars` secrets bundled in the archive
+
+#### App Store Connect
+- [ ] App icon uploaded (1024×1024 px, no alpha channel)
+- [ ] Screenshots uploaded for 6.7" (iPhone 15 Pro Max) and 12.9" (iPad Pro) — required sizes
+- [ ] Privacy labels filled: Photos or Videos, Contact Info, Identifiers — **no Tracking** (no third-party analytics SDK)
+- [ ] Age rating: 4+ (no user-generated content from children visible to others; family-gated)
+- [ ] Keywords and description reference **Wispel** (not TaakHelden)
+
+---
+
 ## Gerelateerde docs
 
 - E2E-checklist (2 devices): `docs/ios-phase1-e2e-checklist.md`

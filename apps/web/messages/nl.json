@@ -48,6 +48,37 @@
         "VALIDATION_FAILED": "Controleer je wachtwoord (minstens 8 tekens) en probeer het opnieuw.",
         "generic": "Er ging iets mis. Probeer het straks nog eens."
       }
+    },
+    "passwordResetSuccess": "Je wachtwoord is opnieuw ingesteld. Log hieronder in.",
+    "resetPassword": {
+      "password": "Nieuw wachtwoord",
+      "confirmPassword": "Herhaal wachtwoord",
+      "submit": "Wachtwoord opslaan",
+      "submitting": "Bezig met opslaan…",
+      "missingToken": "Deze link mist een reset-code. Vraag een nieuwe aan.",
+      "requestNewLink": "Nieuwe link aanvragen",
+      "backToLogin": "Toch liever inloggen?",
+      "loginLink": "Naar inloggen",
+      "errors": {
+        "VALIDATION_FAILED": "Deze link is verlopen of al gebruikt. Vraag een nieuwe aan.",
+        "RATE_LIMITED": "Even een momentje — probeer het over een minuutje nog eens.",
+        "passwordMismatch": "De wachtwoorden komen niet overeen.",
+        "generic": "Er ging iets mis. Probeer het straks nog eens."
+      }
+    },
+    "forgotPasswordLink": "Wachtwoord vergeten?",
+    "forgotPassword": {
+      "email": "E-mailadres",
+      "submit": "Link versturen",
+      "submitting": "Bezig…",
+      "successMessage": "Als dit e-mailadres bij ons bekend is, sturen we je een e-mail met een link om je wachtwoord opnieuw in te stellen.",
+      "backToLogin": "Weet je het nog?",
+      "loginLink": "Terug naar inloggen",
+      "errors": {
+        "RATE_LIMITED": "Even een momentje — probeer het over een minuutje nog eens.",
+        "VALIDATION_FAILED": "Vul een geldig e-mailadres in.",
+        "generic": "Er ging iets mis. Probeer het straks nog eens."
+      }
     }
   },
   "guards": {
@@ -105,7 +136,27 @@
     "cancel": "Annuleren",
     "actionError": "Er ging iets mis. Probeer het nog eens.",
     "photoAlt": "Foto van de afgeronde taak",
-    "photoUnavailable": "Foto is nog niet beschikbaar."
+    "photoUnavailable": "Foto is nog niet beschikbaar.",
+    "proposals": {
+      "sectionLabel": "Taakvragen",
+      "sectionHint": "Jouw kind stelt een taak voor — keur goed of geef een vriendelijk antwoord.",
+      "requestedBy": "Ingediend door {name}",
+      "suggestedPoints": "{points} pt gevraagd",
+      "approve": "Goedkeuren",
+      "approveConfirm": "Taak aanmaken",
+      "approving": "Bezig…",
+      "pointsLabel": "Definitieve punten",
+      "decline": "Afwijzen",
+      "declineConfirm": "Stuur antwoord",
+      "declining": "Bezig…",
+      "declineLabel": "Wat wil je terugsturen?",
+      "declinePlaceholder": "Goed idee, maar nu even niet — misschien later!",
+      "cancel": "Annuleren",
+      "actionError": "Er ging iets mis. Probeer het nog eens.",
+      "loadError": "Kon de taakvragen niet laden.",
+      "declineNoteRequired": "Vul een reactie in — kinderen waarderen een berichtje.",
+      "approveValidationError": "Punten moeten groter dan nul zijn."
+    }
   },
   "taken": {
     "title": "Taken",
@@ -288,6 +339,7 @@
       "resetPin": "Pincode resetten",
       "points": "Punten",
       "delete": "Verwijderen",
+      "pause": "Rustschild",
       "balance": "{points} punten",
       "born": "Geboren in {year}",
       "ageMode": {
@@ -478,6 +530,58 @@
       "body": "Binnenkort: trends per week als hulp voor het gesprek — nooit als controlemiddel."
     }
   },
+  "inzichten": {
+    "title": "Inzichten",
+    "subtitle": "Waar ging het goed, waar kan hulp helpen?",
+    "loading": "Laden…",
+    "loadError": "Kon de inzichten niet laden. Probeer het opnieuw.",
+    "retry": "Opnieuw proberen",
+    "noChildren": "Nog geen kinderen in dit gezin.",
+    "weekOf": "Week van {date}",
+    "prevWeek": "Vorige week",
+    "nextWeek": "Volgende week",
+    "thisWeek": "Deze week",
+    "earned": "Verdiend",
+    "spent": "Besteed",
+    "net": "Netto",
+    "points": "{points} punten",
+    "completion": "Voltooiing",
+    "completionValue": "{pct}%",
+    "tasksApproved": "{approved} van {total}",
+    "streak": "Streak",
+    "streakDays": "{days} dagen",
+    "streakDaysOne": "1 dag",
+    "slippingTitle": "Kan het gesprek helpen?",
+    "slippingHint": "Deze taken zijn de afgelopen week vaker opengebleven of teruggestuurd.",
+    "slippingMissed": "{count}×",
+    "noSlipping": "Alles ging goed — niets dat extra aandacht vraagt.",
+    "empty": "Nog geen gegevens voor deze week.",
+    "frameHint": "Deze inzichten zijn er om het gesprek te helpen — nooit als cijferlijst."
+  },
+  "rustschild": {
+    "badge": "Rustschild aan",
+    "badgeActive": "Rust t/m {date}",
+    "badgeOpenEnded": "Rustschild actief",
+    "set": "Rustschild instellen",
+    "clear": "Rustschild uitzetten",
+    "clearing": "Bezig…",
+    "title": "Rustschild voor {name}",
+    "hint": "Taken worden overgeslagen en de streak telt niet tijdens rust. Geen punten worden afgetrokken.",
+    "fldStartsOn": "Rust vanaf",
+    "fldEndsOn": "Tot (optioneel)",
+    "fldEndsOnHint": "Laat leeg voor open einde — zet het schild uit zodra je wilt.",
+    "fldReason": "Reden (alleen voor jou)",
+    "fldReasonPlaceholder": "Bijv. ziek, vakantie, drukke week",
+    "fldReasonHint": "Maximaal 140 tekens. Nooit zichtbaar voor het kind.",
+    "save": "Opslaan",
+    "saving": "Bezig met opslaan…",
+    "cancel": "Annuleren",
+    "dateRangeInvalid": "De einddatum moet op of na de startdatum liggen.",
+    "errorSave": "Kon het rustschild niet opslaan. Probeer het nog eens.",
+    "errorClear": "Kon het rustschild niet uitzetten. Probeer het nog eens.",
+    "errorLoad": "Kon de pauzestatus niet laden.",
+    "clearConfirm": "Rustschild uitzetten voor {name}?"
+  },
   "marketing": {
     "metaTitle": "Wispel — gratis voor gezinnen",
     "metaDescription": "Wispel helpt gezinnen met huiswerk en klusjes — privacy first, gratis voor je gezin. Positief voor kids, rustig voor ouders.",
@@ -497,7 +601,11 @@
       "accept": "Accepteer je uitnodiging en help mee in het gezin.",
       "loginTitle": "Inloggen",
       "registerTitle": "Gezin starten",
-      "acceptTitle": "Uitnodiging"
+      "acceptTitle": "Uitnodiging",
+      "forgotPasswordTitle": "Wachtwoord vergeten",
+      "forgotPassword": "Vul je e-mailadres in en we sturen je een link om je wachtwoord opnieuw in te stellen.",
+      "resetPasswordTitle": "Nieuw wachtwoord",
+      "resetPassword": "Kies een nieuw wachtwoord voor je Wispel-account."
     },
     "visual": {
       "dayLabel": "Mijn dag",

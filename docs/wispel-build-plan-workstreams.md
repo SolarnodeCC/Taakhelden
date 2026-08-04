@@ -464,7 +464,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | --- | --- | --- | --- | --- |
 | O13 | **Staging hostname** | Keep `*.workers.dev` until prod cutover | No — INFRA later | DevOps |
 | O14 | **Interactive demo** on marketing | **Defer** to Horizon C / WS-CROSS (anti-goal for A) | No | Marketing |
-| O15 | **Inzichten** | Ships as a real read-only "Gesprekskaart" via **WS-INSIGHTS** in the post-review catalog, after Gate G3 — the stub is removed then; hide from nav until that workstream merges | No — WS-INSIGHTS (post-review) | PO + Web |
+| O15 | **Inzichten** | ✅ Shipped as Gesprekskaart via WS-INSIGHTS (PR #85) | — | Locked 2026-08-01 |
 | O16 | **Auth on web:** forgot-password / Google | Backlog after A; email/password + iOS SIWA stay | No for A | Web + Security |
 | O17 | **Token ownership** during parallel UI | ✅ One editor: globals.css + DS tokens + THPalettes (brand sheet) | — | Locked 2026-07-30 |
 
@@ -510,7 +510,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O9 | Subdomain map confirmed as intent: www / app / api on wispel.cc | 2026-07-30 | ADR-0005 §1 |
 | O10 | **Policy** locked (keep `nl.taakhelden.*` if ASC exists; else prefer `cc.wispel.family`); concrete ID pending ASC check | 2026-07-30 | ADR-0005 §4 |
 | O8 | Marketing in same Next `(marketing)` group (implemented with privacy pages) | 2026-07-30 | WS-PRIVACY-PUB |
-| O15 | Hide Inzichten from nav until real Insights | 2026-07-30 | WS-WEB-CRAFT default |
+| O15 | Hide Inzichten from nav until real Insights → **shipped** as Gesprekskaart | 2026-08-01 | WS-INSIGHTS / PR #85 |
 | O21 | Prefer external `/steun`, not IAP (unless Apple forces) | 2026-07-30 | ADR-0005 §3 |
 | O22 | Steun placeholder OK on thin landing | 2026-07-30 | ADR-0005 §3 |
 | **O2–O7, O12, O17** | Brand v1 sheet + Ster+wisp mark + chrome icons; mascot postpone; emoji avatars v1; token owner | 2026-07-30 | `docs/brand/wispel-brand-v1.md` / WS-BRAND |

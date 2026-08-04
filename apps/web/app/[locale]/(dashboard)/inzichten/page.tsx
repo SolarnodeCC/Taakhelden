@@ -1,8 +1,12 @@
 import { setRequestLocale } from "next-intl/server";
-import SectionStub from "../SectionStub";
+import InzichtenClient from "./InzichtenClient";
 
-export default async function InzichtenPage({ params }: { params: Promise<{ locale: string }> }) {
+export default async function InzichtenPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
   const { locale } = await params;
   setRequestLocale(locale);
-  return <SectionStub sectionKey="inzichten" />;
+  return <InzichtenClient locale={locale} />;
 }

@@ -6,7 +6,7 @@ import AuthLegalLinks from "./AuthLegalLinks";
 
 type AuthShellProps = {
   children: React.ReactNode;
-  promiseKey?: "login" | "register" | "accept";
+  promiseKey?: "login" | "register" | "accept" | "forgotPassword" | "resetPassword";
 };
 
 /**
@@ -20,7 +20,11 @@ export default async function AuthShell({ children, promiseKey = "login" }: Auth
       ? "loginTitle"
       : promiseKey === "register"
         ? "registerTitle"
-        : "acceptTitle";
+        : promiseKey === "forgotPassword"
+          ? "forgotPasswordTitle"
+          : promiseKey === "resetPassword"
+            ? "resetPasswordTitle"
+            : "acceptTitle";
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-surface text-text">

@@ -6,6 +6,8 @@ enum ChildDayLoadState: Equatable {
     case ready(ChildTodayViewDTO)
     case emptyAllDone(TodayBalanceDTO)
     case emptyNoTasks
+    /// Child has an active pause set by a parent — show a gentle rest state.
+    case paused(String?)
     case offline
     case error(String)
 }
@@ -56,6 +58,15 @@ final class ChildDayViewModel {
         undoStatusMessage = nil
         state = .loading
         do {
+            // WS-PAUSE: check for an active child pause before loading tasks.
+            // Requires the child session to have a childID available via the API client.
+            if let memberID = apiClient.authStore.childSession?.childID {
+                if let pause = try? await apiClient.fetchChildPause(memberID: memberID), pause.active {
+                    // Prefer the parent-set reason (positive copy), fall back to generic.
+                    state = .paused(pause.reason)
+                    return
+                }
+            }
             let today = try await apiClient.fetchChildToday()
             if today.instances.isEmpty {
                 state = today.balance.todayTotal == 0 ? .emptyNoTasks : .emptyAllDone(today.balance)

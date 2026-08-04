@@ -8,6 +8,14 @@ enum ChildTab: Hashable {
     case mijnHeld
 }
 
+/// Identifies the task currently being focused on so the sheet and
+/// the post-completion offer both have a reference to it.
+private struct ActiveFocusContext: Identifiable, Equatable {
+    var id: String { instanceID }
+    let instanceID: String
+    let taskTitle: String
+}
+
 struct ChildShellView: View {
     @Environment(AppState.self) private var appState
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -15,6 +23,7 @@ struct ChildShellView: View {
     @State private var shopViewModel: ChildShopViewModel?
     @State private var goalViewModel: FamilyGoalViewModel?
     @State private var avatarShopViewModel: AvatarShopViewModel?
+    @State private var proposalViewModel: TaskProposalViewModel?
     @State private var showPushPrimer = false
 
     var body: some View {
@@ -33,7 +42,8 @@ struct ChildShellView: View {
                 avatar: session?.avatar ?? "🦊",
                 displayName: session?.displayName ?? String(localized: "held.fallback.name"),
                 viewModel: dayViewModel,
-                goalViewModel: goalViewModel
+                goalViewModel: goalViewModel,
+                proposalViewModel: proposalViewModel
             )
             .tabItem {
                 Label(
@@ -97,6 +107,9 @@ struct ChildShellView: View {
             }
             if avatarShopViewModel == nil, let childID = session?.childID {
                 avatarShopViewModel = AvatarShopViewModel(apiClient: appState.apiClient, memberID: childID)
+            }
+            if proposalViewModel == nil, isTeen {
+                proposalViewModel = TaskProposalViewModel(apiClient: appState.apiClient)
             }
             await dayViewModel?.load()
             await shopViewModel?.load()
@@ -211,11 +224,19 @@ private struct MijnDagTabView: View {
     let displayName: String
     let viewModel: ChildDayViewModel?
     let goalViewModel: FamilyGoalViewModel?
+    let proposalViewModel: TaskProposalViewModel?
+
+    @State private var focusTimer = FocusTimerService()
+    @State private var activeFocus: ActiveFocusContext?
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: THSpacing.lg) {
+                    // Teen-only: "Vraag een taak aan" affordance (WS-PROPOSAL).
+                    if isTeen, let proposalVM = proposalViewModel {
+                        ProposalSheetButton(palette: palette, viewModel: proposalVM)
+                    }
                     if let progress = goalViewModel?.progress {
                         FamilyGoalCard(
                             progress: progress,
@@ -236,6 +257,8 @@ private struct MijnDagTabView: View {
                         ProgressView(String(localized: "child.day.loading"))
                             .frame(maxWidth: .infinity, alignment: .center)
                             .padding(.top, THSpacing.xxl)
+                    case .paused(let reason):
+                        pausedCard(reason: reason)
                     case .ready(let today):
                         header(balance: today.balance)
                         ForEach(today.instances) { instance in
@@ -296,6 +319,41 @@ private struct MijnDagTabView: View {
                 await goalViewModel?.load()
             }
         }
+        .sheet(item: $activeFocus) { ctx in
+            FocusTimerSheet(
+                taskTitle: ctx.taskTitle,
+                palette: palette,
+                isYoung: isYoung,
+                timer: focusTimer,
+                onComplete: {
+                    activeFocus = nil
+                    focusTimer.stop()
+                    Task { await viewModel?.complete(instanceID: ctx.instanceID, reduceMotion: reduceMotion) }
+                },
+                onDismiss: {
+                    activeFocus = nil
+                }
+            )
+        }
+    }
+
+    @ViewBuilder
+    private func pausedCard(reason: String?) -> some View {
+        THCard(palette: palette) {
+            VStack(alignment: .leading, spacing: THSpacing.sm) {
+                Label(String(localized: "child.pause.title"), systemImage: "moon.zzz.fill")
+                    .font(.headline)
+                    .foregroundStyle(palette.text.color)
+                Text(reason ?? String(localized: "child.pause.detail"))
+                    .foregroundStyle(palette.mutedText.color)
+                if isYoung {
+                    YoungSpeakButton(
+                        text: String(localized: "child.pause.detail"),
+                        palette: palette
+                    )
+                }
+            }
+        }
     }
 
     @ViewBuilder
@@ -349,11 +407,10 @@ private struct MijnDagTabView: View {
     @ViewBuilder
     private func taskCard(_ instance: InstanceViewDTO) -> some View {
         let isDone = instance.status != "open" && instance.status != "open_redo"
-        // Show undo affordance only when: completed this session, within 5-min window,
-        // and not yet approved (approved instances cannot be undone server-side).
         let canUndo = isDone
             && instance.status != "approved"
             && viewModel?.isInUndoWindow(instance.id) == true
+        let isActiveFocusTarget = activeFocus?.instanceID == instance.id
 
         THCard(palette: palette) {
             HStack {
@@ -401,13 +458,31 @@ private struct MijnDagTabView: View {
                 }
             }
 
+            // Focus timer affordance — shown for open tasks on non-young profiles.
+            if !isDone && !isYoung {
+                HStack {
+                    FocusStartButton(palette: palette, isYoung: false) {
+                        if isActiveFocusTarget && focusTimer.phase != .idle {
+                            // Bring the running sheet back up.
+                        }
+                        activeFocus = ActiveFocusContext(
+                            instanceID: instance.id,
+                            taskTitle: instance.title
+                        )
+                        if focusTimer.phase == .idle {
+                            // Sheet will start; timer starts from the sheet.
+                        }
+                    }
+                    Spacer(minLength: 0)
+                }
+            }
+
             if isDone, instance.photoBonusPoints > 0, instance.photoId == nil {
                 PhotoBonusActionsView(palette: palette) { jpegData in
                     Task { await viewModel?.uploadPhoto(for: instance.id, jpegData: jpegData) }
                 }
             }
 
-            // "Oeps, toch niet" — undo affordance within the 5-minute server window.
             if canUndo {
                 Button(String(localized: "child.task.undo.button")) {
                     Task { await viewModel?.undo(instanceID: instance.id) }

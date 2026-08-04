@@ -84,3 +84,14 @@ export const RevokeChildSessionsResult = z.object({
   revokedCount: z.number().int().nonnegative(),
 });
 export type RevokeChildSessionsResult = z.infer<typeof RevokeChildSessionsResult>;
+
+export const ForgotPasswordBody = z.object({
+  email: z.string().email(),
+});
+export type ForgotPasswordBody = z.infer<typeof ForgotPasswordBody>;
+
+export const ResetPasswordBody = z.object({
+  token: z.string().min(1),
+  password: z.string().min(10),
+});
+export type ResetPasswordBody = z.infer<typeof ResetPasswordBody>;

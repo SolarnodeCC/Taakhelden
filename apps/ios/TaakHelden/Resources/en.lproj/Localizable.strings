@@ -233,3 +233,60 @@
 /* Undo affordance — warm, positive, no guilt (§3.7) */
 "child.task.undo.button" = "Oops, undo";
 "child.task.undo.expired" = "Just a bit too late — but you did great!";
+
+/* WS-PAUSE — child rest state */
+"child.pause.title" = "You have a rest day";
+"child.pause.detail" = "No tasks today — enjoy your free time!";
+
+/* WS-PROPOSAL — teen task proposal */
+"proposal.title" = "Request a task";
+"proposal.close" = "Close";
+"proposal.button" = "Request a task";
+"proposal.form.title" = "New proposal";
+"proposal.form.detail" = "Got an idea for a task? Send it through — a parent decides and sets the points.";
+"proposal.field.title" = "Task name";
+"proposal.field.title.placeholder" = "E.g. wash the windows";
+"proposal.field.category" = "Type";
+"proposal.category.homework" = "Homework";
+"proposal.category.household" = "Household";
+"proposal.category.selfcare" = "Self-care";
+"proposal.category.custom" = "Other";
+"proposal.field.points.label" = "You suggest: %d points";
+"proposal.field.points.stepper" = "%d points";
+"proposal.field.note" = "Note (optional)";
+"proposal.field.note.placeholder" = "Explain why this task is useful";
+"proposal.submit" = "Send proposal";
+"proposal.submit.success" = "Proposal sent — a parent will take a look!";
+"proposal.submit.error" = "That didn't work — try again soon.";
+"proposal.list.title" = "Your requests";
+"proposal.list.loading" = "Loading requests…";
+"proposal.list.empty" = "No requests yet — feel free to send one!";
+"proposal.load.error" = "Couldn't load requests — try again soon.";
+"proposal.suggested.points" = "You suggested %d points";
+"proposal.status.pending" = "Waiting on a parent";
+"proposal.status.approved" = "Approved!";
+"proposal.status.declined" = "Let's try something else";
+
+/* WS-FOCUS — focus timer */
+"focus.title" = "Focus time";
+"focus.close" = "Close";
+"focus.ready" = "Ready to start";
+"focus.running" = "Going…";
+"focus.paused" = "On a break";
+"focus.done" = "Nice work!";
+"focus.start" = "Start!";
+"focus.pause" = "Pause";
+"focus.resume" = "Resume";
+"focus.stop" = "Stop";
+"focus.duration.format" = "%d min";
+"focus.duration.pick" = "How long do you want to focus?";
+"focus.button.inline" = "Start focus";
+"focus.button.inline.a11y" = "Start focus timer for this task";
+"focus.complete.offer.title" = "Mark task done too?";
+"focus.complete.offer.detail" = "You worked hard — want to check the task off as well?";
+"focus.complete.offer.yes" = "Yes, done!";
+"focus.complete.offer.later" = "Maybe later";
+"focus.a11y.idle" = "Focus timer, not started";
+"focus.a11y.running" = "Focus timer running, %@ remaining";
+"focus.a11y.paused" = "Focus timer paused, %@ remaining";
+"focus.a11y.done" = "Focus timer done — nice work!";

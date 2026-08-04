@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth";
 import familyRoutes, { parentAccept } from "./routes/families";
 import memberRoutes from "./routes/members";
 import taskRoutes from "./routes/tasks";
+import proposalRoutes from "./routes/proposals";
 import instanceRoutes from "./routes/instances";
 import pointsRoutes from "./routes/points";
 import rewardRoutes from "./routes/rewards";
@@ -20,6 +21,7 @@ import familyGoalsRoutes from "./routes/familyGoals";
 import accountRoutes, { exportDownload } from "./routes/account";
 import notificationRoutes from "./routes/notifications";
 import wsRoutes, { handleWsUpgrade } from "./routes/ws";
+import insightsRoutes from "./routes/insights";
 
 const app = new Hono<AppBindings>().basePath("/v1");
 
@@ -62,6 +64,8 @@ app.use("*", async (c, next) => {
 });
 app.route("/families", familyRoutes);
 app.route("/members", memberRoutes);
+// Vóór /tasks gemount: /tasks/proposals is een eigen resource (WS-PROPOSAL).
+app.route("/tasks/proposals", proposalRoutes);
 app.route("/tasks", taskRoutes);
 app.route("/instances", instanceRoutes);
 app.route("/points", pointsRoutes);
@@ -73,6 +77,7 @@ app.route("/sync", syncRoutes);
 app.route("/badges", badgeRoutes);
 app.route("/avatar", avatarRoutes);
 app.route("/families/me/goals", familyGoalsRoutes);
+app.route("/families/me/insights", insightsRoutes);
 app.route("/account", accountRoutes);
 app.route("/notification-settings", notificationRoutes);
 app.route("/ws", wsRoutes);
