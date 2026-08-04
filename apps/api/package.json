@@ -14,7 +14,7 @@
     "@taakhelden/shared": "*",
     "fflate": "0.8.2",
     "hono": "^4.12.34",
-    "jose": "^5.9.0",
+    "jose": "^6.2.7",
     "zod": "^3.23.0"
   },
   "devDependencies": {
