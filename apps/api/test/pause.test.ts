@@ -384,3 +384,60 @@ describe("pause API round-trip", () => {
     expect(body.pauses).toHaveLength(0);
   });
 });
+
+// ============================================================
+// Regressies: herhaald instellen en kind-scoping bij beëindigen
+// ============================================================
+
+describe("pause regressies", () => {
+  it("PUT met dezelfde startdatum werkt de pauze bij i.p.v. een UNIQUE-fout (0011)", async () => {
+    const fam = await seedFamily("pau_reput");
+    const token = await parentToken(fam.parentId, fam.familyId);
+
+    const first = await api(`/members/${fam.childA}/pause`, {
+      method: "PUT",
+      token,
+      body: { startsOn: TODAY, reason: "Ziek" },
+      idempotencyKey: crypto.randomUUID(),
+    });
+    expect(first.status).toBe(201);
+    const firstId = ((await first.json()) as { id: string }).id;
+
+    // Ouder verlengt de pauze: zelfde startdatum, nieuwe Idempotency-Key.
+    const second = await api(`/members/${fam.childA}/pause`, {
+      method: "PUT",
+      token,
+      body: { startsOn: TODAY, endsOn: TODAY, reason: "Toch wat langer" },
+      idempotencyKey: crypto.randomUUID(),
+    });
+    expect(second.status).toBe(201);
+    const secondBody = (await second.json()) as { id: string; endsOn: string | null };
+    expect(secondBody.id).toBe(firstId);
+    expect(secondBody.endsOn).toBe(TODAY);
+
+    // Eén actieve pauze, met de bijgewerkte reden.
+    const getRes = await api(`/members/${fam.childA}/pause`, { token });
+    const body = (await getRes.json()) as { pauses: Array<{ reason: string | null }> };
+    expect(body.pauses).toHaveLength(1);
+    expect(body.pauses[0]!.reason).toBe("Toch wat langer");
+  });
+
+  it("DELETE beëindigt geen pauze van een ander kind via de verkeerde URL", async () => {
+    const fam = await seedFamily("pau_scope");
+    const token = await parentToken(fam.parentId, fam.familyId);
+    const pauseId = await seedPause(fam.familyId, fam.childB, fam.parentId, TODAY);
+
+    const res = await api(`/members/${fam.childA}/pause/${pauseId}`, {
+      method: "DELETE",
+      token,
+      idempotencyKey: crypto.randomUUID(),
+    });
+    expect(res.status).toBe(404);
+
+    // De pauze van kind B loopt nog.
+    const getRes = await api(`/members/${fam.childB}/pause`, { token });
+    const body = (await getRes.json()) as { pauses: Array<{ active: boolean }> };
+    expect(body.pauses).toHaveLength(1);
+    expect(body.pauses[0]!.active).toBe(true);
+  });
+});

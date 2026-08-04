@@ -35,7 +35,7 @@ export interface ChildInsightsData {
 export async function weeklyInsights(
   db: D1Database,
   familyId: string,
-  opts: { weekOf: string; childId?: string },
+  opts: { weekOf: string; childId?: string; today: string },
 ): Promise<{ weekOf: string; children: ChildInsightsData[] }> {
   const dates = weekDates(opts.weekOf);
   const startDate = dates[0]!; // maandag
@@ -61,7 +61,9 @@ export async function weeklyInsights(
     childRows = results;
   }
 
-  const today = new Date().toISOString().slice(0, 10);
+  // `today` komt uit de gezins-tijdzone (route), zodat de streak niet vlak na
+  // middernacht lokale tijd een dag achterloopt.
+  const today = opts.today;
 
   const children: ChildInsightsData[] = [];
   for (const child of childRows) {

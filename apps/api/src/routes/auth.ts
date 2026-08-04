@@ -306,7 +306,16 @@ auth.post("/reset-password", validate("json", ResetPasswordBody), async (c) => {
     );
   }
 
-  await repo.updatePasswordHash(c.env.DB, userId, await hashSecret(password));
+  // De repo-functie is parent-only; raakt die geen rij, dan is dit geen geldig
+  // ouderaccount en melden we geen geslaagde reset.
+  const updated = await repo.updatePasswordHash(c.env.DB, userId, await hashSecret(password));
+  if (!updated) {
+    throw new ApiException(
+      400,
+      ErrorCodes.VALIDATION_FAILED,
+      "Deze link is verlopen of al gebruikt. Vraag een nieuwe aan.",
+    );
+  }
   // Revoke all active refresh tokens so any compromised session can no longer be used.
   await repo.revokeAllRefreshTokensForUser(c.env.DB, userId);
   return c.json({ ok: true });

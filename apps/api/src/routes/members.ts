@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import type { Context } from "hono";
 import {
   CreateChildBody,
   UpdateMemberBody,
@@ -24,6 +25,7 @@ import { revokeChildDeviceSessions } from "../repo/auth";
 import { getPhoto, setMemberPhotoKey } from "../repo/photos";
 import { EquipAvatarError, equipAvatarItems, getMemberAvatarState } from "../repo/avatar";
 import { listPauses, setPause, clearPause, activePauseFor } from "../repo/pauses";
+import { localDate } from "../services/time";
 
 const members = new Hono<AppBindings>();
 
@@ -207,15 +209,27 @@ members.delete("/:id", async (c) => {
 
 // --- Rustschild (WS-PAUSE) ---
 
-function pauseView(row: {
-  id: string;
-  child_id: string;
-  starts_on: string;
-  ends_on: string | null;
-  reason: string | null;
-  cleared_at: string | null;
-}): ChildPause {
-  const today = new Date().toISOString().slice(0, 10);
+/** Vandaag in de tijdzone van het gezin — pauzedatums zijn lokale kalenderdagen. */
+async function familyToday(c: Context<AppBindings>, familyId: string): Promise<string> {
+  const family = (await repo.getFamily(c.env.DB, familyId)) as { timezone?: unknown } | null;
+  return localDate(typeof family?.timezone === "string" ? family.timezone : "Europe/Amsterdam");
+}
+
+/**
+ * `today` komt uit de gezins-tijdzone (niet UTC): tussen middernacht en 02:00 lokale
+ * tijd zou een UTC-datum een pauze die vandaag begint nog als inactief tonen.
+ */
+function pauseView(
+  row: {
+    id: string;
+    child_id: string;
+    starts_on: string;
+    ends_on: string | null;
+    reason: string | null;
+    cleared_at: string | null;
+  },
+  today: string,
+): ChildPause {
   const active =
     row.cleared_at === null &&
     row.starts_on <= today &&
@@ -241,9 +255,10 @@ members.get("/:id/pause", async (c) => {
   }
 
   const rows = await listPauses(c.env.DB, auth.familyId, childId);
+  const today = await familyToday(c, auth.familyId);
   return c.json(
     ChildPauseResponse.parse({
-      pauses: rows.map((r) => pauseView(r as Parameters<typeof pauseView>[0])),
+      pauses: rows.map((r) => pauseView(r as Parameters<typeof pauseView>[0], today)),
     }),
   );
 });
@@ -268,6 +283,7 @@ members.put("/:id/pause", requireIdempotencyKey, validate("json", SetChildPauseB
   });
 
   const row = await activePauseFor(c.env.DB, familyId, childId, body.startsOn);
+  const today = await familyToday(c, familyId);
   return c.json(
     pauseView(
       (row ?? {
@@ -278,6 +294,7 @@ members.put("/:id/pause", requireIdempotencyKey, validate("json", SetChildPauseB
         reason: body.reason ?? null,
         cleared_at: null,
       }) as Parameters<typeof pauseView>[0],
+      today,
     ),
     201,
   );
@@ -294,7 +311,7 @@ members.delete("/:id/pause/:pauseId", requireIdempotencyKey, async (c) => {
     throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
   }
 
-  const cleared = await clearPause(c.env.DB, familyId, pauseId);
+  const cleared = await clearPause(c.env.DB, familyId, childId, pauseId);
   if (!cleared) {
     throw new ApiException(404, ErrorCodes.NOT_FOUND, "Pauze niet gevonden of al beëindigd.");
   }

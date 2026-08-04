@@ -54,7 +54,13 @@ export async function listPauses(
   return results;
 }
 
-/** Stel een nieuwe pauze in voor een kind. */
+/**
+ * Stel een pauze in voor een kind, of werk een bestaande actieve pauze met dezelfde
+ * startdatum bij. De upsert matcht de partiële unique index uit migratie 0011
+ * (`family_id, child_id, starts_on` waar `cleared_at IS NULL`), zodat een ouder die
+ * dezelfde pauze opnieuw instelt — bijvoorbeeld om de einddatum te verlengen — geen
+ * UNIQUE-fout krijgt. `RETURNING id` levert altijd de id van de rij die nu geldt.
+ */
 export async function setPause(
   db: D1Database,
   familyId: string,
@@ -66,30 +72,50 @@ export async function setPause(
     createdBy: string;
   },
 ): Promise<string> {
-  const id = newId("pz");
-  await db
+  const row = await db
     .prepare(
       `INSERT INTO child_pauses (id, family_id, child_id, starts_on, ends_on, reason, created_by)
-       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+       VALUES (?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT (family_id, child_id, starts_on) WHERE cleared_at IS NULL
+       DO UPDATE SET ends_on = excluded.ends_on,
+                     reason = excluded.reason,
+                     created_by = excluded.created_by
+       RETURNING id`,
     )
-    .bind(id, familyId, input.childId, input.startsOn, input.endsOn, input.reason, input.createdBy)
-    .run();
-  return id;
+    .bind(
+      newId("pz"),
+      familyId,
+      input.childId,
+      input.startsOn,
+      input.endsOn,
+      input.reason,
+      input.createdBy,
+    )
+    .first<{ id: string }>();
+  if (!row) {
+    throw new Error("setPause: no row returned");
+  }
+  return row.id;
 }
 
-/** Sluit een pauze af (cleared_at zetten). Geeft terug of er daadwerkelijk iets gewijzigd is. */
+/**
+ * Sluit een pauze af (cleared_at zetten). Scoped op `childId` zodat de pauze van een
+ * ander kind niet via de URL van dit kind beëindigd kan worden.
+ * Geeft terug of er daadwerkelijk iets gewijzigd is.
+ */
 export async function clearPause(
   db: D1Database,
   familyId: string,
+  childId: string,
   pauseId: string,
 ): Promise<boolean> {
   const res = await db
     .prepare(
       `UPDATE child_pauses
        SET cleared_at = strftime('%Y-%m-%dT%H:%M:%fZ','now')
-       WHERE family_id = ? AND id = ? AND cleared_at IS NULL`,
+       WHERE family_id = ? AND child_id = ? AND id = ? AND cleared_at IS NULL`,
     )
-    .bind(familyId, pauseId)
+    .bind(familyId, childId, pauseId)
     .run();
   return (res.meta.changes ?? 0) > 0;
 }

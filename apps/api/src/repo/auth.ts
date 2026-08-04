@@ -170,14 +170,23 @@ export async function getUserById(db: D1Database, userId: string) {
 
 // --- registratie: gezin + eerste ouder in één batch (atomair) ---
 
-export async function updatePasswordHash(db: D1Database, userId: string, passwordHash: string) {
-  // Parent-only: password reset must never rewrite a child profile hash.
-  await db
+/**
+ * Parent-only: password reset must never rewrite a child profile hash.
+ * Returns whether a row was actually updated, so the caller never reports a
+ * successful reset for a child, missing, or soft-deleted account.
+ */
+export async function updatePasswordHash(
+  db: D1Database,
+  userId: string,
+  passwordHash: string,
+): Promise<boolean> {
+  const res = await db
     .prepare(
       "UPDATE users SET password_hash = ? WHERE id = ? AND role = 'parent' AND deleted_at IS NULL",
     )
     .bind(passwordHash, userId)
     .run();
+  return (res.meta.changes ?? 0) > 0;
 }
 
 /**

@@ -6,7 +6,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { env } from "cloudflare:test";
-import { api } from "./helpers";
+import { api, seedFamily } from "./helpers";
 import { sha256Hex } from "../src/services/passwords";
 import { hashSecret } from "../src/services/passwords";
 
@@ -119,5 +119,26 @@ describe("POST /auth/reset-password — refresh token revocation (SEC-01)", () =
       body: { token: "no_such_token_000000000000", password: "attacker-pass-x1" },
     });
     expect(res.status).toBe(400);
+  });
+
+  it("a reset token pointing at a child account returns 400, not a false ok:true", async () => {
+    // `updatePasswordHash` is parent-only by design (children have no password).
+    // If a reset token's user_id ever resolved to a child row — e.g. through a
+    // future refactor — the route must not report success while leaving the
+    // password untouched.
+    const fam = await seedFamily("pwreset_child");
+    const resetToken = await seedResetToken(fam.childA);
+
+    const res = await api("/auth/reset-password", {
+      body: { token: resetToken, password: "attacker-pass-x1" },
+    });
+    expect(res.status).toBe(400);
+
+    // The reset token must still be consumed (single-use), even though the
+    // password update was rejected — no free retry on the same token.
+    const replay = await api("/auth/reset-password", {
+      body: { token: resetToken, password: "attacker-pass-x2" },
+    });
+    expect(replay.status).toBe(400);
   });
 });
