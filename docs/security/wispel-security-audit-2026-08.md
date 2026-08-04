@@ -21,12 +21,13 @@ with heightened obligations because data subjects are minors (AVG art. 8, DPIA i
 
 ## Remediation status
 
-The four HIGH findings and MEDIUM findings 5, 6, 7, 8, 10, 13 and 14, plus the whole
-LOW batch, were remediated on branch
+All four HIGH findings, every MEDIUM finding except 12, and the whole LOW batch were
+remediated on branch
 `claude/website-security-audit-5p46ws` (see PR #86). Each carries a **Status** line below.
 Regression tests live in `apps/api/test/auth-hardening.test.ts` and
 `apps/web/lib/api/crossOrigin.test.ts` — every one fails against the pre-fix code.
-The remaining MEDIUM, LOW and INFO findings are open.
+Still open: finding 12 (invite code doubles as the child credential — a product change),
+and the INFO items (security event logging, `SECURITY.md`, `APPLE_CLIENT_ID` audience).
 
 ---
 
@@ -700,6 +701,17 @@ the `https:`/`wss:` wildcards. Roll out behind `Content-Security-Policy-Report-O
 to catch violations. `frame-ancestors 'none'`, `base-uri` and `form-action` are already
 correct and should be kept.
 
+**Status**: ✅ **Fixed and verified in a browser.** The CSP moved from the static header list in `next.config.mjs` to `middleware.ts`, where each request gets a fresh nonce. `script-src` is now `'self' 'nonce-…' 'strict-dynamic' https://challenges.cloudflare.com` — no `'unsafe-inline'`. `img-src` and `connect-src` are pinned to the API origin derived from `API_BASE_URL` instead of the `https:`/`wss:` wildcards, falling back to the wider value only when that var is absent (local `next dev`), so a missing config degrades rather than breaking photos and realtime. Added `object-src 'none'`.
+
+`style-src 'unsafe-inline'` stays: Tailwind and Next emit style attributes, and hashing them is not currently practical. Inline CSS is a materially smaller risk than inline JS.
+
+Verified against a production build in headless Chromium rather than by inspection:
+
+- `/nl/login`, `/nl/register`, `/nl`, `/nl/privacy` all return 200, React hydrates, and there are zero CSP violations and zero console errors.
+- All 25 of Next's inline bootstrap scripts carry the nonce.
+- The nonce differs between two requests to the same URL.
+- An attacker-controlled `<script>` injected into the served HTML is **refused** by the browser while the app still hydrates — the control does what it claims.
+
 **References**: OWASP ASVS 4.0 V14.4.3 · MDN CSP `strict-dynamic` · CWE-1021 (Improper
 Restriction of Rendered UI Layers).
 
@@ -1136,8 +1148,8 @@ Regression coverage: `apps/api/test/auth-hardening.test.ts` (10 tests).
 
 ### 3. Planned sprints
 
-Findings 9 (CSP nonces), 12 (decouple invite code from child login — schedule as a product
-change, it affects the login UX), 14 (WebSocket subprotocol auth).
+Finding 12 (decouple the invite code from child login — schedule as a product change, it
+affects the login UX). Findings 9 and 14 are done.
 
 ### 4. Hardening backlog
 
@@ -1161,7 +1173,7 @@ token transition window), and moving the KV rate-limit counter to an atomic back
 | Authentication and authorisation enforced | ✅ Pass | Enforced per request and revocable since finding 3 was fixed |
 | Error messages non-verbose | ✅ Pass | `middleware/error.ts` returns generic 500s |
 | HTTPS enforced site-wide | ✅ Pass | TLS via Cloudflare; HSTS set on web and API — finding 15 |
-| Security headers configured | ⚠️ Partial | Web and API both covered (finding 16); CSP still allows `'unsafe-inline'` — finding 9 |
+| Security headers configured | ✅ Pass | Web and API covered; nonce-based CSP with no `script-src 'unsafe-inline'` |
 | CSRF protection implemented | ✅ Pass | `SameSite=Lax` plus an `Origin` check on every BFF mutation — finding 10 |
 | Rate limiting configured | ✅ Pass | Caller-, account- and user-keyed (findings 1, 13); KV counter still non-atomic under concurrency |
 | Sensitive data encrypted | ✅ Pass | PBKDF2 hashes, SHA-256 refresh tokens, R2 EU jurisdiction |
