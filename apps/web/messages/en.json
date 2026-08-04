@@ -48,6 +48,37 @@
         "VALIDATION_FAILED": "Check your password (at least 8 characters) and try again.",
         "generic": "Something went wrong. Please try again in a bit."
       }
+    },
+    "forgotPasswordLink": "Forgot password?",
+    "passwordResetSuccess": "Your password has been reset. Sign in below.",
+    "forgotPassword": {
+      "email": "Email address",
+      "submit": "Send reset link",
+      "submitting": "Sending…",
+      "successMessage": "If this email address is in our system, we'll send you a link to reset your password.",
+      "backToLogin": "Remembered it?",
+      "loginLink": "Back to sign in",
+      "errors": {
+        "RATE_LIMITED": "Just a moment — please try again in a minute.",
+        "VALIDATION_FAILED": "Please enter a valid email address.",
+        "generic": "Something went wrong. Please try again in a bit."
+      }
+    },
+    "resetPassword": {
+      "password": "New password",
+      "confirmPassword": "Confirm password",
+      "submit": "Save password",
+      "submitting": "Saving…",
+      "missingToken": "This link is missing a reset code. Please request a new one.",
+      "requestNewLink": "Request new link",
+      "backToLogin": "Rather sign in?",
+      "loginLink": "Go to sign in",
+      "errors": {
+        "VALIDATION_FAILED": "This link has expired or already been used. Please request a new one.",
+        "RATE_LIMITED": "Just a moment — please try again in a minute.",
+        "passwordMismatch": "The passwords don't match.",
+        "generic": "Something went wrong. Please try again in a bit."
+      }
     }
   },
   "guards": {
@@ -105,7 +136,27 @@
     "cancel": "Cancel",
     "actionError": "Something went wrong. Please try again.",
     "photoAlt": "Photo of the finished task",
-    "photoUnavailable": "Photo isn't available yet."
+    "photoUnavailable": "Photo isn't available yet.",
+    "proposals": {
+      "sectionLabel": "Task requests",
+      "sectionHint": "Your child proposed a task — approve it or send a friendly reply.",
+      "requestedBy": "Requested by {name}",
+      "suggestedPoints": "{points} pts requested",
+      "approve": "Approve",
+      "approveConfirm": "Create task",
+      "approving": "Working…",
+      "pointsLabel": "Final points",
+      "decline": "Decline",
+      "declineConfirm": "Send reply",
+      "declining": "Working…",
+      "declineLabel": "What's your reply?",
+      "declinePlaceholder": "Good idea, but not right now — maybe later!",
+      "cancel": "Cancel",
+      "actionError": "Something went wrong. Please try again.",
+      "loadError": "Couldn't load task requests.",
+      "declineNoteRequired": "Add a reply — kids appreciate a message.",
+      "approveValidationError": "Points must be greater than zero."
+    }
   },
   "taken": {
     "title": "Tasks",
@@ -288,6 +339,7 @@
       "resetPin": "Reset PIN",
       "points": "Points",
       "delete": "Remove",
+      "pause": "Rest shield",
       "balance": "{points} points",
       "born": "Born in {year}",
       "ageMode": {
@@ -478,6 +530,58 @@
       "body": "Coming soon: weekly trends to support the conversation — never as a monitoring tool."
     }
   },
+  "inzichten": {
+    "title": "Insights",
+    "subtitle": "What went well, where might a conversation help?",
+    "loading": "Loading…",
+    "loadError": "Couldn't load insights. Please try again.",
+    "retry": "Try again",
+    "noChildren": "No children in this family yet.",
+    "weekOf": "Week of {date}",
+    "prevWeek": "Previous week",
+    "nextWeek": "Next week",
+    "thisWeek": "This week",
+    "earned": "Earned",
+    "spent": "Spent",
+    "net": "Net",
+    "points": "{points} pts",
+    "completion": "Completion",
+    "completionValue": "{pct}%",
+    "tasksApproved": "{approved} of {total}",
+    "streak": "Streak",
+    "streakDays": "{days} days",
+    "streakDaysOne": "1 day",
+    "slippingTitle": "Could a conversation help?",
+    "slippingHint": "These tasks were left open or sent back more often this week.",
+    "slippingMissed": "{count}×",
+    "noSlipping": "Everything went well — nothing that needs extra attention.",
+    "empty": "No data available for this week yet.",
+    "frameHint": "These insights are here to support the conversation — never as a score sheet."
+  },
+  "rustschild": {
+    "badge": "Rest shield on",
+    "badgeActive": "Resting until {date}",
+    "badgeOpenEnded": "Rest shield active",
+    "set": "Set rest shield",
+    "clear": "Turn off rest shield",
+    "clearing": "Working…",
+    "title": "Rest shield for {name}",
+    "hint": "Tasks are skipped and streak doesn't count during rest. No points are deducted.",
+    "fldStartsOn": "Rest from",
+    "fldEndsOn": "Until (optional)",
+    "fldEndsOnHint": "Leave empty for open-ended — turn it off whenever you're ready.",
+    "fldReason": "Reason (only for you)",
+    "fldReasonPlaceholder": "E.g. sick, holiday, busy week",
+    "fldReasonHint": "Maximum 140 characters. Never visible to the child.",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "dateRangeInvalid": "The end date must be on or after the start date.",
+    "errorSave": "Couldn't save the rest shield. Please try again.",
+    "errorClear": "Couldn't turn off the rest shield. Please try again.",
+    "errorLoad": "Couldn't load pause status.",
+    "clearConfirm": "Turn off rest shield for {name}?"
+  },
   "marketing": {
     "metaTitle": "Wispel — free for families",
     "metaDescription": "Wispel helps families with homework and chores — privacy first, free for your family. Positive for kids, calm for parents.",
@@ -497,7 +601,11 @@
       "accept": "Accept your invite and join the family.",
       "loginTitle": "Sign in",
       "registerTitle": "Start family",
-      "acceptTitle": "Invitation"
+      "acceptTitle": "Invitation",
+      "forgotPasswordTitle": "Forgot password",
+      "forgotPassword": "Enter your email address and we'll send you a link to reset your password.",
+      "resetPasswordTitle": "New password",
+      "resetPassword": "Choose a new password for your Wispel account."
     },
     "visual": {
       "dayLabel": "My day",

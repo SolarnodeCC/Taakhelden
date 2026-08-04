@@ -14,9 +14,10 @@ import * as ledger from "../repo/ledger";
 import * as rewards from "../repo/rewards";
 import * as photos from "../repo/photos";
 import * as badges from "../repo/badges";
+import * as pauses from "../repo/pauses";
 import { qualifyingBadgeIds } from "./badges";
 import { newId } from "./ids";
-import { localDate, weekDates, weekKey, yesterdayOf, localMidnightUtc } from "./time";
+import { localDate, weekDates, weekKey, yesterdayOf, localMidnightUtc, addDays } from "./time";
 
 const UNDO_WINDOW_MS = 5 * 60 * 1000;
 
@@ -492,13 +493,21 @@ export async function computeBalance(
   childId: string,
 ) {
   const today = localDate(family.timezone);
-  const [bal, day, week, bonusDates, lifetimeEarned] = await Promise.all([
+  const [bal, day, week, bonusDates, lifetimeEarned, activePauses] = await Promise.all([
     ledger.balance(db, familyId, childId),
     instances.dayStats(db, familyId, childId, today),
     instances.weekStats(db, familyId, childId, weekDates(today)),
     ledger.dayBonusDates(db, familyId, childId),
     ledger.lifetimeEarned(db, familyId, childId),
+    pauses.listActivePausesFor(db, familyId, childId),
   ]);
+
+  // Bouw een set van gepauzeerde datums voor de laatste 60 dagen zodat
+  // computeStreak de pauzes transparant kan overslaan.
+  const pausedDates =
+    activePauses.length > 0
+      ? buildPausedDatesSet(activePauses, addDays(today, -60), today)
+      : undefined;
 
   return {
     childId,
@@ -506,13 +515,13 @@ export async function computeBalance(
     todayCompleted: day.approved,
     todayTotal: day.total,
     weekProgress: week.total === 0 ? 0 : week.approved / week.total,
-    streakDays: computeStreak(bonusDates, today),
+    streakDays: computeStreak(bonusDates, today, pausedDates),
     lifetimeEarned,
   };
 }
 
 /**
- * Aaneengesloten dagen met dagbonus, eindigend vandaag of gisteren
+ * Aaneengesloten dagen met dagbonus, eindigend vandaag of gisteren.
  * (`bonusDates` in willekeurige volgorde; alleen de datums tellen).
  *
  * Streakbescherming (productbelofte): per ISO-kalenderweek (ma t/m zo, zie
@@ -525,17 +534,31 @@ export async function computeBalance(
  * is nog niet voorbij. De streak loopt dan t/m gisteren.
  *
  * Vakantiemodus staat hier los van (dat is een gezinsinstelling).
+ *
+ * `pausedDates`: dagen waarop het kind gepauzeerd was (WS-PAUSE). Een gepauzeerde
+ * dag is noch verdiend, noch een gemiste dag — hij wordt transparant overgeslagen
+ * zonder het weekvergevingsbudget te consumeren.
  */
-export function computeStreak(bonusDates: string[], today: string): number {
+export function computeStreak(
+  bonusDates: string[],
+  today: string,
+  pausedDates?: Set<string>,
+): number {
   if (bonusDates.length === 0) return 0;
   const earned = new Set(bonusDates);
   const oldest = bonusDates.reduce((min, date) => (date < min ? date : min));
 
+  // Start gisteren als vandaag nog niet verdiend is (dag is nog bezig) of gepauzeerd.
   let cursor = earned.has(today) ? today : yesterdayOf(today);
   let streak = 0;
   const gapsPerWeek = new Map<string, number>();
 
   while (cursor >= oldest) {
+    if (pausedDates?.has(cursor)) {
+      // Gepauzeerde dag: transparant — telt niet als earned, ook niet als gemiste dag.
+      cursor = yesterdayOf(cursor);
+      continue;
+    }
     if (earned.has(cursor)) {
       streak++;
     } else {
@@ -547,4 +570,26 @@ export function computeStreak(bonusDates: string[], today: string): number {
     cursor = yesterdayOf(cursor);
   }
   return streak;
+}
+
+/**
+ * Bouw een Set van gepauzeerde datums voor een kind op basis van actieve pauzes.
+ * Wordt gebruikt door computeBalance en computeStreak.
+ * `from` is inclusief; `to` is inclusief.
+ */
+export function buildPausedDatesSet(
+  activePauses: Array<{ starts_on: string; ends_on: string | null }>,
+  from: string,
+  to: string,
+): Set<string> {
+  const result = new Set<string>();
+  for (const p of activePauses) {
+    let cur = p.starts_on < from ? from : p.starts_on;
+    const end = p.ends_on === null ? to : p.ends_on < to ? p.ends_on : to;
+    while (cur <= end) {
+      result.add(cur);
+      cur = addDays(cur, 1);
+    }
+  }
+  return result;
 }

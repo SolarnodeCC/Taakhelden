@@ -11,6 +11,15 @@ export {
   NotificationSettingsResponse,
   ParentTodayView,
   TodayBalance,
+  // WS-INSIGHTS
+  ChildInsights,
+  InsightsRange,
+  SlippingTask,
+  WeeklyInsightsResponse,
+  // WS-PAUSE
+  ChildPause,
+  ChildPauseResponse,
+  SetChildPauseBody,
 } from "@taakhelden/shared";
 
 /**

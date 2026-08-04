@@ -9,6 +9,7 @@ import { newId } from "./ids";
 import { weekdayCode, isoWeekNumber, weekDates } from "./time";
 import { listActiveTasksForDate } from "../repo/tasks";
 import { insertInstance } from "../repo/instances";
+import { activePausedChildIds } from "../repo/pauses";
 import { parseJsonColumn } from "./jsonParse";
 
 const StringIdList = z.array(z.string().min(1));
@@ -44,7 +45,7 @@ function taskIdOf(task: Record<string, unknown>): string | null {
   return typeof task.id === "string" ? task.id : null;
 }
 
-/** Genereer alle instances van `date` voor één gezin. Respecteert vacation_mode. */
+/** Genereer alle instances van `date` voor één gezin. Respecteert vacation_mode en kind-pauzes. */
 export async function generateInstancesForFamily(
   db: D1Database,
   familyId: string,
@@ -52,6 +53,9 @@ export async function generateInstancesForFamily(
   date: string,
 ): Promise<number> {
   if (family.vacation_mode) return 0;
+  // Haal gepauzeerde kinderen op vóór de loop zodat de query slechts één keer
+  // uitgevoerd wordt (niet per taak of per kind).
+  const pausedChildren = await activePausedChildIds(db, familyId, date);
   const tasks = await listActiveTasksForDate(db, familyId, date);
   let created = 0;
   for (const taskRaw of tasks) {
@@ -60,6 +64,7 @@ export async function generateInstancesForFamily(
     const taskId = taskIdOf(task);
     if (!taskId) continue;
     for (const childId of assigneesForDate(task, date)) {
+      if (pausedChildren.has(childId)) continue; // rustschild actief — sla over
       await insertInstance(db, familyId, {
         id: newId("ti"),
         taskId,

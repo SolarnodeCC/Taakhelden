@@ -138,14 +138,14 @@ flowchart LR
 | **WS-TRUST-WEB** | Critical parent-web defects | B.5 | Web | ✅ in this PR | — |
 | **WS-TRUST-API** | Security highs (rate limit, export, invite token) | B.5 | Backend + Security | ✅ in this PR | — |
 | **WS-TRUST-IOS** | iOS safety + a11y + device hygiene | B.5 | iOS | ✅ in this PR (multi-child picker deferred) | — |
-| **WS-INSIGHTS** | Inzichten Gesprekskaart (replace stub) | Feature | Web + Backend | After G3 | G3 |
-| **WS-PAUSE** | Rustschild — per-child pause | Feature | Backend + Web + iOS | After G3 | G3 |
-| **WS-PROPOSAL** | Taakvraag — teen task proposal | Feature | Backend + iOS + Web | After G3 | G3 |
-| **WS-FOCUS** | Focusmodus — homework timer | Feature | iOS (+ thin Backend) | After G3 | G3 |
-| **WS-COPARENT** | Co-ouderschap data model (ADR-0004) | Design-gated | Architect + Backend + iOS | Design only | G4 |
-| **WS-AUTH-WEB** | Forgot-password + basic account recovery (web) | Feature | Web | After G3 or parallel with wave 1 | G3 |
-| **WS-ROTATE** | Sibling task rotation UI (uses existing rotation JSON) | Feature | Web + iOS | After wave 1 | — |
-| **WS-IOS-STORE** | App Store submission readiness (path to G5) | iOS-Ship | iOS | Parallel with feature waves | G3→G5 |
+| **WS-INSIGHTS** | Inzichten Gesprekskaart (replace stub) | Feature | Web + Backend | ✅ in feature waves 1–7 | G3 |
+| **WS-PAUSE** | Rustschild — per-child pause | Feature | Backend + Web + iOS | ✅ in feature waves 1–7 | G3 |
+| **WS-PROPOSAL** | Taakvraag — teen task proposal | Feature | Backend + iOS + Web | ✅ in feature waves 1–7 | G3 |
+| **WS-FOCUS** | Focusmodus — homework timer | Feature | iOS (+ thin Backend) | ✅ in feature waves 1–7 (client-only) | G3 |
+| **WS-COPARENT** | Co-ouderschap data model (ADR-0004) | Design-gated | Architect + Backend + iOS | ✅ ADR Proposed | G4 |
+| **WS-AUTH-WEB** | Forgot-password + basic account recovery (web) | Feature | Web | ✅ in feature waves 1–7 | G3 |
+| **WS-ROTATE** | Sibling task rotation UI (uses existing rotation JSON) | Feature | Web + iOS | ✅ already shipped (verified) | — |
+| **WS-IOS-STORE** | App Store submission readiness (path to G5) | iOS-Ship | iOS | ✅ checklist in ReviewNotes | G3→G5 |
 | **WS-ANDROID** | Android app — **PARKED, not before G5** | PARKED | — | Do not start | G5 |
 
 **Owner archetype** = skill mix, not headcount. Streams marked "start now" have no cross-dependency and can run fully in parallel — they touch disjoint layers (web components / API middleware / Swift).
