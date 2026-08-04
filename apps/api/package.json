@@ -10,7 +10,7 @@
     "db:migrate:local": "wrangler d1 migrations apply taakhelden-db --local"
   },
   "dependencies": {
-    "@hono/zod-validator": "^0.4.0",
+    "@hono/zod-validator": "^0.9.0",
     "@taakhelden/shared": "*",
     "fflate": "0.8.2",
     "hono": "^4.12.34",
