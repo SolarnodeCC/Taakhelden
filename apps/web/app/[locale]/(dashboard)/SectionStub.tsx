@@ -6,7 +6,7 @@ export default function SectionStub({ sectionKey }: { sectionKey: string }) {
   const t = useTranslations("sections");
   return (
     <section className="max-w-2xl">
-      <h1 className="text-xl font-semibold text-text">{t(`${sectionKey}.title`)}</h1>
+      <h1 className="text-2xl font-semibold text-text">{t(`${sectionKey}.title`)}</h1>
       <p className="mt-2 text-sm text-muted">{t(`${sectionKey}.body`)}</p>
     </section>
   );

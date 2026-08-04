@@ -17,7 +17,7 @@ import {
   useRequireFullParent,
 } from "../../../../lib/auth/RequireFullParent";
 import { useRouter } from "../../../../i18n/navigation";
-import { Alert, Button } from "../../../../components/ui";
+import { Alert, Button, Card, EmptyState, PageError, SkeletonRows } from "../../../../components/ui";
 import InviteCodeCard from "./InviteCodeCard";
 import InviteParentForm from "./InviteParentForm";
 import FamilySettingsForm from "./FamilySettingsForm";
@@ -35,6 +35,14 @@ import {
   parentBalancesChildren,
   type Balance,
 } from "../../../../lib/api/types";
+
+/** Auto-scroll is a motion trigger, and CSS cannot reach an imperative call. */
+function scrollToCode(el: HTMLElement | null) {
+  const reduced =
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  el?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+}
 
 type Panel =
   | { kind: "create" }
@@ -106,7 +114,7 @@ export default function GezinClient() {
     if (!onboarding) return;
     if (children.length > 0) {
       setOnboardingStep(3);
-      window.setTimeout(() => codeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+      window.setTimeout(() => scrollToCode(codeRef.current), 50);
     } else {
       setOnboardingStep(2);
       setPanel((p) => p ?? { kind: "create" });
@@ -140,7 +148,7 @@ export default function GezinClient() {
       await load();
       if (onboarding) {
         setOnboardingStep(3);
-        window.setTimeout(() => codeRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+        window.setTimeout(() => scrollToCode(codeRef.current), 50);
       }
     } finally {
       setBusy(false);
@@ -178,22 +186,26 @@ export default function GezinClient() {
   if (gate === "upstream_error") return <FullParentUpstreamError />;
 
   if (gate === "loading" || (!family && !failed)) {
-    return <p className="text-sm text-muted">{t("loading")}</p>;
+    return (
+      <div aria-busy>
+        <SkeletonRows count={3} />
+      </div>
+    );
   }
 
   if (failed || !family) {
-    return <p className="text-sm text-muted">{t("loadError")}</p>;
+    return <PageError message={t("loadError")} onRetry={() => void load()} />;
   }
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-6">
+    <div className="flex max-w-2xl flex-col gap-6">
       <header>
-        <h1 className="text-xl font-semibold text-text">{t("title")}</h1>
+        <h1 className="text-2xl font-semibold text-text">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted">{t("subtitle", { name: family.name })}</p>
       </header>
 
       {onboarding && (
-        <div className="rounded-lg border border-accent/30 bg-accent/5 px-4 py-3">
+        <Card variant="tinted-accent">
           <p className="text-sm font-medium text-text">
             {onboardingStep === 2 ? t("onboarding.step2") : t("onboarding.step3")}
           </p>
@@ -207,7 +219,7 @@ export default function GezinClient() {
               </Button>
             </div>
           )}
-        </div>
+        </Card>
       )}
 
       {actionError && <Alert tone="danger">{actionError}</Alert>}
@@ -227,7 +239,7 @@ export default function GezinClient() {
 
       <section aria-labelledby="children-heading">
         <div className="flex items-center justify-between gap-3">
-          <h2 id="children-heading" className="text-base font-semibold text-text">
+          <h2 id="children-heading" className="text-lg font-semibold text-text">
             {t("children.title")}
           </h2>
           {panel?.kind !== "create" && (
@@ -269,7 +281,17 @@ export default function GezinClient() {
         )}
 
         {children.length === 0 && panel?.kind !== "create" ? (
-          <p className="mt-3 text-sm text-muted">{t("children.empty")}</p>
+          <div className="mt-3">
+            <EmptyState
+              title={t("children.emptyTitle")}
+              body={t("children.empty")}
+              action={
+                <Button type="button" onClick={() => setPanel({ kind: "create" })}>
+                  {t("children.add")}
+                </Button>
+              }
+            />
+          </div>
         ) : (
           <ul className="mt-3 flex flex-col gap-2">
             {children.map((child) => {
@@ -282,7 +304,7 @@ export default function GezinClient() {
               return (
                 <li
                   key={child.id}
-                  className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4"
+                  className="flex flex-col gap-3"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
@@ -365,7 +387,7 @@ export default function GezinClient() {
       </section>
 
       <section aria-labelledby="parents-heading">
-        <h2 id="parents-heading" className="text-base font-semibold text-text">
+        <h2 id="parents-heading" className="text-lg font-semibold text-text">
           {t("parents.title")}
         </h2>
         {parents.length === 0 ? (

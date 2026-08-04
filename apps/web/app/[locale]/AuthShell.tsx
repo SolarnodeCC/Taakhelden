@@ -35,7 +35,7 @@ export default async function AuthShell({ children, promiseKey = "login" }: Auth
         <p className="font-display text-2xl font-semibold">
           <WispelWordmark markClassName="h-7 w-7" />
         </p>
-        <h1 className="mt-4 text-lg font-semibold text-text">{t(titleKey)}</h1>
+        <h1 className="mt-4 text-xl font-semibold text-text">{t(titleKey)}</h1>
         <p className="mt-1 text-sm leading-relaxed text-muted">{t(promiseKey)}</p>
         <div className="mt-8">{children}</div>
         <AuthLegalLinks />

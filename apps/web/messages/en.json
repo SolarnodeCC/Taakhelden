@@ -75,7 +75,8 @@
     "realtime": {
       "connecting": "Connecting live updates…",
       "offline": "Live connection lost — data may be out of date"
-    }
+    },
+    "skipToContent": "Skip to content"
   },
   "vandaag": {
     "title": "Today",
@@ -88,7 +89,10 @@
       "open": "To do",
       "awaiting": "Waiting for approval",
       "done": "Done"
-    }
+    },
+    "emptyTitle": "No children in your family yet",
+    "emptyBody": "Add your first child to start planning tasks and awarding points.",
+    "emptyAction": "Add a child"
   },
   "goedkeuren": {
     "title": "Approvals",
@@ -105,7 +109,8 @@
     "cancel": "Cancel",
     "actionError": "Something went wrong. Please try again.",
     "photoAlt": "Photo of the finished task",
-    "photoUnavailable": "Photo isn't available yet."
+    "photoUnavailable": "Photo isn't available yet.",
+    "emptyTitle": "Nothing to review"
   },
   "taken": {
     "title": "Tasks",
@@ -188,6 +193,16 @@
         "submitted": "awaiting approval",
         "open_redo": "try again",
         "approved": "approved"
+      },
+      "moveHandle": "Move {title}",
+      "cellLabel": "{child}, {date}",
+      "a11y": {
+        "instructions": "Press space or enter to pick up the task. Move it with the arrow keys, drop it with space or enter, or cancel with Escape.",
+        "lifted": "Task picked up at {cell}.",
+        "over": "Now over {cell}.",
+        "outside": "Outside the week grid.",
+        "dropped": "Task dropped at {cell}.",
+        "cancelled": "Move cancelled — the task is back where it was."
       }
     },
     "form": {
@@ -217,7 +232,9 @@
       "save": "Save",
       "saving": "Saving…",
       "cancel": "Cancel"
-    }
+    },
+    "emptyTitle": "No tasks yet",
+    "emptyBody": "Create a task or pick one of the examples — you can change everything later."
   },
   "winkel": {
     "title": "Shop",
@@ -254,7 +271,8 @@
       "save": "Save",
       "saving": "Saving…",
       "cancel": "Cancel"
-    }
+    },
+    "noRewardsTitle": "No rewards yet"
   },
   "gezin": {
     "title": "Family",
@@ -278,7 +296,8 @@
       "regenerate": "Create new code",
       "regenerating": "Working…",
       "regenerateConfirm": "The old code stops working immediately. Continue?",
-      "codeAria": "Family code {code}"
+      "codeAria": "Family code {code}",
+      "copyManual": "Copying failed — select the code above to copy it yourself."
     },
     "children": {
       "title": "Children",
@@ -294,7 +313,8 @@
         "young": "Young",
         "mid": "Middle",
         "teen": "Teen"
-      }
+      },
+      "emptyTitle": "No children yet"
     },
     "parents": {
       "title": "Parents & caregivers",
@@ -713,5 +733,11 @@
       ]
     },
     "backHome": "Back to home"
+  },
+  "common": {
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "iconOption": "Icon {icon}"
   }
 }

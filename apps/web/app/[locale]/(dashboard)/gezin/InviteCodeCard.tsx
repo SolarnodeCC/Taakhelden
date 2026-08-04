@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import QRCode from "qrcode";
-import { Button } from "../../../../components/ui";
+import { Button, Card, ConfirmDelete } from "../../../../components/ui";
 
 export default function InviteCodeCard({
   inviteCode,
@@ -19,7 +19,8 @@ export default function InviteCodeCard({
 }) {
   const t = useTranslations("gezin");
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [copyState, setCopyState] = useState<"idle" | "ok" | "fail">("idle");
+  const [confirmRegen, setConfirmRegen] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -45,17 +46,21 @@ export default function InviteCodeCard({
   async function copyCode() {
     try {
       await navigator.clipboard.writeText(inviteCode);
-      setCopied(true);
-      window.setTimeout(() => setCopied(false), 2000);
+      setCopyState("ok");
+      window.setTimeout(() => setCopyState("idle"), 2000);
     } catch {
-      // Clipboard may be unavailable; code remains visible for manual copy.
+      // Insecure context, denied permission, or an older browser. The code stays
+      // on screen for manual copying — but say so, rather than appearing to do
+      // nothing on the one step that gets a child's device paired.
+      setCopyState("fail");
     }
   }
 
   return (
-    <section
+    <Card
+      as="section"
+      variant="panel"
       ref={onCodeMount}
-      className="rounded-lg border border-border bg-surface p-5"
       aria-labelledby="invite-code-heading"
     >
       <h2 id="invite-code-heading" className="text-base font-semibold text-text">
@@ -84,24 +89,47 @@ export default function InviteCodeCard({
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <Button type="button" variant="secondary" size="sm" onClick={copyCode}>
-              {copied ? t("invite.copied") : t("invite.copy")}
+              {copyState === "ok" ? t("invite.copied") : t("invite.copy")}
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="sm"
               disabled={regenerating}
-              onClick={() => {
-                if (window.confirm(t("invite.regenerateConfirm"))) {
-                  onRegenerate();
-                }
-              }}
+              onClick={() => setConfirmRegen(true)}
             >
               {regenerating ? t("invite.regenerating") : t("invite.regenerate")}
             </Button>
           </div>
+          {/* Success is a label swap, which assistive tech never hears — mirror
+              both outcomes into a live region. */}
+          <p role="status" className="sr-only">
+            {copyState === "ok"
+              ? t("invite.copied")
+              : copyState === "fail"
+                ? t("invite.copyManual")
+                : ""}
+          </p>
+          {copyState === "fail" && (
+            <p className="mt-2 text-sm text-muted">{t("invite.copyManual")}</p>
+          )}
         </div>
       </div>
-    </section>
+
+      {confirmRegen && (
+        <div className="mt-4">
+          <ConfirmDelete
+            question={t("invite.regenerateConfirm")}
+            confirmLabel={t("invite.regenerate")}
+            busy={regenerating}
+            onConfirm={() => {
+              setConfirmRegen(false);
+              onRegenerate();
+            }}
+            onCancel={() => setConfirmRegen(false)}
+          />
+        </div>
+      )}
+    </Card>
   );
 }

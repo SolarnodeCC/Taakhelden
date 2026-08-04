@@ -4,7 +4,14 @@
     "reviewer": "Critical UI/UX + accessibility review (parent web dashboard + marketing/auth surface, apps/web)",
     "targetAudience": "Dutch parents on mixed devices (mobile-heavy, low patience, non-technical), operating a family chores app in short bursts; secondary: approve_only co-parents. WCAG 2.1 AA is a hard requirement per .claude/rules/web/ui.md.",
     "scope": "apps/web only. The kid/teen SwiftUI surface (apps/ios) and Design System/ source kits were not executed and are out of scope except where their tokens are mirrored into apps/web/app/globals.css.",
-    "method": "Static review of every .tsx under apps/web/app and apps/web/components against the repo's own token/primitive rules, plus programmatic WCAG contrast computation on every token pair shipped in globals.css. No running instance or screenshots were available in this environment, so findings about rendered geometry (touch-target height, line-height) are derived from the Tailwind config and utility classes rather than measured in a browser."
+    "method": "Static review of every .tsx under apps/web/app and apps/web/components against the repo's own token/primitive rules, plus programmatic WCAG contrast computation on every token pair shipped in globals.css. No running instance or screenshots were available in this environment, so findings about rendered geometry (touch-target height, line-height) are derived from the Tailwind config and utility classes rather than measured in a browser.",
+    "resolution": {
+      "status": "all findings fixed",
+      "date": "2026-08-04",
+      "verification": "npm run typecheck (clean) · npm run lint (clean) · npm test — 131 API + 74 web tests pass · next build succeeds · emitted CSS confirms paired line-heights, the base focus rule and the new tokens",
+      "regressionGuard": "apps/web/lib/design-tokens.test.ts — 18 assertions covering every shipped colour pair against 1.4.3/1.4.11 and asserting the type scale still pairs line-heights. Confirmed to fail on a reverted accent token.",
+      "note": "Findings are marked fixed on the strength of static verification (typecheck, lint, unit tests, production build, emitted CSS). No browser or screen-reader pass was possible in this environment, so the keyboard drag path, the drawer focus behaviour and the rendered touch targets still warrant a manual check."
+    }
   },
   "findings": [
     {
@@ -27,7 +34,9 @@
         "suggested_approach": "Split the accent into two tokens: keep #0e9f8e as a decorative/graphical token (it passes the 3:1 bar of 1.4.11 for non-text) and introduce a darker text/CTA accent that clears 4.5:1. Darken the interactive accent and re-derive the hover state one step darker again. Do not solve this by enlarging button text — the fix belongs in the token, so it propagates to links and nav for free.",
         "example": "--color-accent: #0b7d6f (5.03:1 white-on-fill and fill-on-white, verified); --color-accent-hover: #0a6a5e; keep --color-accent-decorative: #0e9f8e for the WispelMark, progress fills and chart strokes. Mirror the change into Design System/tokens/ and THPalettes per the token-sync rule in globals.css:6-8. Confirm with: node -e contrast check, or axe-core in the E2E lane."
       },
-      "estimatedImpact": "Major compliance win for a one-line token change; lifts ~8 downstream findings (badges, tints, focus ring) at the same time."
+      "estimatedImpact": "Major compliance win for a one-line token change; lifts ~8 downstream findings (badges, tints, focus ring) at the same time.",
+      "status": "fixed",
+      "fix": "`--color-accent` is now #0b7d6f (5.03:1 both directions), `--color-accent-hover` #0a6a5e (6.49:1). The old teal survives as `--color-accent-decorative` for non-text use only."
     },
     {
       "id": "UI-A11Y-002",
@@ -49,7 +58,9 @@
         "suggested_approach": "Register dnd-kit's KeyboardSensor alongside PointerSensor and give each droppable cell a stable accessible name so the announced drop target is meaningful. Separate the two intents on the chip: keep click/Enter for 'edit task', and add an explicit 'verplaatsen' affordance (a small menu or a Space-to-lift model) so activation is unambiguous. Provide dnd-kit's `announcements` and `screenReaderInstructions` in Dutch and English rather than shipping its English defaults into an NL product. As a belt-and-braces alternative, a plain 'verplaats naar…' select on each chip gives a non-drag path for free.",
         "example": "const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })); and on DropCell: aria-label={t('week.cellLabel', { child: childLabel, date: day })}."
       },
-      "estimatedImpact": "Major usability win — restores an entire feature for keyboard and assistive-tech users, and clears the most severe conformance gap in the app."
+      "estimatedImpact": "Major usability win — restores an entire feature for keyboard and assistive-tech users, and clears the most severe conformance gap in the app.",
+      "status": "fixed",
+      "fix": "`KeyboardSensor` registered with a grid-aware `coordinateGetter` that steps exactly one cell per arrow press. Edit and move are now separate controls, since dnd-kit's activator claims Enter/Space. Announcements and instructions localised in nl + en."
     },
     {
       "id": "UI-A11Y-003",
@@ -71,7 +82,9 @@
         "suggested_approach": "Give the aside `id=\"sidebar\"` so the existing aria-controls resolves. Remove the drawer from the tab order when closed on mobile while keeping it permanently available on desktop — the cleanest expression is the `inert` attribute (broadly supported now) applied only in the narrow layout, or conditional rendering keyed to a matchMedia-backed isMobile flag. Whichever is chosen, drive it from a single boolean rather than a ternary with two identical branches, and assert it in a test.",
         "example": "<aside id=\"sidebar\" inert={isMobile && !menuOpen ? \"\" : undefined} …>. Test: render the shell at 375px, assert document.querySelectorAll('#sidebar a').every(a => a.tabIndex === -1) while closed."
       },
-      "estimatedImpact": "Major — removes the single most disorienting keyboard experience in the product; small, contained diff."
+      "estimatedImpact": "Major — removes the single most disorienting keyboard experience in the product; small, contained diff.",
+      "status": "fixed",
+      "fix": "The drawer is `hidden` when closed on mobile, so its links leave the tab order and the accessibility tree. It carries `id=\"sidebar\"`, so the hamburger's `aria-controls` resolves. The duplicate landmark name is gone — the inner `<nav>` is now the only labelled landmark."
     },
     {
       "id": "UI-COLOR-004",
@@ -93,7 +106,9 @@
         "suggested_approach": "Introduce a distinct interactive-border token that clears 3:1 and use it for input and secondary-button outlines, keeping the soft #e5e8ec purely for decorative dividers and card hairlines, where 1.4.11 does not apply. Alternatively give inputs a tinted fill (`bg-surface` inside white cards) so the shape reads from the fill rather than the stroke — but the stroke fix is more predictable across the six card variants in play.",
         "example": "--color-border: #e5e8ec (decorative, unchanged); --color-border-interactive: #8a929c (3.1:1 vs white). Input: border-[--color-border-interactive]; Button secondary: border-[--color-border-interactive]. Verify each token pair against both #ffffff and #f6f7f9, since secondary buttons appear on both."
       },
-      "estimatedImpact": "Major usability + compliance win; token-level change, no markup churn."
+      "estimatedImpact": "Major usability + compliance win; token-level change, no markup churn.",
+      "status": "fixed",
+      "fix": "New `--color-border-interactive` (#828a95 — 3.49:1 on bg, 3.26:1 on surface) is used for input and secondary-button boundaries. `--color-border` stays hairline-only."
     },
     {
       "id": "UI-MOB-005",
@@ -115,7 +130,9 @@
         "suggested_approach": "Encode the minimum in the Button primitive rather than at each call site: add a min-height to every size so `sm` stays visually compact but keeps a 44px hit area. Replace the ×-glyph reorder controls with real icon buttons at the same minimum, and separate 'Verwijderen' from the other three child actions (an overflow menu, or visual distance plus a distinct tone) so a mis-tap cannot be destructive.",
         "example": "SIZES: { sm: 'min-h-11 px-3 py-1.5 text-sm', md: 'min-h-11 px-4 py-2 text-sm', lg: 'min-h-12 px-6 py-3 text-base' } — the min-height enlarges the hit area without inflating the visual weight, since the label stays the same size."
       },
-      "estimatedImpact": "Major mobile-accuracy win; one primitive edit plus two call-site cleanups."
+      "estimatedImpact": "Major mobile-accuracy win; one primitive edit plus two call-site cleanups.",
+      "status": "fixed",
+      "fix": "`min-h-11` on every Button/ButtonLink size (`min-h-12` for lg), on nav links, inline row buttons and form fields. The rotation glyph buttons were replaced; the icon picker uses 44px targets."
     },
     {
       "id": "UI-TYP-006",
@@ -137,7 +154,9 @@
         "suggested_approach": "Restore paired values in the fontSize map so each step ships an intentional line-height: tight ratios for display sizes, ~1.5 for body sizes. This is the one change that fixes every existing screen without touching a single component. Then verify the layout survives the 1.4.12 stress test (1.5× line-height, 0.12em letter-spacing) — with the pairs in place it should.",
         "example": "fontSize: { xs: ['var(--text-xs)', { lineHeight: '1.5' }], sm: ['var(--text-sm)', { lineHeight: '1.5' }], base: ['var(--text-base)', { lineHeight: '1.6' }], lg: ['var(--text-lg)', { lineHeight: '1.4' }], xl: ['var(--text-xl)', { lineHeight: '1.3' }], '2xl': ['var(--text-2xl)', { lineHeight: 'var(--leading-tight)' }], … }"
       },
-      "estimatedImpact": "Major readability win across the whole product from a single config change — the highest leverage item in this report after the accent token."
+      "estimatedImpact": "Major readability win across the whole product from a single config change — the highest leverage item in this report after the accent token.",
+      "status": "fixed",
+      "fix": "`fontSize` now ships `[size, { lineHeight }]` pairs; body steps sit at 1.5–1.6. Verified in the emitted CSS and locked by a regression test."
     },
     {
       "id": "UI-A11Y-007",
@@ -160,7 +179,9 @@
         "suggested_approach": "Define one focus treatment once and apply it everywhere: a 2px offset ring in the (darkened) accent, expressed as a shared class or a `@layer base` rule keyed to `:focus-visible`, so it cannot drift per component. Stop using `outline-none` without an equally strong replacement. Collapse the eight duplicated `fieldClass` strings into the existing `Input` primitive while you are there — they are the same string with the same defect copy-pasted.",
         "example": "In globals.css: `@layer base { :where(a, button, input, select, textarea, [tabindex]):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; } }` — then delete every local `outline-none` and let the base rule govern."
       },
-      "estimatedImpact": "Major keyboard-usability win, and it removes eight copies of a duplicated style string."
+      "estimatedImpact": "Major keyboard-usability win, and it removes eight copies of a duplicated style string.",
+      "status": "fixed",
+      "fix": "One `:focus-visible` rule in `@layer base` — 2px accent outline at 2px offset. Every local `outline-none` removed except the skip-link target, which is documented."
     },
     {
       "id": "UI-CONSIST-008",
@@ -182,7 +203,9 @@
         "suggested_approach": "Decide the canonical dashboard row treatment once (the `bg-surface` + border variant is the de-facto winner at five call sites — Card's white+shadow is the outlier), express it as a Card variant, and migrate all six sites. Add `Card variant=\"row\" | \"panel\"` and a `Chip`/`Badge` usage for the status pills rather than re-declaring the class string. Either adopt or delete the unused kid primitives — dead components that no reviewer exercises will keep accumulating defects.",
         "example": "Card variants: `panel` (bg-bg, shadow-sm, p-5) for standalone cards, `row` (bg-surface, border, p-4) for list items, `tinted` (accent/danger wash) for banners. Then: rg -n 'rounded-lg border border-border bg-surface p-4' apps/web should return zero hits."
       },
-      "estimatedImpact": "Major maintainability win; prerequisite for making the other fixes stick rather than being re-introduced by the next feature."
+      "estimatedImpact": "Major maintainability win; prerequisite for making the other fixes stick rather than being re-introduced by the next feature.",
+      "status": "fixed",
+      "fix": "`Card` gained `panel`/`row`/`tinted-accent`/`tinted-danger` variants plus polymorphic `as`. All 17 hand-rolled containers migrated; the grep now returns zero."
     },
     {
       "id": "UI-COLOR-009",
@@ -204,7 +227,9 @@
         "suggested_approach": "Never pair a tint with a foreground drawn from the same undiluted hue. Introduce explicit `-on-tint` foreground tokens computed against the actual tinted background, and darken `--color-success` for text use the same way UI-COLOR-001 handles the accent. Delete `text-muted/70` — opacity on an already-muted token is how you land at 3.11:1; use a dedicated placeholder token instead, or better, replace the '—' placeholder with real empty-state copy.",
         "example": "--color-accent-on-tint: #0a6a5e (≈6:1 on the /10 tint); --color-success-text: #14713f (≈5:1 on #eaf7ef). Then Badge accent tone: `bg-kid-turquoise-soft text-[--color-accent-on-tint]`."
       },
-      "estimatedImpact": "Moderate-to-major: fixes the least legible text in the product; token-level, no markup changes."
+      "estimatedImpact": "Moderate-to-major: fixes the least legible text in the product; token-level, no markup changes.",
+      "status": "fixed",
+      "fix": "Added `--color-accent-on-tint` (5.4–5.8:1 on the tints) and `--color-success-text` (5.5:1 on success-bg). `text-muted/70` removed."
     },
     {
       "id": "UI-UX-010",
@@ -226,7 +251,9 @@
         "suggested_approach": "Route page-level errors through the Alert primitive so `role=\"alert\"` comes for free, and pair every error with a retry action that re-invokes the existing `load` callback — each screen already has one, so the button is a one-line addition. Distinguish error styling from loading styling on /gezin and /instellingen. Where the realtime socket is disconnected, say so and offer the same retry rather than leaving a stale view.",
         "example": "{failed && <Alert tone=\"danger\">{t('loadError')} <Button size=\"sm\" variant=\"secondary\" onClick={() => void load()}>{t('retry')}</Button></Alert>} — add `retry` to messages/nl.json and messages/en.json."
       },
-      "estimatedImpact": "Major perceived-reliability win; small diff repeated six times."
+      "estimatedImpact": "Major perceived-reliability win; small diff repeated six times.",
+      "status": "fixed",
+      "fix": "New `PageError` primitive routes page failures through `Alert` (so `role=\"alert\"` applies) with a retry button wired to each screen's existing `load` callback."
     },
     {
       "id": "UI-A11Y-011",
@@ -248,7 +275,9 @@
         "suggested_approach": "Add a visually-hidden-until-focused skip link as the first focusable element in the shell, targeting an id on `<main>`. Give the aside and its inner nav distinct names, or drop the label from the aside entirely and let the nested nav carry the navigation identity — one landmark, one name.",
         "example": "<a href=\"#main\" className=\"sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded focus:bg-bg focus:px-4 focus:py-2\">{t('skipToContent')}</a> … <main id=\"main\" tabIndex={-1}>. Add `skipToContent` to both message catalogues."
       },
-      "estimatedImpact": "Moderate-to-major for keyboard users; a handful of lines."
+      "estimatedImpact": "Moderate-to-major for keyboard users; a handful of lines.",
+      "status": "fixed",
+      "fix": "Skip link added as the first focusable element, targeting `<main id=\"main\">`. The duplicate nav landmark name is resolved."
     },
     {
       "id": "UI-UX-012",
@@ -270,7 +299,9 @@
         "suggested_approach": "Replace the native confirm with an in-place confirmation using the existing card/Alert vocabulary — /gezin already does this well with its inline DeleteChildForm, so the pattern exists in-repo and just needs to spread. Where the backend supports it, prefer optimistic removal plus a 5-second 'Ongedaan maken' toast over a pre-confirmation. For invite-code regeneration, state the consequence in the UI ('bestaande koppelcodes werken daarna niet meer') rather than only in a dialog string.",
         "example": "Reuse the DeleteChildForm shape from apps/web/app/[locale]/(dashboard)/gezin/DeleteChildForm.tsx as the canonical inline-destructive pattern, and delete all three window.confirm calls."
       },
-      "estimatedImpact": "Moderate — better error prevention and a visually coherent flow; medium-sized diff."
+      "estimatedImpact": "Moderate — better error prevention and a visually coherent flow; medium-sized diff.",
+      "status": "fixed",
+      "fix": "New `ConfirmDelete` primitive replaces all three `window.confirm` calls with inline confirmation in the app's own register."
     },
     {
       "id": "UI-PERF-013",
@@ -292,7 +323,9 @@
         "suggested_approach": "Add a small Skeleton primitive (a token-driven `animate-pulse` block, honouring prefers-reduced-motion per UI-A11Y-017) and render 2–3 row-shaped placeholders matching the real card geometry. Wrap the loading/loaded region in `aria-busy` plus a polite live region so the state change is announced once. /goedkeuren already wraps its queue in `aria-live=\"polite\"` (line 249) — extend the same treatment to the other five screens.",
         "example": "<div aria-busy={list === null} aria-live=\"polite\">{list === null ? <SkeletonRows count={3} /> : …}</div>"
       },
-      "estimatedImpact": "Moderate perceived-speed improvement; one new primitive, six call sites."
+      "estimatedImpact": "Moderate perceived-speed improvement; one new primitive, six call sites.",
+      "status": "fixed",
+      "fix": "New `Skeleton`/`SkeletonRows` primitives replace the loading sentences, inside `aria-busy` containers."
     },
     {
       "id": "UI-VIS-014",
@@ -314,7 +347,9 @@
         "suggested_approach": "Give each of the four states a genuinely distinct treatment across more than one channel — fill, border weight and a small glyph. Reserve the strongest visual weight for 'submitted' (the only state demanding parent action) rather than for 'done'. Keep the text label; the goal is to make it confirmatory rather than load-bearing.",
         "example": "open: white fill + neutral border; open_redo: coral-soft fill + coral border + ↻ glyph; submitted: solid accent fill + white text + ● glyph (the action state, most prominent); approved/completed: accent-tinted fill + ✓ glyph at reduced opacity (the settled state, least prominent)."
       },
-      "estimatedImpact": "Moderate scanning-speed win on the planner; contained to one function."
+      "estimatedImpact": "Moderate scanning-speed win on the planner; contained to one function.",
+      "status": "fixed",
+      "fix": "Four states now differ on fill, border and glyph, with weight tracking urgency — `submitted` is the loudest, settled work recedes."
     },
     {
       "id": "UI-LAY-015",
@@ -336,7 +371,9 @@
         "suggested_approach": "Move the container into the shell's `<main>` so individual screens stop deciding. Pick one alignment (left-aligned reads better against a left sidebar) and at most two measures — a wide one for list/grid screens and a narrow one for form screens — exposed as a prop rather than re-typed per page.",
         "example": "In AppShell: <main className=\"mx-auto w-full max-w-4xl flex-1 px-4 py-6 sm:px-6 sm:py-8\">, and let form-dense screens opt into an inner max-w-2xl. Then remove all six per-screen wrappers."
       },
-      "estimatedImpact": "Minor-to-moderate polish; small diff, immediately visible."
+      "estimatedImpact": "Minor-to-moderate polish; small diff, immediately visible.",
+      "status": "fixed",
+      "fix": "The container moved into the shell's `<main>` (`mx-auto max-w-4xl`). Per-screen `mx-auto` removed; form-dense screens keep a narrower inner measure."
     },
     {
       "id": "UI-UX-016",
@@ -358,7 +395,9 @@
         "suggested_approach": "Give each empty state a title, one line of positive Dutch copy in the house voice, and a primary action that resolves it. Keep it warm without switching registers — this is a parent surface, so restraint, not confetti. Route new copy through @dutch-child-copy only where it is child-facing; these strings are parent-facing. Replace the '—' bucket placeholder with either nothing or real copy, and drop the failing muted/70 tone either way.",
         "example": "/vandaag empty: 'Nog geen kinderen in je gezin' + 'Voeg je eerste kind toe om taken te kunnen plannen.' + <ButtonLink href=\"/gezin\">Kind toevoegen</ButtonLink>. /goedkeuren empty is already close to right in tone — extend that treatment with an explicit action."
       },
-      "estimatedImpact": "Moderate-to-major activation win for a copy-plus-one-button change per screen."
+      "estimatedImpact": "Moderate-to-major activation win for a copy-plus-one-button change per screen.",
+      "status": "fixed",
+      "fix": "New `EmptyState` primitive with title, body and a resolving action. /vandaag now links to /gezin; /taken, /winkel and /gezin offer their create actions inline."
     },
     {
       "id": "UI-A11Y-017",
@@ -380,7 +419,9 @@
         "suggested_approach": "Broaden the existing media query from one class to a global policy that neutralises transforms, animations and smooth scrolling while leaving colour transitions intact. Gate the two imperative `scrollIntoView` calls on a matchMedia check, since CSS cannot reach them.",
         "example": "@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-property: color, background-color, border-color, opacity !important; scroll-behavior: auto !important; } } — and in GezinClient: el?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })."
       },
-      "estimatedImpact": "Moderate for affected users; very small diff."
+      "estimatedImpact": "Moderate for affected users; very small diff.",
+      "status": "fixed",
+      "fix": "Global `prefers-reduced-motion` policy neutralises transforms, animations and smooth scrolling while keeping colour transitions. The two imperative `scrollIntoView` calls check `matchMedia`."
     },
     {
       "id": "UI-VIS-018",
@@ -402,7 +443,9 @@
         "suggested_approach": "Define three heading roles in the design system and use them everywhere: page title, section title, card title — each with a fixed size, weight and margin. Widen the h1 step so the page title is unambiguously dominant, and retire uppercase-muted for headings (keep it, if at all, for true eyebrow labels above a heading). Existing tokens already cover the sizes; this is about applying them consistently rather than adding any.",
         "example": "h1: text-2xl (24px) font-semibold; h2 section: text-lg (18px) font-semibold text-text; h3 card: text-base font-semibold. Replace the four uppercase-muted section headings with the h2 role."
       },
-      "estimatedImpact": "Moderate scanability and perceived-quality win; mechanical diff."
+      "estimatedImpact": "Moderate scanability and perceived-quality win; mechanical diff.",
+      "status": "fixed",
+      "fix": "Three heading roles applied consistently: h1 `text-2xl`, section h2 `text-lg`, card h3 `text-base`. Uppercase retired from meaning-bearing headings (kept only for marketing eyebrow labels)."
     },
     {
       "id": "UI-USA-019",
@@ -424,7 +467,9 @@
         "suggested_approach": "Export `generateMetadata` from each dashboard page.tsx, pulling the title from the existing `nav` message namespace so the tab title and the sidebar label stay in sync automatically and stay localised. The root template supplies the ' — Wispel' suffix.",
         "example": "export async function generateMetadata({ params }) { const { locale } = await params; const t = await getTranslations({ locale, namespace: 'nav' }); return { title: t('goedkeuren') }; } — repeat for all six, reusing the nav key that already names the route."
       },
-      "estimatedImpact": "Minor-to-moderate; six near-identical small additions."
+      "estimatedImpact": "Minor-to-moderate; six near-identical small additions.",
+      "status": "fixed",
+      "fix": "`generateMetadata` added to all seven dashboard pages, titled from the `nav` namespace so tab, sidebar label and bookmark stay in sync and localised."
     },
     {
       "id": "UI-USA-020",
@@ -446,7 +491,9 @@
         "suggested_approach": "Replace the text input with a small visual picker — a wrapped grid of selectable icon buttons with `aria-pressed`, exactly the pattern already implemented for avatars in ChildForms. Keep a sensible default so the field is skippable. At minimum, show a live preview of the current value next to the input so a typo is visible before saving.",
         "example": "Reuse the avatar picker at apps/web/app/[locale]/(dashboard)/gezin/ChildForms.tsx:120-135 — same interaction, same a11y treatment, applied to the icon set. Size each option at the 44px minimum from UI-MOB-005."
       },
-      "estimatedImpact": "Moderate authoring-quality win; medium diff, and it reuses an existing in-repo pattern."
+      "estimatedImpact": "Moderate authoring-quality win; medium diff, and it reuses an existing in-repo pattern.",
+      "status": "fixed",
+      "fix": "New `IconPicker` primitive replaces both free-text fields. `lib/icons.ts` also maps the API's legacy slugs to glyphs — template tasks were rendering the literal word \"pencil\"."
     },
     {
       "id": "UI-TOKEN-021",
@@ -468,7 +515,9 @@
         "suggested_approach": "Promote the two badge foregrounds to named tokens in globals.css and mirror them into Design System/tokens/ and THPalettes, as the header comment in globals.css instructs. Raise the chip caption to `text-xs` (12px, the scale floor) and drop `opacity-80` — if the caption needs de-emphasis, use the muted colour token, which is contrast-checked, rather than opacity, which is not.",
         "example": "--kid-yellow-text: #8a5a00; --kid-coral-text: #a13a1f; then `text-kid-yellow-text`. Guard with the rule's own check: rg -n '\\[#[0-9a-fA-F]{3,6}\\]|text-\\[[0-9]+px\\]' apps/web/app apps/web/components should return only the QR-code call, which is legitimately documented as barcode pixels (InviteCodeCard.tsx:26-27)."
       },
-      "estimatedImpact": "Minor today, prevents a class of cross-platform drift later; trivial diff."
+      "estimatedImpact": "Minor today, prevents a class of cross-platform drift later; trivial diff.",
+      "status": "fixed",
+      "fix": "`--kid-coral-text` / `--kid-yellow-text` tokens replace the arbitrary hex; `text-[11px]` raised to the scale floor with the opacity dropped; `sm:max-w-[12rem]` moved onto the spacing scale. Only the documented QR exception remains."
     },
     {
       "id": "UI-INT-022",
@@ -490,7 +539,9 @@
         "suggested_approach": "Announce the result through a polite live region rather than a label swap alone, and surface the failure path with a short instruction to select the code manually. Reuse the Alert primitive for the failure case so `role=\"alert\"` comes along.",
         "example": "const [copyState, setCopyState] = useState<'idle'|'ok'|'fail'>('idle'); … <p role=\"status\" className=\"sr-only\">{copyState === 'ok' ? t('invite.copied') : copyState === 'fail' ? t('invite.copyManual') : ''}</p>, with the failure message also shown visually."
       },
-      "estimatedImpact": "Minor polish on a high-stakes step; a few lines plus two message keys."
+      "estimatedImpact": "Minor polish on a high-stakes step; a few lines plus two message keys.",
+      "status": "fixed",
+      "fix": "Copy result announced through a `role=\"status\"` region, and the failure path now shows a visible instruction to select the code manually."
     },
     {
       "id": "UI-INT-023",
@@ -512,7 +563,9 @@
         "suggested_approach": "Drop `disabled` and keep `aria-current=\"true\"`, making the active locale a no-op click. Style the active state as selected rather than as a primary action — a subtle fill or an underline reads as state; a solid accent pill reads as a call to action. Consider a single toggle showing the target language ('EN') instead of two codes, which halves the header's control count.",
         "example": "<button aria-current={isActive ? 'true' : undefined} onClick={() => !isActive && router.replace(pathname, { locale })} className={isActive ? 'bg-surface text-text font-semibold' : 'text-muted hover:bg-border/50'}>"
       },
-      "estimatedImpact": "Minor; small diff on a globally-present control."
+      "estimatedImpact": "Minor; small diff on a globally-present control.",
+      "status": "fixed",
+      "fix": "`disabled` replaced with `aria-current` plus a no-op click, so the active locale stays in the tab order and no longer looks like a primary action."
     },
     {
       "id": "UI-VIS-024",
@@ -534,7 +587,9 @@
         "suggested_approach": "Fold this into the Card variant work in UI-CONSIST-008: set the default padding to whatever the audit of the six existing containers settles on, and expose density as a named variant rather than as a boolean plus a className override.",
         "example": "Card variants row (p-4) / panel (p-5), so Vandaag becomes <Card variant=\"row\"> with no className override."
       },
-      "estimatedImpact": "Minor; resolved for free by UI-CONSIST-008."
+      "estimatedImpact": "Minor; resolved for free by UI-CONSIST-008.",
+      "status": "fixed",
+      "fix": "Resolved by the Card variant work — Vandaag uses `variant=\"row\"` with no padding override."
     }
   ],
   "summary": {

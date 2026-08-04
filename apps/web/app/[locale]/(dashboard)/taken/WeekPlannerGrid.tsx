@@ -3,6 +3,9 @@
 import {
   DndContext,
   type DragEndEvent,
+  KeyboardCode,
+  type KeyboardCoordinateGetter,
+  KeyboardSensor,
   PointerSensor,
   useDraggable,
   useDroppable,
@@ -30,18 +33,107 @@ function isMovable(status: InstanceView["status"]) {
   return status === "open" || status === "open_redo";
 }
 
+/**
+ * Four visually distinct states, each carrying its meaning on more than one
+ * channel (fill, border and glyph) so the grid can be scanned rather than read.
+ * Weight tracks urgency: `submitted` is the only state waiting on the parent, so
+ * it is the loudest; settled work recedes.
+ */
 function statusTone(status: InstanceView["status"]): string {
   switch (status) {
     case "approved":
     case "completed":
-      return "bg-accent/10 text-accent";
+      return "border border-accent/30 bg-accent/10 text-accent-on-tint";
     case "submitted":
-      return "bg-accent/15 text-accent";
+      return "border border-accent bg-accent text-accent-fg";
     case "open_redo":
-      return "border border-border text-muted";
+      return "border border-kid-coral bg-kid-coral-soft text-kid-coral-text";
     default:
-      return "border border-border text-text";
+      return "border border-border-interactive bg-bg text-text";
   }
+}
+
+function statusGlyph(status: InstanceView["status"]): string {
+  switch (status) {
+    case "approved":
+    case "completed":
+      return "✓";
+    case "submitted":
+      return "●";
+    case "open_redo":
+      return "↻";
+    default:
+      return "○";
+  }
+}
+
+/**
+ * Keyboard equivalent of the drag gesture (WCAG 2.1.1). dnd-kit's default getter
+ * translates by a flat 25px per arrow press, which in a week grid means several
+ * presses per cell and no guarantee of landing inside one. This getter is
+ * grid-aware instead: it resolves the cell currently under the item, steps one
+ * column (day) or one row (child) in the pressed direction, and returns that
+ * cell's own position — so one press moves exactly one cell.
+ */
+function createCellCoordinateGetter(
+  childIds: string[],
+  days: string[],
+): KeyboardCoordinateGetter {
+  return (event, { context, currentCoordinates }) => {
+    const { droppableRects, over } = context;
+
+    // Prefer the cell dnd-kit reports as hovered; on the first press after lift
+    // fall back to whichever cell's rect contains the item's top-left corner.
+    let currentId = over?.id != null ? String(over.id) : null;
+    if (currentId === null) {
+      for (const [id, rect] of droppableRects) {
+        if (
+          currentCoordinates.x >= rect.left &&
+          currentCoordinates.x <= rect.left + rect.width &&
+          currentCoordinates.y >= rect.top &&
+          currentCoordinates.y <= rect.top + rect.height
+        ) {
+          currentId = String(id);
+          break;
+        }
+      }
+    }
+
+    const cell = currentId === null ? null : parseCellId(currentId);
+    if (!cell) return;
+
+    let col = days.indexOf(cell.date);
+    let row = childIds.indexOf(cell.childId);
+    if (col < 0 || row < 0) return;
+
+    switch (event.code) {
+      case KeyboardCode.Right:
+        col += 1;
+        break;
+      case KeyboardCode.Left:
+        col -= 1;
+        break;
+      case KeyboardCode.Down:
+        row += 1;
+        break;
+      case KeyboardCode.Up:
+        row -= 1;
+        break;
+      default:
+        return;
+    }
+
+    // Stay inside the grid rather than wrapping — wrapping in two dimensions is
+    // disorienting when you cannot see the whole table at once.
+    const day = days[col];
+    const childId = childIds[row];
+    if (day === undefined || childId === undefined) return;
+
+    const target = droppableRects.get(cellId(childId, day));
+    if (!target) return;
+
+    return { x: target.left, y: target.top };
+  };
 }
 
 function InstanceChip({
@@ -55,6 +147,7 @@ function InstanceChip({
   statusLabel: string;
   onEditTask: (taskId: string) => void;
 }) {
+  const t = useTranslations("taken.week");
   const movable = isMovable(inst.status);
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: inst.id,
@@ -65,35 +158,56 @@ function InstanceChip({
     ? { transform: CSS.Translate.toString(transform), opacity: isDragging ? 0.5 : 1 }
     : undefined;
 
+  // Edit and move are separate controls on purpose. dnd-kit's keyboard activator
+  // claims Enter/Space, so a single button spreading its listeners *and* an
+  // onClick would fire both intents from one keypress.
   return (
     <li ref={setNodeRef} style={style}>
-      <button
-        type="button"
-        onClick={() => onEditTask(inst.taskId)}
+      <div
         className={
-          "w-full rounded px-2 py-1.5 text-left text-xs transition-colors " +
-          statusTone(inst.status) +
-          (movable ? " cursor-grab active:cursor-grabbing" : " cursor-pointer hover:bg-bg")
+          "flex min-h-11 items-stretch overflow-hidden rounded text-xs transition-colors " +
+          statusTone(inst.status)
         }
-        {...(movable ? { ...listeners, ...attributes } : {})}
       >
-        <span className="block font-medium">{inst.title}</span>
-        <span className="block text-[11px] opacity-80">
-          {childLabel} · {statusLabel}
-        </span>
-      </button>
+        <button
+          type="button"
+          onClick={() => onEditTask(inst.taskId)}
+          className="min-w-0 flex-1 px-2 py-1.5 text-left"
+        >
+          <span className="block font-medium">
+            <span aria-hidden>{statusGlyph(inst.status)} </span>
+            {inst.title}
+          </span>
+          <span className="block text-xs">
+            {childLabel} · {statusLabel}
+          </span>
+        </button>
+        {movable && (
+          <button
+            type="button"
+            aria-label={t("moveHandle", { title: inst.title })}
+            className="shrink-0 cursor-grab px-2 active:cursor-grabbing"
+            {...listeners}
+            {...attributes}
+          >
+            <span aria-hidden>⠿</span>
+          </button>
+        )}
+      </div>
     </li>
   );
 }
 
 function DropCell({
   id,
+  cellLabel,
   instances,
   childLabel,
   statusFor,
   onEditTask,
 }: {
   id: string;
+  cellLabel: string;
   instances: InstanceView[];
   childLabel: string;
   statusFor: (status: InstanceView["status"]) => string;
@@ -104,12 +218,13 @@ function DropCell({
   return (
     <td
       ref={setNodeRef}
+      aria-label={cellLabel}
       className={
-        "align-top border-b border-border px-1 py-2 min-h-[4rem] " +
-        (isOver ? "bg-accent/5 ring-1 ring-inset ring-accent/30" : "")
+        "min-h-16 border-b border-border px-1 py-2 align-top " +
+        (isOver ? "bg-accent/10 ring-2 ring-inset ring-accent" : "")
       }
     >
-      <ul className="flex min-h-[3rem] flex-col gap-1.5">
+      <ul className="flex min-h-12 flex-col gap-1.5">
         {instances.map((inst) => (
           <InstanceChip
             key={inst.id}
@@ -140,7 +255,15 @@ export default function WeekPlannerGrid({
   onMove,
 }: Props) {
   const tw = useTranslations("taken.week");
-  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }));
+  const childIds = useMemo(() => childMembers.map((c) => c.id), [childMembers]);
+  const coordinateGetter = useMemo(
+    () => createCellCoordinateGetter(childIds, days),
+    [childIds, days],
+  );
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(KeyboardSensor, { coordinateGetter }),
+  );
 
   const childName = useCallback(
     (id: string) => childMembers.find((c) => c.id === id)?.displayName ?? "—",
@@ -176,9 +299,41 @@ export default function WeekPlannerGrid({
     [instances, onMove],
   );
 
+  // dnd-kit ships English announcements by default; this product is NL-first, so
+  // the live-region copy has to come from the catalogue like everything else.
+  const cellDescription = useCallback(
+    (id: string | number | undefined) => {
+      const cell = id == null ? null : parseCellId(String(id));
+      return cell ? tw("cellLabel", { child: childName(cell.childId), date: cell.date }) : "";
+    },
+    [childName, tw],
+  );
+
+  const announcements = useMemo(
+    () => ({
+      onDragStart: ({ active }: { active: { id: string | number } }) =>
+        tw("a11y.lifted", { cell: cellDescription(active.id) || String(active.id) }),
+      onDragOver: ({ over }: { over: { id: string | number } | null }) =>
+        over ? tw("a11y.over", { cell: cellDescription(over.id) }) : tw("a11y.outside"),
+      onDragEnd: ({ over }: { over: { id: string | number } | null }) =>
+        over ? tw("a11y.dropped", { cell: cellDescription(over.id) }) : tw("a11y.cancelled"),
+      onDragCancel: () => tw("a11y.cancelled"),
+    }),
+    [cellDescription, tw],
+  );
+
   return (
-    <DndContext sensors={sensors} onDragEnd={(e) => void handleDragEnd(e)}>
+    <DndContext
+      sensors={sensors}
+      accessibility={{
+        announcements,
+        screenReaderInstructions: { draggable: tw("a11y.instructions") },
+      }}
+      onDragEnd={(e) => void handleDragEnd(e)}
+    >
       <p className="mb-3 text-sm text-muted">{tw("dragHint")}</p>
+      {/* The 720px floor is a layout minimum for eight columns, not a token —
+          the wrapper scrolls so the page body never scrolls sideways at 320px. */}
       <div className="overflow-x-auto">
         <table className="w-full min-w-[720px] border-collapse text-left text-sm">
           <thead>
@@ -212,6 +367,7 @@ export default function WeekPlannerGrid({
                   <DropCell
                     key={cellId(child.id, day)}
                     id={cellId(child.id, day)}
+                    cellLabel={tw("cellLabel", { child: child.displayName, date: day })}
                     instances={byChildDate.get(cellId(child.id, day)) ?? []}
                     childLabel={childName(child.id)}
                     statusFor={(status) => tw(`status.${status}`)}

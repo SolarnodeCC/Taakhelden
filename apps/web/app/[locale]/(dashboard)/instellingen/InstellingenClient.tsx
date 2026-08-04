@@ -12,6 +12,7 @@ import {
 import { useRouter } from "../../../../i18n/navigation";
 import NotificationSettingsSection from "./NotificationSettingsSection";
 import PrivacySection from "./PrivacySection";
+import { PageError, SkeletonRows } from "../../../../components/ui";
 import SteunSection from "./SteunSection";
 
 export default function InstellingenClient() {
@@ -50,17 +51,21 @@ export default function InstellingenClient() {
   if (gate === "upstream_error") return <FullParentUpstreamError />;
 
   if (gate === "loading" || (!family && !failed)) {
-    return <p className="text-sm text-muted">{t("loading")}</p>;
+    return (
+      <div aria-busy>
+        <SkeletonRows count={3} />
+      </div>
+    );
   }
 
   if (failed || !family) {
-    return <p className="text-sm text-muted">{t("loadError")}</p>;
+    return <PageError message={t("loadError")} onRetry={() => void load()} />;
   }
 
   return (
-    <div className="mx-auto flex max-w-2xl flex-col gap-8">
+    <div className="flex max-w-2xl flex-col gap-8">
       <header>
-        <h1 className="text-xl font-semibold text-text">{t("title")}</h1>
+        <h1 className="text-2xl font-semibold text-text">{t("title")}</h1>
         <p className="mt-1 text-sm text-muted">{t("subtitle")}</p>
       </header>
 

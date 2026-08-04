@@ -9,10 +9,11 @@ import {
   PhotoView,
   type PendingApprovalItem,
 } from "../../../../lib/api/types";
+import { displayIcon } from "../../../../lib/icons";
 import { useRealtimeRefetch } from "../../../../lib/realtime/FamilyRealtimeContext";
 import { APPROVAL_REALTIME_EVENTS } from "../../../../lib/realtime/events";
 import { useRouter } from "../../../../i18n/navigation";
-import { Button } from "../../../../components/ui";
+import { Button, Card, EmptyState, PageError, SkeletonRows } from "../../../../components/ui";
 
 // A submitted/completed task plus its child name — the unit of the approval queue.
 type QueueItem = PendingApprovalItem;
@@ -125,10 +126,10 @@ function QueueCard({ item, onResolve }: { item: QueueItem; onResolve: (id: strin
   }
 
   return (
-    <section className="rounded-lg border border-border bg-surface p-4">
+    <Card as="section" variant="row">
       <div className="flex items-center gap-2">
-        {item.icon && <span aria-hidden>{item.icon}</span>}
-        <h2 className="min-w-0 flex-1 truncate text-base font-semibold text-text">{item.title}</h2>
+        {displayIcon(item.icon) && <span aria-hidden>{displayIcon(item.icon)}</span>}
+        <h2 className="min-w-0 flex-1 truncate text-lg font-semibold text-text">{item.title}</h2>
         {typeof item.points === "number" && (
           <span className="text-sm font-medium text-muted">{t("points", { points: item.points })}</span>
         )}
@@ -172,7 +173,7 @@ function QueueCard({ item, onResolve }: { item: QueueItem; onResolve: (id: strin
               maxLength={200}
               rows={2}
               placeholder={t("redoPlaceholder")}
-              className="mt-1 w-full rounded border border-border bg-bg px-3 py-2 text-sm outline-none focus:border-accent"
+              className="mt-1 min-h-11 w-full rounded border border-border-interactive bg-bg px-3 py-2 text-sm focus:border-accent"
             />
           </label>
           <div className="flex gap-2">
@@ -194,7 +195,7 @@ function QueueCard({ item, onResolve }: { item: QueueItem; onResolve: (id: strin
           </div>
         </form>
       )}
-    </section>
+    </Card>
   );
 }
 
@@ -233,27 +234,29 @@ export default function GoedkeurenClient() {
 
   return (
     <div className="max-w-2xl">
-      <h1 className="text-xl font-semibold text-text">{t("title")}</h1>
+      <h1 className="text-2xl font-semibold text-text">{t("title")}</h1>
 
-      {failed && <p className="mt-4 text-sm text-danger">{t("loadError")}</p>}
-
-      {!failed && queue === null && <p className="mt-4 text-sm text-muted">{t("loading")}</p>}
-
-      {queue !== null && queue.length === 0 && (
-        <p className="mt-4 text-sm text-muted">{t("empty")}</p>
-      )}
-
-      {queue !== null && queue.length > 0 && (
-        <div
-          className="mt-4 flex flex-col gap-4"
-          aria-live="polite"
-          aria-label={t("title")}
-        >
-          {queue.map((item) => (
-            <QueueCard key={item.id} item={item} onResolve={resolve} />
-          ))}
+      {failed && (
+        <div className="mt-4">
+          <PageError message={t("loadError")} onRetry={() => void loadQueue()} />
         </div>
       )}
+
+      <div className="mt-4" aria-busy={!failed && queue === null}>
+        {!failed && queue === null && <SkeletonRows count={2} />}
+
+        {queue !== null && queue.length === 0 && (
+          <EmptyState title={t("emptyTitle")} body={t("empty")} />
+        )}
+
+        {queue !== null && queue.length > 0 && (
+          <div className="flex flex-col gap-4" aria-live="polite" aria-label={t("title")}>
+            {queue.map((item) => (
+              <QueueCard key={item.id} item={item} onResolve={resolve} />
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

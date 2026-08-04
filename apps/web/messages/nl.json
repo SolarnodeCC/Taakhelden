@@ -75,7 +75,8 @@
     "realtime": {
       "connecting": "Live verbinding maken…",
       "offline": "Live verbinding verbroken — gegevens kunnen verouderd zijn"
-    }
+    },
+    "skipToContent": "Direct naar de inhoud"
   },
   "vandaag": {
     "title": "Vandaag",
@@ -88,7 +89,10 @@
       "open": "Te doen",
       "awaiting": "Wacht op goedkeuring",
       "done": "Af"
-    }
+    },
+    "emptyTitle": "Nog geen kinderen in je gezin",
+    "emptyBody": "Voeg je eerste kind toe, dan kun je taken plannen en punten uitdelen.",
+    "emptyAction": "Kind toevoegen"
   },
   "goedkeuren": {
     "title": "Goedkeuren",
@@ -105,7 +109,8 @@
     "cancel": "Annuleren",
     "actionError": "Er ging iets mis. Probeer het nog eens.",
     "photoAlt": "Foto van de afgeronde taak",
-    "photoUnavailable": "Foto is nog niet beschikbaar."
+    "photoUnavailable": "Foto is nog niet beschikbaar.",
+    "emptyTitle": "Niets te doen"
   },
   "taken": {
     "title": "Taken",
@@ -188,6 +193,16 @@
         "submitted": "wacht op goedkeuring",
         "open_redo": "opnieuw",
         "approved": "goedgekeurd"
+      },
+      "moveHandle": "Verplaats {title}",
+      "cellLabel": "{child}, {date}",
+      "a11y": {
+        "instructions": "Druk op spatie of enter om de taak op te pakken. Verplaats met de pijltjestoetsen, zet neer met spatie of enter, of annuleer met Escape.",
+        "lifted": "Taak opgepakt bij {cell}.",
+        "over": "Nu boven {cell}.",
+        "outside": "Buiten het weekrooster.",
+        "dropped": "Taak neergezet bij {cell}.",
+        "cancelled": "Verplaatsen geannuleerd — de taak staat weer op zijn plek."
       }
     },
     "form": {
@@ -217,7 +232,9 @@
       "save": "Opslaan",
       "saving": "Bezig met opslaan…",
       "cancel": "Annuleren"
-    }
+    },
+    "emptyTitle": "Nog geen taken",
+    "emptyBody": "Maak een taak aan of kies er een uit de voorbeelden — je kunt alles later aanpassen."
   },
   "winkel": {
     "title": "Winkel",
@@ -254,7 +271,8 @@
       "save": "Opslaan",
       "saving": "Bezig met opslaan…",
       "cancel": "Annuleren"
-    }
+    },
+    "noRewardsTitle": "Nog geen beloningen"
   },
   "gezin": {
     "title": "Gezin",
@@ -278,7 +296,8 @@
       "regenerate": "Nieuwe code maken",
       "regenerating": "Bezig…",
       "regenerateConfirm": "De oude code werkt meteen niet meer. Doorgaan?",
-      "codeAria": "Gezinscode {code}"
+      "codeAria": "Gezinscode {code}",
+      "copyManual": "Kopiëren lukte niet — selecteer de code hierboven om hem zelf te kopiëren."
     },
     "children": {
       "title": "Kinderen",
@@ -294,7 +313,8 @@
         "young": "Jong",
         "mid": "Midden",
         "teen": "Tiener"
-      }
+      },
+      "emptyTitle": "Nog geen kinderen"
     },
     "parents": {
       "title": "Ouders & verzorgers",
@@ -713,5 +733,11 @@
       ]
     },
     "backHome": "Terug naar home"
+  },
+  "common": {
+    "retry": "Opnieuw proberen",
+    "cancel": "Annuleren",
+    "delete": "Verwijderen",
+    "iconOption": "Icoon {icon}"
   }
 }

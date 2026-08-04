@@ -17,6 +17,19 @@ cited to `file:line`.
 
 ---
 
+> **Status: all 24 findings fixed** (2026-08-04). Per-finding notes live in the
+> JSON under `status` / `fix`. Verification: `npm run typecheck` clean,
+> `npm run lint` clean, `npm test` — 131 API + 74 web tests pass, `next build`
+> succeeds, and the emitted CSS confirms paired line-heights, the base focus
+> rule and the new tokens. A regression guard
+> (`apps/web/lib/design-tokens.test.ts`, 18 assertions) now fails the build if
+> any shipped colour pair drops below its WCAG threshold or the type scale loses
+> its line-heights — confirmed to fail on a reverted accent token.
+>
+> These are static verifications. No browser or screen-reader pass was possible
+> in this environment, so the keyboard drag path, the drawer focus behaviour and
+> the rendered touch targets still warrant a manual check.
+
 ## Verdict
 
 The architecture is sound and the semantic HTML is above the React norm. The damage is
