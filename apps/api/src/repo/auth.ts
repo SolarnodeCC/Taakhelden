@@ -53,6 +53,59 @@ export async function getFamilyByInviteCode(db: D1Database, code: string) {
     .first();
 }
 
+/**
+ * Boekt één mislukte pincode-poging en zet zo nodig de lock — in één atomaire
+ * UPDATE, zodat gelijktijdige pogingen elkaar niet overschrijven. De teller
+ * stond eerder in KV (read-then-write op eventually consistent storage), waardoor
+ * parallelle pogingen vanaf verschillende edge-locaties de lock konden ontlopen.
+ *
+ * De lock loopt exponentieel op per volle ronde van `maxAttempts` mislukkingen,
+ * zodat herhaald proberen steeds duurder wordt.
+ */
+export async function registerPinFailure(
+  db: D1Database,
+  familyId: string,
+  childId: string,
+  opts: { maxAttempts: number; baseLockMinutes: number; maxLockMinutes: number },
+): Promise<{ attempts: number; lockedUntil: string | null; justLocked: boolean }> {
+  // Statische SQL, uitsluitend gebonden waarden — ook de ophoogstap.
+  const row = await db
+    .prepare(
+      `UPDATE users
+          SET pin_fail_count = pin_fail_count + ?
+        WHERE family_id = ? AND id = ? AND role = 'child' AND deleted_at IS NULL
+        RETURNING pin_fail_count`,
+    )
+    .bind(1, familyId, childId)
+    .first<{ pin_fail_count: number }>();
+  if (!row) return { attempts: 0, lockedUntil: null, justLocked: false };
+
+  const attempts = row.pin_fail_count;
+  if (attempts < opts.maxAttempts) return { attempts, lockedUntil: null, justLocked: false };
+
+  const cycles = Math.floor(attempts / opts.maxAttempts);
+  const minutes = Math.min(opts.baseLockMinutes * 2 ** (cycles - 1), opts.maxLockMinutes);
+  const lockedUntil = new Date(Date.now() + minutes * 60_000).toISOString();
+  await db
+    .prepare(
+      "UPDATE users SET pin_locked_until = ? WHERE family_id = ? AND id = ? AND role = 'child' AND deleted_at IS NULL",
+    )
+    .bind(lockedUntil, familyId, childId)
+    .run();
+  // Alleen op de eerste poging van een nieuwe ronde ouders lastigvallen.
+  return { attempts, lockedUntil, justLocked: attempts % opts.maxAttempts === 0 };
+}
+
+/** Geslaagde login (of nieuwe pincode): teller en lock schoon. */
+export async function clearPinFailures(db: D1Database, familyId: string, childId: string) {
+  await db
+    .prepare(
+      "UPDATE users SET pin_fail_count = 0, pin_locked_until = NULL WHERE family_id = ? AND id = ? AND role = 'child'",
+    )
+    .bind(familyId, childId)
+    .run();
+}
+
 export async function getChildForLogin(db: D1Database, familyId: string, childId: string) {
   return db
     .prepare(
@@ -110,11 +163,41 @@ export async function consumeRefreshToken(db: D1Database, token: string) {
   return db.prepare("SELECT * FROM refresh_tokens WHERE token_hash = ?").bind(hash).first();
 }
 
+/**
+ * Werd een al-verbruikt refresh token opnieuw aangeboden?
+ *
+ * Rotatie is single-use, dus een replay faalt sowieso. Maar een replay is óók
+ * hét signaal dat iemand anders het token in handen heeft: de legitieme client
+ * heeft het al ingewisseld. Dan is de hele keten verdacht, niet alleen dit token.
+ * Geeft de eigenaar terug zodat de aanroeper alles kan intrekken.
+ */
+export async function detectRefreshReuse(db: D1Database, token: string) {
+  return db
+    .prepare("SELECT user_id FROM refresh_tokens WHERE token_hash = ? AND revoked_at IS NOT NULL")
+    .bind(await sha256Hex(token))
+    .first<{ user_id: string }>();
+}
+
+/** Alle nog geldige refresh tokens van één gebruiker intrekken. */
+export async function revokeAllRefreshTokens(db: D1Database, userId: string): Promise<number> {
+  const res = await db
+    .prepare("UPDATE refresh_tokens SET revoked_at = datetime('now') WHERE user_id = ? AND revoked_at IS NULL")
+    .bind(userId)
+    .run();
+  return res.meta.changes ?? 0;
+}
+
+/** Geeft de ingetrokken rij terug, zodat de aanroeper ook het access-token kan intrekken. */
 export async function revokeRefreshToken(db: D1Database, token: string) {
+  const hash = await sha256Hex(token);
   await db
     .prepare("UPDATE refresh_tokens SET revoked_at = datetime('now') WHERE token_hash = ?")
-    .bind(await sha256Hex(token))
+    .bind(hash)
     .run();
+  return db
+    .prepare("SELECT user_id FROM refresh_tokens WHERE token_hash = ?")
+    .bind(hash)
+    .first<{ user_id: string }>();
 }
 
 export async function storeChildDeviceSession(

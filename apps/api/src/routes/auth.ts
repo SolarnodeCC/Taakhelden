@@ -16,37 +16,38 @@ import {
 import type { AppBindings } from "../types";
 import { ApiException } from "../middleware/error";
 import { validate } from "../middleware/validate";
-import { rateLimit } from "../middleware/ratelimit";
+import { callerIp, rateLimit, rateLimitSubject } from "../middleware/ratelimit";
 import { newId, newFamilyCode, newToken } from "../services/ids";
 import { issueChildTokens, issueParentTokens } from "../services/session";
-import { hashSecret, verifySecret, sha256Hex } from "../services/passwords";
+import { hashSecret, needsRehash, verifySecret, sha256Hex } from "../services/passwords";
 import { verifyTurnstile } from "../services/turnstile";
 import { verifyAppleIdentityToken } from "../services/apple";
 import { notifyParents, parentCopy } from "../services/notifier";
+import { revokeIssuedTokens } from "../services/revocation";
 import { sendPasswordResetEmail } from "../services/email";
 import * as repo from "../repo/auth";
 
 const PIN_MAX_ATTEMPTS = 5;
 const PIN_LOCK_MINUTES = 15;
+/** Bovengrens op de exponentiële backoff — een kind moet er ooit weer in kunnen. */
+const PIN_MAX_LOCK_MINUTES = 4 * 60;
 
 const auth = new Hono<AppBindings>();
 
 type ParentRow = { id: string; family_id: string; permissions: string };
 
 auth.post("/register", validate("json", RegisterBody), async (c) => {
-  await rateLimit(c, "register", 5);
   const body = c.req.valid("json");
+  await rateLimit(c, "register", 5);
+  // Ook per e-mailadres begrensd: werkt door als het IP roteert of ontbreekt.
+  await rateLimitSubject(c, "register-email", body.email, 3, 3600);
 
   if (!c.env.JWT_SECRET) {
     console.error("unhandled", "JWT_SECRET is not configured");
     throw new Error("JWT_SECRET is not configured");
   }
 
-  const human = await verifyTurnstile(
-    c.env.TURNSTILE_SECRET,
-    body.turnstileToken,
-    c.req.header("CF-Connecting-IP"),
-  );
+  const human = await verifyTurnstile(c.env, body.turnstileToken, callerIp(c) ?? undefined);
   if (!human) {
     throw new ApiException(400, ErrorCodes.VALIDATION_FAILED, "Verificatie mislukt, probeer het opnieuw.");
   }
@@ -76,14 +77,27 @@ auth.post("/register", validate("json", RegisterBody), async (c) => {
 });
 
 auth.post("/login", validate("json", LoginBody), async (c) => {
-  await rateLimit(c, "login", 5);
   const body = c.req.valid("json");
+  await rateLimit(c, "login", 5);
+  // Per account, niet per bron: begrenst credential stuffing per doelwit, ook
+  // als de aanvaller over veel IP's beschikt.
+  await rateLimitSubject(c, "login-account", body.email, 10, 900);
 
   const user = await repo.getParentByEmail(c.env.DB, body.email);
   const ok =
     user?.password_hash && (await verifySecret(body.password, user.password_hash as string));
   if (!user || !ok) {
     throw new ApiException(401, ErrorCodes.INVALID_CREDENTIALS, "E-mail of wachtwoord klopt niet.");
+  }
+  // Migreer een hash met verouderde KDF-parameters nu we het wachtwoord toch in
+  // handen hebben. Buiten de response om: dit mag inloggen niet vertragen of
+  // laten falen.
+  if (needsRehash(user.password_hash as string)) {
+    c.executionCtx.waitUntil(
+      hashSecret(body.password)
+        .then((hash) => repo.updatePasswordHash(c.env.DB, user.id as string, hash))
+        .catch(() => {}),
+    );
   }
   const tokens = await issueParentTokens(c.env.DB, c.env.JWT_SECRET, user as unknown as ParentRow);
   return c.json({ familyId: user.family_id, userId: user.id, ...tokens });
@@ -142,8 +156,20 @@ auth.post("/apple", validate("json", AppleAuthBody), async (c) => {
 
 auth.post("/refresh", validate("json", RefreshBody), async (c) => {
   await rateLimit(c, "refresh", 30);
-  const consumed = await repo.consumeRefreshToken(c.env.DB, c.req.valid("json").refreshToken);
-  const user = consumed && (await repo.getUserById(c.env.DB, consumed.user_id as string));
+  const presented = c.req.valid("json").refreshToken;
+  const consumed = await repo.consumeRefreshToken(c.env.DB, presented);
+  if (!consumed) {
+    // Een al verbruikt token dat terugkomt betekent dat twee partijen het
+    // hebben. Welke van de twee de dief is weten we niet, dus trekken we de
+    // hele keten in: iedereen logt opnieuw in, de aanvaller houdt niets over.
+    const reused = await repo.detectRefreshReuse(c.env.DB, presented);
+    if (reused?.user_id) {
+      await repo.revokeAllRefreshTokens(c.env.DB, reused.user_id);
+      await revokeIssuedTokens(c.env, reused.user_id);
+    }
+    throw new ApiException(401, ErrorCodes.UNAUTHORIZED, "Sessie verlopen, log opnieuw in.");
+  }
+  const user = await repo.getUserById(c.env.DB, consumed.user_id as string);
   if (!user) {
     throw new ApiException(401, ErrorCodes.UNAUTHORIZED, "Sessie verlopen, log opnieuw in.");
   }
@@ -152,14 +178,23 @@ auth.post("/refresh", validate("json", RefreshBody), async (c) => {
 });
 
 auth.post("/logout", validate("json", LogoutBody), async (c) => {
-  await repo.revokeRefreshToken(c.env.DB, c.req.valid("json").refreshToken);
+  const consumed = await repo.revokeRefreshToken(c.env.DB, c.req.valid("json").refreshToken);
+  // Ook het lopende access-token intrekken: uitloggen op een gedeelde computer
+  // moet meteen effect hebben, niet pas als de JWT verloopt.
+  if (consumed?.user_id) {
+    await revokeIssuedTokens(c.env, consumed.user_id as string);
+  }
   return c.json({ ok: true });
 });
 
 /** Stap 1 kind-login: gezinscode → kindprofielen. Zwaar rate-limited, geen PII. */
 auth.post("/family-code", validate("json", FamilyCodeBody), async (c) => {
+  const { familyCode } = c.req.valid("json");
   await rateLimit(c, "family-code", 10);
-  const family = await repo.getFamilyByInviteCode(c.env.DB, c.req.valid("json").familyCode);
+  // Ook per code: de kinderlijst achter een gezinscode mag niet vanaf veel IP's
+  // te harvesten zijn.
+  await rateLimitSubject(c, "family-code-value", familyCode, 20, 3600);
+  const family = await repo.getFamilyByInviteCode(c.env.DB, familyCode);
   if (!family) {
     throw new ApiException(
       404,
@@ -193,12 +228,19 @@ auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
 
   const ok = child.pincode_hash && (await verifySecret(body.pincode, child.pincode_hash as string));
   if (!ok) {
-    const attemptsKey = `pinfail:${child.id}`;
-    const attempts = Number((await c.env.KV.get(attemptsKey)) ?? "0") + 1;
-    await c.env.KV.put(attemptsKey, String(attempts), { expirationTtl: PIN_LOCK_MINUTES * 60 });
-    if (attempts >= PIN_MAX_ATTEMPTS) {
-      const until = new Date(Date.now() + PIN_LOCK_MINUTES * 60 * 1000).toISOString();
-      await repo.setPinLock(c.env.DB, family.id as string, child.id as string, until);
+    // Atomair ophogen + zo nodig locken: gelijktijdige pogingen kunnen de lock
+    // niet meer ontlopen door allemaal dezelfde oude tellerstand te lezen.
+    const { lockedUntil, justLocked } = await repo.registerPinFailure(
+      c.env.DB,
+      family.id as string,
+      child.id as string,
+      {
+        maxAttempts: PIN_MAX_ATTEMPTS,
+        baseLockMinutes: PIN_LOCK_MINUTES,
+        maxLockMinutes: PIN_MAX_LOCK_MINUTES,
+      },
+    );
+    if (justLocked) {
       // Ouders informeren — buiten de response om, en een APNs-fout blokkeert niets.
       c.executionCtx.waitUntil(
         notifyParents(
@@ -208,7 +250,9 @@ auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
           { type: "pin_lock", childId: child.id as string },
         ).catch(() => {}),
       );
-      throw new ApiException(403, ErrorCodes.PIN_LOCKED, "Even pauze! Probeer het over een kwartiertje nog eens.");
+    }
+    if (lockedUntil) {
+      throw new ApiException(403, ErrorCodes.PIN_LOCKED, "Even pauze! Probeer het straks nog eens.");
     }
     throw new ApiException(
       401,
@@ -217,7 +261,7 @@ auth.post("/child-session", validate("json", ChildSessionBody), async (c) => {
     );
   }
 
-  await c.env.KV.delete(`pinfail:${child.id}`);
+  await repo.clearPinFailures(c.env.DB, family.id as string, child.id as string);
   return c.json(ChildSessionResult.parse(await issueChildTokens(c.env.DB, c.env.JWT_SECRET, {
     id: child.id as string,
     family_id: family.id as string,

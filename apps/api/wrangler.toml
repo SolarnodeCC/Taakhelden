@@ -3,7 +3,22 @@ main = "src/index.ts"
 compatibility_date = "2026-07-01"
 compatibility_flags = ["nodejs_compat"]
 
-# --- default/base-omgeving (production erft hiervan via [env.production]) ---
+# --- De enige omgeving ---
+#
+# Dit project deployt één Worker (`taakhelden-api`); `deploy-prod.yml` draait
+# `wrangler deploy` zonder `--env`. De bindings hieronder ZIJN dus productie.
+#
+# Er stond hier eerder een `[env.production]`-blok met de tekst dat productie
+# "hiervan erft". Dat klopt niet: wrangler erft d1_databases, r2_buckets,
+# kv_namespaces, durable_objects en queues niet naar een named environment —
+# die moeten per environment opnieuw. Het blok declareerde er geen enkele, dus
+# `--env production` zou een Worker zonder database hebben gedeployd. Verwijderd
+# om die valstrik weg te nemen.
+#
+# Gevolg, bewust geaccepteerd: er is geen aparte staging-laag. Elk `--remote`
+# commando vanuit een checkout raakt live gezinsdata. Zie
+# docs/security/wispel-security-audit-2026-08.md (bevinding 5) voor wat een
+# echte productie-tier zou vergen.
 [[d1_databases]]
 binding = "DB"
 database_name = "taakhelden-db"
@@ -52,11 +67,14 @@ APPLE_BUNDLE_ID = "nl.taakhelden.app"
 
 # Deploy fails if these are missing on the Worker. Set via GitHub Environment
 # secrets (synced in deploy-prod.yml) or `npx wrangler secret put <NAME>`.
-# Optional secrets (Turnstile / APNs key / email) are listed in
+# Optional secrets (APNs key / email) are listed in
 # docs/cloudflare-bindings-audit.md and synced when present in GitHub.
+#
+# TURNSTILE_SECRET is required: registration fails closed without it, so a
+# missing secret must break the deploy rather than silently disable bot
+# protection on the only unauthenticated account-creation endpoint.
+# HMAC_SECRET is required so photo/export URL signing never falls back to
+# JWT_SECRET — a leaked transfer URL must not become a token-forging key.
+# deploy-prod.yml generates one when the GitHub Environment has none.
 [secrets]
-required = ["JWT_SECRET"]
-
-[env.production]
-name = "taakhelden-api-prod"
-# production heeft eigen D1/R2/KV — id's invullen na aanmaken
+required = ["JWT_SECRET", "TURNSTILE_SECRET", "HMAC_SECRET"]

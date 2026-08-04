@@ -40,6 +40,63 @@ export function getApiBaseUrl(): string {
 }
 
 /**
+ * The end user's IP, to forward to the API Worker.
+ *
+ * The BFF reaches the Worker over a service binding with a freshly constructed
+ * Request, so Cloudflare does not set `CF-Connecting-IP` on it. Without this the
+ * Worker cannot identify the caller and every rate limit degrades into a single
+ * shared counter, letting one client lock everyone out.
+ *
+ * Read only from headers Cloudflare sets on the inbound edge request — never
+ * from a client-supplied value that we would then present as trusted.
+ */
+export function forwardedClientIp(req: Request): string | null {
+  const direct = req.headers.get("CF-Connecting-IP");
+  if (direct) return direct;
+  return req.headers.get("X-Forwarded-For")?.split(",")[0]?.trim() || null;
+}
+
+/**
+ * Reject a cross-site state-changing request.
+ *
+ * The BFF authenticates purely from the `th_at` cookie, so `SameSite=lax` is
+ * currently the only thing standing between a cross-site POST and every family
+ * mutation (create child, set PIN, adjust points, delete account). That is one
+ * control with no backstop. Comparing `Origin` to the request's own origin is
+ * stateless, needs no token plumbing, and does not depend on cookie semantics.
+ *
+ * Returns a 403 response when the request must be rejected, or `null` to
+ * continue. Safe methods are never blocked; a missing `Origin` is allowed
+ * because non-browser clients (and some same-origin navigations) omit it, and
+ * `SameSite` still covers the browser case there.
+ */
+export function crossOriginBlock(req: Request): Response | null {
+  if (req.method === "GET" || req.method === "HEAD" || req.method === "OPTIONS") return null;
+  const origin = req.headers.get("Origin");
+  if (!origin) return null;
+  let expected: string;
+  try {
+    expected = new URL(req.url).origin;
+  } catch {
+    return null;
+  }
+  if (origin === expected) return null;
+  return Response.json(
+    { error: { code: "FORBIDDEN", message: "Ongeldige herkomst." } },
+    { status: 403 },
+  );
+}
+
+/** Base headers plus the forwarded client IP, for an outbound `apiFetch` call. */
+export function forwardHeaders(
+  req: Request,
+  base: Record<string, string>,
+): Record<string, string> {
+  const clientIp = forwardedClientIp(req);
+  return clientIp ? { ...base, "X-Forwarded-For": clientIp } : base;
+}
+
+/**
  * Server-side call to the API Worker.
  *
  * On Cloudflare, Workers in the same `*.workers.dev` zone cannot call each

@@ -1,0 +1,16 @@
+# Structured migration evidence for Jankurai HLT-030 (sql-bad-behavior).
+# Runtime engine is Cloudflare D1 / SQLite.
+
+engine = "sqlite"
+phase = "expand"
+risk = "low"
+owner = "api"
+approval = "security-audit-2026-08-finding-6"
+affected_objects = [
+  "idempotency_keys.fingerprint",
+]
+lock_timeout = "n/a-sqlite-d1"
+statement_timeout = "n/a-sqlite-d1"
+rollback = "roll-forward only; additive nullable column"
+backup = "D1 point-in-time / local wrangler state"
+verify = "apps/api/test/auth-hardening.test.ts"

@@ -127,9 +127,12 @@ describe("DELETE /account", () => {
     const body = (await del.json()) as { deletedAt: string; purgeAfter: string };
     expect(new Date(body.purgeAfter) > new Date(body.deletedAt)).toBe(true);
 
-    // Gezin is soft-deleted → /families/me geeft 404
+    // Het access-token van de ouder is bij de verwijdering ingetrokken, dus de
+    // volgende call strandt al op de auth-middleware (401) i.p.v. op het
+    // soft-deleted gezin (404). Zonder die intrekking bleef de gezinsdata nog
+    // tot een uur na verwijdering leesbaar.
     const me = await api("/families/me", { token: reg.accessToken });
-    expect(me.status).toBe(404);
+    expect(me.status).toBe(401);
 
     const row = await env.DB
       .prepare("SELECT deleted_at FROM families WHERE id = ?")

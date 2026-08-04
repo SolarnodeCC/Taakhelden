@@ -12,7 +12,10 @@ vi.mock("../../../../lib/auth/session", () => ({
   setTokens: (tokens: unknown) => setTokens(tokens),
 }));
 
-vi.mock("../../../../lib/api/config", () => ({
+// Keep the real `forwardHeaders` so the client-IP forwarding stays under test;
+// only the transport is stubbed.
+vi.mock("../../../../lib/api/config", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../../../lib/api/config")>()),
   getApiBaseUrl: () => "http://worker.test/v1",
   apiFetch: (path: string, init?: RequestInit) =>
     fetch(`http://worker.test/v1${path.startsWith("/") ? path : `/${path}`}`, init),

@@ -20,16 +20,22 @@ export async function purgeOldIdempotencyKeys(db: D1Database) {
     .run();
 }
 
-/** Cached DO-mutatieresponse voor `{userId}:{idempotencyKey}` — of null. */
-export async function getIdempotencyResponse(
+/**
+ * Gecachte DO-mutatieresponse voor `{userId}:{idempotencyKey}` — of null.
+ *
+ * `fingerprint` legt vast vóór wélke operatie de sleutel is gebruikt, zodat de
+ * aanroeper een echte retry kan onderscheiden van hergebruik voor iets anders.
+ * NULL bij rijen van vóór migratie 0010.
+ */
+export async function getIdempotencyRecord(
   db: D1Database,
   storeKey: string,
-): Promise<string | null> {
+): Promise<{ response: string; fingerprint: string | null } | null> {
   const cached = await db
-    .prepare("SELECT response FROM idempotency_keys WHERE key = ?")
+    .prepare("SELECT response, fingerprint FROM idempotency_keys WHERE key = ?")
     .bind(storeKey)
-    .first<{ response: string }>();
-  return cached?.response ?? null;
+    .first<{ response: string; fingerprint: string | null }>();
+  return cached ?? null;
 }
 
 /**
@@ -41,9 +47,12 @@ export async function storeIdempotencyResponse(
   storeKey: string,
   userId: string,
   responseJson: string,
+  fingerprint: string,
 ): Promise<void> {
   await db
-    .prepare("INSERT OR IGNORE INTO idempotency_keys (key, user_id, response) VALUES (?, ?, ?)")
-    .bind(storeKey, userId, responseJson)
+    .prepare(
+      "INSERT OR IGNORE INTO idempotency_keys (key, user_id, response, fingerprint) VALUES (?, ?, ?, ?)",
+    )
+    .bind(storeKey, userId, responseJson, fingerprint)
     .run();
 }

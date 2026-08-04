@@ -71,6 +71,8 @@ photoTransfer.get("/:id/file", async (c) => {
   return c.newResponse(object.body as ReadableStream, 200, {
     "Content-Type": photo.content_type,
     "Cache-Control": "private, max-age=300",
+    // Door gebruikers geüploade bytes: nooit als document laten renderen.
+    "Content-Disposition": "inline; filename=\"photo\"",
   });
 });
 

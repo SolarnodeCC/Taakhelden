@@ -6,7 +6,12 @@
  * Routes sturen mutaties als interne POST /complete|/approve|/redo|/undo|/adjust;
  * de payload bevat altijd familyId zodat elke repo-aanroep gescoped blijft.
  */
-import { ErrorCodes, type SyncMutation, type CompleteResult } from "@taakhelden/shared";
+import {
+  ErrorCodes,
+  WS_SUBPROTOCOL,
+  type SyncMutation,
+  type CompleteResult,
+} from "@taakhelden/shared";
 import type { Env } from "../types";
 import { ApiException } from "../middleware/error";
 import {
@@ -23,8 +28,9 @@ import {
 } from "../services/pointsEngine";
 import { notifyChild, notifyParents, memberName, childCopy, parentCopy } from "../services/notifier";
 import { processSyncBatch } from "../services/syncService";
+import { sha256Hex } from "../services/passwords";
 import { applyMoveInstance } from "../services/instanceService";
-import { getIdempotencyResponse, storeIdempotencyResponse } from "../repo/system";
+import { getIdempotencyRecord, storeIdempotencyResponse } from "../repo/system";
 import { completeActiveGoalIfReached } from "../repo/familyGoals";
 
 interface MutationBody {
@@ -56,7 +62,15 @@ export class FamilyRoom implements DurableObject {
     if (req.headers.get("Upgrade") === "websocket") {
       const pair = new WebSocketPair();
       this.state.acceptWebSocket(pair[1]); // hibernation-API: overleeft evictions
-      return new Response(null, { status: 101, webSocket: pair[0] });
+      // Bood de client een subprotocol aan, dan moet de server er precies één
+      // van teruggeven — anders breekt de browser de handshake af.
+      const offered = (req.headers.get("Sec-WebSocket-Protocol") ?? "")
+        .split(",")
+        .map((entry) => entry.trim());
+      const headers = offered.includes(WS_SUBPROTOCOL)
+        ? { "Sec-WebSocket-Protocol": WS_SUBPROTOCOL }
+        : undefined;
+      return new Response(null, { status: 101, webSocket: pair[0], headers });
     }
     if (req.method !== "POST") {
       return new Response("not found", { status: 404 });
@@ -102,10 +116,29 @@ export class FamilyRoom implements DurableObject {
     const rawKey = body.idempotencyKey;
     if (!rawKey) return this.handleMutation(path, body);
     const storeKey = `${body.actor.userId}:${rawKey}`;
-    const cached = await getIdempotencyResponse(this.env.DB, storeKey);
-    if (cached) return JSON.parse(cached);
+    const fingerprint = await mutationFingerprint(path, body);
+    const cached = await getIdempotencyRecord(this.env.DB, storeKey);
+    if (cached) {
+      // Zelfde sleutel, andere operatie: dat is een clientfout, geen retry.
+      // Stilzwijgend de eerste response teruggeven zou de tweede mutatie laten
+      // verdampen terwijl de client succes ziet.
+      if (cached.fingerprint && cached.fingerprint !== fingerprint) {
+        throw new ApiException(
+          409,
+          ErrorCodes.IDEMPOTENCY_KEY_REUSED,
+          "Deze Idempotency-Key is al voor een andere actie gebruikt.",
+        );
+      }
+      return JSON.parse(cached.response);
+    }
     const result = await this.handleMutation(path, body);
-    await storeIdempotencyResponse(this.env.DB, storeKey, body.actor.userId, JSON.stringify(result));
+    await storeIdempotencyResponse(
+      this.env.DB,
+      storeKey,
+      body.actor.userId,
+      JSON.stringify(result),
+      fingerprint,
+    );
     return result;
   }
 
@@ -283,4 +316,15 @@ export class FamilyRoom implements DurableObject {
       }
     }
   }
+}
+
+/**
+ * Identificeert de operatie waarvoor een Idempotency-Key is gebruikt: het
+ * DO-pad plus de payload, zonder de sleutel zelf. Zo telt een echte retry
+ * (zelfde pad, zelfde payload) als replay en hergebruik voor iets anders niet.
+ */
+async function mutationFingerprint(path: string, body: MutationBody): Promise<string> {
+  const rest: Record<string, unknown> = { ...body };
+  delete rest.idempotencyKey;
+  return sha256Hex(`${path}:${JSON.stringify(rest)}`);
 }

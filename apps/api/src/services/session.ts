@@ -10,7 +10,14 @@ import { signJwt, type JwtPayload } from "./jwt";
 import { storeChildDeviceSession, storeRefreshToken } from "../repo/auth";
 
 export const ACCESS_TTL_PARENT = 60 * 60; //  1 u  (spec §1)
-export const ACCESS_TTL_CHILD = 24 * 60 * 60; // 24 u
+/**
+ * 1 u — was 24 u. Een access-token is niet intrekbaar zonder de KV-check in
+ * services/revocation.ts, en die is eventually consistent; de TTL is de harde
+ * bovengrens op elke intrekking. Het kindtoestel houdt een refresh token van
+ * 30 dagen en ververst bij een 401 (iOS: TaakHeldenAPIClient), dus dit kost
+ * geen offline-gebruik.
+ */
+export const ACCESS_TTL_CHILD = 60 * 60;
 export const REFRESH_TTL_DAYS = 30;
 export const CHILD_REFRESH_TTL_DAYS = 30;
 

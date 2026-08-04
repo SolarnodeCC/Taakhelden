@@ -22,6 +22,7 @@ import { newId } from "../services/ids";
 import { hashSecret } from "../services/passwords";
 import * as repo from "../repo/families";
 import { revokeChildDeviceSessions } from "../repo/auth";
+import { revokeIssuedTokens } from "../services/revocation";
 import { getPhoto, setMemberPhotoKey } from "../repo/photos";
 import { EquipAvatarError, equipAvatarItems, getMemberAvatarState } from "../repo/avatar";
 import { listPauses, setPause, clearPause, activePauseFor } from "../repo/pauses";
@@ -169,12 +170,11 @@ members.post("/:id/device-sessions/revoke", async (c) => {
   if (!member || member.role !== "child") {
     throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
   }
-  return c.json(
-    RevokeChildSessionsResult.parse({
-      ok: true,
-      revokedCount: await revokeChildDeviceSessions(c.env.DB, familyId, memberId),
-    }),
-  );
+  const revokedCount = await revokeChildDeviceSessions(c.env.DB, familyId, memberId);
+  // Zonder dit trok deze route alleen de refresh tokens in en bleef het lopende
+  // access-token gewoon werken — terwijl de ouder "ingetrokken" te zien kreeg.
+  await revokeIssuedTokens(c.env, memberId);
+  return c.json(RevokeChildSessionsResult.parse({ ok: true, revokedCount }));
 });
 
 /** Profielfoto koppelen na de presigned-flow (§3.6). Zichtbaar zodra 'ready'. */
@@ -204,6 +204,10 @@ members.delete("/:id", async (c) => {
     throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
   }
   await repo.softDeleteMember(c.env.DB, familyId, memberId);
+  // Een verwijderd kind mag niet met een nog geldig access-token verder kunnen
+  // lezen (AVG art. 17).
+  await revokeChildDeviceSessions(c.env.DB, familyId, memberId);
+  await revokeIssuedTokens(c.env, memberId);
   return c.json({ ok: true, deletedAt: new Date().toISOString() });
 });
 
