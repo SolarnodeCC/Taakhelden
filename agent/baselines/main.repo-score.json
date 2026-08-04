@@ -1,14 +1,14 @@
 {
-  "report_fingerprint": "sha256:f829f985301166c6d6bdf8d2567217f5c605cd3439066d12ebf600d0ffa4ca8e",
-  "input_fingerprint": "sha256:d14739fc2b8844685515982ad4a666e8dc0d93d6609cbf7ff06a8ae2d2216cea",
+  "report_fingerprint": "sha256:4496c8612d9adc24c6aa8a6bceb4daf485d2134b7b12da4bc205bc798d3a7b8a",
+  "input_fingerprint": "sha256:ed7c20e6669f7fe8c60a3e5cf2867dbc936b26b7ab5e15b2db637494e91baf01",
   "policy_fingerprint": "sha256:20e69f63f26de0c53e8f6a8df3b7234d5d27169372d8ae045880cfb1929a5a8c",
   "manifest_fingerprints": {
-    "owner_map": "sha256:3b06acff282adb26e61cf9c6b4af52457e345dd2532b30606ae1909792f32e3f",
+    "owner_map": "sha256:859731935da9846138f71d73b7b777f1dbcb3022a6e586df0d12311d220377ba",
     "test_map": "sha256:b4dfceccd0b8d87446132a282d38079acea31cd19fa19e5dea56e6f7c33ac869",
     "generated_zones": "sha256:8e884fbb53897f8e3197fc9ea998412b5a235c56b065800f1771c4097b4698e7"
   },
   "dirty_worktree": false,
-  "generated_at": "1785264310",
+  "generated_at": "1785860289",
   "schema_url": "schemas/repo-score.schema.json",
   "standard": "jankurai",
   "standard_version": "0.9.0",
@@ -49,20 +49,20 @@
     "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
     "HLT-023-INPUT-BOUNDARY-GAP on apps/api/src/repo/rewards.ts",
     "HLT-013-RENDERED-UX-GAP on apps/web",
-    "HLT-006-DIRECT-DB-WRONG-LAYER on apps/web/app/api/v1/[...path]/route.ts",
+    "HLT-006-DIRECT-DB-WRONG-LAYER on apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx",
     "HLT-017-OPAQUE-OBSERVABILITY on crates/domain",
     "HLT-025-RELEASE-READINESS-GAP on docs/release.md"
   ],
   "repo": ".",
-  "run_id": "1785264310",
-  "started_at": "1785264310",
-  "elapsed_ms": 1993,
+  "run_id": "1785860289",
+  "started_at": "1785860289",
+  "elapsed_ms": 3567,
   "scope": {
     "mode": "full",
     "paths": []
   },
-  "score": 52,
-  "raw_score": 52,
+  "score": 53,
+  "raw_score": 53,
   "decision": {
     "status": "advisory",
     "minimum_score": 40,
@@ -70,7 +70,7 @@
     "hard_findings": 0,
     "soft_findings": 46,
     "ratchet": {
-      "baseline_score": 52,
+      "baseline_score": 53,
       "allowed_drop": 0,
       "passed": true,
       "score_delta": 0,
@@ -83,7 +83,7 @@
     }
   },
   "git": {
-    "head": "c0b90d8",
+    "head": "81eaef9",
     "base": null,
     "changed_files": 0,
     "mode": "full",
@@ -367,15 +367,16 @@
     {
       "name": "Security and supply-chain posture",
       "weight": 12,
-      "score": 26,
-      "weighted_points": 3.12,
+      "score": 38,
+      "weighted_points": 4.56,
       "evidence": [
         "lockfile present",
-        "sql bad-behavior advisory signals: 9",
+        "secret or dependency scan tooling found",
+        "sql bad-behavior advisory signals: 14",
         "typescript bad-behavior advisory signals: 27",
         "ci bad-behavior hard findings: 1",
         "gittools bad-behavior advisory signals: 1",
-        "web security bad-behavior advisory signals: 4"
+        "web security bad-behavior advisory signals: 9"
       ],
       "notes": [
         "no explicit security lane found",
@@ -388,11 +389,11 @@
       "score": 50,
       "weighted_points": 6.0,
       "evidence": [
-        "largest authored code file: apps/api/src/services/pointsEngine.ts (534 LOC)",
+        "largest authored code file: apps/api/src/services/pointsEngine.ts (595 LOC)",
         "code file exceeds 500 LOC",
         "most code files stay under 300 LOC",
         "copy-code advisory classes found: 3 (advisory only, no score impact)",
-        "sql bad-behavior advisory signals: 9",
+        "sql bad-behavior advisory signals: 14",
         "typescript bad-behavior advisory signals: 27",
         "ci bad-behavior hard findings: 1",
         "gittools bad-behavior advisory signals: 1"
@@ -406,7 +407,7 @@
       "weighted_points": 3.6,
       "evidence": [
         "database surface present",
-        "strict DB boundary violation: apps/web/app/api/v1/[...path]/route.ts"
+        "strict DB boundary violation: apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx"
       ],
       "notes": [
         "direct DB access leaks out of the data boundary"
@@ -1058,7 +1059,7 @@
   "copy_code": {
     "schema_version": "1.1.0",
     "generated_by": "jankurai copy-code",
-    "generated_at": "2026-07-28T18:45:08.233825423+00:00",
+    "generated_at": "2026-08-04T16:18:06.194770761+00:00",
     "repo": ".",
     "auditor_version": "1.6.10",
     "status": "review",
@@ -1096,9 +1097,9 @@
       ]
     },
     "summary": {
-      "files_scanned": 307,
-      "files_considered": 157,
-      "active_files": 157,
+      "files_scanned": 396,
+      "files_considered": 202,
+      "active_files": 202,
       "exact_file_classes": 0,
       "hard_classes": 0,
       "warning_classes": 3,
@@ -1177,8 +1178,8 @@
           {
             "path": "apps/api/src/services/session.ts",
             "language": "typescript",
-            "start_line": 17,
-            "end_line": 20,
+            "start_line": 24,
+            "end_line": 27,
             "unit_name": "randomToken"
           }
         ]
@@ -1205,15 +1206,15 @@
           {
             "path": "apps/api/src/services/taskEngine.ts",
             "language": "typescript",
-            "start_line": 48,
-            "end_line": 51,
+            "start_line": 49,
+            "end_line": 52,
             "unit_name": "generateInstancesForFamily"
           },
           {
             "path": "apps/api/src/services/taskEngine.ts",
             "language": "typescript",
-            "start_line": 80,
-            "end_line": 83,
+            "start_line": 85,
+            "end_line": 88,
             "unit_name": "generateWeekAheadForFamily"
           }
         ]
@@ -1451,7 +1452,7 @@
       "problem": "`Code shape and semantic surface` scored 50 below the standard floor of 85",
       "agent_fix": "split large or ambiguous authored code into smaller semantic modules with focused tests",
       "evidence": [
-        "largest authored code file: apps/api/src/services/pointsEngine.ts (534 LOC)",
+        "largest authored code file: apps/api/src/services/pointsEngine.ts (595 LOC)",
         "code file exceeds 500 LOC",
         "most code files stay under 300 LOC",
         "copy-code advisory classes found: 3 (advisory only, no score impact)"
@@ -1461,7 +1462,7 @@
       "confidence": 0.76,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:ddc823fcc1543b4dac4da989030c30141f272b92c5f5f61dab3158d30b7a7b97",
+      "fingerprint": "sha256:f4688c2a1835d256e41854d1afd9b416ae15b96a2ea058212ab910273bb8d44f",
       "rule_id": "HLT-001-DEAD-MARKER",
       "tlr": "Entropy",
       "lane": "fast",
@@ -1853,20 +1854,20 @@
       "severity": "medium",
       "category": "security",
       "path": ".github/workflows/jankurai.yml",
-      "problem": "`Security and supply-chain posture` scored 26 below the standard floor of 85",
+      "problem": "`Security and supply-chain posture` scored 38 below the standard floor of 85",
       "agent_fix": "wire secret, dependency, provenance, and workflow scans into an operational CI lane",
       "evidence": [
         "lockfile present",
-        "sql bad-behavior advisory signals: 9",
-        "typescript bad-behavior advisory signals: 27",
-        "ci bad-behavior hard findings: 1"
+        "secret or dependency scan tooling found",
+        "sql bad-behavior advisory signals: 14",
+        "typescript bad-behavior advisory signals: 27"
       ],
       "check_id": "HLT-016-SUPPLY-CHAIN-DRIFT:security",
       "hardness": "soft",
       "confidence": 0.76,
       "evidence_kind": "workflow-command",
       "rerun_command": "just security",
-      "fingerprint": "sha256:8f34bd5e30d13e094f11c3b6ea598e576706da75dc047155dc14fa950cdb6808",
+      "fingerprint": "sha256:a597dc394216d72e739bacf0e24b2934b9cde2f82cdd341ab9f952ccd25e2895",
       "rule_id": "HLT-016-SUPPLY-CHAIN-DRIFT",
       "tlr": "Security, secrets, agency",
       "lane": "security",
@@ -2357,7 +2358,7 @@
     {
       "severity": "high",
       "category": "data",
-      "path": "apps/web/app/api/v1/[...path]/route.ts",
+      "path": "apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx",
       "problem": "direct database access appears in a wrong layer",
       "agent_fix": "move SQL and DB clients to `crates/adapters` or `db/`; expose typed application/domain APIs upward",
       "evidence": [
@@ -2368,7 +2369,7 @@
       "confidence": 0.95,
       "evidence_kind": "sql",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:b3fe8562e7911417c71aae3071f6b2749cf4be66ac5f023cd0f2d2fc1902661e",
+      "fingerprint": "sha256:05b257a9a6e51420478d0edb5360b5011e2ef58f218e53be151ee770de8081c9",
       "rule_id": "HLT-006-DIRECT-DB-WRONG-LAYER",
       "tlr": "Contracts/data",
       "lane": "db",
@@ -2408,7 +2409,7 @@
       "agent_fix": "move durable truth into migrations, constraints, adapters, and application-owned transactions",
       "evidence": [
         "database surface present",
-        "strict DB boundary violation: apps/web/app/api/v1/[...path]/route.ts",
+        "strict DB boundary violation: apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx",
         "direct DB access leaks out of the data boundary"
       ],
       "check_id": "HLT-006-DIRECT-DB-WRONG-LAYER:data",
@@ -2416,7 +2417,7 @@
       "confidence": 0.76,
       "evidence_kind": "sql",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:7946105ef656d17c7aa8cb8befa5bb4551ea7f67ca8ff197264ea85aada7ef6b",
+      "fingerprint": "sha256:51995ab62cc6fc9e50541edef861499b8a425d386e872aabbdccff22cfb05ffb",
       "rule_id": "HLT-006-DIRECT-DB-WRONG-LAYER",
       "tlr": "Contracts/data",
       "lane": "db",
@@ -2539,7 +2540,7 @@
   ],
   "agent_fix_queue": [
     {
-      "path": "apps/web/app/api/v1/[...path]/route.ts",
+      "path": "apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx",
       "priority": "high",
       "rule_id": "HLT-006-DIRECT-DB-WRONG-LAYER",
       "tlr": "Contracts/data",
@@ -2902,7 +2903,7 @@
       "lane": "security",
       "owner": "ops",
       "task": "wire secret, dependency, provenance, and workflow scans into an operational CI lane",
-      "why": "`Security and supply-chain posture` scored 26 below the standard floor of 85"
+      "why": "`Security and supply-chain posture` scored 38 below the standard floor of 85"
     }
   ]
 }
