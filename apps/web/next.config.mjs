@@ -3,30 +3,23 @@ import createNextIntlPlugin from "next-intl/plugin";
 const withNextIntl = createNextIntlPlugin(); // defaults to ./i18n/request.ts
 
 /**
- * Security headers for the parent dashboard (child/family data).
- * CSP allows Cloudflare Turnstile + WebSocket to the API host; signed photo
- * URLs may be absolute https on the API origin so img-src includes https:.
+ * Static security headers for the parent dashboard (child/family data).
+ *
+ * The CSP is NOT here: it carries a per-request nonce so Next's inline
+ * bootstrap scripts can run without `script-src 'unsafe-inline'`, which a
+ * static header cannot express. See `middleware.ts`.
  */
 const securityHeaders = [
   { key: "X-Frame-Options", value: "DENY" },
+  // Cloudflare kan HSTS ook op zone-niveau zetten; hier expliciet zodat de
+  // garantie bij de app hoort en niet bij een dashboard-instelling.
+  {
+    key: "Strict-Transport-Security",
+    value: "max-age=63072000; includeSubDomains; preload",
+  },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
   { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
-  {
-    key: "Content-Security-Policy",
-    value: [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https:",
-      "font-src 'self' data:",
-      "connect-src 'self' https: wss:",
-      "frame-src https://challenges.cloudflare.com",
-      "frame-ancestors 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join("; "),
-  },
 ];
 
 /** @type {import('next').NextConfig} */

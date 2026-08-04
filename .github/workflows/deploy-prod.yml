@@ -95,6 +95,12 @@ jobs:
             printf '::error::JWT_SECRET must be set on the GitHub Environment production.\n'
             exit 1
           fi
+          # Registration fails closed without this, so a missing value must stop
+          # the deploy rather than ship an unprotected sign-up endpoint.
+          if [ -z "${TURNSTILE_SECRET:-}" ]; then
+            printf '::error::TURNSTILE_SECRET must be set on the GitHub Environment production.\n'
+            exit 1
+          fi
           put_secret JWT_SECRET "$JWT_SECRET"
           put_secret HMAC_SECRET "${HMAC_SECRET:-}"
           put_secret TURNSTILE_SECRET "${TURNSTILE_SECRET:-}"
@@ -111,24 +117,36 @@ jobs:
           workingDirectory: apps/api
           command: deploy
       # Registration/login mint JWTs; without JWT_SECRET every register returns 500.
+      # Photo/export URL signing likewise fails closed without HMAC_SECRET.
       # Bootstrap once if the secret is missing. Prefer an explicit GitHub secret
       # when present; otherwise generate a random value (do not rotate an existing one).
-      - name: Ensure JWT_SECRET
+      - name: Ensure signing secrets
         working-directory: apps/api
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: "5546763229b35df670e33d9316d7f2e0"
           JWT_SECRET_FROM_GITHUB: ${{ secrets.JWT_SECRET }}
+          HMAC_SECRET_FROM_GITHUB: ${{ secrets.HMAC_SECRET }}
         run: |
           set -euo pipefail
           list=$(npx wrangler secret list)
-          if printf '%s' "$list" | grep -q '"name": "JWT_SECRET"'; then
-            exit 0
+          if ! printf '%s' "$list" | grep -q '"name": "JWT_SECRET"'; then
+            if [ -n "${JWT_SECRET_FROM_GITHUB}" ]; then
+              printf '%s' "$JWT_SECRET_FROM_GITHUB" | npx wrangler secret put JWT_SECRET
+            else
+              openssl rand -hex 32 | npx wrangler secret put JWT_SECRET
+            fi
           fi
-          if [ -n "${JWT_SECRET_FROM_GITHUB}" ]; then
-            printf '%s' "$JWT_SECRET_FROM_GITHUB" | npx wrangler secret put JWT_SECRET
-          else
-            openssl rand -hex 32 | npx wrangler secret put JWT_SECRET
+          # Same bootstrap for the transfer-signing key. Generate rather than
+          # reuse JWT_SECRET: key separation is the point. Only ever created when
+          # absent, so it stays stable across deploys (rotating it would only
+          # invalidate signed URLs, which live 5 minutes).
+          if ! printf '%s' "$list" | grep -q '"name": "HMAC_SECRET"'; then
+            if [ -n "${HMAC_SECRET_FROM_GITHUB}" ]; then
+              printf '%s' "$HMAC_SECRET_FROM_GITHUB" | npx wrangler secret put HMAC_SECRET
+            else
+              openssl rand -hex 32 | npx wrangler secret put HMAC_SECRET
+            fi
           fi
       # Smoke-test tegen de workers.dev-URL zolang api.taakhelden.nl nog niet
       # als custom domain aan de worker gekoppeld is. Zet dit terug naar
@@ -141,16 +159,24 @@ jobs:
           printf '%s' "$body" | grep -q '"ok":true'
           printf '%s' "$body" | grep -q '"db":true'
           # Do not assert JWT presence in the body — /health no longer exposes it.
-          # Register must succeed end-to-end (not 500). Do not log the body —
-          # a 201 response includes access/refresh tokens.
+          #
+          # The register check asserts REJECTION, not success. It used to post a
+          # placeholder Turnstile token and require 201, which could only pass
+          # while bot protection was disabled in production — so the smoke test
+          # actively held the anti-bot control open. Asserting a 400 proves
+          # routing, JSON handling, schema validation and the Turnstile path are
+          # all live, and writes nothing to the production database.
+          # Unique address per run: /auth/register is also rate-limited per
+          # e-mail address, and a fixed one would start returning 429 after a
+          # few deploys in the same hour.
           email="smoke-$(date +%s)@example.com"
           code=$(curl -sS -o /tmp/reg.json -w "%{http_code}" \
             -X POST https://taakhelden-api.oostelaar.workers.dev/v1/auth/register \
             -H "Content-Type: application/json" \
-            -d "{\"email\":\"$email\",\"password\":\"SmokeTestPassword1\",\"familyName\":\"Smoke\",\"displayName\":\"Smoke\",\"turnstileToken\":\"dev-bypass\"}")
+            -d "{\"email\":\"$email\",\"password\":\"SmokeTestPassword1\",\"familyName\":\"Smoke\",\"displayName\":\"Smoke\",\"turnstileToken\":\"invalid-smoke-token\"}")
           echo "register status=$code"
-          if [ "$code" != "201" ]; then
-            # Log error code only (no tokens).
-            python3 -c 'import json,sys; d=json.load(open("/tmp/reg.json")); print("error=", (d.get("error") or {}).get("code"))'
-          fi
-          test "$code" = "201"
+          # Log the error code only (never the body).
+          python3 -c 'import json; d=json.load(open("/tmp/reg.json")); print("error=", (d.get("error") or {}).get("code"))'
+          # 400 = Turnstile rejected the token, which is the healthy outcome.
+          # A 201 here means bot protection is off and must fail the deploy.
+          test "$code" = "400"

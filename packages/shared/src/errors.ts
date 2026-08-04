@@ -18,6 +18,8 @@ export const ErrorCodes = {
   INVALID_INVITE: "INVALID_INVITE",
   INSTANCE_SLOT_TAKEN: "INSTANCE_SLOT_TAKEN",
   IDEMPOTENCY_REPLAY: "IDEMPOTENCY_REPLAY",
+  /** Zelfde Idempotency-Key, andere operatie of payload — clientfout, geen replay. */
+  IDEMPOTENCY_KEY_REUSED: "IDEMPOTENCY_KEY_REUSED",
   RATE_LIMITED: "RATE_LIMITED",
   UPSTREAM_UNAVAILABLE: "UPSTREAM_UNAVAILABLE", // BFF kon de Worker niet bereiken (geen client-fout)
 } as const;

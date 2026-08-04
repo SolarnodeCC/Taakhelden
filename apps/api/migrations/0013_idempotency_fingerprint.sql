@@ -1,0 +1,12 @@
+-- Idempotency-Key koppelen aan de operatie waarvoor hij is gebruikt.
+--
+-- De cache-sleutel was (user_id, key) zonder pad of payload. Hergebruikte een
+-- client dezelfde sleutel voor een andere actie, dan kreeg hij de response van
+-- de eerste terug — met HTTP 200 en zonder foutsignaal. De tweede actie voerde
+-- dus nooit uit terwijl de client succes zag: ledger en UI liepen uiteen.
+--
+-- Met een fingerprint over (pad + payload) kunnen we onderscheiden tussen een
+-- echte retry (zelfde fingerprint → gecachte response) en hergebruik voor iets
+-- anders (andere fingerprint → 409). NULL = rij van vóór deze migratie; die
+-- verlopen binnen 48 uur via purgeOldIdempotencyKeys.
+ALTER TABLE idempotency_keys ADD COLUMN fingerprint TEXT;

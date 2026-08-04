@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ErrorCodes } from "@taakhelden/shared";
-import { apiFetch } from "../../../../lib/api/config";
+import { apiFetch, crossOriginBlock, forwardedClientIp } from "../../../../lib/api/config";
 import { getAccessToken, refreshTokens, clearTokens } from "../../../../lib/auth/session";
 
 /**
@@ -9,6 +9,11 @@ import { getAccessToken, refreshTokens, clearTokens } from "../../../../lib/auth
  * a 401 transparently refreshes (rotating cookies) and retries once.
  */
 async function proxy(req: Request, path: string[]): Promise<Response> {
+  // CSRF defence-in-depth: every mutation for the whole API surface funnels
+  // through here, so SameSite=lax must not be the only thing guarding it.
+  const blocked = crossOriginBlock(req);
+  if (blocked) return blocked;
+
   const target = new URL(req.url);
   const upstreamPath = `/${path.join("/")}${target.search}`;
 
@@ -17,6 +22,10 @@ async function proxy(req: Request, path: string[]): Promise<Response> {
 
   const buildHeaders = (token: string): HeadersInit => {
     const headers: Record<string, string> = { Authorization: `Bearer ${token}` };
+    // Zonder dit ziet de Worker geen client-IP (een service binding zet geen
+    // CF-Connecting-IP) en viel elke rate limit terug op één gedeelde teller.
+    const clientIp = forwardedClientIp(req);
+    if (clientIp) headers["X-Forwarded-For"] = clientIp;
     const contentType = req.headers.get("Content-Type");
     if (contentType) headers["Content-Type"] = contentType;
     // Preserve idempotency keys for future mutation endpoints.

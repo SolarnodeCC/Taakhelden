@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ErrorCodes, WsTokenResponse } from "@taakhelden/shared";
-import { apiFetch, getApiBaseUrl } from "../../../../lib/api/config";
+import { apiFetch, crossOriginBlock, forwardHeaders, getApiBaseUrl } from "../../../../lib/api/config";
 import { apiBaseToWsUrl } from "../../../../lib/realtime/wsUrl";
 import { WsConnectResponse } from "../../../../lib/realtime/types";
 import { getAccessToken, refreshTokens, clearTokens } from "../../../../lib/auth/session";
@@ -9,11 +9,14 @@ import { getAccessToken, refreshTokens, clearTokens } from "../../../../lib/auth
  * Mint a short-lived FamilyRoom WebSocket token and return the upgrade URL.
  * The browser cannot send Authorization on WebSocket, so connect uses ?token=.
  */
-export async function POST(): Promise<Response> {
+export async function POST(req: Request): Promise<Response> {
+  const blocked = crossOriginBlock(req);
+  if (blocked) return blocked;
+
   const send = (token: string) =>
     apiFetch("/ws/token", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: forwardHeaders(req, { Authorization: `Bearer ${token}` }),
       cache: "no-store",
     });
 

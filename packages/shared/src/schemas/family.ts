@@ -116,7 +116,9 @@ export type InviteLinkResponse = z.infer<typeof InviteLinkResponse>;
  */
 export const ParentAcceptBody = z.object({
   token: z.string().min(1),
-  password: z.string().min(8, "Kies een wachtwoord van minstens 8 tekens."),
+  // Gelijk aan RegisterBody: een co-ouder krijgt dezelfde rechten als de
+  // ouder die registreerde, dus ook dezelfde wachtwoordeis.
+  password: z.string().min(10, "Kies een wachtwoord van minstens 10 tekens."),
   displayName: z.string().min(1).max(30).optional(),
 });
 export type ParentAcceptBody = z.infer<typeof ParentAcceptBody>;

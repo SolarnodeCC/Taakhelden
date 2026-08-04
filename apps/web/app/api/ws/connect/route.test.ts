@@ -11,7 +11,10 @@ vi.mock("../../../../lib/auth/session", () => ({
   clearTokens: () => clearTokens(),
 }));
 
-vi.mock("../../../../lib/api/config", () => ({
+// Keep the real `forwardHeaders` so the client-IP forwarding stays under test;
+// only the transport is stubbed.
+vi.mock("../../../../lib/api/config", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../../../lib/api/config")>()),
   getApiBaseUrl: () => "http://worker.test/v1",
   apiFetch: (path: string, init?: RequestInit) =>
     fetch(`http://worker.test/v1${path.startsWith("/") ? path : `/${path}`}`, init),
@@ -39,7 +42,7 @@ describe("POST /api/ws/connect", () => {
       }),
     );
 
-    const res = await POST();
+    const res = await POST(new Request("https://app.test/api/ws/connect", { method: "POST" }));
     expect(res.status).toBe(200);
     expect(await res.json()).toEqual({
       token: "ws-token",
@@ -58,7 +61,7 @@ describe("POST /api/ws/connect", () => {
     getAccessToken.mockResolvedValue(undefined);
     refreshTokens.mockResolvedValue(null);
 
-    const res = await POST();
+    const res = await POST(new Request("https://app.test/api/ws/connect", { method: "POST" }));
     expect(res.status).toBe(401);
     const body = await res.json();
     expect(body.error.code).toBe(ErrorCodes.UNAUTHORIZED);
