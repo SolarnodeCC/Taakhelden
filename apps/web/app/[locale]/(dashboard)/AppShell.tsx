@@ -49,7 +49,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<ShellData | null>(null);
   const [failed, setFailed] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
-  const sidebarRef = useRef<HTMLElement>(null);
+  const sidebarRef = useRef<HTMLDivElement>(null);
   const menuButtonRef = useRef<HTMLButtonElement>(null);
 
   const loadShell = useCallback(async () => {
@@ -156,7 +156,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
               aria-current={active ? "page" : undefined}
               onClick={() => setMenuOpen(false)}
               className={
-                "inline-flex items-center gap-2.5 rounded px-3 py-2 text-sm font-medium transition-colors " +
+                "inline-flex min-h-11 items-center gap-2.5 rounded px-3 py-2 text-sm font-medium transition-colors " +
                 (active ? "bg-accent text-accent-fg" : "text-text hover:bg-border/50")
               }
             >
@@ -171,6 +171,14 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="flex min-h-screen">
+      {/* Bypass block (WCAG 2.4.1) — first focusable element in the shell. */}
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:border focus:border-border-interactive focus:bg-bg focus:px-4 focus:py-2 focus:text-sm focus:font-medium focus:text-text"
+      >
+        {t("skipToContent")}
+      </a>
+
       {/* ── Mobile backdrop ── */}
       {menuOpen && (
         <div
@@ -180,23 +188,29 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
         />
       )}
 
-      {/* ── Sidebar (desktop: always visible; mobile: slide-in drawer) ── */}
-      <aside
+      {/* ── Sidebar (desktop: always visible; mobile: drawer) ──
+       * Closed on mobile it is `hidden`, i.e. display:none — so its links leave
+       * both the tab order and the accessibility tree (WCAG 2.4.3). Toggling
+       * display rules out a transform transition, hence the mount animation;
+       * the global reduced-motion policy neutralises it. The element is always
+       * in the DOM, so the hamburger's aria-controls always resolves. Landmark
+       * duty belongs to the inner <nav> alone — a labelled <aside> around it
+       * would announce the same name twice.
+       */}
+      <div
+        id="sidebar"
         ref={sidebarRef}
-        aria-label={t("nav")}
-        aria-hidden={!menuOpen ? undefined : undefined}
         className={[
-          // Shared
-          "flex w-60 shrink-0 flex-col border-r border-border bg-surface",
-          // Mobile: fixed overlay, z above backdrop, animate
-          "fixed inset-y-0 left-0 z-40 transition-transform duration-200",
-          menuOpen ? "translate-x-0" : "-translate-x-full",
-          // Desktop: static, always visible
-          "sm:relative sm:translate-x-0 sm:transition-none",
+          "w-60 shrink-0 flex-col border-r border-border bg-surface",
+          // Mobile: fixed overlay above the backdrop, only while open.
+          "fixed inset-y-0 left-0 z-40",
+          menuOpen ? "flex motion-safe:animate-drawer-in" : "hidden",
+          // Desktop: static, always visible.
+          "sm:relative sm:flex sm:animate-none",
         ].join(" ")}
       >
         {sidebarContent}
-      </aside>
+      </div>
 
       {/* ── Main area ── */}
       <div className="flex min-w-0 flex-1 flex-col">
@@ -209,7 +223,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
             aria-expanded={menuOpen}
             aria-controls="sidebar"
             onClick={() => setMenuOpen((prev) => !prev)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded text-text hover:bg-border/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-accent sm:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded text-text hover:bg-border/50 sm:hidden"
           >
             {/* Hamburger / X icon via SVG — no raw hex, uses currentColor */}
             {menuOpen ? (
@@ -240,7 +254,17 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
           </div>
         </header>
 
-        <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+        {/* One container for every screen — pages no longer pick their own
+         * width or alignment, so the title stays put as the parent navigates. */}
+        {/* `tabIndex={-1}` exists only so the skip link can land here; the ring
+            is suppressed because this focus is programmatic, never user-driven. */}
+        <main
+          id="main"
+          tabIndex={-1}
+          className="mx-auto w-full max-w-4xl flex-1 px-4 py-6 focus:outline-none sm:px-6 sm:py-8"
+        >
+          {children}
+        </main>
       </div>
     </div>
   );

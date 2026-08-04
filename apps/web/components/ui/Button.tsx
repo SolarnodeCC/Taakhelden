@@ -11,15 +11,17 @@ const VARIANTS: Record<Variant, string> = {
   primary:
     "bg-accent text-accent-fg border border-accent hover:bg-accent-hover",
   secondary:
-    "bg-bg text-text border border-border hover:bg-surface",
+    "bg-bg text-text border border-border-interactive hover:bg-surface",
   ghost: "bg-transparent text-text border border-transparent hover:bg-surface",
   danger: "bg-danger text-white border border-danger hover:opacity-90",
 };
 
+// `min-h` carries the touch target; padding still controls how heavy the button
+// looks. So `sm` stays visually compact while remaining tappable (WCAG 2.5.5).
 const SIZES: Record<Size, string> = {
-  sm: "px-3 py-1.5 text-sm",
-  md: "px-4 py-2 text-sm",
-  lg: "px-6 py-3 text-base",
+  sm: "min-h-11 px-3 py-1.5 text-sm",
+  md: "min-h-11 px-4 py-2 text-sm",
+  lg: "min-h-12 px-6 py-3 text-base",
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {

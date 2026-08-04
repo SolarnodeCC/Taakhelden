@@ -16,7 +16,7 @@ import { Alert } from "../../../../components/ui";
 import WeekPlannerGrid, { WeekPlannerAlert, useWeekMove } from "./WeekPlannerGrid";
 
 const fieldClass =
-  "rounded border border-border bg-bg px-2 py-1.5 text-sm outline-none focus:border-accent";
+  "min-h-11 rounded border border-border-interactive bg-bg px-2 py-1.5 text-sm focus:border-accent";
 
 interface Props {
   children: MemberView[];

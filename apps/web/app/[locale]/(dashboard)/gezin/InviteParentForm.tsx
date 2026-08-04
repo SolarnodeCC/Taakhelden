@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { InviteParentBody, ErrorCodes, type ErrorCode } from "@taakhelden/shared";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { InviteParentResult, InviteLinkResponse } from "../../../../lib/api/types";
-import { Alert, Button, Field, Input } from "../../../../components/ui";
+import { Alert, Button, Card, Field, Input } from "../../../../components/ui";
 
 const KNOWN_ERRORS: ErrorCode[] = [
   ErrorCodes.EMAIL_IN_USE,
@@ -88,7 +88,7 @@ export default function InviteParentForm({ onInvited }: { onInvited: () => Promi
   }
 
   return (
-    <div className="mt-3 rounded-lg border border-border bg-surface p-4">
+    <Card variant="row" className="mt-3">
       <h3 className="text-sm font-semibold text-text">{t("title")}</h3>
       <p className="mt-1 text-sm text-muted">{t("hint")}</p>
 
@@ -171,6 +171,6 @@ export default function InviteParentForm({ onInvited }: { onInvited: () => Promi
           )}
         </div>
       )}
-    </div>
+    </Card>
   );
 }

@@ -6,14 +6,14 @@ type Size = "sm" | "md" | "lg";
 
 const VARIANTS: Record<Variant, string> = {
   primary: "bg-accent text-accent-fg border border-accent hover:bg-accent-hover",
-  secondary: "bg-bg text-text border border-border hover:bg-surface",
+  secondary: "bg-bg text-text border border-border-interactive hover:bg-surface",
   ghost: "bg-transparent text-text border border-transparent hover:bg-surface",
 };
 
 const SIZES: Record<Size, string> = {
-  sm: "px-3 py-1.5 text-sm",
-  md: "px-4 py-2 text-sm",
-  lg: "px-6 py-3 text-base",
+  sm: "min-h-11 px-3 py-1.5 text-sm",
+  md: "min-h-11 px-4 py-2 text-sm",
+  lg: "min-h-12 px-6 py-3 text-base",
 };
 
 type ButtonLinkProps = Omit<ComponentProps<typeof Link>, "className"> & {

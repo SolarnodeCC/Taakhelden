@@ -21,6 +21,7 @@
     ".github/": "ops",
     ".claude/": "agent",
     ".claude/rules/": "agent",
-    "agent/": "agent"
+    "agent/": "agent",
+    ".jankurai/": "agent"
   }
 }

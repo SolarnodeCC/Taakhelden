@@ -1,0 +1,632 @@
+{
+  "audit": {
+    "timestamp": "2026-08-03T00:00:00Z",
+    "reviewer": "Critical UI/UX + accessibility review (parent web dashboard + marketing/auth surface, apps/web)",
+    "targetAudience": "Dutch parents on mixed devices (mobile-heavy, low patience, non-technical), operating a family chores app in short bursts; secondary: approve_only co-parents. WCAG 2.1 AA is a hard requirement per .claude/rules/web/ui.md.",
+    "scope": "apps/web only. The kid/teen SwiftUI surface (apps/ios) and Design System/ source kits were not executed and are out of scope except where their tokens are mirrored into apps/web/app/globals.css.",
+    "method": "Static review of every .tsx under apps/web/app and apps/web/components against the repo's own token/primitive rules, plus programmatic WCAG contrast computation on every token pair shipped in globals.css. No running instance or screenshots were available in this environment, so findings about rendered geometry (touch-target height, line-height) are derived from the Tailwind config and utility classes rather than measured in a browser.",
+    "resolution": {
+      "status": "all findings fixed",
+      "date": "2026-08-04",
+      "verification": "npm run typecheck (clean) · npm run lint (clean) · npm test — 131 API + 74 web tests pass · next build succeeds · emitted CSS confirms paired line-heights, the base focus rule and the new tokens",
+      "regressionGuard": "apps/web/lib/design-tokens.test.ts — 18 assertions covering every shipped colour pair against 1.4.3/1.4.11 and asserting the type scale still pairs line-heights. Confirmed to fail on a reverted accent token.",
+      "note": "Findings are marked fixed on the strength of static verification (typecheck, lint, unit tests, production build, emitted CSS). No browser or screen-reader pass was possible in this environment, so the keyboard drag path, the drawer focus behaviour and the rendered touch targets still warrant a manual check."
+    }
+  },
+  "findings": [
+    {
+      "id": "UI-COLOR-001",
+      "severity": "critical",
+      "category": "color",
+      "title": "The brand accent fails WCAG AA at 3.30:1 — every primary button, link and active nav item is non-compliant",
+      "issue": "`--color-accent: #0e9f8e` yields 3.30:1 against white, both as foreground text and as a button fill under white text. WCAG 2.1 AA requires 4.5:1 for text below 18.66px bold / 24px regular. The primary Button renders `text-sm` (14px) semibold on `bg-accent` — nowhere near large-text territory. The hover state `--color-accent-hover: #0c8c7d` is 4.15:1 and also fails.",
+      "location": {
+        "screen": "Global — every screen in apps/web",
+        "component": "globals.css token, Button, ButtonLink, AppShell nav, all inline links",
+        "element": "apps/web/app/globals.css:21-22; apps/web/components/ui/Button.tsx:11-12; apps/web/components/ui/ButtonLink.tsx:8; apps/web/app/[locale]/(dashboard)/AppShell.tsx:160; apps/web/app/[locale]/AuthLegalLinks.tsx:234"
+      },
+      "currentState": "Teal #0e9f8e is the single accent for the parent register. It fills the primary CTA (white label), colours every inline link on white, and fills the active sidebar item. Measured: white-on-accent 3.30:1, accent-on-white 3.30:1, white-on-accent-hover 4.15:1.",
+      "problemStatement": "This is the most-used colour pair in the product and it fails the app's own stated AA bar. Parents in bright daylight, over-40 users with reduced contrast sensitivity, and anyone on a dimmed phone screen will strain on exactly the elements that must be unmistakable — 'Opslaan', 'Goedkeuren', 'Aanmaken'. It also creates concrete compliance exposure: the repo commits to WCAG 2.1 AA in .claude/rules/web/ui.md, and a family app in NL touching child data invites scrutiny.",
+      "severity_justification": "Critical: a Level AA success criterion (1.4.3 Contrast Minimum) fails on the primary action of every screen, not on a decorative edge case. It is also the cheapest fix in this report — one token value.",
+      "affectedUsers": "All users; acutely low-vision users, older parents, and anyone outdoors or on a low-brightness screen. Roughly 100% of sessions touch at least one failing element.",
+      "recommendation": {
+        "principle": "WCAG 2.1 AA — 1.4.3 Contrast (Minimum), 4.5:1 for normal-size text",
+        "suggested_approach": "Split the accent into two tokens: keep #0e9f8e as a decorative/graphical token (it passes the 3:1 bar of 1.4.11 for non-text) and introduce a darker text/CTA accent that clears 4.5:1. Darken the interactive accent and re-derive the hover state one step darker again. Do not solve this by enlarging button text — the fix belongs in the token, so it propagates to links and nav for free.",
+        "example": "--color-accent: #0b7d6f (5.03:1 white-on-fill and fill-on-white, verified); --color-accent-hover: #0a6a5e; keep --color-accent-decorative: #0e9f8e for the WispelMark, progress fills and chart strokes. Mirror the change into Design System/tokens/ and THPalettes per the token-sync rule in globals.css:6-8. Confirm with: node -e contrast check, or axe-core in the E2E lane."
+      },
+      "estimatedImpact": "Major compliance win for a one-line token change; lifts ~8 downstream findings (badges, tints, focus ring) at the same time.",
+      "status": "fixed",
+      "fix": "`--color-accent` is now #0b7d6f (5.03:1 both directions), `--color-accent-hover` #0a6a5e (6.49:1). The old teal survives as `--color-accent-decorative` for non-text use only."
+    },
+    {
+      "id": "UI-A11Y-002",
+      "severity": "critical",
+      "category": "accessibility",
+      "title": "Week planner rescheduling is drag-only — no keyboard path exists (WCAG 2.1.1, Level A)",
+      "issue": "`WeekPlannerGrid` registers a single dnd-kit sensor: `useSensors(useSensor(PointerSensor, ...))`. dnd-kit's `KeyboardSensor` is never imported or registered, so the drag interaction has no keyboard equivalent. The draggable chip is a `<button>`, but its `onClick` is bound to `onEditTask` — pressing Enter opens the task editor, it does not initiate a move. There is therefore no keyboard route to move a task instance to another day or another child.",
+      "location": {
+        "screen": "/taken → tab 'Week'",
+        "component": "WeekPlannerGrid",
+        "element": "apps/web/app/[locale]/(dashboard)/taken/WeekPlannerGrid.tsx:143 (sensor setup); :70-84 (InstanceChip button); :89-125 (DropCell)"
+      },
+      "currentState": "A parent can see the week grid with a keyboard and can tab to each chip, but Enter/Space opens the edit form. Dragging a chip from Tuesday to Thursday, or from one child's row to another, requires a pointer with a 6px activation distance.",
+      "problemStatement": "Keyboard operability is a Level A criterion — the floor, not the ceiling. Rescheduling is a core planning affordance of the Week tab (it is the tab's reason to exist), so a keyboard-only or switch-device parent loses a whole feature, not a shortcut. Motor-impaired users who can click but cannot sustain a precise 6px-threshold drag across a 720px-wide table are equally locked out. dnd-kit ships KeyboardSensor precisely for this and it is a small addition.",
+      "severity_justification": "Critical: Level A failure (2.1.1 Keyboard) that blocks a primary task, with no alternative path anywhere in the UI. Level A failures are more serious than the AA contrast issues above.",
+      "affectedUsers": "Keyboard-only users, switch//assistive-input users, screen-reader users, and anyone with a tremor or limited fine motor control. Also every touch user on a narrow phone, where dragging inside a horizontally-scrolling table competes with the scroll gesture.",
+      "recommendation": {
+        "principle": "WCAG 2.1 Level A — 2.1.1 Keyboard; Nielsen heuristic #7 Flexibility and efficiency of use",
+        "suggested_approach": "Register dnd-kit's KeyboardSensor alongside PointerSensor and give each droppable cell a stable accessible name so the announced drop target is meaningful. Separate the two intents on the chip: keep click/Enter for 'edit task', and add an explicit 'verplaatsen' affordance (a small menu or a Space-to-lift model) so activation is unambiguous. Provide dnd-kit's `announcements` and `screenReaderInstructions` in Dutch and English rather than shipping its English defaults into an NL product. As a belt-and-braces alternative, a plain 'verplaats naar…' select on each chip gives a non-drag path for free.",
+        "example": "const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 6 } }), useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates })); and on DropCell: aria-label={t('week.cellLabel', { child: childLabel, date: day })}."
+      },
+      "estimatedImpact": "Major usability win — restores an entire feature for keyboard and assistive-tech users, and clears the most severe conformance gap in the app.",
+      "status": "fixed",
+      "fix": "`KeyboardSensor` registered with a grid-aware `coordinateGetter` that steps exactly one cell per arrow press. Edit and move are now separate controls, since dnd-kit's activator claims Enter/Space. Announcements and instructions localised in nl + en."
+    },
+    {
+      "id": "UI-A11Y-003",
+      "severity": "critical",
+      "category": "accessibility",
+      "title": "Mobile drawer stays focusable while off-screen; its ARIA wiring is a no-op and points at a non-existent id",
+      "issue": "Three defects compound in the mobile sidebar. (1) When closed, the aside is only visually translated off-canvas (`-translate-x-full`) — it is not `hidden`, not `inert`, and not `aria-hidden`, so all six nav links remain in the tab order and in the accessibility tree. (2) The line intended to fix this is a no-op: `aria-hidden={!menuOpen ? undefined : undefined}` evaluates to `undefined` on both branches. (3) The hamburger declares `aria-controls=\"sidebar\"` but no element in the codebase carries `id=\"sidebar\"` (verified: zero matches), so the relationship is broken.",
+      "location": {
+        "screen": "All /vandaag, /goedkeuren, /taken, /winkel, /gezin, /instellingen screens at <640px",
+        "component": "AppShell",
+        "element": "apps/web/app/[locale]/(dashboard)/AppShell.tsx:187 (dead aria-hidden), :210 (dangling aria-controls), :184-199 (aside, no id)"
+      },
+      "currentState": "On a phone with the menu closed, tabbing from the hamburger walks the user through six invisible links before reaching page content. Focus lands off-screen with no visible indicator. A screen-reader user hears the full navigation announced as available while it is not on screen.",
+      "problemStatement": "This is a textbook 'focus disappears' failure. Sighted keyboard users experience six consecutive Tab presses with nothing highlighted anywhere on screen — the classic symptom that makes a page feel broken. Screen-reader users get a misleading model of what is currently presented. The dead `aria-hidden` ternary suggests the issue was known and the fix silently lost its condition, so nothing in review caught it — worth a regression test, not just a patch.",
+      "severity_justification": "Critical: fails 2.4.3 Focus Order and 2.4.7 Focus Visible (both AA), plus 4.1.2 Name/Role/Value via the broken aria-controls reference. It affects every authenticated mobile session, which for this audience is the majority.",
+      "affectedUsers": "All mobile keyboard and screen-reader users; also anyone using an external keyboard on a tablet in the narrow layout.",
+      "recommendation": {
+        "principle": "WCAG 2.1 AA — 2.4.3 Focus Order, 2.4.7 Focus Visible, 4.1.2 Name, Role, Value",
+        "suggested_approach": "Give the aside `id=\"sidebar\"` so the existing aria-controls resolves. Remove the drawer from the tab order when closed on mobile while keeping it permanently available on desktop — the cleanest expression is the `inert` attribute (broadly supported now) applied only in the narrow layout, or conditional rendering keyed to a matchMedia-backed isMobile flag. Whichever is chosen, drive it from a single boolean rather than a ternary with two identical branches, and assert it in a test.",
+        "example": "<aside id=\"sidebar\" inert={isMobile && !menuOpen ? \"\" : undefined} …>. Test: render the shell at 375px, assert document.querySelectorAll('#sidebar a').every(a => a.tabIndex === -1) while closed."
+      },
+      "estimatedImpact": "Major — removes the single most disorienting keyboard experience in the product; small, contained diff.",
+      "status": "fixed",
+      "fix": "The drawer is `hidden` when closed on mobile, so its links leave the tab order and the accessibility tree. It carries `id=\"sidebar\"`, so the hamburger's `aria-controls` resolves. The duplicate landmark name is gone — the inner `<nav>` is now the only labelled landmark."
+    },
+    {
+      "id": "UI-COLOR-004",
+      "severity": "critical",
+      "category": "accessibility",
+      "title": "Form fields and secondary buttons have no perceivable boundary — border token is 1.23:1",
+      "issue": "`--color-border: #e5e8ec` measures 1.23:1 against `--color-bg` (#ffffff). WCAG 1.4.11 Non-text Contrast requires 3:1 for the visual information needed to identify a user-interface component and its state. Text inputs are `bg-bg` (white) with a 1px #e5e8ec border sitting on a white page — the control's only boundary is four times below the required contrast. The `secondary` Button variant is the same combination: white fill, white page, 1.23:1 border.",
+      "location": {
+        "screen": "Every form: /login, /register, /uitnodiging, /taken (TaskForm), /winkel (RewardForm), /gezin (ChildForms, FamilySettingsForm, PointsPanel), /instellingen",
+        "component": "Input, Button variant=secondary, ButtonLink variant=secondary, and the repeated inline `fieldClass` string",
+        "element": "apps/web/app/globals.css:18; apps/web/components/ui/Field.tsx:35-38; apps/web/components/ui/Button.tsx:13-14; apps/web/components/ui/ButtonLink.tsx:9; apps/web/app/[locale]/(dashboard)/taken/TaskForm.tsx:23"
+      },
+      "currentState": "On the login screen a parent sees two labels with a faint grey rectangle beneath each. On the marketing hero the 'Inloggen' secondary CTA next to the filled primary reads as plain text with a barely-visible outline.",
+      "problemStatement": "Users cannot reliably tell where a field begins or that the secondary CTA is a button at all — this is the 'invisible interaction' anti-pattern. It is worse on the auth and marketing screens, where the secondary button sits on `bg-surface` (#f6f7f9) and the border-to-background delta shrinks further. The cost is measured in form hesitation and missed secondary paths (parents who never discover 'Inloggen' next to 'Begin gratis'), and it is a straightforward AA failure.",
+      "severity_justification": "Critical: 1.4.11 Non-text Contrast (AA) fails on the boundary of every input in the product, and the same token makes a primary navigation choice (secondary CTA) functionally invisible. Broad blast radius, unambiguous standard.",
+      "affectedUsers": "All users; severely low-vision users, older parents, anyone on a glossy screen in daylight. Every registration and login attempt passes through it.",
+      "recommendation": {
+        "principle": "WCAG 2.1 AA — 1.4.11 Non-text Contrast (3:1 for UI component boundaries)",
+        "suggested_approach": "Introduce a distinct interactive-border token that clears 3:1 and use it for input and secondary-button outlines, keeping the soft #e5e8ec purely for decorative dividers and card hairlines, where 1.4.11 does not apply. Alternatively give inputs a tinted fill (`bg-surface` inside white cards) so the shape reads from the fill rather than the stroke — but the stroke fix is more predictable across the six card variants in play.",
+        "example": "--color-border: #e5e8ec (decorative, unchanged); --color-border-interactive: #8a929c (3.1:1 vs white). Input: border-[--color-border-interactive]; Button secondary: border-[--color-border-interactive]. Verify each token pair against both #ffffff and #f6f7f9, since secondary buttons appear on both."
+      },
+      "estimatedImpact": "Major usability + compliance win; token-level change, no markup churn.",
+      "status": "fixed",
+      "fix": "New `--color-border-interactive` (#828a95 — 3.49:1 on bg, 3.26:1 on surface) is used for input and secondary-button boundaries. `--color-border` stays hairline-only."
+    },
+    {
+      "id": "UI-MOB-005",
+      "severity": "high",
+      "category": "mobile",
+      "title": "No button size reaches the 44px touch-target minimum; rotation reorder controls are roughly 20px",
+      "issue": "Button heights are the sum of font-size, vertical padding and border. With line-height stripped from the type scale (see UI-TYP-006), `sm` = 14px text + 12px padding + 2px border ≈ 30px; `md` ≈ 34px; `lg` ≈ 42px. All three fall short of the 44×44 CSS-px target that WCAG 2.5.5 (AAA), WCAG 2.2's 2.5.8 (AA, 24px minimum) and both platform HIGs converge on. The rotation reorder controls in TaskForm are far worse: `px-1.5 text-xs` with no vertical padding produces roughly 20×20px hit areas for ↑, ↓ and ×.",
+      "location": {
+        "screen": "Every screen; worst on /taken (TaskForm rotation editor) and /gezin (four per-child action buttons)",
+        "component": "Button SIZES map; TaskForm rotation controls; GezinClient child action row",
+        "element": "apps/web/components/ui/Button.tsx:19-23; apps/web/app/[locale]/(dashboard)/taken/TaskForm.tsx:310-336; apps/web/app/[locale]/(dashboard)/gezin/GezinClient.tsx:264-297"
+      },
+      "currentState": "The hamburger is correctly sized at `h-11 w-11` (44px) — the rest of the app is not. On /gezin each child row carries four `size=\"sm\"` buttons (Punten / Bewerken / Pin / Verwijderen) at ~30px tall, wrapping on a phone, with 'Verwijderen' adjacent to benign actions.",
+      "problemStatement": "Fitts's Law is unforgiving on a phone held one-handed while a child waits. Small adjacent targets do not merely slow parents down — they produce wrong taps, and on /gezin the wrong tap sits next to a destructive delete. The single correctly-sized control in the app (the hamburger) shows the team knows the rule; it just was not encoded in the primitive, so nothing else inherits it.",
+      "severity_justification": "High rather than critical: it impairs and mis-routes rather than blocks, and WCAG 2.1's 44px rule is AAA (2.2's 24px AA rule is met by `md`/`lg` but not by the ~20px rotation controls, which do fail AA under 2.5.8).",
+      "affectedUsers": "All touch users — the dominant mode for this audience — and especially users with tremor, larger fingertips, or one-handed operation. The rotation controls also fail for low-precision pointer users on desktop.",
+      "recommendation": {
+        "principle": "WCAG 2.2 AA — 2.5.8 Target Size (Minimum); WCAG 2.1 AAA — 2.5.5; Apple HIG 44pt / Material 48dp; Fitts's Law",
+        "suggested_approach": "Encode the minimum in the Button primitive rather than at each call site: add a min-height to every size so `sm` stays visually compact but keeps a 44px hit area. Replace the ×-glyph reorder controls with real icon buttons at the same minimum, and separate 'Verwijderen' from the other three child actions (an overflow menu, or visual distance plus a distinct tone) so a mis-tap cannot be destructive.",
+        "example": "SIZES: { sm: 'min-h-11 px-3 py-1.5 text-sm', md: 'min-h-11 px-4 py-2 text-sm', lg: 'min-h-12 px-6 py-3 text-base' } — the min-height enlarges the hit area without inflating the visual weight, since the label stays the same size."
+      },
+      "estimatedImpact": "Major mobile-accuracy win; one primitive edit plus two call-site cleanups.",
+      "status": "fixed",
+      "fix": "`min-h-11` on every Button/ButtonLink size (`min-h-12` for lg), on nav links, inline row buttons and form fields. The rotation glyph buttons were replaced; the icon picker uses 44px targets."
+    },
+    {
+      "id": "UI-TYP-006",
+      "severity": "high",
+      "category": "typography",
+      "title": "The type scale silently strips every line-height — all body copy renders at browser default ~1.2",
+      "issue": "`tailwind.config.ts` extends `fontSize` with bare strings (`sm: \"var(--text-sm)\"`). In Tailwind 3.x a string value emits `font-size` only, replacing the framework default which pairs each step with a line-height (`sm: ['0.875rem', { lineHeight: '1.25rem' }]`). Every `text-xs`…`text-4xl` utility in this codebase therefore sets size and nothing else, and body text falls back to the UA's `normal` (~1.15–1.2 for the system stack). The design system defines `--leading-normal: 1.5` and `--leading-tight: 1.2`, but `leading-*` classes appear only 12 times across 578 className occurrences — 11 of them on the marketing page. The entire authenticated dashboard sets no line-height at all.",
+      "location": {
+        "screen": "Every screen; most damaging on /instellingen, /gezin and the legal pages where multi-line Dutch paragraphs dominate",
+        "component": "Tailwind theme configuration",
+        "element": "apps/web/tailwind.config.ts:60-69 (fontSize map); apps/web/app/globals.css:60-61 (leading tokens, largely unused); apps/web/app/[locale]/(dashboard)/instellingen/PrivacySection.tsx:167,171"
+      },
+      "currentState": "Hint text, error copy, empty states and legal prose render tightly stacked at roughly 1.2 line-height. The marketing landing looks markedly more readable than the product because it is the only surface that applies `leading-relaxed` by hand.",
+      "problemStatement": "1.2 is a display line-height applied to body prose — it measurably slows reading and raises line-skipping for everyone, and disproportionately for dyslexic readers and low-vision users who track lines by their gaps. The failure mode is insidious: it is invisible in code review (`text-sm` looks correct), so every new component inherits the defect. Two registers diverging in readability, with marketing better than the product, is exactly backwards.",
+      "severity_justification": "High: affects 100% of text in the product and undermines the design system's own tokens, but does not by itself fail an AA success criterion (1.4.12 Text Spacing governs whether user-applied spacing breaks the layout, not the default). Readability cost is real and pervasive.",
+      "affectedUsers": "All readers; dyslexic and low-vision users most acutely; anyone reading the privacy or terms pages, which are long-form by nature.",
+      "recommendation": {
+        "principle": "Typographic best practice (1.4–1.6 line-height for body prose); WCAG 2.1 AA 1.4.12 Text Spacing as the resilience check",
+        "suggested_approach": "Restore paired values in the fontSize map so each step ships an intentional line-height: tight ratios for display sizes, ~1.5 for body sizes. This is the one change that fixes every existing screen without touching a single component. Then verify the layout survives the 1.4.12 stress test (1.5× line-height, 0.12em letter-spacing) — with the pairs in place it should.",
+        "example": "fontSize: { xs: ['var(--text-xs)', { lineHeight: '1.5' }], sm: ['var(--text-sm)', { lineHeight: '1.5' }], base: ['var(--text-base)', { lineHeight: '1.6' }], lg: ['var(--text-lg)', { lineHeight: '1.4' }], xl: ['var(--text-xl)', { lineHeight: '1.3' }], '2xl': ['var(--text-2xl)', { lineHeight: 'var(--leading-tight)' }], … }"
+      },
+      "estimatedImpact": "Major readability win across the whole product from a single config change — the highest leverage item in this report after the accent token.",
+      "status": "fixed",
+      "fix": "`fontSize` now ships `[size, { lineHeight }]` pairs; body steps sit at 1.5–1.6. Verified in the emitted CSS and locked by a regression test."
+    },
+    {
+      "id": "UI-A11Y-007",
+      "severity": "high",
+      "category": "accessibility",
+      "title": "Inputs suppress the browser focus ring and replace it with a 1px hue shift; there is no app-wide focus system",
+      "issue": "Every text field in the app applies `outline-none` and substitutes `focus:border-accent` — a 1px border that changes from #e5e8ec to #0e9f8e. The focus cue is therefore hue-only, one pixel thick, and delivered by the same colour flagged in UI-COLOR-001. Exactly one element in the codebase defines a proper focus-visible ring: the hamburger button (`focus-visible:ring-2 focus-visible:ring-accent`). Every other interactive element — Button, ButtonLink, nav links, tab buttons, the dozens of hand-rolled `<button>`s — falls back to the UA default, which varies by browser and is not designed against these surfaces.",
+      "location": {
+        "screen": "Every form and every interactive surface",
+        "component": "Input primitive and eight duplicated inline `fieldClass` strings",
+        "element": "apps/web/components/ui/Field.tsx:34-38; apps/web/app/[locale]/(dashboard)/taken/TaskForm.tsx:23; apps/web/app/[locale]/(dashboard)/winkel/RewardForm.tsx:9; apps/web/app/[locale]/(dashboard)/taken/TemplatePicker.tsx:15; apps/web/app/[locale]/(dashboard)/taken/WeekOverview.tsx:19; apps/web/app/[locale]/(dashboard)/gezin/ChildForms.tsx:105,271; apps/web/app/[locale]/(dashboard)/gezin/FamilySettingsForm.tsx:131; apps/web/app/[locale]/(dashboard)/goedkeuren/GoedkeurenClient.tsx:175; apps/web/app/[locale]/(dashboard)/AppShell.tsx:212 (the only correct example)",
+        "note": "The 1px teal border measures 3.30:1 against the white field, so it technically clears 1.4.11's 3:1 — this finding is about perceptibility and consistency, not a clean-cut failure."
+      },
+      "currentState": "Tabbing through the registration form, the only signal that focus moved is a thin teal edge on one of four near-identical white rectangles. Tabbing through the dashboard produces a different-looking ring on every browser.",
+      "problemStatement": "A hue-only, 1px cue is the weakest form a focus indicator can take: it is nearly invisible to users with reduced contrast sensitivity, and carries no information for anyone who cannot separate teal from light grey. `outline-none` deliberately removed the one indicator that was guaranteed to work, and nothing systematic replaced it. The result is that keyboard navigation quality varies by component and by browser — the opposite of what a design system is for.",
+      "severity_justification": "High: 2.4.7 Focus Visible is technically satisfied (something changes), but the indicator is far below the intent of the criterion and fails WCAG 2.2's 2.4.11 Focus Appearance. The inconsistency is a design-system defect in its own right.",
+      "affectedUsers": "Keyboard users, low-vision users, users with colour-vision deficiency (a green/grey shift is among the least reliable cues for deuteranopia), and anyone navigating a long form without a mouse.",
+      "recommendation": {
+        "principle": "WCAG 2.1 AA — 2.4.7 Focus Visible; WCAG 2.2 AA — 2.4.11 Focus Appearance; Inclusive Components focus-ring guidance",
+        "suggested_approach": "Define one focus treatment once and apply it everywhere: a 2px offset ring in the (darkened) accent, expressed as a shared class or a `@layer base` rule keyed to `:focus-visible`, so it cannot drift per component. Stop using `outline-none` without an equally strong replacement. Collapse the eight duplicated `fieldClass` strings into the existing `Input` primitive while you are there — they are the same string with the same defect copy-pasted.",
+        "example": "In globals.css: `@layer base { :where(a, button, input, select, textarea, [tabindex]):focus-visible { outline: 2px solid var(--color-accent); outline-offset: 2px; } }` — then delete every local `outline-none` and let the base rule govern."
+      },
+      "estimatedImpact": "Major keyboard-usability win, and it removes eight copies of a duplicated style string.",
+      "status": "fixed",
+      "fix": "One `:focus-visible` rule in `@layer base` — 2px accent outline at 2px offset. Every local `outline-none` removed except the skip-link target, which is documented."
+    },
+    {
+      "id": "UI-CONSIST-008",
+      "severity": "high",
+      "category": "layout",
+      "title": "The UI primitives are almost entirely unused — six hand-rolled card variants stand in for them",
+      "issue": "`components/ui/` exports Card, Badge, ProgressBar, PointsBadge, StreakBadge and RewardCard. Usage counts across app/: Card = 1, Badge = 0, ProgressBar = 0, PointsBadge = 0, StreakBadge = 0, RewardCard = 0. Every list row instead hand-rolls `rounded-lg border border-border bg-surface p-4`, and every status chip hand-rolls `rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent`. The Card primitive itself specifies `bg-bg` + `shadow-sm` + `p-5` — so the single screen that uses it (Vandaag) is the one screen whose cards look different from all the others, and it overrides the primitive's own padding to compensate (`<Card padded={false} className=\"p-4\">`).",
+      "location": {
+        "screen": "All dashboard screens",
+        "component": "components/ui exports vs. inline markup in every *Client.tsx",
+        "element": "apps/web/components/ui/index.ts; apps/web/app/[locale]/(dashboard)/vandaag/VandaagClient.tsx:38 (the lone Card, with padding overridden); hand-rolled rows at goedkeuren/GoedkeurenClient.tsx:128, taken/TakenClient.tsx:61, winkel/WinkelClient.tsx:63,113, gezin/GezinClient.tsx:237, gezin/InviteCodeCard.tsx:58"
+      },
+      "currentState": "Six near-identical but not identical container treatments coexist: white+shadow+p-5 (Card), grey+border+p-4 (most rows), grey+border+p-5 (invite card, child form), accent-tinted+p-3 (onboarding banner), danger-tinted+p-4 (delete zone). Status chips are re-declared at four call sites with slightly different padding.",
+      "problemStatement": "The project's own rule is explicit — 'Herbruik de primitives in apps/web/components/ui/ i.p.v. ad-hoc markup' (CLAUDE.md) — and the codebase does the opposite. The consequence is not merely aesthetic: it means every fix in this report (focus rings, touch targets, contrast) has to be applied six times instead of once, and will drift again. It also means the design system's own components are untested by real usage, so the kid-register primitives (PointsBadge, StreakBadge, RewardCard) are shipping dead code carrying their own defects (see UI-TOKEN-021).",
+      "severity_justification": "High: no single user-facing failure, but it is the structural cause of most other findings' blast radius and it directly violates a stated hard rule of the repo.",
+      "affectedUsers": "Users experience it as subtle inconsistency (cards that don't quite match between tabs); the team experiences it as multiplied maintenance and repeated regressions.",
+      "recommendation": {
+        "principle": "Nielsen heuristic #4 Consistency and standards; DRY / single source of truth; the repo's own web/ui.md primitive rule",
+        "suggested_approach": "Decide the canonical dashboard row treatment once (the `bg-surface` + border variant is the de-facto winner at five call sites — Card's white+shadow is the outlier), express it as a Card variant, and migrate all six sites. Add `Card variant=\"row\" | \"panel\"` and a `Chip`/`Badge` usage for the status pills rather than re-declaring the class string. Either adopt or delete the unused kid primitives — dead components that no reviewer exercises will keep accumulating defects.",
+        "example": "Card variants: `panel` (bg-bg, shadow-sm, p-5) for standalone cards, `row` (bg-surface, border, p-4) for list items, `tinted` (accent/danger wash) for banners. Then: rg -n 'rounded-lg border border-border bg-surface p-4' apps/web should return zero hits."
+      },
+      "estimatedImpact": "Major maintainability win; prerequisite for making the other fixes stick rather than being re-introduced by the next feature.",
+      "status": "fixed",
+      "fix": "`Card` gained `panel`/`row`/`tinted-accent`/`tinted-danger` variants plus polymorphic `as`. All 17 hand-rolled containers migrated; the grep now returns zero."
+    },
+    {
+      "id": "UI-COLOR-009",
+      "severity": "high",
+      "category": "color",
+      "title": "Tinted chips, success alerts and de-emphasised text all fall below 4.5:1",
+      "issue": "Beyond the accent token itself, several derived pairs fail measurement: accent text on `bg-accent/10` = 2.95:1 over white and 2.76:1 over surface; the Badge `accent` tone (#0c8c7d on #d9f2ef) = 3.53:1; `--color-success` on `--color-success-bg` = 3.60:1, so `<Alert tone=\"success\">` fails; `text-muted/70` = 3.11:1; and kid-turquoise on kid-cream = 3.12:1 for any kid-register text mirrored to iOS.",
+      "location": {
+        "screen": "/taken (task badges), /vandaag (balance chip), /login (success alert after account deletion), marketing kid preview",
+        "component": "Alert, Badge, and inline accent-tint chips",
+        "element": "apps/web/app/globals.css:26-27 (success pair); apps/web/components/ui/Alert.tsx:9; apps/web/components/ui/Badge.tsx:9; apps/web/app/[locale]/(dashboard)/taken/TakenClient.tsx:97,102; apps/web/app/[locale]/(dashboard)/vandaag/VandaagClient.tsx:41,57"
+      },
+      "currentState": "Task metadata badges ('Goedkeuring nodig', 'Fotobonus +5') render teal-on-pale-teal at ~2.9:1 in 12px type — the smallest text in the app on the lowest-contrast background. The post-deletion success alert on /login, which carries a legally-relevant purge date, sits at 3.60:1.",
+      "problemStatement": "Small text on tinted fills is where contrast failures hurt most, because size and contrast deficits compound. These chips carry real decision information — whether a task needs approval, what a child's balance is — not decoration. The success alert case is worse still: it is the only confirmation a parent gets that account deletion started and when data will be purged.",
+      "severity_justification": "High: multiple AA 1.4.3 failures on information-bearing text, at the smallest sizes shipped. Not critical only because each individually affects a narrower slice of screens than UI-COLOR-001.",
+      "affectedUsers": "All users reading task metadata and balances; low-vision users effectively lose the chip content entirely.",
+      "recommendation": {
+        "principle": "WCAG 2.1 AA — 1.4.3 Contrast (Minimum); avoid stacking small type with low-contrast tints",
+        "suggested_approach": "Never pair a tint with a foreground drawn from the same undiluted hue. Introduce explicit `-on-tint` foreground tokens computed against the actual tinted background, and darken `--color-success` for text use the same way UI-COLOR-001 handles the accent. Delete `text-muted/70` — opacity on an already-muted token is how you land at 3.11:1; use a dedicated placeholder token instead, or better, replace the '—' placeholder with real empty-state copy.",
+        "example": "--color-accent-on-tint: #0a6a5e (≈6:1 on the /10 tint); --color-success-text: #14713f (≈5:1 on #eaf7ef). Then Badge accent tone: `bg-kid-turquoise-soft text-[--color-accent-on-tint]`."
+      },
+      "estimatedImpact": "Moderate-to-major: fixes the least legible text in the product; token-level, no markup changes.",
+      "status": "fixed",
+      "fix": "Added `--color-accent-on-tint` (5.4–5.8:1 on the tints) and `--color-success-text` (5.5:1 on success-bg). `text-muted/70` removed."
+    },
+    {
+      "id": "UI-UX-010",
+      "severity": "high",
+      "category": "usability",
+      "title": "Every page-level error is a dead end: unannounced, unstyled, and offering no way to retry",
+      "issue": "All six dashboard screens render load failures as a bare `<p className=\"text-sm text-danger\">` with a generic message and no recovery affordance. None carries `role=\"alert\"`, so screen readers announce nothing when a fetch fails after the page has rendered. The Alert primitive — which does set `role=\"alert\"` — exists and is used for form errors, but never for page errors. On /gezin and /instellingen the failure state renders as `text-muted`, so a hard error is styled identically to 'Laden…'.",
+      "location": {
+        "screen": "/vandaag, /goedkeuren, /taken, /winkel, /gezin, /instellingen",
+        "component": "All *Client.tsx load-failure branches",
+        "element": "apps/web/app/[locale]/(dashboard)/vandaag/VandaagClient.tsx:112; goedkeuren/GoedkeurenClient.tsx:238; taken/TakenClient.tsx:248; winkel/WinkelClient.tsx:234; gezin/GezinClient.tsx:185 (styled text-muted); instellingen/InstellingenClient.tsx:57 (styled text-muted)"
+      },
+      "currentState": "A dropped connection produces a single grey or red sentence. The only route back is a manual browser reload — which, on /gezin, the parent may not realise is needed because the error looks like a loading message.",
+      "problemStatement": "This audience is on mobile networks in a kitchen; transient failures are the normal case, not the exception. Nielsen's error-recovery heuristic asks for a constructive exit, and there is none — the user must infer that reloading is the answer. The screen-reader gap is sharper: because these strings appear after an async failure rather than at render, a blind parent gets no indication at all that the queue they are waiting on failed to load. Styling errors as muted grey on two screens is a straightforward defect.",
+      "severity_justification": "High: fails Nielsen heuristic #9 (help users recognise, diagnose and recover from errors) on every screen, and creates a silent failure for assistive-technology users (WCAG 4.1.3 Status Messages, AA).",
+      "affectedUsers": "Every user on a flaky connection — the common case on mobile; screen-reader users get no notification whatsoever.",
+      "recommendation": {
+        "principle": "Nielsen heuristic #9 Error recovery; WCAG 2.1 AA — 4.1.3 Status Messages",
+        "suggested_approach": "Route page-level errors through the Alert primitive so `role=\"alert\"` comes for free, and pair every error with a retry action that re-invokes the existing `load` callback — each screen already has one, so the button is a one-line addition. Distinguish error styling from loading styling on /gezin and /instellingen. Where the realtime socket is disconnected, say so and offer the same retry rather than leaving a stale view.",
+        "example": "{failed && <Alert tone=\"danger\">{t('loadError')} <Button size=\"sm\" variant=\"secondary\" onClick={() => void load()}>{t('retry')}</Button></Alert>} — add `retry` to messages/nl.json and messages/en.json."
+      },
+      "estimatedImpact": "Major perceived-reliability win; small diff repeated six times.",
+      "status": "fixed",
+      "fix": "New `PageError` primitive routes page failures through `Alert` (so `role=\"alert\"` applies) with a retry button wired to each screen's existing `load` callback."
+    },
+    {
+      "id": "UI-A11Y-011",
+      "severity": "high",
+      "category": "accessibility",
+      "title": "No skip link, and the two navigation landmarks share one accessible name",
+      "issue": "The dashboard shell offers no 'skip to content' link, so every keyboard user traverses the full sidebar on every page. Additionally the `<aside>` and the `<nav>` nested inside it both take `aria-label={t(\"nav\")}` — two landmarks with the same name, which is precisely what landmark labelling is meant to prevent. `<main>` carries no id or tabindex, so there is nothing to skip to even if a link were added.",
+      "location": {
+        "screen": "All authenticated screens",
+        "component": "AppShell",
+        "element": "apps/web/app/[locale]/(dashboard)/AppShell.tsx:149 (inner nav label), :186 (aside label — same string), :243 (main, no id)"
+      },
+      "currentState": "Tab from the URL bar on /goedkeuren and you pass the wordmark and six nav links before reaching the first approve button — on every navigation, since the sidebar re-enters the tab order each time.",
+      "problemStatement": "Bypass Blocks is a Level A criterion and the standard remedy is a single anchor. The duplicate landmark naming compounds it: a screen-reader user listing landmarks to orient themselves hears the same name twice with no way to tell which is the real navigation. For a dashboard whose whole value is quick daily triage, forcing six redundant Tab presses per visit is a real tax on the primary workflow.",
+      "severity_justification": "High: 2.4.1 Bypass Blocks is Level A. Not critical because content remains reachable — just slowly — and the duplicate landmark is confusing rather than blocking.",
+      "affectedUsers": "Keyboard-only and screen-reader users, on every page load. Also switch users, for whom each extra step is expensive.",
+      "recommendation": {
+        "principle": "WCAG 2.1 Level A — 2.4.1 Bypass Blocks; ARIA Authoring Practices on landmark labelling",
+        "suggested_approach": "Add a visually-hidden-until-focused skip link as the first focusable element in the shell, targeting an id on `<main>`. Give the aside and its inner nav distinct names, or drop the label from the aside entirely and let the nested nav carry the navigation identity — one landmark, one name.",
+        "example": "<a href=\"#main\" className=\"sr-only focus:not-sr-only focus:absolute focus:z-50 focus:m-2 focus:rounded focus:bg-bg focus:px-4 focus:py-2\">{t('skipToContent')}</a> … <main id=\"main\" tabIndex={-1}>. Add `skipToContent` to both message catalogues."
+      },
+      "estimatedImpact": "Moderate-to-major for keyboard users; a handful of lines.",
+      "status": "fixed",
+      "fix": "Skip link added as the first focusable element, targeting `<main id=\"main\">`. The duplicate nav landmark name is resolved."
+    },
+    {
+      "id": "UI-UX-012",
+      "severity": "medium",
+      "category": "interaction",
+      "title": "Destructive deletes rely on native window.confirm, with no undo anywhere in the product",
+      "issue": "Deleting a task, deleting a reward and regenerating the family invite code all gate on `window.confirm()`. That dialog cannot be styled or translated beyond the message string, renders in the OS chrome rather than the product, is suppressed outright in some embedded and mobile contexts, and blocks the main thread. More importantly, once confirmed there is no undo path for any of the three.",
+      "location": {
+        "screen": "/taken, /winkel, /gezin",
+        "component": "TakenClient.remove, WinkelClient.removeReward, InviteCodeCard regenerate",
+        "element": "apps/web/app/[locale]/(dashboard)/taken/TakenClient.tsx:196; apps/web/app/[locale]/(dashboard)/winkel/WinkelClient.tsx:207; apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx:95"
+      },
+      "currentState": "A native grey OS dialog appears mid-flow, visually unrelated to the app. Confirming deletes immediately and permanently. Regenerating the invite code silently invalidates the code already shared with a child's device — with a native confirm as the only warning.",
+      "problemStatement": "Confirmation dialogs are a weak safeguard: users learn to dismiss them reflexively, so they stop preventing the mistakes they exist for. An undo window is materially stronger and less annoying. The invite-code case is the sharpest: regeneration has an invisible consequence (previously shared codes stop working) that a one-line native confirm cannot convey. The abrupt visual break also undermines the calm parent register the design system deliberately specifies.",
+      "severity_justification": "Medium: real data loss is possible but only after an explicit confirmation, and the actions are not high-frequency. Raised above low by the invite-code case, where the consequence is not visible in the UI at all.",
+      "affectedUsers": "All parents managing tasks and rewards; parents who regenerate an invite code without realising a child's device will be logged out of the pairing.",
+      "recommendation": {
+        "principle": "Nielsen heuristic #3 User control and freedom (undo over confirm); heuristic #5 Error prevention",
+        "suggested_approach": "Replace the native confirm with an in-place confirmation using the existing card/Alert vocabulary — /gezin already does this well with its inline DeleteChildForm, so the pattern exists in-repo and just needs to spread. Where the backend supports it, prefer optimistic removal plus a 5-second 'Ongedaan maken' toast over a pre-confirmation. For invite-code regeneration, state the consequence in the UI ('bestaande koppelcodes werken daarna niet meer') rather than only in a dialog string.",
+        "example": "Reuse the DeleteChildForm shape from apps/web/app/[locale]/(dashboard)/gezin/DeleteChildForm.tsx as the canonical inline-destructive pattern, and delete all three window.confirm calls."
+      },
+      "estimatedImpact": "Moderate — better error prevention and a visually coherent flow; medium-sized diff.",
+      "status": "fixed",
+      "fix": "New `ConfirmDelete` primitive replaces all three `window.confirm` calls with inline confirmation in the app's own register."
+    },
+    {
+      "id": "UI-PERF-013",
+      "severity": "medium",
+      "category": "performance",
+      "title": "Loading is a grey sentence, not a skeleton — content pops in with unannounced layout shift",
+      "issue": "Every screen renders `<p className=\"text-sm text-muted\">{t('loading')}</p>` while fetching, then replaces it with the full list. No skeleton preserves the eventual layout, and no `aria-live` region announces the transition. The one skeleton in the codebase — the photo thumbnail's `animate-pulse` placeholder — shows the team can do this; it just isn't applied at page level.",
+      "location": {
+        "screen": "All dashboard screens",
+        "component": "All *Client.tsx loading branches",
+        "element": "apps/web/app/[locale]/(dashboard)/vandaag/VandaagClient.tsx:114; goedkeuren/GoedkeurenClient.tsx:240,67 (the good example); taken/TakenClient.tsx:273; winkel/WinkelClient.tsx:281; gezin/GezinClient.tsx:181"
+      },
+      "currentState": "Opening /vandaag shows a heading and the word 'Laden…' at the top-left, then the child cards appear all at once and push nothing (the text was one line, the content is many). Perceived latency is the full round trip with no progressive feedback.",
+      "problemStatement": "Skeletons are worth more than their pixel cost because they set an expectation of shape and make the same wait feel shorter (Nielsen's system-status heuristic). The current treatment also gives no cue about how much is coming — a parent with four children sees the same one-line placeholder as a parent with one. And because the loading text is not in a live region, screen-reader users get silence during the wait and no announcement when content lands.",
+      "severity_justification": "Medium: nothing is blocked and the data does arrive, but it degrades perceived performance on every session-opening screen, and the silent transition is a status-message gap for AT users.",
+      "affectedUsers": "All users, most noticeably on mobile networks; screen-reader users experience the transition as unannounced.",
+      "recommendation": {
+        "principle": "Nielsen heuristic #1 Visibility of system status; WCAG 2.1 AA — 4.1.3 Status Messages; perceived-performance research on skeleton screens",
+        "suggested_approach": "Add a small Skeleton primitive (a token-driven `animate-pulse` block, honouring prefers-reduced-motion per UI-A11Y-017) and render 2–3 row-shaped placeholders matching the real card geometry. Wrap the loading/loaded region in `aria-busy` plus a polite live region so the state change is announced once. /goedkeuren already wraps its queue in `aria-live=\"polite\"` (line 249) — extend the same treatment to the other five screens.",
+        "example": "<div aria-busy={list === null} aria-live=\"polite\">{list === null ? <SkeletonRows count={3} /> : …}</div>"
+      },
+      "estimatedImpact": "Moderate perceived-speed improvement; one new primitive, six call sites.",
+      "status": "fixed",
+      "fix": "New `Skeleton`/`SkeletonRows` primitives replace the loading sentences, inside `aria-busy` containers."
+    },
+    {
+      "id": "UI-VIS-014",
+      "severity": "medium",
+      "category": "visualHierarchy",
+      "title": "Week planner encodes 'submitted' and 'approved' as 10% vs 15% of the same hue — a distinction nobody can see",
+      "issue": "`statusTone()` returns `bg-accent/10 text-accent` for approved/completed and `bg-accent/15 text-accent` for submitted. A 5-percentage-point alpha difference on the same hue is imperceptible in practice — the two most operationally different states in the parent's week (done vs. waiting on you) are rendered as visually identical. `open` and `open_redo` are likewise separated only by `text-text` vs `text-muted`.",
+      "location": {
+        "screen": "/taken → tab 'Week'",
+        "component": "WeekPlannerGrid.statusTone",
+        "element": "apps/web/app/[locale]/(dashboard)/taken/WeekPlannerGrid.tsx:33-45"
+      },
+      "currentState": "Every chip in the grid is a pale teal or a bordered white pill. Status is recoverable only by reading the 11px secondary line inside each chip.",
+      "problemStatement": "The Week tab exists to let a parent scan a whole week and spot what needs attention. Colour is the fastest pre-attentive channel available and it is being spent on a distinction the eye cannot resolve — so the scan collapses into reading every chip's caption. To the credit of the implementation the textual status label is always present, so this is not a colour-only failure; it is a wasted encoding. Also worth noting: 'open_redo' (a task sent back for another try) is the state a parent most needs to notice, and it is styled as the most muted of the four.",
+      "severity_justification": "Medium: information is available in text, so no accessibility criterion fails; the cost is scanning speed on the screen designed for scanning.",
+      "affectedUsers": "All parents using the week planner; users with colour-vision deficiency get nothing from the encoding at all, though the text label saves them.",
+      "recommendation": {
+        "principle": "Pre-attentive processing / visual hierarchy; Nielsen heuristic #6 Recognition rather than recall",
+        "suggested_approach": "Give each of the four states a genuinely distinct treatment across more than one channel — fill, border weight and a small glyph. Reserve the strongest visual weight for 'submitted' (the only state demanding parent action) rather than for 'done'. Keep the text label; the goal is to make it confirmatory rather than load-bearing.",
+        "example": "open: white fill + neutral border; open_redo: coral-soft fill + coral border + ↻ glyph; submitted: solid accent fill + white text + ● glyph (the action state, most prominent); approved/completed: accent-tinted fill + ✓ glyph at reduced opacity (the settled state, least prominent)."
+      },
+      "estimatedImpact": "Moderate scanning-speed win on the planner; contained to one function.",
+      "status": "fixed",
+      "fix": "Four states now differ on fill, border and glyph, with weight tracking urgency — `submitted` is the loudest, settled work recedes."
+    },
+    {
+      "id": "UI-LAY-015",
+      "severity": "medium",
+      "category": "layout",
+      "title": "Container width and alignment change on every tab — content jumps sideways as the parent navigates",
+      "issue": "Each dashboard screen picks its own container: /vandaag `max-w-4xl` left-aligned, /taken `max-w-4xl` left-aligned, /winkel `max-w-3xl` left-aligned, /goedkeuren `max-w-2xl` left-aligned, /gezin `mx-auto max-w-2xl` centred, /instellingen `mx-auto max-w-2xl` centred. Both the measure and the horizontal anchor change between sibling tabs.",
+      "location": {
+        "screen": "All six dashboard screens",
+        "component": "Root wrapper of each *Client.tsx",
+        "element": "vandaag/VandaagClient.tsx:109; goedkeuren/GoedkeurenClient.tsx:235; taken/TakenClient.tsx:224; winkel/WinkelClient.tsx:231; gezin/GezinClient.tsx:189; instellingen/InstellingenClient.tsx:61"
+      },
+      "currentState": "On a desktop screen, moving from /taken to /gezin shifts the page title from the left edge to the horizontal centre and narrows the content column by roughly a third. Nothing about the content justifies the change.",
+      "problemStatement": "Stable layout is how users build spatial memory of an app. When the title moves between tabs, every navigation costs a moment of re-orientation, and the product reads as assembled rather than designed. The mixed alignment is the more jarring half — a narrower measure for form-heavy screens is a defensible choice, but centring only two of six is not.",
+      "severity_justification": "Medium: purely a polish and coherence issue with no functional or accessibility consequence, but it is visible on every navigation and cheap to fix.",
+      "affectedUsers": "Desktop and tablet users; invisible below the container widths, so most phone users are unaffected.",
+      "recommendation": {
+        "principle": "Nielsen heuristic #4 Consistency and standards; spatial-memory / layout-stability principles",
+        "suggested_approach": "Move the container into the shell's `<main>` so individual screens stop deciding. Pick one alignment (left-aligned reads better against a left sidebar) and at most two measures — a wide one for list/grid screens and a narrow one for form screens — exposed as a prop rather than re-typed per page.",
+        "example": "In AppShell: <main className=\"mx-auto w-full max-w-4xl flex-1 px-4 py-6 sm:px-6 sm:py-8\">, and let form-dense screens opt into an inner max-w-2xl. Then remove all six per-screen wrappers."
+      },
+      "estimatedImpact": "Minor-to-moderate polish; small diff, immediately visible.",
+      "status": "fixed",
+      "fix": "The container moved into the shell's `<main>` (`mx-auto max-w-4xl`). Per-screen `mx-auto` removed; form-dense screens keep a narrower inner measure."
+    },
+    {
+      "id": "UI-UX-016",
+      "severity": "medium",
+      "category": "usability",
+      "title": "Empty states are grey sentences with no next step — the moments that most need guidance offer none",
+      "issue": "Every empty state renders as a single muted paragraph and nothing else. /vandaag with no children shows `noChildren` text but no link to /gezin, where children are created. /taken with no tasks shows `empty` text while the 'Nieuwe taak' button sits detached in the header. /winkel shows `noRewards` and `noRequests` the same way. Within a child card, empty buckets render a literal '—' in `text-muted/70` (3.11:1).",
+      "location": {
+        "screen": "/vandaag, /taken, /winkel, /gezin",
+        "component": "Empty-state branches of each *Client.tsx",
+        "element": "vandaag/VandaagClient.tsx:117 (noChildren), :57 ('—' placeholder); taken/TakenClient.tsx:277; winkel/WinkelClient.tsx:242,284; gezin/GezinClient.tsx:225"
+      },
+      "currentState": "A parent who has just registered lands on /vandaag and sees a heading plus one grey sentence. The action that resolves the state lives on a different route, unlinked.",
+      "problemStatement": "Empty states are the first screen a new user sees and the highest-leverage onboarding surface in the product — a dead end there converts directly into abandonment. The /vandaag case is the costliest: it is the post-registration default route, and the resolution ('add a child') is a route away with no link. The onboarding banner on /gezin shows the team knows how to write a guided moment; that thinking just hasn't reached the empty states.",
+      "severity_justification": "Medium: nothing is blocked and a determined parent will find /gezin in the sidebar, but it wastes the single best activation opportunity in the funnel.",
+      "affectedUsers": "Every new family, in their first session — the highest-stakes moment for retention. Also returning parents who have cleared their queue.",
+      "recommendation": {
+        "principle": "Nielsen heuristic #1 Visibility of system status and #7 Flexibility; empty-state-as-onboarding practice",
+        "suggested_approach": "Give each empty state a title, one line of positive Dutch copy in the house voice, and a primary action that resolves it. Keep it warm without switching registers — this is a parent surface, so restraint, not confetti. Route new copy through @dutch-child-copy only where it is child-facing; these strings are parent-facing. Replace the '—' bucket placeholder with either nothing or real copy, and drop the failing muted/70 tone either way.",
+        "example": "/vandaag empty: 'Nog geen kinderen in je gezin' + 'Voeg je eerste kind toe om taken te kunnen plannen.' + <ButtonLink href=\"/gezin\">Kind toevoegen</ButtonLink>. /goedkeuren empty is already close to right in tone — extend that treatment with an explicit action."
+      },
+      "estimatedImpact": "Moderate-to-major activation win for a copy-plus-one-button change per screen.",
+      "status": "fixed",
+      "fix": "New `EmptyState` primitive with title, body and a resolving action. /vandaag now links to /gezin; /taken, /winkel and /gezin offer their create actions inline."
+    },
+    {
+      "id": "UI-A11Y-017",
+      "severity": "medium",
+      "category": "accessibility",
+      "title": "prefers-reduced-motion covers only the marketing animation; app motion ignores it",
+      "issue": "globals.css defines a single reduced-motion block, scoped to `.mkt-rise`. Everything else animates unconditionally: the mobile drawer's 200ms slide transform, the photo skeleton's `animate-pulse`, the progress-bar width transition, every `transition-colors`, and two `scrollIntoView({ behavior: \"smooth\" })` calls on /gezin.",
+      "location": {
+        "screen": "All screens; motion is most pronounced on mobile (drawer) and /gezin (smooth scroll)",
+        "component": "globals.css reduced-motion block; AppShell drawer; GoedkeurenClient photo skeleton; GezinClient onboarding scroll",
+        "element": "apps/web/app/globals.css:128-132 (scoped to .mkt-rise only); AppShell.tsx:192; goedkeuren/GoedkeurenClient.tsx:67; gezin/GezinClient.tsx:109,143; components/ui/ProgressBar.tsx:24"
+      },
+      "currentState": "A user with 'Reduce Motion' enabled at OS level still gets a sliding drawer, a pulsing skeleton, and an automatic smooth scroll during onboarding.",
+      "problemStatement": "For users with vestibular disorders, large-area transform animations and unrequested smooth scrolling are the two triggers that matter most — and the app ships both. The infrastructure is already present in globals.css; it was simply written for one class instead of as a global policy. Colour transitions are harmless and can stay; movement and pulsing should not.",
+      "severity_justification": "Medium: WCAG 2.3.3 Animation from Interactions is Level AAA, so this is not an AA failure, but the affected users experience real physical discomfort and the fix is a few lines.",
+      "affectedUsers": "Users with vestibular disorders, migraine sensitivity, or motion-triggered nausea — commonly estimated at a low-single-digit percentage of adults, and self-identified via an OS setting the app can read for free.",
+      "recommendation": {
+        "principle": "WCAG 2.1 AAA — 2.3.3 Animation from Interactions; respect user agent preferences",
+        "suggested_approach": "Broaden the existing media query from one class to a global policy that neutralises transforms, animations and smooth scrolling while leaving colour transitions intact. Gate the two imperative `scrollIntoView` calls on a matchMedia check, since CSS cannot reach them.",
+        "example": "@media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-property: color, background-color, border-color, opacity !important; scroll-behavior: auto !important; } } — and in GezinClient: el?.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' })."
+      },
+      "estimatedImpact": "Moderate for affected users; very small diff.",
+      "status": "fixed",
+      "fix": "Global `prefers-reduced-motion` policy neutralises transforms, animations and smooth scrolling while keeping colour transitions. The two imperative `scrollIntoView` calls check `matchMedia`."
+    },
+    {
+      "id": "UI-VIS-018",
+      "severity": "medium",
+      "category": "visualHierarchy",
+      "title": "Heading hierarchy is compressed and inconsistent — h2 is 12px uppercase on one screen and 16px sentence case on another",
+      "issue": "Page titles are `text-xl` (20px) against 16px body — a 1.25× step where a dashboard h1 normally sits at 1.5–2×. The dashboard header's family name is `text-sm` semibold, so the persistent chrome is smaller than everything it frames. Section-level h2 is styled two different ways: `text-sm font-semibold uppercase tracking-wide text-muted` on /winkel versus `text-base font-semibold text-text` on /gezin and /instellingen.",
+      "location": {
+        "screen": "All dashboard screens",
+        "component": "Page headings and section headings across *Client.tsx",
+        "element": "winkel/WinkelClient.tsx:238,261 (uppercase muted h2); gezin/GezinClient.tsx:230,321 (base semibold h2); vandaag/VandaagClient.tsx:52 (uppercase h3); AppShell.tsx:227 (text-sm family name); all page h1s at text-xl"
+      },
+      "currentState": "Scanning /winkel, the section headings are small grey uppercase labels that read as metadata; on /gezin the same level reads as a proper heading. Nothing on a dashboard page is visually dominant.",
+      "problemStatement": "Weak and inconsistent hierarchy makes a page harder to scan and pushes users into reading linearly. The compression is amplified by UI-TYP-006: with line-heights stripped, headings also lose the vertical breathing room that normally does part of the hierarchy work. All-caps additionally reduces word-shape recognition and slows scanning, so it is the wrong choice for a heading that carries meaning ('Inwisselverzoeken' is the actionable queue on that screen).",
+      "severity_justification": "Medium: no functional or accessibility failure — the semantic heading levels are correct and consistent, which matters most for screen readers — but visual scanning is slower than it needs to be across the whole product.",
+      "affectedUsers": "All sighted users, particularly on longer screens like /gezin and /instellingen where several sections compete.",
+      "recommendation": {
+        "principle": "Typographic hierarchy; scanability research (F-pattern); all-caps reduces word-shape legibility",
+        "suggested_approach": "Define three heading roles in the design system and use them everywhere: page title, section title, card title — each with a fixed size, weight and margin. Widen the h1 step so the page title is unambiguously dominant, and retire uppercase-muted for headings (keep it, if at all, for true eyebrow labels above a heading). Existing tokens already cover the sizes; this is about applying them consistently rather than adding any.",
+        "example": "h1: text-2xl (24px) font-semibold; h2 section: text-lg (18px) font-semibold text-text; h3 card: text-base font-semibold. Replace the four uppercase-muted section headings with the h2 role."
+      },
+      "estimatedImpact": "Moderate scanability and perceived-quality win; mechanical diff.",
+      "status": "fixed",
+      "fix": "Three heading roles applied consistently: h1 `text-2xl`, section h2 `text-lg`, card h3 `text-base`. Uppercase retired from meaning-bearing headings (kept only for marketing eyebrow labels)."
+    },
+    {
+      "id": "UI-USA-019",
+      "severity": "medium",
+      "category": "usability",
+      "title": "Every dashboard tab has the browser title 'Wispel' — no page identity in tabs, history or bookmarks",
+      "issue": "No file under `app/[locale]/(dashboard)/` exports `metadata` or `generateMetadata` (verified: zero matches). All six screens therefore inherit the root default title. The marketing landing does implement `generateMetadata` properly, so the pattern exists in-repo and simply was not carried into the dashboard.",
+      "location": {
+        "screen": "/vandaag, /goedkeuren, /taken, /winkel, /gezin, /instellingen",
+        "component": "Dashboard page.tsx files",
+        "element": "apps/web/app/[locale]/(dashboard)/*/page.tsx (no metadata export); compare apps/web/app/[locale]/(marketing)/page.tsx:8-25 (correct pattern); root template at apps/web/app/[locale]/layout.tsx:25"
+      },
+      "currentState": "A parent with the dashboard open in three tabs sees three tabs labelled 'Wispel'. Browser history is an undifferentiated list. A bookmark to the approval queue is titled 'Wispel'.",
+      "problemStatement": "The document title is the primary orientation cue outside the viewport — tabs, history, bookmarks, window switchers, and the first thing a screen reader announces on navigation. Because this is a client-routed SPA-like dashboard, an unchanging title also means AT users get no announcement that the route changed at all. The root layout already defines a `%s — Wispel` template, so each page needs one line.",
+      "severity_justification": "Medium: mild friction for sighted users but a genuine orientation gap for screen-reader users on route change (WCAG 2.4.2 Page Titled, Level A, is arguably met by the generic title but defeated in spirit).",
+      "affectedUsers": "Multi-tab users (common for parents comparing the shop and the queue), screen-reader users on every navigation, and anyone bookmarking a section.",
+      "recommendation": {
+        "principle": "WCAG 2.1 Level A — 2.4.2 Page Titled; Nielsen heuristic #1 Visibility of system status",
+        "suggested_approach": "Export `generateMetadata` from each dashboard page.tsx, pulling the title from the existing `nav` message namespace so the tab title and the sidebar label stay in sync automatically and stay localised. The root template supplies the ' — Wispel' suffix.",
+        "example": "export async function generateMetadata({ params }) { const { locale } = await params; const t = await getTranslations({ locale, namespace: 'nav' }); return { title: t('goedkeuren') }; } — repeat for all six, reusing the nav key that already names the route."
+      },
+      "estimatedImpact": "Minor-to-moderate; six near-identical small additions.",
+      "status": "fixed",
+      "fix": "`generateMetadata` added to all seven dashboard pages, titled from the `nav` namespace so tab, sidebar label and bookmark stay in sync and localised."
+    },
+    {
+      "id": "UI-USA-020",
+      "severity": "medium",
+      "category": "usability",
+      "title": "Icons are free-text slug fields — parents must type 'star' or 'gift' with no picker and no preview",
+      "issue": "Both TaskForm and RewardForm expose the icon as a bare text input defaulting to the literal strings `\"star\"` and `\"gift\"`. There is no picker, no preview of the result, and no indication of which values are valid — yet the chosen value is rendered back as a glyph throughout the app (`{item.icon && <span aria-hidden>{item.icon}</span>}`), so a wrong value silently produces a missing or literal-text icon.",
+      "location": {
+        "screen": "/taken (new/edit task), /winkel (new/edit reward)",
+        "component": "TaskForm, RewardForm, TemplatePicker",
+        "element": "apps/web/app/[locale]/(dashboard)/taken/TaskForm.tsx:180-181; apps/web/app/[locale]/(dashboard)/winkel/RewardForm.tsx:66-68; consumers at goedkeuren/GoedkeurenClient.tsx:130, taken/TakenClient.tsx:64, vandaag/VandaagClient.tsx:64"
+      },
+      "currentState": "The 'Icoon' field shows the word 'star'. A parent can type anything. Whatever they type is rendered directly into task lists, the approval queue and the child's view, with no preview at authoring time.",
+      "problemStatement": "This is mystery meat: the field asks the user to know an internal vocabulary that is documented nowhere in the UI. It fails the recognition-over-recall heuristic outright, and it leaks an implementation detail (icon keys) into a parent-facing form. The stakes are higher than they look because the icon is one of the few visual anchors a pre-reading child has for identifying a task — a parent who types nonsense degrades the child's experience without ever seeing the result.",
+      "severity_justification": "Medium: the form still submits and a default exists, so nothing breaks; but the feature is effectively undiscoverable and the downstream quality impact lands on the child's surface.",
+      "affectedUsers": "Every parent creating a task or reward; indirectly every child, who sees whatever icon resulted.",
+      "recommendation": {
+        "principle": "Nielsen heuristic #6 Recognition rather than recall; heuristic #2 Match between system and the real world; progressive disclosure",
+        "suggested_approach": "Replace the text input with a small visual picker — a wrapped grid of selectable icon buttons with `aria-pressed`, exactly the pattern already implemented for avatars in ChildForms. Keep a sensible default so the field is skippable. At minimum, show a live preview of the current value next to the input so a typo is visible before saving.",
+        "example": "Reuse the avatar picker at apps/web/app/[locale]/(dashboard)/gezin/ChildForms.tsx:120-135 — same interaction, same a11y treatment, applied to the icon set. Size each option at the 44px minimum from UI-MOB-005."
+      },
+      "estimatedImpact": "Moderate authoring-quality win; medium diff, and it reuses an existing in-repo pattern.",
+      "status": "fixed",
+      "fix": "New `IconPicker` primitive replaces both free-text fields. `lib/icons.ts` also maps the API's legacy slugs to glyphs — template tasks were rendering the literal word \"pencil\"."
+    },
+    {
+      "id": "UI-TOKEN-021",
+      "severity": "medium",
+      "category": "color",
+      "title": "Token drift: raw hex in two shipped primitives, plus an off-scale 11px type size",
+      "issue": "PointsBadge and StreakBadge hardcode `text-[#8a5a00]` and `text-[#a13a1f]` — arbitrary hex values that exist in no token file and cannot be themed. WeekPlannerGrid uses `text-[11px]`, a size that is not on the type scale and sits below the smallest token (`--text-xs`, 12px), further dimmed by `opacity-80`. This directly contradicts the repo's stated rule ('nooit ruwe hex/px hardcoderen', CLAUDE.md; 'Never hardcode hex or arbitrary px', .claude/rules/web/ui.md).",
+      "location": {
+        "screen": "/taken → Week tab; kid-register primitives (currently unrendered)",
+        "component": "PointsBadge, StreakBadge, WeekPlannerGrid InstanceChip",
+        "element": "apps/web/components/ui/PointsBadge.tsx:5; apps/web/components/ui/StreakBadge.tsx:5; apps/web/app/[locale]/(dashboard)/taken/WeekPlannerGrid.tsx:81"
+      },
+      "currentState": "The two hardcoded colours are, to their credit, contrast-safe (5.37:1 and 5.42:1 on their soft backgrounds) — but they are invisible to the token system, so a palette change in globals.css will leave them stranded. The 11px chip caption carries the child name and status, at 80% opacity.",
+      "problemStatement": "Token drift is a slow failure: nothing looks wrong today, and everything drifts on the next palette change. Because these three values sit in components — and the badge pair is mirrored into THPalettes for iOS — the drift will show up as web/iOS divergence rather than as a visible web bug. The 11px caption is a separate concern: it is the smallest text in the product, it is functional rather than decorative, and the added opacity pushes it further down.",
+      "severity_justification": "Medium: no current user-visible failure (contrast happens to pass), but it breaks the repo's own hard rule and guarantees future divergence across three platforms.",
+      "affectedUsers": "Indirect today; all users at the next palette change. The 11px caption directly affects anyone reading the week planner.",
+      "recommendation": {
+        "principle": "Design-token single source of truth (the repo's own web/ui.md rule); type-scale discipline",
+        "suggested_approach": "Promote the two badge foregrounds to named tokens in globals.css and mirror them into Design System/tokens/ and THPalettes, as the header comment in globals.css instructs. Raise the chip caption to `text-xs` (12px, the scale floor) and drop `opacity-80` — if the caption needs de-emphasis, use the muted colour token, which is contrast-checked, rather than opacity, which is not.",
+        "example": "--kid-yellow-text: #8a5a00; --kid-coral-text: #a13a1f; then `text-kid-yellow-text`. Guard with the rule's own check: rg -n '\\[#[0-9a-fA-F]{3,6}\\]|text-\\[[0-9]+px\\]' apps/web/app apps/web/components should return only the QR-code call, which is legitimately documented as barcode pixels (InviteCodeCard.tsx:26-27)."
+      },
+      "estimatedImpact": "Minor today, prevents a class of cross-platform drift later; trivial diff.",
+      "status": "fixed",
+      "fix": "`--kid-coral-text` / `--kid-yellow-text` tokens replace the arbitrary hex; `text-[11px]` raised to the scale floor with the opacity dropped; `sm:max-w-[12rem]` moved onto the spacing scale. Only the documented QR exception remains."
+    },
+    {
+      "id": "UI-INT-022",
+      "severity": "low",
+      "category": "interaction",
+      "title": "Copy-to-clipboard confirms visually only, and fails silently when the clipboard is unavailable",
+      "issue": "`copyCode` swaps the button label to 'Gekopieerd' for two seconds. The change is not in a live region, so screen-reader users get no confirmation. When `navigator.clipboard.writeText` rejects — insecure context, Safari permission denial, older browsers — the catch block is empty and the UI shows nothing at all.",
+      "location": {
+        "screen": "/gezin",
+        "component": "InviteCodeCard",
+        "element": "apps/web/app/[locale]/(dashboard)/gezin/InviteCodeCard.tsx:45-53 (silent catch), :86-88 (label swap)"
+      },
+      "currentState": "Success is signalled by a label change only. Failure is signalled not at all — the button appears to do nothing, and the parent is left to select the code manually without being told that is what happened.",
+      "problemStatement": "The invite code is the one artefact a parent must transfer to a child's device, so a silent no-op sits directly on the critical onboarding path. The existing comment ('code remains visible for manual copy') is a reasonable fallback strategy, but it is never communicated to the user, which turns a graceful degradation into an apparent bug.",
+      "severity_justification": "Low: the code is displayed in large monospace type and the QR alternative is right beside it, so the task is completable. Cost is a moment of confusion at a high-stakes point.",
+      "affectedUsers": "Screen-reader users (no confirmation ever); any parent on a browser or context where the Clipboard API is blocked.",
+      "recommendation": {
+        "principle": "Nielsen heuristic #1 Visibility of system status; WCAG 2.1 AA — 4.1.3 Status Messages",
+        "suggested_approach": "Announce the result through a polite live region rather than a label swap alone, and surface the failure path with a short instruction to select the code manually. Reuse the Alert primitive for the failure case so `role=\"alert\"` comes along.",
+        "example": "const [copyState, setCopyState] = useState<'idle'|'ok'|'fail'>('idle'); … <p role=\"status\" className=\"sr-only\">{copyState === 'ok' ? t('invite.copied') : copyState === 'fail' ? t('invite.copyManual') : ''}</p>, with the failure message also shown visually."
+      },
+      "estimatedImpact": "Minor polish on a high-stakes step; a few lines plus two message keys.",
+      "status": "fixed",
+      "fix": "Copy result announced through a `role=\"status\"` region, and the failure path now shows a visible instruction to select the code manually."
+    },
+    {
+      "id": "UI-INT-023",
+      "severity": "low",
+      "category": "interaction",
+      "title": "Language switcher disables the active locale, removing it from the tab order and styling it as a disabled primary",
+      "issue": "The current locale's button is rendered `disabled` while also carrying `aria-current=\"true\"` and the filled `bg-accent text-accent-fg` treatment. Disabling removes it from the tab order, so a keyboard user tabbing through the header lands only on the inactive locale — and sees a filled primary-looking control that cannot be focused.",
+      "location": {
+        "screen": "Dashboard header, auth header, marketing header",
+        "component": "LanguageSwitcher",
+        "element": "apps/web/app/[locale]/LanguageSwitcher.tsx:18-28"
+      },
+      "currentState": "On /vandaag in Dutch, 'NL' is a solid teal pill that cannot be focused or activated; 'EN' is a plain grey text button. The two are also all-caps two-letter codes with no visible label explaining what they are (the `aria-label` supplies 'Nederlands'/'English' to AT only).",
+      "problemStatement": "`aria-current` is the correct mechanism for 'this is the active choice'; `disabled` on top of it is redundant and actively harmful, because it removes the element from keyboard navigation and from the accessibility tree's interactive set. The visual treatment compounds the confusion: a filled accent pill is the app's primary-action styling, so the current locale looks like the recommended action rather than the current state.",
+      "severity_justification": "Low: the switcher still works — the other locale is reachable and one click does the job — so nothing is blocked. It is a correctness and polish issue on a low-frequency control.",
+      "affectedUsers": "Keyboard users (inconsistent tab stops in the header); users who read the filled pill as a button to press.",
+      "recommendation": {
+        "principle": "ARIA Authoring Practices — aria-current for state, not disabled; Nielsen heuristic #4 Consistency",
+        "suggested_approach": "Drop `disabled` and keep `aria-current=\"true\"`, making the active locale a no-op click. Style the active state as selected rather than as a primary action — a subtle fill or an underline reads as state; a solid accent pill reads as a call to action. Consider a single toggle showing the target language ('EN') instead of two codes, which halves the header's control count.",
+        "example": "<button aria-current={isActive ? 'true' : undefined} onClick={() => !isActive && router.replace(pathname, { locale })} className={isActive ? 'bg-surface text-text font-semibold' : 'text-muted hover:bg-border/50'}>"
+      },
+      "estimatedImpact": "Minor; small diff on a globally-present control.",
+      "status": "fixed",
+      "fix": "`disabled` replaced with `aria-current` plus a no-op click, so the active locale stays in the tab order and no longer looks like a primary action."
+    },
+    {
+      "id": "UI-VIS-024",
+      "severity": "low",
+      "category": "visualHierarchy",
+      "title": "The one screen that uses the Card primitive overrides its padding, defeating the token it exists to enforce",
+      "issue": "Vandaag renders `<Card padded={false} className=\"p-4\">` — it opts out of the primitive's `p-5` and re-applies `p-4` to match the hand-rolled rows on the other five screens. The primitive's padding decision is therefore inverted at its only call site.",
+      "location": {
+        "screen": "/vandaag",
+        "component": "Card usage in ChildCard",
+        "element": "apps/web/app/[locale]/(dashboard)/vandaag/VandaagClient.tsx:38; primitive at apps/web/components/ui/Card.tsx:10-27"
+      },
+      "currentState": "Card ships `p-5`; the codebase's sole consumer disables that and substitutes `p-4`, matching the ad-hoc rows elsewhere.",
+      "problemStatement": "This is a small but clear signal that the primitive's defaults do not match what the product actually needs — the implementer reached for the escape hatch on the first use. Left alone, it guarantees that the next Card consumer copies the override rather than the default, and the primitive's padding token becomes decorative. Worth treating as evidence for UI-CONSIST-008 rather than as an isolated bug.",
+      "severity_justification": "Low: no user-visible defect — the result is consistent with neighbouring screens, which is the point. It is a design-system smell.",
+      "affectedUsers": "None directly; developers extending the system.",
+      "recommendation": {
+        "principle": "Design-system defaults should encode the common case; escape hatches signal a wrong default",
+        "suggested_approach": "Fold this into the Card variant work in UI-CONSIST-008: set the default padding to whatever the audit of the six existing containers settles on, and expose density as a named variant rather than as a boolean plus a className override.",
+        "example": "Card variants row (p-4) / panel (p-5), so Vandaag becomes <Card variant=\"row\"> with no className override."
+      },
+      "estimatedImpact": "Minor; resolved for free by UI-CONSIST-008.",
+      "status": "fixed",
+      "fix": "Resolved by the Card variant work — Vandaag uses `variant=\"row\"` with no padding override."
+    }
+  ],
+  "summary": {
+    "totalFindings": 24,
+    "byCriticality": {
+      "critical": 4,
+      "high": 7,
+      "medium": 10,
+      "low": 3
+    },
+    "byCategory": {
+      "visualHierarchy": 3,
+      "typography": 1,
+      "color": 4,
+      "layout": 2,
+      "interaction": 3,
+      "mobile": 1,
+      "accessibility": 5,
+      "usability": 4,
+      "performance": 1
+    },
+    "overallAssessment": "This is a competently built dashboard with a genuine design system behind it, and it is undermined by defects at the token layer rather than at the component layer. The architecture is sound: tokens are centralised in globals.css, mapped through Tailwind, mirrored to iOS, and governed by written rules. The semantic HTML is above average for a React codebase — real fieldsets, real legends, scoped table headers, aria-labelledby on sections, aria-live on the approval queue, correct heading nesting, inputMode on pincode fields, idempotency-safe action nonces. Several hard problems were solved deliberately and well: focus trapping and Escape handling in the mobile drawer, the QR-contrast exception documented in a comment, the positive-framing bucket mapping in Vandaag. That quality makes the failures below more surprising, not less. Three findings account for most of the damage and all three live in configuration, not components. The brand accent measures 3.30:1 and fails WCAG AA on every primary button, link and active nav item in the product. The border token measures 1.23:1, so form fields and secondary buttons have no perceivable boundary — a 1.4.11 failure across every form. And the Tailwind fontSize map, by using bare strings, silently strips Tailwind's paired line-heights, so all body prose renders at roughly 1.2 line-height with only the marketing page compensating by hand. Each of these is a few lines of configuration and each fixes dozens of screens at once. Alongside them sit two Level A accessibility failures that no token change will reach: the week planner registers only a PointerSensor, so rescheduling a task has no keyboard path at all; and the mobile drawer stays focusable off-canvas because its aria-hidden ternary returns undefined on both branches and its aria-controls points at an id that does not exist. The connective tissue problem is that the design system's primitives are almost entirely unused — Card appears once (with its padding overridden), and Badge, ProgressBar, PointsBadge, StreakBadge and RewardCard appear zero times, while six hand-rolled card treatments and four copies of the same status-chip class string do the work instead. That is why every fix in this report currently has to be applied six times. Fixing the primitives is what makes the rest of the fixes stay fixed. What is missing, and would have caught most of this before review: there is no axe-core lane, no visual regression, no Storybook, and no contrast assertion in CI — a gap the repo already acknowledges as HLT-013. The four critical findings here are all machine-detectable.",
+    "topThreePriorities": [
+      "1. UI-COLOR-001 + UI-COLOR-004 + UI-COLOR-009 — the accent (3.30:1) and border (1.23:1) tokens fail WCAG AA on the primary button, every link, every active nav item and every form-field boundary in the product. Fix at the token layer in globals.css: darken the interactive accent to ~#0b7d6f (5.03:1), add a 3:1 interactive-border token, and add -on-tint foregrounds. Roughly ten lines of CSS clears three findings across every screen.",
+      "2. UI-A11Y-002 + UI-A11Y-003 — two Level A failures. Week-planner rescheduling is drag-only (PointerSensor is the sole registered dnd-kit sensor, so keyboard users lose the feature entirely), and the mobile drawer stays in the tab order while off-canvas because its aria-hidden ternary is a no-op and its aria-controls targets a non-existent id. Level A failures outrank the AA contrast work on severity; they are listed second only because the token fix is faster and broader.",
+      "3. UI-TYP-006 + UI-CONSIST-008 — the fontSize map's bare strings strip every line-height, so all body copy renders at ~1.2 and only the marketing page compensates; and the UI primitives are effectively unused, with six hand-rolled card treatments standing in for Card. The first is a one-config-block fix that improves readability everywhere; the second is the structural work that stops all of the above from silently regressing."
+    ],
+    "notableStrengths": [
+      "Real design tokens, centralised in one file with a documented three-way sync contract to Design System/tokens/ and THPalettes.",
+      "Semantic HTML well above the React norm: fieldset/legend, scope=\"row\" table headers, aria-labelledby sections, role=\"alert\" on the Alert primitive, correct heading nesting.",
+      "Mobile drawer implements focus trapping and Escape-to-close with focus restoration — genuinely hard work done properly, and let down only by the off-canvas focus bug.",
+      "The hamburger is correctly sized at 44×44 (h-11 w-11), showing the touch-target rule is known; it just was not encoded in the Button primitive.",
+      "The week grid is correctly wrapped in overflow-x-auto so a 720px table never forces the page body to scroll horizontally at 320px.",
+      "Photo thumbnails use a bounded exponential-backoff poll with a real skeleton placeholder — the best loading treatment in the app, and the model the other screens should follow.",
+      "The QR code's black-on-white values are hardcoded with an explicit comment justifying the token exception — the right way to break a rule.",
+      "Positive-framing status buckets in Vandaag (open/awaiting/done, never 'te laat') correctly implement the product's tone guidance.",
+      "Full nl/en parity: both catalogues carry 717 lines and no user-facing string is hardcoded in a component."
+    ]
+  }
+}

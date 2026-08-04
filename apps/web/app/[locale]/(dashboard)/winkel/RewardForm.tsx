@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 import type { RewardView, RewardFormPayload } from "../../../../lib/api/types";
-import { Button, Alert } from "../../../../components/ui";
+import { REWARD_ICONS } from "../../../../lib/icons";
+import { Alert, Button, Card, IconPicker } from "../../../../components/ui";
 
 const fieldClass =
-  "mt-1 w-full rounded border border-border bg-bg px-3 py-2 text-sm outline-none focus:border-accent";
+  "mt-1 min-h-11 w-full rounded border border-border-interactive bg-bg px-3 py-2 text-sm focus:border-accent";
 
 interface Props {
   initial?: RewardView;
@@ -43,7 +44,7 @@ export default function RewardForm({ initial, onSubmit, onCancel }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="rounded-lg border border-border bg-surface p-4">
+    <Card as="form" variant="row" onSubmit={handleSubmit}>
       <h2 className="text-base font-semibold text-text">
         {initial ? t("editTitle") : t("createTitle")}
       </h2>
@@ -61,11 +62,6 @@ export default function RewardForm({ initial, onSubmit, onCancel }: Props) {
         </label>
 
         <label className="text-sm font-medium text-text">
-          {t("fldIcon")}
-          <input value={icon} onChange={(e) => setIcon(e.target.value)} className={fieldClass} />
-        </label>
-
-        <label className="text-sm font-medium text-text">
           {t("fldPrice")}
           <input
             type="number"
@@ -79,13 +75,22 @@ export default function RewardForm({ initial, onSubmit, onCancel }: Props) {
         </label>
       </div>
 
-      <label className="mt-3 flex items-center gap-2 text-sm font-medium text-text">
+      <div className="mt-3">
+        <IconPicker
+          label={t("fldIcon")}
+          options={REWARD_ICONS}
+          value={icon}
+          onChange={setIcon}
+        />
+      </div>
+
+      <label className="mt-3 flex min-h-11 items-center gap-2 text-sm font-medium text-text">
         <input type="checkbox" checked={limited} onChange={(e) => setLimited(e.target.checked)} />
         {t("fldLimited")}
       </label>
 
       {limited && (
-        <label className="mt-2 block text-sm font-medium text-text sm:max-w-[12rem]">
+        <label className="mt-2 block text-sm font-medium text-text sm:w-48">
           {t("fldLimitPerWeek")}
           <input
             type="number"
@@ -107,6 +112,6 @@ export default function RewardForm({ initial, onSubmit, onCancel }: Props) {
           {t("cancel")}
         </Button>
       </div>
-    </form>
+    </Card>
   );
 }

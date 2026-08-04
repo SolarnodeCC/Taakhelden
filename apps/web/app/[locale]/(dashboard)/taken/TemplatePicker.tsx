@@ -9,10 +9,10 @@ import {
   type TaskTemplate,
 } from "../../../../lib/api/types";
 import { ageFromBirthYear } from "../../../../lib/taken/dates";
-import { Alert, Button } from "../../../../components/ui";
+import { Alert, Button, Card } from "../../../../components/ui";
 
 const fieldClass =
-  "mt-1 w-full rounded border border-border bg-bg px-3 py-2 text-sm outline-none focus:border-accent";
+  "mt-1 min-h-11 w-full rounded border border-border-interactive bg-bg px-3 py-2 text-sm focus:border-accent";
 
 interface Props {
   children: MemberView[];
@@ -63,7 +63,7 @@ export default function TemplatePicker({ children, onUseTemplate, onCancel }: Pr
   }
 
   return (
-    <div className="rounded-lg border border-border bg-surface p-4">
+    <Card variant="row">
       <h2 className="text-base font-semibold text-text">{tt("title")}</h2>
       <p className="mt-1 text-sm text-muted">{tt("hint")}</p>
 
@@ -162,6 +162,6 @@ export default function TemplatePicker({ children, onUseTemplate, onCancel }: Pr
           {tt("cancel")}
         </Button>
       </div>
-    </div>
+    </Card>
   );
 }
