@@ -6,7 +6,7 @@ import { NotificationSettingsPatch, type NotificationSetting } from "@taakhelden
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { MemberView, NotificationSettingsResponse } from "../../../../lib/api/types";
 import { avatarEmoji } from "../../../../lib/avatars";
-import { Alert, Button, Field, Input } from "../../../../components/ui";
+import { Alert, Button, Card, Field, Input } from "../../../../components/ui";
 
 function toHhMm(value: string): string {
   const match = /^(\d{2}:\d{2})/.exec(value);
@@ -83,7 +83,7 @@ function ChildNotificationCard({
   const emoji = avatarEmoji(child.avatarId);
 
   return (
-    <li className="rounded-lg border border-border bg-surface p-4">
+    <Card as="li" variant="row">
       <div className="flex items-center gap-2">
         {emoji && (
           <span className="text-xl" aria-hidden>
@@ -155,7 +155,7 @@ function ChildNotificationCard({
           </Button>
         </div>
       </div>
-    </li>
+    </Card>
   );
 }
 

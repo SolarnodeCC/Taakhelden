@@ -17,7 +17,7 @@ export function RewardCard({
   return (
     <div
       className={[
-        "flex flex-col items-center gap-2 rounded-xl border border-border bg-white",
+        "flex flex-col items-center gap-2 rounded-xl border border-border bg-bg",
         "p-4 text-center font-rounded shadow-sm",
         affordable ? "" : "opacity-55",
       ].join(" ")}

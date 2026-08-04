@@ -12,13 +12,14 @@ import {
   type TaskFormPrefill,
   type TaskTemplate,
 } from "../../../../lib/api/types";
+import { displayIcon } from "../../../../lib/icons";
 import { useRouter } from "../../../../i18n/navigation";
 import {
   FullParentForbidden,
   FullParentUpstreamError,
   useRequireFullParent,
 } from "../../../../lib/auth/RequireFullParent";
-import { Button } from "../../../../components/ui";
+import { Button, Card, ConfirmDelete, EmptyState, PageError, SkeletonRows } from "../../../../components/ui";
 import TaskForm from "./TaskForm";
 import TemplatePicker from "./TemplatePicker";
 import WeekOverview from "./WeekOverview";
@@ -34,11 +35,17 @@ function TaskRow({
   childName,
   onEdit,
   onDelete,
+  confirming,
+  onConfirmDelete,
+  onCancelDelete,
 }: {
   task: TaskView;
   childName: (id: string) => string;
   onEdit: () => void;
   onDelete: () => void;
+  confirming: boolean;
+  onConfirmDelete: () => void;
+  onCancelDelete: () => void;
 }) {
   const t = useTranslations("taken");
   const recurrence =
@@ -58,11 +65,12 @@ function TaskRow({
     : null;
 
   return (
-    <li className="flex items-start justify-between gap-3 rounded-lg border border-border bg-surface p-4">
+    <Card as="li" variant="row" className="flex flex-col gap-3">
+      <div className="flex items-start justify-between gap-3">
       <div className="min-w-0">
         <div className="flex items-center gap-2">
-          {task.icon && <span aria-hidden>{task.icon}</span>}
-          <h2 className="truncate text-base font-semibold text-text">{task.title}</h2>
+          {displayIcon(task.icon) && <span aria-hidden>{displayIcon(task.icon)}</span>}
+          <h2 className="truncate text-lg font-semibold text-text">{task.title}</h2>
         </div>
         <p className="mt-0.5 text-sm text-muted">
           {t("points", { points: task.points })} · {t(`category.${task.category}`)} · {recurrence}
@@ -94,34 +102,42 @@ function TaskRow({
             </span>
           )}
           {task.approvalRequired && (
-            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent">
+            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent-on-tint">
               {t("badge.approval")}
             </span>
           )}
           {task.photoBonusPoints > 0 && (
-            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent">
+            <span className="rounded-full bg-accent/10 px-2 py-0.5 text-xs text-accent-on-tint">
               {t("badge.photoBonus", { points: task.photoBonusPoints })}
             </span>
           )}
         </div>
       </div>
-      <div className="flex shrink-0 gap-2">
-        <button
-          type="button"
-          onClick={onEdit}
-          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-text transition-colors hover:bg-bg"
-        >
-          {t("edit")}
-        </button>
-        <button
-          type="button"
-          onClick={onDelete}
-          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-bg"
-        >
-          {t("delete")}
-        </button>
+        <div className="flex shrink-0 gap-2">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="inline-flex min-h-11 items-center rounded border border-border-interactive px-3 py-1.5 text-sm font-medium text-text transition-colors hover:bg-bg"
+          >
+            {t("edit")}
+          </button>
+          <button
+            type="button"
+            onClick={onDelete}
+            className="inline-flex min-h-11 items-center rounded border border-border-interactive px-3 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-bg"
+          >
+            {t("delete")}
+          </button>
+        </div>
       </div>
-    </li>
+      {confirming && (
+        <ConfirmDelete
+          question={t("deleteConfirm")}
+          onConfirm={onConfirmDelete}
+          onCancel={onCancelDelete}
+        />
+      )}
+    </Card>
   );
 }
 
@@ -149,6 +165,7 @@ export default function TakenClient() {
   const [failed, setFailed] = useState(false);
   const [form, setForm] = useState<FormState>(null);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState<TaskView | null>(null);
 
   const load = useCallback(async () => {
     try {
@@ -193,10 +210,10 @@ export default function TakenClient() {
   }
 
   async function remove(task: TaskView) {
-    if (!window.confirm(t("deleteConfirm"))) return;
     try {
       await apiClient.delete(`/api/v1/tasks/${task.id}`);
       setTasks((prev) => (prev ? prev.filter((x) => x.id !== task.id) : prev));
+      setPendingDelete(null);
     } catch {
       setFailed(true);
     }
@@ -218,12 +235,12 @@ export default function TakenClient() {
 
   const tabClass = (active: boolean) =>
     "rounded-md px-3 py-1.5 text-sm font-medium transition-colors " +
-    (active ? "bg-accent/10 text-accent" : "text-muted hover:bg-bg hover:text-text");
+    (active ? "bg-accent/10 text-accent-on-tint" : "text-muted hover:bg-bg hover:text-text");
 
   return (
-    <div className="max-w-4xl">
+    <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-xl font-semibold text-text">{t("title")}</h1>
+        <h1 className="text-2xl font-semibold text-text">{t("title")}</h1>
         {form === null && !showTemplates && (
           <div className="flex flex-wrap gap-2">
             <Button type="button" variant="secondary" onClick={() => setShowTemplates(true)}>
@@ -245,7 +262,11 @@ export default function TakenClient() {
         </button>
       </div>
 
-      {failed && <p className="mt-4 text-sm text-danger">{t("loadError")}</p>}
+      {failed && (
+        <div className="mt-4">
+          <PageError message={t("loadError")} onRetry={() => void load()} />
+        </div>
+      )}
 
       {showTemplates && (
         <div className="mt-4">
@@ -270,11 +291,23 @@ export default function TakenClient() {
       )}
 
       {tab === "list" && !failed && tasks === null && (
-        <p className="mt-4 text-sm text-muted">{t("loading")}</p>
+        <div className="mt-4" aria-busy>
+          <SkeletonRows count={3} />
+        </div>
       )}
 
       {tab === "list" && tasks !== null && tasks.length === 0 && form === null && !showTemplates && (
-        <p className="mt-4 text-sm text-muted">{t("empty")}</p>
+        <div className="mt-4">
+          <EmptyState
+            title={t("emptyTitle")}
+            body={t("emptyBody")}
+            action={
+              <Button type="button" onClick={() => setForm({ mode: "create" })}>
+                {t("newTask")}
+              </Button>
+            }
+          />
+        </div>
       )}
 
       {tab === "list" && tasks !== null && tasks.length > 0 && (
@@ -285,7 +318,10 @@ export default function TakenClient() {
               task={task}
               childName={childName}
               onEdit={() => setForm({ mode: "edit", task })}
-              onDelete={() => remove(task)}
+              onDelete={() => setPendingDelete(task)}
+              confirming={pendingDelete?.id === task.id}
+              onConfirmDelete={() => void remove(task)}
+              onCancelDelete={() => setPendingDelete(null)}
             />
           ))}
         </ul>

@@ -12,7 +12,8 @@ import {
 } from "../../../../lib/api/types";
 import type { MemberView } from "../../../../lib/api/types";
 import { isDateRangeValid } from "../../../../lib/taken/dates";
-import { Button, Alert } from "../../../../components/ui";
+import { TASK_ICONS } from "../../../../lib/icons";
+import { Alert, Button, Card, IconPicker } from "../../../../components/ui";
 
 const CATEGORIES: TaskCategory[] = ["household", "homework", "selfcare", "custom"];
 const DAYPARTS: Daypart[] = ["morning", "afternoon", "evening"];
@@ -20,7 +21,7 @@ const WEEKDAYS: Weekday[] = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
 type RecurrenceChoice = "once" | "daily" | "weekly";
 
 const fieldClass =
-  "mt-1 w-full rounded border border-border bg-bg px-3 py-2 text-sm outline-none focus:border-accent";
+  "mt-1 min-h-11 w-full rounded border border-border-interactive bg-bg px-3 py-2 text-sm focus:border-accent";
 
 function mergeSource(initial?: TaskView, prefill?: TaskFormPrefill) {
   return { ...prefill, ...initial };
@@ -140,9 +141,10 @@ export default function TaskForm({ children, initial, prefill, onSubmit, onCance
   }
 
   return (
-    <form
+    <Card
+      as="form"
+      variant="row"
       onSubmit={handleSubmit}
-      className="rounded-lg border border-border bg-surface p-4"
     >
       <h2 className="text-base font-semibold text-text">
         {initial ? tf("editTitle") : tf("createTitle")}
@@ -173,11 +175,6 @@ export default function TaskForm({ children, initial, prefill, onSubmit, onCance
               </option>
             ))}
           </select>
-        </label>
-
-        <label className="text-sm font-medium text-text">
-          {tf("fldIcon")}
-          <input value={icon} onChange={(e) => setIcon(e.target.value)} className={fieldClass} />
         </label>
 
         <label className="text-sm font-medium text-text">
@@ -255,6 +252,15 @@ export default function TaskForm({ children, initial, prefill, onSubmit, onCance
         </label>
       </div>
 
+      <div className="mt-3">
+        <IconPicker
+          label={tf("fldIcon")}
+          options={TASK_ICONS}
+          value={icon}
+          onChange={setIcon}
+        />
+      </div>
+
       {recChoice === "weekly" && (
         <fieldset className="mt-3">
           <legend className="text-sm font-medium text-text">{tf("fldDays")}</legend>
@@ -265,7 +271,7 @@ export default function TaskForm({ children, initial, prefill, onSubmit, onCance
                 className={
                   "cursor-pointer rounded border px-2.5 py-1 text-sm " +
                   (days.includes(d)
-                    ? "border-accent bg-accent/10 text-accent"
+                    ? "border-accent bg-accent/10 text-accent-on-tint"
                     : "border-border text-muted")
                 }
               >
@@ -366,7 +372,7 @@ export default function TaskForm({ children, initial, prefill, onSubmit, onCance
                 className={
                   "cursor-pointer rounded border px-2.5 py-1 text-sm " +
                   (assignees.includes(child.id)
-                    ? "border-accent bg-accent/10 text-accent"
+                    ? "border-accent bg-accent/10 text-accent-on-tint"
                     : "border-border text-muted")
                 }
               >
@@ -402,6 +408,6 @@ export default function TaskForm({ children, initial, prefill, onSubmit, onCance
           {tf("cancel")}
         </Button>
       </div>
-    </form>
+    </Card>
   );
 }

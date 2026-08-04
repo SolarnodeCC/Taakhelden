@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { CreateChildBody, UpdateMemberBody } from "@taakhelden/shared";
-import { Field, Input, Alert, Button } from "../../../../components/ui";
+import { Alert, Button, Card, Field, Input } from "../../../../components/ui";
 import { AVATAR_PLACEHOLDERS } from "../../../../lib/avatars";
 import type { MemberView } from "../../../../lib/api/types";
 
@@ -81,9 +81,10 @@ export function ChildCreateForm({
   }
 
   return (
-    <form
+    <Card
+      as="form"
+      variant="panel"
       onSubmit={handleSubmit}
-      className="rounded-lg border border-border bg-surface p-5"
       aria-labelledby="child-create-title"
     >
       <h2 id="child-create-title" className="text-base font-semibold text-text">
@@ -102,7 +103,7 @@ export function ChildCreateForm({
 
         <Field label={t("form.birthYear")}>
           <select
-            className="rounded-sm border border-border bg-bg px-3 py-2 text-sm text-text outline-none focus:border-accent"
+            className="min-h-11 rounded-sm border border-border-interactive bg-bg px-3 py-2 text-sm text-text focus:border-accent"
             value={birthYear}
             onChange={(e) => setBirthYear(e.target.value)}
             required
@@ -191,7 +192,7 @@ export function ChildCreateForm({
           </Button>
         </div>
       </div>
-    </form>
+    </Card>
   );
 }
 
@@ -247,9 +248,10 @@ export function ChildEditForm({
   }
 
   return (
-    <form
+    <Card
+      as="form"
+      variant="panel"
       onSubmit={handleSubmit}
-      className="rounded-lg border border-border bg-surface p-5"
       aria-labelledby="child-edit-title"
     >
       <h2 id="child-edit-title" className="text-base font-semibold text-text">
@@ -268,7 +270,7 @@ export function ChildEditForm({
 
         <Field label={t("form.birthYear")}>
           <select
-            className="rounded-sm border border-border bg-bg px-3 py-2 text-sm text-text outline-none focus:border-accent"
+            className="min-h-11 rounded-sm border border-border-interactive bg-bg px-3 py-2 text-sm text-text focus:border-accent"
             value={birthYear}
             onChange={(e) => setBirthYear(e.target.value)}
             required
@@ -318,7 +320,7 @@ export function ChildEditForm({
           </Button>
         </div>
       </div>
-    </form>
+    </Card>
   );
 }
 
@@ -355,9 +357,10 @@ export function PincodeResetForm({
   }
 
   return (
-    <form
+    <Card
+      as="form"
+      variant="panel"
       onSubmit={handleSubmit}
-      className="rounded-lg border border-border bg-surface p-5"
       aria-labelledby="pin-reset-title"
     >
       <h2 id="pin-reset-title" className="text-base font-semibold text-text">
@@ -398,6 +401,6 @@ export function PincodeResetForm({
           </Button>
         </div>
       </div>
-    </form>
+    </Card>
   );
 }

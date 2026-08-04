@@ -12,6 +12,7 @@ import {
   type RewardFormPayload,
   type RedemptionView,
 } from "../../../../lib/api/types";
+import { displayIcon } from "../../../../lib/icons";
 import { useRealtimeRefetch } from "../../../../lib/realtime/FamilyRealtimeContext";
 import { SHOP_REALTIME_EVENTS } from "../../../../lib/realtime/events";
 import { useRouter } from "../../../../i18n/navigation";
@@ -20,7 +21,7 @@ import {
   FullParentUpstreamError,
   useRequireFullParent,
 } from "../../../../lib/auth/RequireFullParent";
-import { Alert, Button } from "../../../../components/ui";
+import { Alert, Button, Card, ConfirmDelete, EmptyState, PageError, SkeletonRows } from "../../../../components/ui";
 import RewardForm from "./RewardForm";
 
 type FormState = { mode: "create" } | { mode: "edit"; reward: RewardView } | null;
@@ -60,11 +61,11 @@ function RedemptionCard({
   }
 
   return (
-    <li className="rounded-lg border border-border bg-surface p-4">
+    <Card as="li" variant="row">
       <div className="flex items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            {redemption.icon && <span aria-hidden>{redemption.icon}</span>}
+            {displayIcon(redemption.icon) && <span aria-hidden>{displayIcon(redemption.icon)}</span>}
             <span className="truncate text-sm font-semibold text-text">{redemption.title}</span>
           </div>
           <p className="mt-0.5 text-sm text-muted">
@@ -95,7 +96,7 @@ function RedemptionCard({
           <Alert tone="danger">{error}</Alert>
         </div>
       )}
-    </li>
+    </Card>
   );
 }
 
@@ -103,41 +104,57 @@ function RewardRow({
   reward,
   onEdit,
   onDelete,
+  confirming,
+  onConfirmDelete,
+  onCancelDelete,
 }: {
   reward: RewardView;
   onEdit: () => void;
   onDelete: () => void;
+  confirming: boolean;
+  onConfirmDelete: () => void;
+  onCancelDelete: () => void;
 }) {
   const t = useTranslations("winkel");
   return (
-    <li className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface p-4">
-      <div className="min-w-0">
-        <div className="flex items-center gap-2">
-          {reward.icon && <span aria-hidden>{reward.icon}</span>}
-          <span className="truncate text-base font-semibold text-text">{reward.title}</span>
+    <Card as="li" variant="row" className="flex flex-col gap-3">
+      <div className="flex items-center justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-center gap-2">
+            {displayIcon(reward.icon) && <span aria-hidden>{displayIcon(reward.icon)}</span>}
+            <span className="truncate text-lg font-semibold text-text">{reward.title}</span>
+          </div>
+          <p className="mt-0.5 text-sm text-muted">
+            {t("price", { points: reward.price })}
+            {reward.limitPerWeek != null &&
+              ` · ${t("limitPerWeek", { count: reward.limitPerWeek })}`}
+          </p>
         </div>
-        <p className="mt-0.5 text-sm text-muted">
-          {t("price", { points: reward.price })}
-          {reward.limitPerWeek != null && ` · ${t("limitPerWeek", { count: reward.limitPerWeek })}`}
-        </p>
+        <div className="flex shrink-0 gap-2">
+          <button
+            type="button"
+            onClick={onEdit}
+            className="inline-flex min-h-11 items-center rounded border border-border-interactive px-3 py-1.5 text-sm font-medium text-text transition-colors hover:bg-bg"
+          >
+            {t("edit")}
+          </button>
+          <button
+            type="button"
+            onClick={onDelete}
+            className="inline-flex min-h-11 items-center rounded border border-border-interactive px-3 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-bg"
+          >
+            {t("delete")}
+          </button>
+        </div>
       </div>
-      <div className="flex shrink-0 gap-2">
-        <button
-          type="button"
-          onClick={onEdit}
-          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-text transition-colors hover:bg-bg"
-        >
-          {t("edit")}
-        </button>
-        <button
-          type="button"
-          onClick={onDelete}
-          className="rounded border border-border px-3 py-1.5 text-sm font-medium text-danger transition-colors hover:bg-bg"
-        >
-          {t("delete")}
-        </button>
-      </div>
-    </li>
+      {confirming && (
+        <ConfirmDelete
+          question={t("deleteConfirm")}
+          onConfirm={onConfirmDelete}
+          onCancel={onCancelDelete}
+        />
+      )}
+    </Card>
   );
 }
 
@@ -150,6 +167,7 @@ export default function WinkelClient() {
   const [children, setChildren] = useState<MemberView[]>([]);
   const [failed, setFailed] = useState(false);
   const [form, setForm] = useState<FormState>(null);
+  const [pendingDelete, setPendingDelete] = useState<RewardView | null>(null);
   const hadDataRef = useRef(false);
 
   const load = useCallback(async () => {
@@ -204,10 +222,10 @@ export default function WinkelClient() {
   }
 
   async function removeReward(reward: RewardView) {
-    if (!window.confirm(t("deleteConfirm"))) return;
     try {
       await apiClient.delete(`/api/v1/rewards/${reward.id}`);
       setRewards((prev) => (prev ? prev.filter((x) => x.id !== reward.id) : prev));
+      setPendingDelete(null);
     } catch {
       setFailed(true);
     }
@@ -229,15 +247,17 @@ export default function WinkelClient() {
 
   return (
     <div className="max-w-3xl">
-      <h1 className="text-xl font-semibold text-text">{t("title")}</h1>
+      <h1 className="text-2xl font-semibold text-text">{t("title")}</h1>
 
-      {failed && <p className="mt-4 text-sm text-danger">{t("loadError")}</p>}
+      {failed && (
+        <div className="mt-4">
+          <PageError message={t("loadError")} onRetry={() => void load()} />
+        </div>
+      )}
 
       {/* Inwisselverzoeken — de actiegerichte wachtrij. */}
       <section className="mt-5">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-          {t("requestsHeading")}
-        </h2>
+        <h2 className="text-lg font-semibold text-text">{t("requestsHeading")}</h2>
         {requests.length === 0 ? (
           <p className="mt-2 text-sm text-muted">{t("noRequests")}</p>
         ) : (
@@ -258,9 +278,7 @@ export default function WinkelClient() {
       {/* Beloningen beheren. */}
       <section className="mt-8">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-muted">
-            {t("rewardsHeading")}
-          </h2>
+          <h2 className="text-lg font-semibold text-text">{t("rewardsHeading")}</h2>
           {form === null && (
             <Button type="button" onClick={() => setForm({ mode: "create" })}>
               {t("newReward")}
@@ -278,10 +296,24 @@ export default function WinkelClient() {
           </div>
         )}
 
-        {!failed && rewards === null && <p className="mt-3 text-sm text-muted">{t("loading")}</p>}
+        {!failed && rewards === null && (
+          <div className="mt-3" aria-busy>
+            <SkeletonRows count={2} />
+          </div>
+        )}
 
         {rewards !== null && rewards.length === 0 && form === null && (
-          <p className="mt-3 text-sm text-muted">{t("noRewards")}</p>
+          <div className="mt-3">
+            <EmptyState
+              title={t("noRewardsTitle")}
+              body={t("noRewards")}
+              action={
+                <Button type="button" onClick={() => setForm({ mode: "create" })}>
+                  {t("newReward")}
+                </Button>
+              }
+            />
+          </div>
         )}
 
         {rewards !== null && rewards.length > 0 && (
@@ -291,7 +323,10 @@ export default function WinkelClient() {
                 key={reward.id}
                 reward={reward}
                 onEdit={() => setForm({ mode: "edit", reward })}
-                onDelete={() => removeReward(reward)}
+                onDelete={() => setPendingDelete(reward)}
+                confirming={pendingDelete?.id === reward.id}
+                onConfirmDelete={() => void removeReward(reward)}
+                onCancelDelete={() => setPendingDelete(null)}
               />
             ))}
           </ul>

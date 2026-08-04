@@ -32,9 +32,11 @@ export function Input({ invalid = false, className = "", ...rest }: InputProps) 
   return (
     <input
       className={[
-        "rounded-sm border bg-bg px-3 py-2 text-sm text-text outline-none",
+        // No `outline-none`: the field keeps the app-wide focus ring from
+        // globals.css. The border shift is reinforcement, not the only cue.
+        "min-h-11 rounded-sm border bg-bg px-3 py-2 text-sm text-text",
         "transition-colors focus:border-accent",
-        invalid ? "border-danger" : "border-border",
+        invalid ? "border-danger" : "border-border-interactive",
         className,
       ].join(" ")}
       {...rest}

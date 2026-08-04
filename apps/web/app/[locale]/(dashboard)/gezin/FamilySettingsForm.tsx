@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { FamilyPatchBody } from "@taakhelden/shared";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { FamilyView } from "../../../../lib/api/types";
-import { Alert, Button, Field, Input } from "../../../../components/ui";
+import { Alert, Button, Card, Field, Input } from "../../../../components/ui";
 
 /** Dispatched after a successful settings save so AppShell can refresh the family name. */
 export const FAMILY_UPDATED_EVENT = "taakhelden:family-updated";
@@ -97,7 +97,7 @@ export default function FamilySettingsForm({ family, onSaved }: Props) {
   }
 
   return (
-    <section aria-labelledby="settings-heading" className="rounded-lg border border-border bg-surface p-4">
+    <Card as="section" variant="row" aria-labelledby="settings-heading">
       <h2 id="settings-heading" className="text-base font-semibold text-text">
         {t("title")}
       </h2>
@@ -128,7 +128,7 @@ export default function FamilySettingsForm({ family, onSaved }: Props) {
             name="timezone"
             value={timezone}
             onChange={(e) => setTimezone(e.target.value)}
-            className="w-full rounded-sm border border-border bg-bg px-3 py-2 text-sm text-text outline-none focus:border-accent"
+            className="min-h-11 w-full rounded-sm border border-border-interactive bg-bg px-3 py-2 text-sm text-text focus:border-accent"
             size={Math.min(8, Math.max(4, filteredZones.length))}
           >
             {!filteredZones.includes(timezone) && (
@@ -225,6 +225,6 @@ export default function FamilySettingsForm({ family, onSaved }: Props) {
           </Button>
         </div>
       </form>
-    </section>
+    </Card>
   );
 }

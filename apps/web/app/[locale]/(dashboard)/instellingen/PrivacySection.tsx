@@ -6,7 +6,7 @@ import { AccountDeleteBody } from "@taakhelden/shared";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { pollExportJob } from "../../../../lib/privacy/exportPoll";
 import { useRouter } from "../../../../i18n/navigation";
-import { Alert, Button, Field, Input } from "../../../../components/ui";
+import { Alert, Button, Card, Field, Input } from "../../../../components/ui";
 
 export default function PrivacySection() {
   const t = useTranslations("instellingen.privacy");
@@ -88,7 +88,7 @@ export default function PrivacySection() {
         </h2>
         <p className="mt-1 text-sm text-muted">{t("hint")}</p>
 
-        <div className="mt-4 rounded-lg border border-border bg-surface p-4">
+        <Card variant="row" className="mt-4">
           <h3 className="text-sm font-semibold text-text">{t("exportTitle")}</h3>
           <p className="mt-1 text-sm text-muted">{t("exportHint")}</p>
           <div className="mt-3 flex flex-wrap items-center gap-3">
@@ -114,10 +114,10 @@ export default function PrivacySection() {
           {downloadUrl && (
             <p className="mt-2 text-xs text-muted">{t("exportLinkExpiry")}</p>
           )}
-        </div>
+        </Card>
       </div>
 
-      <div className="rounded-lg border border-danger/40 bg-danger/5 p-4">
+      <Card variant="tinted-danger">
         <h3 className="text-sm font-semibold text-text">{t("deleteTitle")}</h3>
         <p className="mt-1 text-sm text-muted">{t("deleteHint")}</p>
 
@@ -151,7 +151,7 @@ export default function PrivacySection() {
             </Button>
           </div>
         </form>
-      </div>
+      </Card>
     </section>
   );
 }

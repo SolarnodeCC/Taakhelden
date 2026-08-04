@@ -6,7 +6,7 @@ type Tone = "danger" | "success";
 
 const TONES: Record<Tone, string> = {
   danger: "bg-danger-bg text-danger",
-  success: "bg-success-bg text-success",
+  success: "bg-success-bg text-success-text",
 };
 
 export function Alert({

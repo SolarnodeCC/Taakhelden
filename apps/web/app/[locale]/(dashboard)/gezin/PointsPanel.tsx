@@ -12,7 +12,7 @@ import {
   parentBalancesChildren,
 } from "../../../../lib/api/types";
 import { avatarEmoji } from "../../../../lib/avatars";
-import { Alert, Button, Field, Input } from "../../../../components/ui";
+import { Alert, Button, Card, Field, Input } from "../../../../components/ui";
 
 interface Props {
   child: MemberView;
@@ -118,7 +118,7 @@ export default function PointsPanel({ child, onClose }: Props) {
   const emoji = avatarEmoji(child.avatarId);
 
   return (
-    <div className="mt-3 rounded-lg border border-border bg-surface p-4">
+    <Card variant="row" className="mt-3">
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2">
           {emoji && (
@@ -235,6 +235,6 @@ export default function PointsPanel({ child, onClose }: Props) {
           </div>
         </form>
       </section>
-    </div>
+    </Card>
   );
 }
