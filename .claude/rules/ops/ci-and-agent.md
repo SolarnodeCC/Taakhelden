@@ -24,6 +24,9 @@ paths: .github/workflows/**/*.yml,.github/workflows/**/*.yaml,.claude/**/*,agent
   - `block-migration-edit.mjs` (PreToolUse)
   - `guard-route-sql.mjs` (PostToolUse)
 - New agents/skills: follow existing frontmatter patterns; reference `COMMON_RULES.md`.
+- **Never put production data in an agent prompt** — no real family rows, child photos, ledger
+  dumps or D1 exports, not even to reproduce a bug. Synthetic fixtures only (`WS-AI-DEVLANE`,
+  ADR-0006). Agents never get merge rights on `main`.
 - Path rules live in `.claude/rules/` — see `README.md` for glob index.
 
 ## `agent/` governance files

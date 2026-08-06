@@ -61,3 +61,24 @@ Bij een vermoed datalek:
   - de privacyverklaring de foto-retentie noemt (**publiek:** `/privacy` in `apps/web`),
   - de subprocessors-lijst publiek beschikbaar is (zie `/privacy`),
   - en de DPIA is afgerond.
+
+## 6. AI-verwerking
+
+Beleid: [`ADR-0006`](./adr/ADR-0006-ai-policy-and-approved-use-cases.md) ·
+scope: [`wispel-ai-workstreams.md`](./wispel-ai-workstreams.md).
+
+- Er draait **vandaag geen AI** over gezinsdata. Zolang dat zo is, staat dat ook zo op `/privacy`.
+- Als AI wordt geactiveerd, geldt: **alleen Cloudflare Workers AI**, uitsluitend op **aggregaten
+  en pseudoniemen** (`kind_1`), nooit op namen, geboortejaren, foto's of kind-geschreven vrije
+  tekst met identificerende inhoud.
+- Cloudflare documenteert voor Workers AI dat klantcontent niet wordt gebruikt om modellen te
+  trainen en niet met andere klanten wordt gedeeld, maar biedt **geen EU-only inferentieregio**
+  (anders dan D1 `weur` en R2 `eu`). De-identificatie is daarom geen extra maatregel maar de
+  dragende maatregel.
+- Wij bewaren uitsluitend de **gegenereerde tekst**, nooit de prompt. Prompts worden niet gelogd.
+- Toestemming is een **aparte, intrekbare ouder-toggle** (default uit) achter de parental gate.
+  Intrekken verwijdert de opgeslagen gegenereerde teksten.
+- De subprocessorlijst (§2) krijgt een rij *Cloudflare Workers AI — gede-identificeerde
+  weekaggregaten* op het moment dat de eerste AI-feature live gaat, niet eerder.
+- Toolchain (agents, code-review, copy-concepten) valt buiten deze verwerking, maar nooit buiten
+  de regel: **geen productiedata in een prompt**.

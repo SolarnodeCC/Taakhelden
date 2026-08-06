@@ -39,4 +39,6 @@ When API behavior changes, update the API spec **in the same PR** as schema/rout
 ## Do not
 
 - Duplicate the full six arch rules here — point to `CLAUDE.md` / `COMMON_RULES.md`.
-- Document Qesto-only stacks (Stripe, Vectorize, Workers AI) — not in TaakHelden.
+- Document Qesto-only stacks (Stripe, Vectorize) — not in TaakHelden. **Workers AI is now in
+  scope but conditionally** — see `docs/adr/ADR-0006-ai-policy-and-approved-use-cases.md`; do not
+  document AI behavior beyond what that ADR approves.
