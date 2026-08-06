@@ -12,6 +12,8 @@ Codebase-paden en Worker-namen kunnen nog `taakhelden` heten tot WS-STRINGS / WS
 - `docs/wispel-rebrand-and-ui-plan.md` — rebrand-strategie, ChoreHero-appendix
 - `docs/wispel-build-plan-workstreams.md` — **build plan, workstreams, open points §13**
 - `docs/adr/ADR-0005-wispel-privacy-free-donations.md` — privacy first + free/donations
+- `docs/adr/ADR-0006-ai-policy-and-approved-use-cases.md` — **AI-beleid, toegestane use cases, App Store-conformiteit**
+- `docs/wispel-ai-workstreams.md` — AI-workstreams (scope, AC, Gate G-AI)
 - `docs/taakhelden-productvoorstel.md` — functioneel ontwerp, gamification, UI-richtlijnen (naam historisch; verdienmodel bijgewerkt)
 - `docs/taakhelden-cloudflare-github-architectuur.md` — infrastructuur en CI/CD
 - `docs/taakhelden-api-specificatie.md` — het API-contract (leidend voor alle endpoints)
@@ -44,6 +46,9 @@ Codebase-paden en Worker-namen kunnen nog `taakhelden` heten tot WS-STRINGS / WS
    Nieuwe request/response-velden eerst daar toevoegen. Legacy mirrors in
    `apps/web/lib/api/types.ts` mogen tijdelijk bestaan; geen nieuwe drift.
 7. **Geen betaalmuur op kernfuncties**; donatie-UI nooit op kind-tabbladen (ADR-0005).
+8. **AI alleen binnen ADR-0006**: uitsluitend Workers AI (`c.env.AI`) in het productpad, nooit
+   kind-PII in een prompt, nooit vrije AI-tekst richting een kind, en AI-output schrijft nooit
+   naar het ledger. Geen AI-feature zonder Zod-validatie, deterministische fallback en kill switch.
 
 ## Taal & toon
 - Code, identifiers en commits: Engels. Gebruikersgerichte strings: Nederlands.

@@ -8,6 +8,10 @@ description: AI/GenAI implementation craft for TaakHelden on Workers AI — prom
 Follow `.claude/skills/COMMON_RULES.md` for global constraints.
 Edge ownership: see `.claude/skills/HANDOFFS.md` (AI edges E27–E30).
 
+> **Scope is fixed by ADR-0006** (`docs/adr/ADR-0006-ai-policy-and-approved-use-cases.md`) and
+> `docs/wispel-ai-workstreams.md`. Nothing calling `c.env.AI` over family-derived data merges before
+> **Gate G-AI** (DPIA §5b, `/privacy` §AI, parent opt-in, kill switch, NL eval set).
+>
 > **Status: not yet built.** TaakHelden ships **no AI today** — no LLM calls, no embeddings,
 > no RAG. This skill is the standard to follow *if* an AI feature is ever approved (by PO +
 > `taakhelden-ai-strategy`). Absent AI work, there is nothing to do here.

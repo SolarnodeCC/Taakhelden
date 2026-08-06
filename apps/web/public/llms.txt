@@ -1,0 +1,25 @@
+# Wispel
+
+> Wispel is a free gamification app for Dutch families: children earn points for
+> homework and household chores, parents manage tasks and rewards. iOS + web.
+
+- Free for families. No subscription, no trial paywall, no feature paywall on
+  core functionality. Sustained by optional, parent-only donations — never
+  shown to children.
+- Privacy first: no ads, no third-party trackers or ad SDKs in the child
+  experience, EU-hosted (Cloudflare Workers, D1, R2 — EU regions), photos are
+  EXIF-stripped and deleted after 30 days.
+- No AI in the product today. If an AI feature ever ships, it stays
+  parent-facing or safety-facing only: never a chatbot for children, never
+  child-identifying data in a model prompt, opt-in and off by default. See
+  /privacy for the current, authoritative statement.
+- Not a Kids Category app — it is a family app used by parents and children
+  together, with a parent-only settings area (parental gate) and no data
+  shared with third parties without disclosure.
+
+## Pages
+
+- [Privacy](https://wispel.cc/nl/privacy): what data we collect, why, where it
+  lives, and our AI policy — in plain Dutch and English.
+- [Terms](https://wispel.cc/nl/voorwaarden): terms of use.
+- [Support Wispel](https://wispel.cc/nl/steun): optional parent donations.

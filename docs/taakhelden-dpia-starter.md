@@ -83,6 +83,53 @@ van §1–§4:
 
 ---
 
+## 5b. AI-verwerking — aanvullende verwerkingsactiviteit (Gate G-AI)
+
+Beleid: [`ADR-0006`](./adr/ADR-0006-ai-policy-and-approved-use-cases.md).
+Deze sectie moet **afgerond en juridisch getoetst** zijn vóór de eerste modelaanroep over
+gezinsafgeleide data (Gate G-AI in [`wispel-ai-workstreams.md`](./wispel-ai-workstreams.md)).
+
+### Nieuwe verwerkingsactiviteit
+
+Het genereren van een wekelijkse, ouder-facing samenvattingstekst uit reeds bestaande
+weekaggregaten, via Cloudflare Workers AI. Geen nieuwe gegevensverzameling — een nieuw
+**doel** en een nieuwe **ontvanger** voor bestaande gegevens.
+
+| Element | Toelichting |
+| --- | --- |
+| **Verwerkte gegevens** | Weekaggregaten per kind: verdiende/uitgegeven punten, afgerond/totaal, streak, categorieën van slippende taken, en een verschil t.o.v. vorige week. Kinderen worden aangeduid als `kind_1..n`. |
+| **Uitgesloten gegevens** | Roepnaam, `childId`, `familyId`, geboortejaar, `age_mode`-koppeling aan een naam, avatar-id, foto's, taaktitels (ouder-geschreven vrije tekst), en elke door een kind geschreven tekst. |
+| **Ontvanger** | Cloudflare (Workers AI) als subverwerker. Geen andere modelaanbieder. |
+| **Verwerkingsverantwoordelijke** | Ongewijzigd — Wispel. |
+| **Rechtsgrond** | Toestemming van de ouder (AVG art. 6 lid 1 sub a), apart van de algemene accountgrondslag, intrekbaar, **default uit**. Voor kindgegevens blijft AVG art. 8 (ouderlijk gezag) het kader. |
+| **Bewaartermijn** | Alleen de gegenereerde tekst, in D1, zolang de betreffende week zichtbaar is in Inzichten. Prompts worden niet opgeslagen en niet gelogd. Intrekken van toestemming verwijdert de opgeslagen teksten. |
+| **Geautomatiseerde besluitvorming** | **Geen.** De output is beschrijvende tekst voor een ouder; er volgt geen besluit, geen puntenmutatie en geen rechtsgevolg (AVG art. 22 niet van toepassing). |
+| **Profilering van kinderen** | Uitgesloten als doel. Geen stemmings-, emotie- of gedragsvoorspelling (R3 in ADR-0006). Geen vergelijking tussen kinderen. |
+
+### Risicoanalyse (aanvulling)
+
+| Risico | Ernst | Mitigatie |
+| --- | --- | --- |
+| Kind-PII lekt via de prompt | Hoog | De-identificatie in de promptbouwer; test die een gezin met echte namen voedt en asserteert dat geen naam in de payload voorkomt; codereview-regel (`CLAUDE.md` regel 8) |
+| Geen EU-only inferentieregio bij Workers AI | Midden | Alleen aggregaten en pseudoniemen; geen bijzondere categorieën; Cloudflare-toezegging dat klantcontent niet voor training wordt gebruikt en niet met andere klanten wordt gedeeld |
+| Ongewenste of onjuiste tekst over een kind | Midden | Zod-validatie, deterministische fallback, `@dutch-child-copy`-toonreview, "klopt dit niet?"-actie voor de ouder, kill switch |
+| Toestemming onduidelijk of impliciet | Hoog | Aparte toggle achter de parental gate, default uit, in gewone taal, met `/privacy`-sectie — tevens de Apple 5.1.2(i)-verplichting |
+| Functiekruip richting kind-facing AI | Hoog | AI-2 en R1/R5 in ADR-0006; herziening vereist een nieuwe ADR |
+| Promptinjectie via kind- of oudertekst | Midden | Vrije tekst gaat niet in deze prompt; waar wel (WS-AI-GUARD) staat hij nooit in de system-prompt en kan hij geen ander gezin bereiken |
+| Productiedata in toolchain-prompts | Midden | Alleen synthetische fixtures; regel vastgelegd in `.claude/rules/ops/ci-and-agent.md` |
+
+### Open acties vóór activatie AI in productie
+
+- [ ] DPO/FG-review op deze sectie
+- [ ] Privacyverklaring uitbreiden: sectie "AI bij Wispel" (NL + EN) + subprocessorrij
+- [ ] Toestemmingsflow: aparte ouder-toggle, default uit, intrekken wist gegenereerde teksten
+- [ ] De-identificatietest in `apps/api/test/` (namen komen niet in de payload)
+- [ ] Kill switch (KV) aantoonbaar werkend zonder deploy
+- [ ] Nederlandse eval-set met before/after vastgelegd
+- [ ] App Store privacy-labels en age-rating-vragenlijst opnieuw beoordeeld
+
+---
+
 ## 5. Open acties vóór productie-foto's
 
 - [ ] Volledige DPIA uitwerken met FG/DPO-review

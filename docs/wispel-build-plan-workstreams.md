@@ -440,6 +440,7 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | L4 | Pricing model | **Free for families**; optional **donations** (parent-only, never child-facing) |
 | L5 | Anti-positioning | Not an English ChoreHero / “Hero” clone |
 | L6 | Child motivation rules | No negatives, no sibling ranking (unchanged product rules) |
+| L7 | AI posture | **Parent- and safety-facing only** — Workers AI only, never child PII in a prompt, never free-form AI text to a child, AI never writes the ledger, never an "AI" marketing claim. See [ADR-0006](./adr/ADR-0006-ai-policy-and-approved-use-cases.md) |
 
 ### 13.2 Open — decide before / during Gate G0 (brand lock)
 
@@ -499,6 +500,10 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O32 | Cursor agent id rename `taakhelden-*` | Optional; not user-facing | Later |
 | O33 | Pedagogical expert review as marketing claim | Strong trust story; schedule outside eng critical path | B/C |
 | O34 | Co-ouderschap / focustimer / Taakvraag | **Now scoped** in the post-review catalog (`wispel-post-review-workstreams.md`): WS-COPARENT (design-gated, G4), WS-FOCUS, WS-PROPOSAL — all behind Gate G3. Apple Watch remains out of scope. | Post-review streams |
+| O36 | **AI use cases** — which ones, if any | ✅ Scoped in [`wispel-ai-workstreams.md`](./wispel-ai-workstreams.md): DEVLANE + WEBPOLICY start now; GUARD behind G3; INSIGHT behind **Gate G-AI**; ONDEVICE parked. Chatbot / photo-AI / mood-AI rejected (ADR-0006 §4) | Post-G3 |
+| O37 | **AI consent + `/privacy` §AI** (Apple 5.1.2(i)) | Parent-only toggle, **default off**, behind the parental gate; `/privacy` section required before activation, not before coding | Blocks G-AI |
+| O38 | **DPIA §5b sign-off** | Legal/DPO review of the AI processing activity — hard blocker on any `c.env.AI` call over family-derived data | Blocks G-AI |
+| O39 | **Model + eval set** for NL output | Candidates `gemma-4-26b-a4b-it` / `llama-3.1-8b-fp8` / `gpt-oss-20b`; choice is an **eval outcome**. Note: `llama-guard-3-8b` does not list Dutch → T0 wordlist first | Blocks WS-AI-GUARD fase 2 + WS-AI-INSIGHT |
 | O35 | **Android deferral — PO lock 2026-08-01** | **PARKED until Gate G5** (iOS App Store live). No `WS-ANDROID` coding, no Android project scaffolding, no "Android soon" eng spikes, until G5 passes. Cite P8 in the post-review catalog (`wispel-post-review-workstreams.md` §7). Marketing may say iOS-first; do not promise an Android date. | Post-G5 only |
 
 ### 13.7 Decision log (fill as answers land)
@@ -514,7 +519,8 @@ Track decisions here. Strategy doc §14 points here so we do not maintain two li
 | O21 | Prefer external `/steun`, not IAP (unless Apple forces) | 2026-07-30 | ADR-0005 §3 |
 | O22 | Steun placeholder OK on thin landing | 2026-07-30 | ADR-0005 §3 |
 | **O2–O7, O12, O17** | Brand v1 sheet + Ster+wisp mark + chrome icons; mascot postpone; emoji avatars v1; token owner | 2026-07-30 | `docs/brand/wispel-brand-v1.md` / WS-BRAND |
-| O11, O13, O16, O18–O20, O23–O33 | *Pending* | — | — |
+| **L7 / O36** | **AI posture + approved use cases** — parent/safety-facing only; chatbot, photo-AI and mood-AI rejected | 2026-08-06 | [ADR-0006](./adr/ADR-0006-ai-policy-and-approved-use-cases.md) / [`wispel-ai-workstreams.md`](./wispel-ai-workstreams.md) |
+| O11, O13, O16, O18–O20, O23–O33, O37–O39 | *Pending* | — | — |
 | **P1** | **Invite-token fix shape** — Option A: separate reveal endpoint; `inviteToken` never echoed in create response | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
 | **P2** | **Insights slipping-tasks signal** — both `open` + `open_redo`, top 5, no sibling ranking | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
 | **P3** | **Rustschild pause shape** — open-ended pause allowed + easy parent clear | 2026-08-01 | [`wispel-post-review-workstreams.md` §7](./wispel-post-review-workstreams.md) |
