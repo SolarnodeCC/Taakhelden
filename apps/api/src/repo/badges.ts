@@ -22,15 +22,11 @@ export async function listCatalogue(db: D1Database): Promise<BadgeRow[]> {
 export async function getBadges(db: D1Database, ids: string[]): Promise<BadgeRow[]> {
   if (ids.length === 0) return [];
   const unique = [...new Set(ids)];
-  const results: BadgeRow[] = [];
-  for (const id of unique) {
-    const row = await db
-      .prepare("SELECT id, title, description, icon FROM badges WHERE id = ?")
-      .bind(id)
-      .first<BadgeRow>();
-    if (row) results.push(row);
-  }
-  return results;
+  // Eén statement per id, maar als één db.batch()-round trip — geen dynamische
+  // placeholder-string (die leest als een unsafe input-sink voor scanners).
+  const stmt = db.prepare("SELECT id, title, description, icon FROM badges WHERE id = ?");
+  const batchResults = await db.batch<BadgeRow>(unique.map((id) => stmt.bind(id)));
+  return batchResults.flatMap((r) => r.results);
 }
 
 export interface EarnedBadge {

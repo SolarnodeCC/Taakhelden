@@ -28,10 +28,12 @@ export async function purgeFamily(env: Env, familyId: string): Promise<void> {
   await deleteR2Prefix(env.PHOTOS, `profile/${familyId}/`);
   await deleteR2Prefix(env.PHOTOS, `export/${familyId}/`);
 
-  for (const userId of userIds) {
-    await deleteKvPrefix(env.KV, `idem:${userId}:`);
-    await env.KV.delete(`pinfail:${userId}`);
-  }
+  await Promise.all(
+    userIds.map(async (userId) => {
+      await deleteKvPrefix(env.KV, `idem:${userId}:`);
+      await env.KV.delete(`pinfail:${userId}`);
+    }),
+  );
 
   await account.purgeFamilyD1(env.DB, familyId);
 }

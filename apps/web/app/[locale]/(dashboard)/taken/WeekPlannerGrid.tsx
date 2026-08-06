@@ -414,7 +414,9 @@ export function useWeekMove(setInstances: Dispatch<SetStateAction<InstanceView[]
       });
 
       try {
-        const updated = await apiClient.post<InstanceView>(`/api/v1/instances/${instanceId}/move`, target);
+        const updated = InstanceView.parse(
+          await apiClient.post<unknown>(`/api/v1/instances/${instanceId}/move`, target),
+        );
         setInstances((current) =>
           current?.map((inst) => (inst.id === instanceId ? updated : inst)) ?? current,
         );

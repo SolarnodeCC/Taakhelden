@@ -20,6 +20,7 @@ import { callFamilyRoom } from "../services/familyRoom";
 import { getFamily, listChildren } from "../repo/families";
 import { listForDate, listHistory, listPendingApproval } from "../repo/instances";
 import { isContractV2 } from "../services/contract";
+import { decodeCursor } from "../services/jsonParse";
 import { toInstanceView as instanceView } from "../services/instanceView";
 import { computeBalance } from "../services/pointsEngine";
 import { localDate } from "../services/time";
@@ -27,27 +28,6 @@ import { localDate } from "../services/time";
 const instances = new Hono<AppBindings>();
 
 type FamilyRow = { timezone: string; week_bonus_threshold: number };
-
-/**
- * Decodeert de opaque base64-cursor uit de query. Een kapotte of geknoeide
- * cursor is een cliëntfout (400), geen 500 — atob/JSON.parse mogen nooit
- * ongevangen falen, en het resultaat wordt pas als HistoryCursor vertrouwd
- * nadat de vorm geverifieerd is (geen blinde `as`-cast op clientinvoer).
- */
-function decodeHistoryCursor(raw?: string): HistoryCursor | undefined {
-  if (!raw) return undefined;
-  let json: unknown;
-  try {
-    json = JSON.parse(atob(raw));
-  } catch {
-    throw new ApiException(400, ErrorCodes.VALIDATION_FAILED, "Ongeldige cursor.");
-  }
-  const parsed = HistoryCursor.safeParse(json);
-  if (!parsed.success) {
-    throw new ApiException(400, ErrorCodes.VALIDATION_FAILED, "Ongeldige cursor.");
-  }
-  return parsed.data;
-}
 
 /** Kind: eigen dag + puntenstatus. Ouder: alle kinderen gegroepeerd. */
 instances.get("/today", async (c) => {
@@ -96,7 +76,7 @@ instances.get("/today", async (c) => {
 instances.get("/", async (c) => {
   const { familyId } = requireParent(c);
   const limit = Math.min(Number(c.req.query("limit") ?? 50), 100);
-  const cursor = decodeHistoryCursor(c.req.query("cursor"));
+  const cursor = decodeCursor(c.req.query("cursor"), HistoryCursor);
 
   const rows = await listHistory(c.env.DB, familyId, {
     childId: c.req.query("childId"),

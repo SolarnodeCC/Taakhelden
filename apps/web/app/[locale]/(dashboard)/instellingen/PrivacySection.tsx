@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useTranslations } from "next-intl";
-import { AccountDeleteBody } from "@taakhelden/shared";
+import { AccountDeleteBody, AccountDeleteResult, ExportJobView } from "@taakhelden/shared";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { pollExportJob } from "../../../../lib/privacy/exportPoll";
 import { useRouter } from "../../../../i18n/navigation";
@@ -26,9 +26,7 @@ export default function PrivacySection() {
     setExportError(null);
     setDownloadUrl(null);
     try {
-      const started = await apiClient.post<{ exportId: string; status: string }>(
-        "/api/v1/account/export",
-      );
+      const started = ExportJobView.parse(await apiClient.post<unknown>("/api/v1/account/export"));
       const job = await pollExportJob(started.exportId);
       if (job.status === "ready" && job.downloadUrl) {
         setDownloadUrl(job.downloadUrl);
@@ -60,9 +58,8 @@ export default function PrivacySection() {
 
     setDeleteBusy(true);
     try {
-      const result = await apiClient.delete<{ deletedAt: string; purgeAfter: string }>(
-        "/api/v1/account",
-        parsed.data,
+      const result = AccountDeleteResult.parse(
+        await apiClient.delete<unknown>("/api/v1/account", parsed.data),
       );
       await apiClient.post("/api/auth/logout");
       const purge = encodeURIComponent(result.purgeAfter);
