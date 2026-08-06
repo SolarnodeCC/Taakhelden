@@ -71,7 +71,10 @@ export type MemberView = z.infer<typeof MemberView>;
 export const UpdateMemberBody = z.object({
   displayName: z.string().min(1).max(30).optional(),
   avatarId: z.string().optional(),
-  birthYear: z.number().int().min(2005).optional(),
+  // Zelfde ondergrens/leeftijdsvloer als CreateChildBody.birthYear — een PATCH
+  // mag de "kind is minstens 3 jaar" regel niet kunnen omzeilen die bij
+  // aanmaken wel geldt.
+  birthYear: z.number().int().min(2005).max(new Date().getFullYear() - 3).optional(),
 });
 export type UpdateMemberBody = z.infer<typeof UpdateMemberBody>;
 

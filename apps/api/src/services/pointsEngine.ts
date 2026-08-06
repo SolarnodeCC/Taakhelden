@@ -84,9 +84,16 @@ async function bookPoints(
     photoBonusPoints = task.photo_bonus_points;
   }
 
+  // Dag- en weekbonus-tellingen zijn onafhankelijke reads (beide alleen tegen
+  // task_instances, niet tegen het ledger) — parallel ophalen scheelt een
+  // D1-round trip binnen de DO-serialisatie per gezin.
+  const [day, week] = await Promise.all([
+    instances.dayStats(db, familyId, inst.child_id, inst.date),
+    instances.weekStats(db, familyId, inst.child_id, weekDates(inst.date)),
+  ]);
+
   // Dagbonus: alle taken van deze dag afgerond én nog niet eerder geboekt.
   let dayBonusEarned = false;
-  const day = await instances.dayStats(db, familyId, inst.child_id, inst.date);
   if (
     day.total > 0 &&
     day.approved === day.total &&
@@ -105,7 +112,6 @@ async function bookPoints(
   // compleet en de bonus kan elke dag vallen zodra de drempel gehaald is
   // (niet meer alleen op zondag). Weeksleutel als ref_id → max één per week.
   let weekBonusEarned = false;
-  const week = await instances.weekStats(db, familyId, inst.child_id, weekDates(inst.date));
   const ref = weekKey(inst.date);
   if (
     week.total > 0 &&
@@ -153,10 +159,10 @@ async function awardBadges(
   const earned = await badges.listEarnedIds(db, familyId, childId);
   const candidates = qualifyingBadgeIds(stats).filter((id) => !earned.has(id));
 
-  const awarded: string[] = [];
-  for (const id of candidates) {
-    if (await badges.award(db, familyId, childId, id)) awarded.push(id);
-  }
+  // Onafhankelijke inserts (elk zijn eigen PK) — parallel toekennen, volgorde
+  // van `candidates` blijft behouden voor de confetti-response.
+  const outcomes = await Promise.all(candidates.map((id) => badges.award(db, familyId, childId, id)));
+  const awarded = candidates.filter((_, i) => outcomes[i]);
   if (awarded.length === 0) return [];
 
   const rows = await badges.getBadges(db, awarded);
@@ -272,7 +278,8 @@ export async function applyRedo(
     throw new ApiException(409, ErrorCodes.INVALID_STATUS, "Deze taak wacht niet op goedkeuring.");
   }
   await instances.setStatus(db, familyId, instanceId, { status: "open_redo", redoNote: note });
-  // TODO(iteratie 2): positieve pushmelding naar kind (notifier.childCopy.redo).
+  // Kindmelding bij redo (notifier.childCopy.redo) is bewust nog niet gekoppeld
+  // hier; ledger-mutatie zelf is compleet en punt-neutraal (architectuurregel 4).
   return { status: "open_redo", childId: inst.child_id };
 }
 

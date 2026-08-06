@@ -79,6 +79,7 @@ export async function getMemberAvatarState(
   db: D1Database,
   familyId: string,
   memberId: string,
+  catalogueOverride?: AvatarCatalogItem[],
 ): Promise<MemberAvatarState | null> {
   const row = await db
     .prepare(
@@ -97,7 +98,7 @@ export async function getMemberAvatarState(
 
   const [lifetime, catalogue, earnedBadgeIds] = await Promise.all([
     lifetimeEarned(db, familyId, memberId),
-    listAvatarCatalog(db),
+    catalogueOverride ?? listAvatarCatalog(db),
     listEarnedIds(db, familyId, memberId),
   ]);
   const level = levelFromLifetime(lifetime);
@@ -124,11 +125,11 @@ export async function equipAvatarItems(
   memberId: string,
   body: EquipAvatarBody,
 ): Promise<MemberAvatarState | null> {
-  const state = await getMemberAvatarState(db, familyId, memberId);
+  const catalogue = await listAvatarCatalog(db);
+  const state = await getMemberAvatarState(db, familyId, memberId, catalogue);
   if (!state) return null;
 
   const unlocked = new Set(state.unlocked);
-  const catalogue = await listAvatarCatalog(db);
   const byId = new Map(catalogue.map((item) => [item.id, item]));
 
   const next = { ...state.equipped };
