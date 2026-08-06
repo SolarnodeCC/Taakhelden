@@ -748,7 +748,7 @@
     },
     "privacy": {
       "title": "Privacy",
-      "updated": "Last updated: 30 July 2026",
+      "updated": "Last updated: 6 August 2026",
       "intro": "Wispel is privacy first. We build for families: collect as little as we can, no ads, and no tracking of children. Below is what we do and don’t do — in plain language.",
       "sections": [
         {
@@ -774,6 +774,10 @@
         {
           "heading": "Where data lives",
           "body": "We host on Cloudflare (Workers, D1, R2) with EU-first location choices (including D1 weur, R2 eu). Apple may be involved for Sign in with Apple and push (APNs). An email provider may send co-parent invites — only to parent emails."
+        },
+        {
+          "heading": "AI at Wispel",
+          "body": "We don’t use AI on family data today. If we ever do, fixed rules apply: only Cloudflare Workers AI (no other provider), never names, photos or birth years in an AI request — only summarised weekly figures with a stand-in alias per child. Children never see AI-generated text; AI never decides on points or approvals. Any AI feature is opt-in per family, off by default, and can be turned off again at any time. We update this page before any AI feature is switched on for the first time."
         },
         {
           "heading": "Who can access it",

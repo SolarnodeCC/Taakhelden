@@ -748,7 +748,7 @@
     },
     "privacy": {
       "title": "Privacy",
-      "updated": "Laatst bijgewerkt: 30 juli 2026",
+      "updated": "Laatst bijgewerkt: 6 augustus 2026",
       "intro": "Wispel is privacy first. We bouwen voor Nederlandse gezinnen: zo weinig mogelijk gegevens, geen advertenties, en kinderen krijgen geen tracking. Hieronder staat in gewone taal wat we wel en niet doen.",
       "sections": [
         {
@@ -774,6 +774,10 @@
         {
           "heading": "Waar staan de gegevens?",
           "body": "We hosten op Cloudflare (Workers, D1, R2) met EU-first locatiekeuzes (onder meer D1 weur, R2 eu). Apple kan betrokken zijn bij Sign in with Apple en push (APNs). Een e-mailprovider kan co-ouderuitnodigingen versturen — alleen naar ouder-e-mailadressen."
+        },
+        {
+          "heading": "AI bij Wispel",
+          "body": "Op dit moment gebruiken we geen AI voor gezinsdata. Als we dat ooit wél doen, gelden vaste regels: alleen Cloudflare Workers AI (geen andere aanbieder), nooit namen, foto’s of geboortejaren in een AI-opdracht — alleen samengevatte weekcijfers met een schuilnaam per kind. Kinderen krijgen nooit AI-gegenereerde tekst te zien; AI beslist nooit over punten of goedkeuringen. Elke AI-functie is opt-in per gezin, staat standaard uit, en kun je op elk moment weer uitzetten. We werken deze pagina bij vóórdat een AI-functie voor het eerst aangaat."
         },
         {
           "heading": "Wie heeft toegang?",

@@ -85,6 +85,8 @@ het productpad valt en dus buiten AI-4 — maar níet buiten AI-1.
 
 ## 4. WS-AI-WEBPOLICY — AI-beleid voor wispel.cc
 
+**Status: geïmplementeerd (interim — zie noot bij AC4).**
+
 **Doel:** bepalen hoe AI zich tot onze website verhoudt — in beide richtingen. Wat mag er van
 buiten op onze site (crawlers, widgets), en wat vertellen wij over ons eigen AI-gebruik.
 
@@ -103,12 +105,35 @@ iOS-first, geen ads) is goedkoop en corrigeert dat, zonder één regel productco
 is expliciet: **toestaan voor de marketingpagina's, blokkeren op `app.` en `api.`**.
 
 **Acceptatiecriteria:**
-1. `/privacy` beschrijft in gewone taal: welke AI-dienst, welke gegevens wel/niet, hoe je het uitzet.
-2. De sectie is er ook als AI nog uit staat — dan als "wij gebruiken op dit moment geen AI voor
-   gezinsdata", en die zin wijzigt in dezelfde PR als de activatie.
-3. Geen enkele pagina laadt een third-party AI-script (CSP-test).
-4. `robots.txt` en `llms.txt` staan live op `www`; `app.` en `api.` weren crawlers.
-5. Geen "AI" als feature-claim in hero, features of App Store-copy (R6).
+1. ✅ `/privacy` beschrijft in gewone taal: welke AI-dienst, welke gegevens wel/niet, hoe je het
+   uitzet. — sectie "AI bij Wispel" / "AI at Wispel", `messages/nl.json` + `en.json` (na "Waar staan
+   de gegevens?"), zelfde structuur als de andere secties.
+2. ✅ De sectie is er ook als AI nog uit staat — dan als "wij gebruiken op dit moment geen AI voor
+   gezinsdata", en die zin wijzigt in dezelfde PR als de activatie. — huidige tekst begint met
+   "Op dit moment gebruiken we geen AI voor gezinsdata."
+3. ✅ Geen enkele pagina laadt een third-party AI-script (CSP-test). — `apps/web/lib/csp.ts`
+   (uit `middleware.ts` getrokken zodat hij testbaar is zonder de Next-runtime) +
+   `apps/web/lib/csp.test.ts`: asserteert dat `script-src` nooit een bekend AI-widget-domein
+   bevat en nooit terugvalt op `'unsafe-inline'`. Geverifieerd op een live `next build` +
+   `next start`: `script-src 'self' 'nonce-…' 'strict-dynamic' https://challenges.cloudflare.com`.
+4. ⚠️ `robots.txt` en `llms.txt` staan live — **interim, pad-gebaseerd i.p.v. host-gebaseerd.**
+   Marketing en dashboard draaien vandaag op **één** Next-app zonder host-split (O9 —
+   `app.`/`api.`-subdomeinsplitsing is nog open, WS-INFRA). `apps/web/app/robots.ts` disallowed
+   daarom `/api/` plus elke dashboard- en auth-route (`/*/vandaag`, `/*/gezin`, `/*/goedkeuren`,
+   `/*/instellingen`, `/*/inzichten`, `/*/taken`, `/*/winkel`, `/*/login`, `/*/register`,
+   `/*/uitnodiging`, `/*/wachtwoord-reset`, `/*/wachtwoord-vergeten`) en allowed de rest;
+   `apps/web/app/sitemap.ts` bevat uitsluitend de publieke pagina's (`/`, `/privacy`,
+   `/voorwaarden`, `/steun`) per taal. `apps/web/public/llms.txt` staat live op `/llms.txt`.
+   **Nog open:** Cloudflare **AI Crawl Control** is een zone-instelling, geen code — moet apart
+   gezet worden bij de infra-cutover (O9/WS-INFRA), dan pas is de host-gebaseerde blokkade op
+   `app.`/`api.` echt.
+5. ✅ Geen "AI" als feature-claim in hero, features of App Store-copy (R6). — `llms.txt` noemt AI
+   uitsluitend in de zin "No AI in the product today", niet als marketingclaim.
+
+Geverifieerd met een echte `next build` + `next start`: `/robots.txt`, `/sitemap.xml`, `/llms.txt`
+en de CSP-header op `/nl` renderen zoals hierboven beschreven. Root proof lane
+(`npm run typecheck && npm test`) groen: 25/215 (api) + 12/82 (web, +1 test file / +3 tests
+t.o.v. voor deze stream).
 
 **Docs to update:** `docs/taakhelden-privacy-minimum.md` §2 (subprocessors), ADR-0006 exit-criteria.
 
