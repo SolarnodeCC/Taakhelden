@@ -11,7 +11,7 @@ import {
 import { MemberList, type MemberView } from "../../../../lib/api/types";
 import { apiClient, ApiClientError } from "../../../../lib/api/client";
 import { useRouter } from "../../../../i18n/navigation";
-import { Button, Field, Input } from "../../../../components/ui";
+import { Badge, Button, Field, Input } from "../../../../components/ui";
 
 function ProposalCard({
   proposal,
@@ -87,6 +87,12 @@ function ProposalCard({
         </span>
       </div>
       <p className="mt-0.5 text-sm text-muted">{t("requestedBy", { name: childName })}</p>
+      {proposal.reviewFlag && (
+        <p className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted">
+          <Badge tone="neutral">{t("reviewFlagBadge")}</Badge>
+          <span>{t("reviewFlagHint")}</span>
+        </p>
+      )}
       {proposal.note && (
         <p className="mt-2 rounded bg-bg px-3 py-2 text-sm italic text-muted">
           &ldquo;{proposal.note}&rdquo;

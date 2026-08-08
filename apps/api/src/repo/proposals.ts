@@ -21,19 +21,21 @@ export interface ProposalRow {
   decision_note: string | null;
   created_task_id: string | null;
   created_at: string;
+  /** WS-AI-GUARD (ADR-0006): NULL = geen vlag; ouder-only, zie `proposalView`. */
+  review_flag: string | null;
 }
 
 /** Nieuwe taakvraag van een kind. Levert geen punten op en maakt geen taak aan. */
 export async function createProposal(
   db: D1Database,
   familyId: string,
-  input: CreateProposalBody & { childId: string },
+  input: CreateProposalBody & { childId: string; reviewFlag?: string | null },
 ): Promise<string> {
   const id = newId("prp");
   await db
     .prepare(
-      `INSERT INTO task_proposals (id, family_id, child_id, title, category, icon, suggested_points, note)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO task_proposals (id, family_id, child_id, title, category, icon, suggested_points, note, review_flag)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     )
     .bind(
       id,
@@ -44,6 +46,7 @@ export async function createProposal(
       input.icon,
       input.suggestedPoints,
       input.note ?? null,
+      input.reviewFlag ?? null,
     )
     .run();
   return id;
