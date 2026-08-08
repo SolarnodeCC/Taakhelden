@@ -160,7 +160,9 @@
       "actionError": "Something went wrong. Please try again.",
       "loadError": "Couldn't load task requests.",
       "declineNoteRequired": "Add a reply — kids appreciate a message.",
-      "approveValidationError": "Points must be greater than zero."
+      "approveValidationError": "Points must be greater than zero.",
+      "reviewFlagBadge": "Worth a read",
+      "reviewFlagHint": "This request's text contains a word that may be worth your attention — read it through before you decide."
     }
   },
   "taken": {

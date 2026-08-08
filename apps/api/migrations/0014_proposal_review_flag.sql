@@ -1,0 +1,11 @@
+-- WS-AI-GUARD (ADR-0006) — deterministische veiligheidsvlag op Taakvraag-tekst.
+--
+-- Taakvragen zijn de enige plek waar een kind (tiener) vrije tekst het systeem
+-- in stuurt (title/note); die tekst komt bij een ouder terecht. `review_flag`
+-- is een korte, niet-blokkerende markering die de OUDER ziet in de queue —
+-- het kind ziet 'm nooit (afgedwongen op API-niveau, niet hier). De taakvraag
+-- wordt hoe dan ook aangemaakt: dit is een signaal, geen filter.
+--
+-- Fase 1 (deze migratie) is deterministisch (services/proposalScreen.ts), geen
+-- model-call. NULL = geen vlag; anders een korte code, bv. 'language'.
+ALTER TABLE task_proposals ADD COLUMN review_flag TEXT;

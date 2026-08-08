@@ -5266,6 +5266,10 @@
               },
               "createdAt": {
                 "type": "string"
+              },
+              "reviewFlag": {
+                "type": "string",
+                "nullable": true
               }
             },
             "required": [
@@ -5341,6 +5345,10 @@
                     },
                     "createdAt": {
                       "type": "string"
+                    },
+                    "reviewFlag": {
+                      "type": "string",
+                      "nullable": true
                     }
                   },
                   "required": [

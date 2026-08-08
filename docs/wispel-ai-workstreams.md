@@ -141,6 +141,9 @@ t.o.v. voor deze stream).
 
 ## 5. WS-AI-GUARD — veiligheidsvlag op Taakvraag-tekst
 
+**Status: fase 1 geïmplementeerd.** Gate G3 geverifieerd tegen productiecode (niet alleen docs)
+vóór de build — zie de correcties hieronder, gevonden door een architectuur-review vooraf.
+
 **Doel:** de enige plek waar een kind vrije tekst het systeem in stuurt, is
 `POST /tasks/proposals` (`title`, `note` — tiener-only, P4). Die tekst komt bij een ouder terecht.
 Dat is user-generated content in de zin van richtlijn 1.2. We willen een filter dat de ouder
@@ -153,17 +156,32 @@ Dat is user-generated content in de zin van richtlijn 1.2. We willen een filter 
 | Deterministische lijst (fase 1) | Notificatie naar externe instanties |
 | Optioneel classifier-model (fase 2, na eval) | Sentiment/mood-analyse (R3 — verboden) |
 
-**Ontwerp, fase 1 (T0 — bouwen):**
+**Ontwerp, fase 1 (T0 — gebouwd):**
 
-- Migratie **0014**: `ALTER TABLE task_proposals ADD COLUMN review_flag TEXT` (NULL = schoon;
-  anders een korte code, bv. `language`). Plus `.verify.sql`.
-- `apps/api/src/services/` krijgt een `proposalScreen.ts` met een pure functie
-  `screenProposalText(title, note): string | null` — deterministisch, testbaar, geen I/O.
-- `repo/proposals.ts` slaat de vlag op bij `createProposal`; `listProposals` geeft hem alleen
-  terug op het ouderpad. Zod: `TaskProposal.reviewFlag: z.string().nullable()` in
-  `packages/shared`, **niet** meegestuurd in de kind-view.
+- Migratie **0014** (`0014_proposal_review_flag.sql` + `.verify.sql` + `.meta.toml`):
+  `ALTER TABLE task_proposals ADD COLUMN review_flag TEXT` (NULL = schoon; anders een korte
+  code, vandaag alleen `language`).
+- `apps/api/src/services/proposalScreen.ts` — pure functie `screenProposalText(title, note):
+  "language" | null`, deterministische Nederlandse woordgrens-regex gericht op mogelijke
+  veiligheidszorgen (zelfbeschadiging, geweld, seksueel, middelen), **geen** brede
+  scheldwoordenfilter. `apps/api/test/proposalScreen.test.ts` dekt woordgrenzen (geen false
+  positive op substrings als "hamster") en de bewuste uitzondering voor "seksualiteit".
+- **Correctie op het oorspronkelijke ontwerp (architectuur-review vooraf):** er was maar één
+  role-blinde `proposalView()` en twéé lekpaden, niet één — de `POST`-create-response (201, direct
+  naar het indienende kind) én de `GET`-lijst. `TaskProposal.reviewFlag` is `.nullable().optional()`
+  (niet alleen `.nullable()`): het veld ontbreekt volledig in kind-facing responses in plaats van
+  `null` te tonen. `proposalView(row, includeReviewFlag: boolean)` is nu expliciet per call-site —
+  `false` op de create-response en op `GET` voor `auth.role === "child"`, `true` op `GET` voor
+  `auth.role === "parent"` en op de approve/decline-responses (altijd ouder-only via
+  `requireParent(c, { full: true })`).
+- Contract-regeneratie (`npm run openapi:generate`) bijgewerkt in dezelfde PR
+  (`docs/openapi/taakhelden-core-v1.json`). De iOS Swift-contract-generator emit geen
+  `TaskProposal`-type (Taakvraag is nog niet op het iOS-contractoppervlak, P4 blijft teen-only
+  zonder iOS-koppeling) — geen Swift-wijziging nodig, geverifieerd met een echte
+  `openapi:generate`-run, niet aangenomen.
 - Nooit blokkeren: de taakvraag wordt altijd aangemaakt. De ouder ziet een neutrale markering
-  ("even zelf lezen"), beslist zelf, en de bestaande vriendelijke afwijs-flow blijft ongewijzigd.
+  (`Badge tone="neutral"` + hint-tekst, `apps/web/…/goedkeuren/ProposalQueue.tsx`), beslist zelf,
+  en de bestaande vriendelijke afwijs-flow blijft ongewijzigd.
 
 **Ontwerp, fase 2 (T2 — alleen ná eval):** dezelfde vlag, tweede signaal via
 `@cf/meta/llama-guard-3-8b` in de Queue, ná de insert. **Voorwaarde:** de modelkaart noemt
@@ -172,16 +190,25 @@ eval-set die aantoont dat het beter is dan de lijst, ship fase 2 niet. Prompt be
 de tekst — geen naam, geen `childId`, geen `familyId`.
 
 **Acceptatiecriteria:**
-1. Een taakvraag met problematische tekst wordt **aangemaakt** en gemarkeerd, niet geweigerd.
-2. Het kind ziet nooit een vlag, een waarschuwing of een toonverandering (§3.7-test).
-3. `reviewFlag` lekt niet naar een kindtoken (authz-test, cross-role én cross-family).
-4. De screening voegt geen meetbare latency toe aan `POST /tasks/proposals` (fase 1 is in-process
-   en O(n) over de tekst; fase 2 is async).
-5. Fase 2 mergt alleen met een eval-artefact dat winst t.o.v. fase 1 aantoont.
+1. ✅ Een taakvraag met problematische tekst wordt **aangemaakt** en gemarkeerd, niet geweigerd. —
+   `apps/api/test/proposals.test.ts` "markeert een taakvraag met zorgwekkende tekst, maar
+   blokkeert 'm niet": 201, status `pending`, `review_flag = 'language'` in D1.
+2. ✅ Het kind ziet nooit een vlag, een waarschuwing of een toonverandering (§3.7-test). — geen
+   UI-wijziging op het kindpad; de kind-facing 201/GET-responses missen het veld volledig
+   (getest, niet alleen `null`).
+3. ✅ `reviewFlag` lekt niet naar een kindtoken (authz-test, cross-role én cross-family). —
+   "ouder ziet de vlag in de lijst; kind nooit — ook niet als null" in `proposals.test.ts`.
+4. ✅ De screening voegt geen meetbare latency toe aan `POST /tasks/proposals` (fase 1 is
+   in-process en O(n) over de tekst; fase 2 is async). — pure functie, geen I/O, geen `await`.
+5. Fase 2 mergt alleen met een eval-artefact dat winst t.o.v. fase 1 aantoont. — **nog niet
+   gebouwd**, blijft T0 tot een Nederlandse eval er is.
 
-**Dependencies:** `WS-PROPOSAL` (geshipt). Gate G3.
+**Dependencies:** `WS-PROPOSAL` (geshipt). Gate G3 — geverifieerd tegen productiecode (ledger-
+formattering, `listPendingApproval`, stabiele Idempotency-Key, rate limits, invite-token-fix,
+iOS PIN-hashing) vóór deze stream is gebouwd.
 
-**Docs to update:** `docs/taakhelden-api-specificatie.md` (veld `reviewFlag`, ouder-only).
+**Docs to update:** `docs/taakhelden-api-specificatie.md` (veld `reviewFlag`, ouder-only — gedaan),
+`packages/shared/src/schemas/proposal.ts` (gedaan, zie diff).
 
 ---
 
