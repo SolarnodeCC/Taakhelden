@@ -15,6 +15,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -51,137 +52,145 @@ fun WinkelTab(
     val speechBus = appState.environment.speechBus
     val state by viewModel.shop.state.collectAsState()
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(WDimens.spacingXl),
-        verticalArrangement = Arrangement.spacedBy(WDimens.spacingLg),
+    // Pull to refresh: the shop changes when a parent adds a reward or approves a
+    // redemption, and a child should not have to leave the tab to find out.
+    PullToRefreshBox(
+        isRefreshing = state.isLoading,
+        onRefresh = viewModel::refreshShop,
+        modifier = Modifier.fillMaxSize(),
     ) {
-        val rewards = state.rewards
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(WDimens.spacingXl),
+            verticalArrangement = Arrangement.spacedBy(WDimens.spacingLg),
+        ) {
+            val rewards = state.rewards
 
-        when {
-            state.isLoading && rewards == null -> Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(WDimens.spacingMd),
-            ) {
-                CircularProgressIndicator(color = palette.accent.color)
-                Text(
-                    text = stringResource(R.string.child_shop_loading),
-                    color = palette.mutedText.color,
-                )
-            }
-
-            rewards != null -> {
-                WCard {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(WDimens.spacingSm),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.child_shop_title),
-                            style = MaterialTheme.typography.displaySmall,
-                            fontWeight = FontWeight.Bold,
-                            color = palette.text.color,
-                        )
-                        if (isYoung) {
-                            YoungSpeakButton(
-                                text = stringResource(
-                                    R.string.child_shop_balance_speak,
-                                    rewards.balance,
-                                ),
-                                speechBus = speechBus,
-                            )
-                        }
-                    }
+            when {
+                state.isLoading && rewards == null -> Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(WDimens.spacingMd),
+                ) {
+                    CircularProgressIndicator(color = palette.accent.color)
                     Text(
-                        text = stringResource(R.string.child_shop_balance, rewards.balance),
+                        text = stringResource(R.string.child_shop_loading),
                         color = palette.mutedText.color,
                     )
                 }
 
-                state.status?.let { status ->
-                    Text(
-                        text = stringResource(
-                            when (status) {
-                                ChildShopStatus.REDEEM_SUCCESS -> R.string.child_shop_redeem_success
-                                ChildShopStatus.INSUFFICIENT_POINTS ->
-                                    R.string.child_shop_insufficient
-                                ChildShopStatus.PINNED -> R.string.child_shop_pinned
-                                ChildShopStatus.PIN_ERROR -> R.string.child_shop_pin_error
-                            },
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = palette.mutedText.color,
-                    )
-                }
-
-                rewards.savingsGoal?.let { goal ->
-                    SavingsGoalCard(goal = goal, balance = rewards.balance, isTeen = isTeen)
-                }
-
-                state.pendingRedemptions.forEach { redemption ->
+                rewards != null -> {
                     WCard {
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(WDimens.spacingMd),
+                            horizontalArrangement = Arrangement.spacedBy(WDimens.spacingSm),
                         ) {
                             Text(
-                                text = redemption.icon ?: "🎁",
-                                fontSize = 28.sp,
-                                modifier = Modifier.clearAndSetSemantics { },
+                                text = stringResource(R.string.child_shop_title),
+                                style = MaterialTheme.typography.displaySmall,
+                                fontWeight = FontWeight.Bold,
+                                color = palette.text.color,
                             )
-                            Column(modifier = Modifier.weight(1f)) {
-                                Text(text = redemption.title, color = palette.text.color)
-                                Text(
-                                    text = stringResource(R.string.child_shop_pending),
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = palette.mutedText.color,
+                            if (isYoung) {
+                                YoungSpeakButton(
+                                    text = stringResource(
+                                        R.string.child_shop_balance_speak,
+                                        rewards.balance,
+                                    ),
+                                    speechBus = speechBus,
                                 )
                             }
-                            WBadge(
-                                text = stringResource(
-                                    R.string.child_points_badge,
-                                    redemption.price,
-                                ),
+                        }
+                        Text(
+                            text = stringResource(R.string.child_shop_balance, rewards.balance),
+                            color = palette.mutedText.color,
+                        )
+                    }
+
+                    state.status?.let { status ->
+                        Text(
+                            text = stringResource(
+                                when (status) {
+                                    ChildShopStatus.REDEEM_SUCCESS -> R.string.child_shop_redeem_success
+                                    ChildShopStatus.INSUFFICIENT_POINTS ->
+                                        R.string.child_shop_insufficient
+                                    ChildShopStatus.PINNED -> R.string.child_shop_pinned
+                                    ChildShopStatus.PIN_ERROR -> R.string.child_shop_pin_error
+                                },
+                            ),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = palette.mutedText.color,
+                        )
+                    }
+
+                    rewards.savingsGoal?.let { goal ->
+                        SavingsGoalCard(goal = goal, balance = rewards.balance, isTeen = isTeen)
+                    }
+
+                    state.pendingRedemptions.forEach { redemption ->
+                        WCard {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(WDimens.spacingMd),
+                            ) {
+                                Text(
+                                    text = redemption.icon ?: "🎁",
+                                    fontSize = 28.sp,
+                                    modifier = Modifier.clearAndSetSemantics { },
+                                )
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(text = redemption.title, color = palette.text.color)
+                                    Text(
+                                        text = stringResource(R.string.child_shop_pending),
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        color = palette.mutedText.color,
+                                    )
+                                }
+                                WBadge(
+                                    text = stringResource(
+                                        R.string.child_points_badge,
+                                        redemption.price,
+                                    ),
+                                )
+                            }
+                        }
+                    }
+
+                    if (rewards.rewards.isEmpty()) {
+                        WCard {
+                            Text(
+                                text = stringResource(R.string.child_shop_empty),
+                                color = palette.text.color,
+                            )
+                        }
+                    } else {
+                        rewards.rewards.forEach { reward ->
+                            RewardCard(
+                                reward = reward,
+                                balance = rewards.balance,
+                                isTeen = isTeen,
+                                isRedeeming = state.redeemingRewardId == reward.id,
+                                isPinning = state.pinningRewardId == reward.id,
+                                onRedeem = { viewModel.redeem(reward.id, reduceMotion) },
+                                onPin = { viewModel.pin(reward.id) },
                             )
                         }
                     }
                 }
 
-                if (rewards.rewards.isEmpty()) {
-                    WCard {
-                        Text(
-                            text = stringResource(R.string.child_shop_empty),
-                            color = palette.text.color,
-                        )
-                    }
-                } else {
-                    rewards.rewards.forEach { reward ->
-                        RewardCard(
-                            reward = reward,
-                            balance = rewards.balance,
-                            isTeen = isTeen,
-                            isRedeeming = state.redeemingRewardId == reward.id,
-                            isPinning = state.pinningRewardId == reward.id,
-                            onRedeem = { viewModel.redeem(reward.id, reduceMotion) },
-                            onPin = { viewModel.pin(reward.id) },
-                        )
-                    }
+                state.hasLoadError -> WCard {
+                    Text(
+                        text = stringResource(R.string.child_shop_load_error),
+                        color = palette.text.color,
+                    )
+                    WSecondaryButton(
+                        text = stringResource(R.string.child_retry),
+                        onClick = viewModel::refreshShop,
+                    )
                 }
-            }
-
-            state.hasLoadError -> WCard {
-                Text(
-                    text = stringResource(R.string.child_shop_load_error),
-                    color = palette.text.color,
-                )
-                WSecondaryButton(
-                    text = stringResource(R.string.child_retry),
-                    onClick = viewModel::refreshShop,
-                )
             }
         }
     }

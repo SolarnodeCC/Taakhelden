@@ -146,7 +146,7 @@ flowchart LR
 | **WS-AUTH-WEB** | Forgot-password + basic account recovery (web) | Feature | Web | ✅ in feature waves 1–7 | G3 |
 | **WS-ROTATE** | Sibling task rotation UI (uses existing rotation JSON) | Feature | Web + iOS | ✅ already shipped (verified) | — |
 | **WS-IOS-STORE** | App Store submission readiness (path to G5) | iOS-Ship | iOS | ✅ checklist in ReviewNotes | G3→G5 |
-| **WS-ANDROID** | Android app — **PARKED, not before G5** | PARKED | — | Do not start | G5 |
+| **WS-ANDROID** | Android app (Compose, `apps/android/`) | Client | Android | ⚠️ Code landed ahead of G5 — **P8 ruling pending** | G5 (release) |
 
 **Owner archetype** = skill mix, not headcount. Streams marked "start now" have no cross-dependency and can run fully in parallel — they touch disjoint layers (web components / API middleware / Swift).
 
@@ -707,15 +707,25 @@ Note: even if `durationMinutes` is sent, the server stores only the **incremente
 
 ---
 
-### WS-ANDROID — Android app (PARKED until G5)
+### WS-ANDROID — Android app
 
-**Status: PARKED — do not start.**
+**Status: code landed ahead of the gate — P8 needs a PO ruling.**
 
-Not started. Unblocked **only** when Gate G5 passes (Wispel iPhone app accepted by Apple and publicly available on the App Store).
+**Original lock (2026-08-01 — P8):** parked until Gate G5 passes (Wispel iPhone app accepted by Apple and publicly available on the App Store). No `WS-ANDROID` coding, no Android project scaffolding, no "Android soon" eng spikes that dilute iOS ship velocity. Marketing may describe Wispel as iOS-first; do not promise an Android date. Android demand is real (medium demand signal from competitive research) but halving focus before iOS ships is the wrong trade.
 
-No `WS-ANDROID` coding, no Android project scaffolding, no "Android soon" eng spikes that dilute iOS ship velocity. Marketing may describe Wispel as iOS-first; do not promise an Android date.
+**What actually happened:** a full Android port was built on direct instruction, before G5. `apps/android/` now contains a Compose app at feature parity with iOS (child + parent modes, offline sync, photo bonus, avatar shop, family goal, focus timer, teen proposals, parental gate, widget), plus the Worker-side FCM path that Android push needs.
 
-**PO lock 2026-08-01 — P8.** See §7 (P8) and Gate G5 in §2. Android demand is real (medium demand signal from competitive research) but halving focus before iOS ships is the wrong trade.
+This does **not** silently lift P8. The lock was a sequencing decision about *focus*, and that trade-off is unchanged by the code existing: G5 is still ⬜ Pending on every criterion (see `apps/ios/ReviewNotes.md`). What the PO now has to decide is narrower than the original question:
+
+| Decision | Consequence |
+| --- | --- |
+| **Keep P8 as-is** | Android code stays merged but unreleased. No Play listing, no Android date in marketing, no Android bugs on the board until G5. iOS focus is preserved; the port is sunk cost that keeps. |
+| **Amend P8 to "build allowed, release gated on G5"** | Same shipping order, but Android maintenance (contract changes, CI lane) is now an accepted ongoing cost. Closest to the current state of the repo. |
+| **Retire P8** | Android becomes a parallel shipping track. Needs an explicit owner and a Play Store workstream; this is the option that re-opens the focus trade P8 was protecting against. |
+
+Until that ruling lands, treat Android as **merged but not shipping**: keep the CI lane green, but no Play Console submission and no Android date in marketing.
+
+**Remaining before an Android release is even possible** (independent of the P8 ruling): Apple Services ID for the web sign-in flow, `google-services.json` + FCM Worker secrets, a release keystore and Play signing, Play Data-safety form, and the two-device E2E pass. See `apps/android/README.md` §"Nog handmatig".
 
 ---
 
@@ -759,7 +769,7 @@ This is the canonical post-competitive-research execution order as of **2026-08-
 | P6 | ✅ LOCKED | **ADR-0004 Option A** (one child identity, multiple family memberships) + **per-family ledger** (balance is always scoped to one `family_id`) | Option A matches the product promise of a single point history; per-family ledger preserves the `familyId` security boundary and matches hard rule 3 — still behind G4 | WS-COPARENT / G4 |
 | P7 | ✅ LOCKED | **Yes — send a positive push notification** to the teen when a parent approves their Taakvraag | Immediate positive feedback completes the agency loop and is consistent with the positive-only push stance; copy must pass `@dutch-child-copy` | WS-PROPOSAL |
 
-| P8 | ✅ LOCKED | **Android is out of scope until Gate G5 (iOS App Store live)**. No `WS-ANDROID` coding, no Android project scaffolding, no "Android soon" eng spikes. Marketing may say iOS-first; do not promise an Android date. | Sequencing: iOS must ship before Android gets any eng attention. Competitive research confirms medium-priority Android demand, but an unfinished iOS costs more than Android can buy at this stage. | WS-ANDROID / G5 |
+| P8 | ⚠️ **RE-OPENED** (was LOCKED 2026-08-01) | Original lock: **Android out of scope until Gate G5 (iOS App Store live)** — no `WS-ANDROID` coding or scaffolding; marketing may say iOS-first with no Android date. **A full Android port was since built on direct instruction, before G5.** The lock is not silently lifted: see §WS-ANDROID for the three options the PO must choose between. | Sequencing: iOS must ship before Android gets eng attention. Competitive research confirms medium-priority Android demand, but an unfinished iOS costs more than Android can buy at this stage. That rationale is untouched by the code existing — G5 is still pending on every criterion. | WS-ANDROID / G5 |
 
 All eight decisions logged in `wispel-build-plan-workstreams.md` §13.7 (2026-08-01).
 

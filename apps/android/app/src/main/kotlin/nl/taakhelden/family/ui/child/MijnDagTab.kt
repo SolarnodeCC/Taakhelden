@@ -16,6 +16,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -69,147 +70,155 @@ fun MijnDagTab(
     val avatar = session?.avatar ?: "🦊"
     val displayName = session?.displayName ?: stringResource(R.string.held_fallback_name)
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(WDimens.spacingXl),
-        verticalArrangement = Arrangement.spacedBy(WDimens.spacingLg),
+    // Pull to refresh is the gesture a child reaches for first when they think a parent
+    // has just approved something; the retry button below is only for the error state.
+    PullToRefreshBox(
+        isRefreshing = state is ChildDayLoadState.Loading,
+        onRefresh = viewModel::refreshDay,
+        modifier = Modifier.fillMaxSize(),
     ) {
-        // Teens get agency: they can propose work rather than only receive it (WS-PROPOSAL).
-        if (isTeen) {
-            ProposalSheetButton(store = viewModel.proposals)
-        }
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+                .padding(WDimens.spacingXl),
+            verticalArrangement = Arrangement.spacedBy(WDimens.spacingLg),
+        ) {
+            // Teens get agency: they can propose work rather than only receive it (WS-PROPOSAL).
+            if (isTeen) {
+                ProposalSheetButton(store = viewModel.proposals)
+            }
 
-        (goalState as? nl.taakhelden.core.child.FamilyGoalLoadState.Ready)?.progress?.let { goal ->
-            FamilyGoalCard(progress = goal, isTeen = isTeen, speechBus = speechBus)
-        }
+            (goalState as? nl.taakhelden.core.child.FamilyGoalLoadState.Ready)?.progress?.let { goal ->
+                FamilyGoalCard(progress = goal, isTeen = isTeen, speechBus = speechBus)
+            }
 
-        notice?.let { current ->
-            Text(
-                text = stringResource(
-                    when (current) {
-                        ChildDayNotice.UNDO_EXPIRED -> R.string.child_task_undo_expired
-                        ChildDayNotice.PHOTO_UPLOAD_FAILED -> R.string.child_photo_upload_error
-                    },
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = palette.mutedText.color,
-            )
-        }
-
-        when (val current = state) {
-            is ChildDayLoadState.Loading -> Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(WDimens.spacingMd),
-            ) {
-                CircularProgressIndicator(color = palette.accent.color)
+            notice?.let { current ->
                 Text(
-                    text = stringResource(R.string.child_day_loading),
+                    text = stringResource(
+                        when (current) {
+                            ChildDayNotice.UNDO_EXPIRED -> R.string.child_task_undo_expired
+                            ChildDayNotice.PHOTO_UPLOAD_FAILED -> R.string.child_photo_upload_error
+                        },
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
                     color = palette.mutedText.color,
                 )
             }
 
-            is ChildDayLoadState.Paused -> WCard {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(WDimens.spacingSm),
+            when (val current = state) {
+                is ChildDayLoadState.Loading -> Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(WDimens.spacingMd),
                 ) {
-                    Icon(
-                        imageVector = Icons.Filled.Bedtime,
-                        contentDescription = null,
-                        tint = palette.accent.color,
-                    )
+                    CircularProgressIndicator(color = palette.accent.color)
                     Text(
-                        text = stringResource(R.string.child_pause_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = palette.text.color,
+                        text = stringResource(R.string.child_day_loading),
+                        color = palette.mutedText.color,
                     )
                 }
-                val detail = current.reason ?: stringResource(R.string.child_pause_detail)
-                Text(text = detail, color = palette.mutedText.color)
-                if (isYoung) YoungSpeakButton(text = detail, speechBus = speechBus)
-            }
 
-            is ChildDayLoadState.Ready -> {
-                DayHeader(
-                    balance = current.today.balance,
-                    avatar = avatar,
-                    displayName = displayName,
-                    isTeen = isTeen,
-                    speechBus = speechBus,
-                )
-                current.today.instances.forEach { instance ->
-                    TaskCard(
-                        instance = instance,
-                        viewModel = viewModel,
-                        reduceMotion = reduceMotion,
-                        speechBus = speechBus,
-                        onStartFocus = {
-                            activeFocus = ActiveFocusContext(instance.id, instance.title)
-                        },
-                    )
-                }
-            }
-
-            is ChildDayLoadState.EmptyAllDone -> {
-                DayHeader(
-                    balance = current.balance,
-                    avatar = avatar,
-                    displayName = displayName,
-                    isTeen = isTeen,
-                    speechBus = speechBus,
-                )
-                val headline = stringResource(
-                    if (isTeen) R.string.child_all_done_teen else R.string.child_all_done,
-                )
-                WCard {
+                is ChildDayLoadState.Paused -> WCard {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(WDimens.spacingSm),
                     ) {
+                        Icon(
+                            imageVector = Icons.Filled.Bedtime,
+                            contentDescription = null,
+                            tint = palette.accent.color,
+                        )
                         Text(
-                            text = headline,
+                            text = stringResource(R.string.child_pause_title),
                             style = MaterialTheme.typography.titleMedium,
                             color = palette.text.color,
                         )
-                        if (isYoung) YoungSpeakButton(text = headline, speechBus = speechBus)
                     }
+                    val detail = current.reason ?: stringResource(R.string.child_pause_detail)
+                    Text(text = detail, color = palette.mutedText.color)
+                    if (isYoung) YoungSpeakButton(text = detail, speechBus = speechBus)
+                }
+
+                is ChildDayLoadState.Ready -> {
+                    DayHeader(
+                        balance = current.today.balance,
+                        avatar = avatar,
+                        displayName = displayName,
+                        isTeen = isTeen,
+                        speechBus = speechBus,
+                    )
+                    current.today.instances.forEach { instance ->
+                        TaskCard(
+                            instance = instance,
+                            viewModel = viewModel,
+                            reduceMotion = reduceMotion,
+                            speechBus = speechBus,
+                            onStartFocus = {
+                                activeFocus = ActiveFocusContext(instance.id, instance.title)
+                            },
+                        )
+                    }
+                }
+
+                is ChildDayLoadState.EmptyAllDone -> {
+                    DayHeader(
+                        balance = current.balance,
+                        avatar = avatar,
+                        displayName = displayName,
+                        isTeen = isTeen,
+                        speechBus = speechBus,
+                    )
+                    val headline = stringResource(
+                        if (isTeen) R.string.child_all_done_teen else R.string.child_all_done,
+                    )
+                    WCard {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(WDimens.spacingSm),
+                        ) {
+                            Text(
+                                text = headline,
+                                style = MaterialTheme.typography.titleMedium,
+                                color = palette.text.color,
+                            )
+                            if (isYoung) YoungSpeakButton(text = headline, speechBus = speechBus)
+                        }
+                        Text(
+                            text = stringResource(R.string.child_all_done_detail),
+                            color = palette.mutedText.color,
+                        )
+                    }
+                }
+
+                is ChildDayLoadState.EmptyNoTasks -> WCard {
+                    val detail = stringResource(R.string.child_no_missions_detail)
                     Text(
-                        text = stringResource(R.string.child_all_done_detail),
-                        color = palette.mutedText.color,
+                        text = stringResource(R.string.child_no_missions),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = palette.text.color,
+                    )
+                    Text(text = detail, color = palette.mutedText.color)
+                    if (isYoung) YoungSpeakButton(text = detail, speechBus = speechBus)
+                }
+
+                is ChildDayLoadState.Offline -> WCard {
+                    Text(
+                        text = stringResource(R.string.child_connection_safe),
+                        color = palette.text.color,
                     )
                 }
-            }
 
-            is ChildDayLoadState.EmptyNoTasks -> WCard {
-                val detail = stringResource(R.string.child_no_missions_detail)
-                Text(
-                    text = stringResource(R.string.child_no_missions),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = palette.text.color,
-                )
-                Text(text = detail, color = palette.mutedText.color)
-                if (isYoung) YoungSpeakButton(text = detail, speechBus = speechBus)
-            }
-
-            is ChildDayLoadState.Offline -> WCard {
-                Text(
-                    text = stringResource(R.string.child_connection_safe),
-                    color = palette.text.color,
-                )
-            }
-
-            is ChildDayLoadState.Error -> WCard {
-                Text(
-                    text = stringResource(R.string.child_connection_safe),
-                    color = palette.text.color,
-                )
-                WSecondaryButton(
-                    text = stringResource(R.string.child_retry),
-                    onClick = viewModel::refreshDay,
-                )
+                is ChildDayLoadState.Error -> WCard {
+                    Text(
+                        text = stringResource(R.string.child_connection_safe),
+                        color = palette.text.color,
+                    )
+                    WSecondaryButton(
+                        text = stringResource(R.string.child_retry),
+                        onClick = viewModel::refreshDay,
+                    )
+                }
             }
         }
     }

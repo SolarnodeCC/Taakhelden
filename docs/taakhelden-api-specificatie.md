@@ -50,7 +50,7 @@ Cursor-based: `?limit=50&cursor=…` → response bevat `nextCursor` (null = ein
 /rewards       beloningswinkel + inlossingen
 /badges        verdiende badges
 /devices       pushtoken-registratie, notificatie-instellingen
-/sync          batch-sync voor offline-first iOS
+/sync          batch-sync voor offline-first clients (iOS + Android)
 /account       AVG: export & verwijdering
 /ws            WebSocket (Durable Object per gezin)
 ```
@@ -253,7 +253,7 @@ Saldo = som van de ledger, berekend in de Durable Object van het gezin (serialis
 
 | Methode & pad | Rol | Beschrijving |
 |---|---|---|
-| `POST /devices` | beide | `{apnsToken, platform, userId}` — token per profiel (gedeeld iPad-scenario: token kan aan meerdere profielen hangen). |
+| `POST /devices` | beide | `{apnsToken, platform, userId}` — token per profiel (gedeeld toestel: token kan aan meerdere profielen hangen). `platform` is `ios` \| `android` en bepaalt de gateway: APNs of FCM. Het veld heet historisch `apnsToken` maar draagt ook het FCM-registratietoken. |
 | `DELETE /devices/{token}` | beide | Bij uitloggen. |
 | `GET/PATCH /notification-settings` | parent | Per kind: aan/uit, tijdvensters; kind-instellingen beheert de ouder. |
 
@@ -350,7 +350,7 @@ apps/api/
     │   ├── taskEngine.ts    # recurrence → instances, roulatie
     │   ├── pointsEngine.ts  # ledger, dag/weekbonus, streaks, badges
     │   ├── photoService.ts  # presign, confirm, signed GET
-    │   └── notifier.ts      # APNs-payloads + positieve copy-catalogus
+    │   └── notifier.ts      # APNs- en FCM-payloads + positieve copy-catalogus
     ├── do/
     │   └── FamilyRoom.ts    # Durable Object: WS-broadcast + ledger-serialisatie
     ├── repo/                # ENIGE plek met SQL; elke functie eist familyId
