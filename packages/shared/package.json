@@ -6,8 +6,8 @@
   "types": "src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "openapi:generate": "tsx scripts/generate-openapi.ts && tsx scripts/generate-swift-contract.ts",
-    "openapi:check": "npm run openapi:generate && git diff --exit-code -- ../../docs/openapi/taakhelden-core-v1.json ../../apps/ios/TaakHelden/Core/API/Generated/ContractModels.swift"
+    "openapi:generate": "tsx scripts/generate-openapi.ts && tsx scripts/generate-swift-contract.ts && tsx scripts/generate-kotlin-contract.ts",
+    "openapi:check": "npm run openapi:generate && git diff --exit-code -- ../../docs/openapi/taakhelden-core-v1.json ../../apps/ios/TaakHelden/Core/API/Generated/ContractModels.swift ../../apps/android/core/src/main/kotlin/nl/taakhelden/core/api/ContractModels.kt"
   },
   "dependencies": {
     "zod": "^3.23.0"

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      A bare Material3 shell: every colour the user actually sees comes from the Compose
+      theme in ui/theme, which is driven by the shared design tokens. Keeping this
+      XML theme neutral stops the two systems from disagreeing.
+    -->
+    <style name="Theme.Wispel" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/wispel_parent_background</item>
+        <item name="android:navigationBarColor">@color/wispel_parent_background</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowBackground">@color/wispel_parent_background</item>
+    </style>
+</resources>

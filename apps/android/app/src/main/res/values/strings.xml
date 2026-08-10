@@ -1,0 +1,387 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Dutch is the default locale: Wispel ships for NL families, so an unmatched device
+  locale must land on Dutch rather than English. English lives in values-en/.
+  Child-facing copy follows the positive style guide (productvoorstel §3.7) — never
+  guilt-inducing, never blaming.
+-->
+<resources xmlns:tools="http://schemas.android.com/tools" tools:locale="nl">
+    <!-- The product name is the brand; it reads the same in every locale. -->
+    <string name="app_name" translatable="false">Wispel</string>
+
+    <!-- Non-translatable identifiers -->
+    <string name="push_channel_id" translatable="false">wispel_family</string>
+    <string name="apple_redirect_scheme" translatable="false">nl.taakhelden.family</string>
+
+    <!-- Common -->
+    <string name="common_back">Terug</string>
+    <string name="common_cancel">Annuleren</string>
+    <string name="common_close">Sluiten</string>
+    <string name="common_delete_digit">Verwijder</string>
+    <string name="sign_in_with_apple">Log in met Apple</string>
+
+    <!-- Welcome hub -->
+    <string name="welcome_pitch">Samen taken en huiswerk bijhouden — voor het hele gezin.</string>
+    <string name="welcome_detail">Start als ouder een gezin, of koppel een kindertoestel met een gezinscode.</string>
+    <string name="welcome_parent">Ik ben een ouder</string>
+    <string name="welcome_child">Ik heb al een gezinscode</string>
+
+    <!-- Child pairing -->
+    <string name="pairing_title">Kindertoestel koppelen</string>
+    <string name="pairing_step_code">1. Gezinscode</string>
+    <string name="pairing_code_placeholder">123456</string>
+    <string name="pairing_load_profiles">Profielen laden</string>
+    <string name="pairing_step_profile">2. Kies jouw profiel bij %s</string>
+    <string name="pairing_mode_teen">Teenmodus</string>
+    <string name="pairing_mode_kid">Kindmodus</string>
+    <string name="pairing_step_pin">3. Gebruik pincode</string>
+    <string name="pairing_pin_placeholder">4 cijfers</string>
+    <string name="pairing_biometrics_toggle">Vingerafdruk mag later helpen</string>
+    <string name="pairing_pin_note">Voor kinderen onder 13 blijft \'Gebruik pincode\' altijd zichtbaar naast de vingerafdruk.</string>
+    <string name="pairing_submit">Koppelen en verder</string>
+
+    <!-- Parent onboarding -->
+    <string name="onboarding_title">Gezin starten</string>
+    <string name="onboarding_signin_detail">Log in met Apple om je gezin te starten.</string>
+    <string name="onboarding_family_name">Gezinsnaam (optioneel)</string>
+    <string name="onboarding_child_title">Eerste kind</string>
+    <string name="onboarding_child_name">Roepnaam</string>
+    <string name="onboarding_child_birth_year">Geboortejaar</string>
+    <string name="onboarding_child_avatar">Kies een avatar</string>
+    <string name="onboarding_child_pin">Kind-pincode</string>
+    <string name="onboarding_child_submit">Kind toevoegen</string>
+    <string name="onboarding_code_title">Je gezinscode</string>
+    <string name="onboarding_code_accessibility">Gezinscode %s</string>
+    <string name="onboarding_code_detail">Houd deze code bij het kindertoestel. %s kan nu koppelen met de pincode die je net koos.</string>
+    <string name="onboarding_code_child_fallback">Je kind</string>
+    <string name="onboarding_code_next">Ga naar kind-koppelen</string>
+    <string name="onboarding_validation_error">Vul alle velden in en kies een pincode van 4 cijfers.</string>
+    <string name="onboarding_default_family_name">Ons gezin</string>
+    <string name="onboarding_default_parent_name">Ouder</string>
+
+    <!-- Child unlock -->
+    <string name="child_unlock_hi">Hoi %s!</string>
+    <string name="child_unlock_hi_young">Hoi!</string>
+    <string name="child_unlock_title">Ontgrendel je heldenplek</string>
+    <string name="child_unlock_biometrics">Gebruik je vingerafdruk</string>
+    <string name="child_unlock_biometrics_reason">Ontgrendel Wispel om verder te gaan.</string>
+    <string name="child_unlock_pin_retry">Die pincode klopt nog niet — probeer het rustig opnieuw.</string>
+    <string name="child_unlock_pin_alternative">Of gebruik je pincode</string>
+    <string name="child_unlock_pin_alternative_hint">Pincode is altijd beschikbaar naast de vingerafdruk</string>
+    <string name="child_unlock_speak_intro">Hoi %s. Ontgrendel je heldenplek.</string>
+    <string name="child_young_unlock_title">Open je plek</string>
+    <string name="child_young_pin_retry">Die code klopt nog niet — probeer het rustig opnieuw.</string>
+    <string name="child_young_speak">Voorleesknop</string>
+
+    <!-- Child chrome -->
+    <string name="child_tab_day">Mijn Dag</string>
+    <string name="child_tab_day_young">Dag</string>
+    <string name="child_tab_shop">Winkel</string>
+    <string name="child_tab_shop_young">Shop</string>
+    <string name="child_tab_hero">Mijn Ster</string>
+    <string name="child_tab_hero_young">Ster</string>
+    <string name="child_day_loading">Even je heldendag laden…</string>
+    <string name="child_day_title">Vandaag</string>
+    <string name="child_day_progress">%1$d van %2$d klaar</string>
+    <string name="child_day_speak">Je hebt %1$d van %2$d missies klaar</string>
+    <string name="child_points_badge">%d punten</string>
+    <string name="child_streak">🔥 %d dagen streak</string>
+    <string name="child_streak_teen">%d dagen streak</string>
+    <string name="child_all_done">Alles gedaan - je bent een ster vandaag!</string>
+    <string name="child_all_done_teen">Alles gedaan — nette dag.</string>
+    <string name="child_all_done_detail">Morgen staan er weer nieuwe missies klaar.</string>
+    <string name="child_no_missions">Nog geen missies</string>
+    <string name="child_no_missions_detail">Vraag papa of mama even om er eentje klaar te zetten.</string>
+    <string name="child_connection_safe">We kunnen even geen verbinding maken — je afgevinkte taken zijn veilig.</string>
+    <string name="child_offline_safe">Wordt bewaard - sturen we zo.</string>
+    <string name="child_retry">Opnieuw proberen</string>
+    <string name="child_task_points">+%d punten</string>
+    <string name="child_task_done">Afgevinkt</string>
+    <string name="child_task_done_button">Klaar!</string>
+    <string name="child_task_undo_button">Oeps, toch niet</string>
+    <string name="child_task_undo_expired">Je was net iets te laat — maar je hebt het goed gedaan!</string>
+    <string name="child_photo_ready">Foto is klaar — bonus volgt na goedkeuring!</string>
+    <string name="child_photo_processing">Foto wordt nagekeken…</string>
+    <string name="child_photo_bonus_hint">+%d bonuspunten met een foto</string>
+    <string name="child_photo_upload_error">Foto lukte niet — je mag het nog een keer proberen.</string>
+    <string name="child_photo_take">Foto maken</string>
+    <string name="child_photo_pick">Foto kiezen</string>
+
+    <!-- WS-PAUSE — child rest state -->
+    <string name="child_pause_title">Je hebt even rust</string>
+    <string name="child_pause_detail">Geen taken vandaag — geniet van je vrije tijd!</string>
+
+    <!-- Child shop -->
+    <string name="child_shop_loading">Winkel laden…</string>
+    <string name="child_shop_title">Winkel</string>
+    <string name="child_shop_balance">Je hebt %d punten</string>
+    <string name="child_shop_balance_speak">Je hebt %d punten in de winkel</string>
+    <string name="child_shop_empty">Straks staan hier beloningen klaar — pap of mam vult de winkel.</string>
+    <string name="child_shop_affordable">Je kunt deze kiezen!</string>
+    <string name="child_shop_affordable_teen">Past bij je saldo</string>
+    <string name="child_shop_need_more">Nog %1$d punten tot %2$s</string>
+    <string name="child_shop_load_error">De winkel konden we even niet laden — probeer zo opnieuw.</string>
+    <string name="child_shop_redeem">Kopen!</string>
+    <string name="child_shop_redeem_young">Kopen</string>
+    <string name="child_shop_pin">Spaardoel</string>
+    <string name="child_shop_pinned">Je spaardoel</string>
+    <string name="child_shop_goal_progress">Nog %1$d punten tot %2$s — je komt eraan!</string>
+    <string name="child_shop_goal_progress_teen">Nog %1$d punten tot %2$s</string>
+    <string name="child_shop_redeem_success">Netjes! Papa of mama kijkt zo of het mag.</string>
+    <string name="child_shop_insufficient">Bijna! Spaar nog even door — je kunt het.</string>
+    <string name="child_shop_pending">Wacht op papa of mama…</string>
+    <string name="child_shop_pin_error">Spaardoel lukte niet — probeer zo opnieuw.</string>
+
+    <!-- Mijn Ster / avatar -->
+    <string name="held_fallback_name">Ster</string>
+    <string name="held_level_format">Level %d</string>
+    <string name="held_level_speak">Je bent op level %d</string>
+    <string name="held_lifetime_format">Alles bij elkaar: %1$d punten · streak %2$d</string>
+    <string name="held_level_explain">Je level groeit mee met alle punten die je ooit hebt verdiend — niet met je huidige saldo.</string>
+    <string name="held_parent_gate_hint">Houd lang vast om de ouderpoort te openen</string>
+    <string name="held_parent_gate_action">Open ouderpoort</string>
+    <string name="held_avatar_title">Avatar-shop</string>
+    <string name="held_avatar_preview">Avatar</string>
+    <string name="held_avatar_slot">Onderdeel</string>
+    <string name="held_avatar_slot_hat">Hoed</string>
+    <string name="held_avatar_slot_background">Achtergrond</string>
+    <string name="held_avatar_slot_accessory">Extra</string>
+    <string name="held_avatar_loading">Shop laden…</string>
+    <string name="held_avatar_load_error">De shop konden we even niet laden — probeer zo opnieuw.</string>
+    <string name="held_avatar_equip_error">Dat lukte nog niet — probeer het zo nog eens.</string>
+    <string name="held_avatar_unlocked">Ontgrendeld — kies maar!</string>
+    <string name="held_avatar_equip">Aandoen</string>
+    <string name="held_avatar_equipped">Aan</string>
+    <string name="held_avatar_unlock_level">Nog tot level %d te gaan — jij kunt dit!</string>
+    <string name="held_avatar_unlock_points">Nog tot %d verdiende punten — bijna!</string>
+    <string name="held_avatar_unlock_badge">Verdien eerst de bijpassende badge — je komt er!</string>
+    <string name="held_avatar_unlock_soon">Dit komt eraan — blijf missies doen!</string>
+
+    <!-- Family goal -->
+    <string name="goal_card_title">Gezinsdoel</string>
+    <string name="goal_card_progress">Jullie zijn al op %1$d van de %2$d punten — samen sterker!</string>
+    <string name="goal_card_progress_teen">%1$d / %2$d punten samen</string>
+    <string name="goal_card_speak">Jullie hebben samen %1$d van de %2$d punten</string>
+    <string name="goal_parent_title">Gezinsdoel</string>
+    <string name="goal_parent_detail">Stel één coöperatief doel in. Geen ranglijst tussen broers of zussen — alleen samen vooruit.</string>
+    <string name="goal_parent_name">Titel</string>
+    <string name="goal_parent_icon">Icoon</string>
+    <string name="goal_parent_target">Streefpunt: %d</string>
+    <string name="goal_parent_create">Gezinsdoel starten</string>
+    <string name="goal_parent_created">Gezinsdoel staat klaar — de kinderen zien de voortgang op Mijn Dag.</string>
+    <string name="goal_parent_error">Dat lukte niet. Misschien is er al een actief doel.</string>
+    <string name="goal_parent_default_title">Samen pizza-avond</string>
+
+    <!-- Push opt-in primer -->
+    <string name="child_push_primer_title">Mag Wispel je een seintje geven?</string>
+    <string name="child_push_primer_body">Alleen korte, vriendelijke herinneringen — zonder taaknamen of foto’s op je vergrendelscherm. Je kunt dit later uitzetten.</string>
+    <string name="child_push_primer_accept">Ja, mag</string>
+    <string name="child_push_primer_decline">Nu niet</string>
+    <string name="push_channel_name">Vriendelijke herinneringen</string>
+    <string name="push_channel_description">Korte seintjes van Wispel. Nooit met taaknamen of foto\'s op je vergrendelscherm.</string>
+
+    <!-- WS-PROPOSAL — teen task proposal -->
+    <string name="proposal_title">Vraag een taak aan</string>
+    <string name="proposal_button">Vraag een taak aan</string>
+    <string name="proposal_form_title">Nieuw voorstel</string>
+    <string name="proposal_form_detail">Heb je een idee voor een taak? Stuur het door — papa of mama beslist en stelt de punten in.</string>
+    <string name="proposal_field_title">Taaknaam</string>
+    <string name="proposal_field_title_placeholder">Bijv. ramen lappen</string>
+    <string name="proposal_field_category">Soort</string>
+    <string name="proposal_category_homework">Huiswerk</string>
+    <string name="proposal_category_household">Huishouden</string>
+    <string name="proposal_category_selfcare">Zelfzorg</string>
+    <string name="proposal_category_custom">Anders</string>
+    <string name="proposal_field_points_label">Stel je voor: %d punten</string>
+    <string name="proposal_field_points_stepper">%d punten</string>
+    <string name="proposal_field_note">Toelichting (optioneel)</string>
+    <string name="proposal_field_note_placeholder">Leg uit waarom deze taak handig is</string>
+    <string name="proposal_submit">Stuur voorstel in</string>
+    <string name="proposal_submit_success">Voorstel verstuurd — papa of mama kijkt er naar!</string>
+    <string name="proposal_submit_error">Dat lukte even niet — probeer het straks opnieuw.</string>
+    <string name="proposal_list_title">Jouw aanvragen</string>
+    <string name="proposal_list_loading">Aanvragen laden…</string>
+    <string name="proposal_list_empty">Nog geen aanvragen — doe gerust een voorstel!</string>
+    <string name="proposal_load_error">Aanvragen konden we niet laden — probeer zo opnieuw.</string>
+    <string name="proposal_suggested_points">Jij stelde %d punten voor</string>
+    <string name="proposal_status_pending">Wacht op papa of mama</string>
+    <string name="proposal_status_approved">Goedgekeurd!</string>
+    <string name="proposal_status_declined">Laten we iets anders proberen</string>
+
+    <!-- WS-FOCUS — focus timer -->
+    <string name="focus_title">Focustijd</string>
+    <string name="focus_ready">Klaar om te beginnen</string>
+    <string name="focus_running">Bezig…</string>
+    <string name="focus_paused">Even pauze</string>
+    <string name="focus_done">Goed gedaan!</string>
+    <string name="focus_start">Begin!</string>
+    <string name="focus_pause">Pauze</string>
+    <string name="focus_resume">Doorgaan</string>
+    <string name="focus_stop">Stoppen</string>
+    <string name="focus_duration_format">%d min</string>
+    <string name="focus_duration_pick">Hoelang wil je focussen?</string>
+    <string name="focus_button_inline">Focus starten</string>
+    <string name="focus_button_inline_a11y">Focustimer starten voor deze taak</string>
+    <string name="focus_complete_offer_title">Taak ook afvinken?</string>
+    <string name="focus_complete_offer_detail">Je hebt lekker hard gewerkt — wil je de taak ook als klaar markeren?</string>
+    <string name="focus_complete_offer_yes">Ja, klaar!</string>
+    <string name="focus_complete_offer_later">Misschien later</string>
+    <string name="focus_a11y_idle">Focustimer, nog niet gestart</string>
+    <string name="focus_a11y_running">Focustimer actief, %s over</string>
+    <string name="focus_a11y_paused">Focustimer gepauzeerd, %s over</string>
+    <string name="focus_a11y_done">Focustimer klaar — goed gedaan!</string>
+
+    <!-- Parent gate -->
+    <string name="parent_gate_title">Ouderpoort</string>
+    <string name="parent_gate_description">Oudermodus blijft verborgen voor kinderen en opent alleen via toestel-authenticatie of een ouderaccount.</string>
+    <string name="parent_gate_behind">Wat hierachter zit</string>
+    <string name="parent_gate_behind_detail">Vandaag per kind, goedkeuren met veilige fotoweergave, rustige instellingen en privacy-acties zoals export of verwijderen.</string>
+    <string name="parent_gate_child_pin_blocked">Kind-pincode opent dit bewust niet</string>
+    <string name="parent_gate_la_button">Ontgrendel met je vingerafdruk of schermvergrendeling</string>
+    <string name="parent_gate_la_title">Ouderpoort openen</string>
+    <string name="parent_gate_la_reason">Ontgrendel de oudermodus van Wispel</string>
+    <string name="parent_gate_la_failed">De authenticatie is niet gelukt. Probeer het nog eens of gebruik je ouderaccount.</string>
+    <string name="parent_gate_account_button">Gebruik ouderaccount</string>
+    <string name="parent_gate_cancel">Toch terug</string>
+    <string name="parent_gate_push_note">Push-links naar goedkeuren landen ook eerst hier, met generieke meldingstekst op het vergrendelscherm.</string>
+    <string name="parent_gate_account_title">Log in als ouder</string>
+    <string name="parent_gate_account_detail">Voor goedkeuren, beheer en privacy-acties heb je een ouderaccount-sessie nodig op dit toestel.</string>
+
+    <!-- Parent mode -->
+    <string name="parent_mode_title">Oudermodus</string>
+    <string name="parent_mode_subtitle">Kijk per kind wat vandaag loopt, keur foto\'s veilig goed en houd instellingen rustig in de hand.</string>
+    <string name="parent_mode_pending">%d te keuren</string>
+    <string name="parent_mode_back">Terug naar kindmodus</string>
+    <string name="parent_mode_refresh">Ververs</string>
+    <string name="parent_surface_vandaag">Vandaag</string>
+    <string name="parent_surface_goedkeuren">Goedkeuren</string>
+    <string name="parent_surface_taken">Taken</string>
+    <string name="parent_surface_beloningen">Beloningen</string>
+    <string name="parent_surface_instellingen">Instellingen</string>
+
+    <!-- Parent today -->
+    <string name="parent_today_loading">Vandaag laden…</string>
+    <string name="parent_today_loading_detail">We halen per kind rustig de nieuwste stand op.</string>
+    <string name="parent_today_empty">Nog geen kinderen zichtbaar</string>
+    <string name="parent_today_empty_detail">Zodra er een profiel gekoppeld is, zie je hier per kind de dag in drie rustige kolommen.</string>
+    <string name="parent_today_child_quiet">Vandaag is het rustig voor %s.</string>
+    <string name="parent_today_balance">%d punten</string>
+    <string name="parent_today_points_short">%d pt</string>
+    <string name="parent_bucket_open">Te doen</string>
+    <string name="parent_bucket_awaiting">Wacht op goedkeuring</string>
+    <string name="parent_bucket_done">Af</string>
+    <string name="parent_bucket_empty">—</string>
+    <string name="parent_task_status_open">Klaar om op te pakken</string>
+    <string name="parent_task_status_submitted">Wacht op goedkeuring</string>
+    <string name="parent_task_status_approved">Goedgekeurd</string>
+    <string name="parent_task_status_completed">Afgerond</string>
+    <string name="parent_task_status_redo">Nog even afronden</string>
+
+    <!-- Parent approvals -->
+    <string name="parent_approvals_empty">Niets te keuren — lekker rustig.</string>
+    <string name="parent_approvals_empty_detail">Nieuwe foto\'s en goedkeuringen landen hier automatisch achter de ouderpoort.</string>
+    <string name="parent_approvals_submitted_by">Ingediend door %s</string>
+    <string name="parent_approvals_approve">Goedkeuren</string>
+    <string name="parent_approvals_redo">Nog even kijken</string>
+    <string name="parent_approvals_no_photo">Zonder foto</string>
+    <string name="parent_approvals_photo_safe">Fullscreen bekijken zonder locatie- of cameragegevens te tonen.</string>
+    <string name="parent_approvals_photo_processing">Foto wordt nagekeken…</string>
+    <string name="parent_approvals_photo_ready">Foto klaar om te bekijken</string>
+    <string name="parent_approvals_toggle_bulk">Kies mee voor bulk goedkeuren</string>
+    <string name="parent_approvals_points">%d punten</string>
+    <string name="parent_photo_accessibility_label">Taakfoto</string>
+
+    <!-- Bulk approve -->
+    <string name="parent_bulk_title">Bulk goedkeuren</string>
+    <string name="parent_bulk_button">Keur %d kaartjes goed</string>
+    <string name="parent_bulk_allowed">Je selectie hoort bij hetzelfde kind en kan veilig samen door.</string>
+    <string name="parent_bulk_empty">Kies eerst een paar kaartjes van hetzelfde kind.</string>
+    <string name="parent_bulk_mixed">Bulk goedkeuren werkt alleen voor kaartjes van hetzelfde kind.</string>
+    <string name="parent_bulk_photo_ack">Voor geselecteerde foto\'s vragen we eerst een bewuste bevestiging.</string>
+    <string name="parent_bulk_photo_toggle">Ik heb de geselecteerde foto\'s bewust bekeken.</string>
+    <string name="parent_bulk_failures">%d goedkeuringen lukten niet — probeer die rustig opnieuw.</string>
+
+    <!-- Redo sheet -->
+    <string name="parent_redo_title">Nog even kijken</string>
+    <string name="parent_redo_note_prompt">Stuur een korte, positieve notitie mee voor %s.</string>
+    <string name="parent_redo_note_placeholder">Bijna! Kijk nog even naar de hoekjes, dan is hij klaar.</string>
+    <string name="parent_redo_submit">Verstuur notitie</string>
+
+    <!-- Parent settings -->
+    <string name="parent_settings_sound_title">Geluiden</string>
+    <string name="parent_settings_sound_detail">Ouders kunnen het beloningsgeluid hier rustig aan- of uitzetten zonder dat die instelling in kindmodus zichtbaar is.</string>
+    <string name="parent_settings_sound_toggle">Geluiden aan</string>
+    <string name="parent_settings_privacy_title">Privacy en gegevens</string>
+    <string name="parent_settings_privacy_detail">Je kunt je gezinsdata opvragen of je account verwijderen. Dit blijft alleen bereikbaar achter de ouderpoort.</string>
+    <string name="parent_settings_export">Vraag je data-export aan</string>
+    <string name="parent_settings_export_ready">Je export is klaar: %s</string>
+    <string name="parent_settings_export_pending">We zetten je export klaar. Kom zo nog even terug achter de ouderpoort.</string>
+    <string name="parent_settings_export_failed">De export lukte niet. Probeer het zo nog eens.</string>
+    <string name="parent_settings_delete">Verwijder account en gezin</string>
+    <string name="parent_settings_delete_confirm_title">Weet je het zeker?</string>
+    <string name="parent_settings_delete_confirm_message">Hiermee vraag je om je account en gezinsdata te verwijderen. Dit blijft bewust achter de ouderpoort.</string>
+    <string name="parent_settings_delete_confirm_button">Account verwijderen</string>
+    <string name="parent_settings_delete_success">Je accountverzoek is verwerkt. Je wordt nu veilig teruggezet.</string>
+    <string name="parent_settings_delete_siwa_title">Bevestig met Apple</string>
+    <string name="parent_settings_delete_siwa_detail">Voor de zekerheid vragen we opnieuw je Apple-login voordat we het gezin verwijderen.</string>
+
+    <!-- Parent task and reward management -->
+    <string name="parent_tasks_create_title">Nieuwe taak</string>
+    <string name="parent_tasks_create_placeholder">Bijvoorbeeld: schoenen wegzetten</string>
+    <string name="parent_tasks_create_points">%d punten</string>
+    <string name="parent_tasks_create_button">Taak toevoegen</string>
+    <string name="parent_tasks_meta">%1$d pt · %2$d kind(eren)</string>
+    <string name="parent_tasks_archive">Archiveren</string>
+    <string name="parent_tasks_empty">Nog geen taken — voeg er rustig eentje toe.</string>
+    <string name="parent_tasks_need_child">Koppel eerst een kindprofiel voordat je een taak toevoegt.</string>
+    <string name="parent_rewards_create_title">Nieuwe beloning</string>
+    <string name="parent_rewards_create_placeholder">Bijvoorbeeld: filmavond</string>
+    <string name="parent_rewards_create_price">%d punten</string>
+    <string name="parent_rewards_create_button">Beloning toevoegen</string>
+    <string name="parent_rewards_meta">%d punten</string>
+    <string name="parent_rewards_archive">Archiveren</string>
+    <string name="parent_rewards_empty">Nog geen beloningen in de winkel.</string>
+    <string name="parent_stepper_increase">Meer</string>
+    <string name="parent_stepper_decrease">Minder</string>
+
+    <!-- Photo viewer -->
+    <string name="parent_photo_safe_title">Veilige fotoweergave</string>
+    <string name="parent_photo_safe_detail">Wispel laat hier bewust geen EXIF-, locatie- of cameragegevens zien. Alleen de foto zelf telt mee voor de beoordeling.</string>
+
+    <!-- Sync status -->
+    <string name="parent_sync_live">Live</string>
+    <string name="parent_sync_sync">Sync</string>
+    <string name="parent_sync_disconnected">Niet verbonden</string>
+    <string name="parent_sync_connecting">Verbinden…</string>
+    <string name="parent_sync_connected">Verbonden</string>
+    <string name="parent_sync_reconnect">Opnieuw in %ds</string>
+    <string name="parent_sync_idle">Nog niet gestart</string>
+    <string name="parent_sync_busy">Bezig</string>
+    <string name="parent_sync_updated">Bijgewerkt om %s</string>
+    <string name="parent_sync_retry">Nogmaals proberen</string>
+
+    <!-- Core error messages (nl.taakhelden.core.i18n.UserMessage) -->
+    <string name="error_invalid_family_code">Die gezinscode lijkt nog niet compleet.</string>
+    <string name="error_invalid_pin">Die pincode mist nog een paar cijfers.</string>
+    <string name="error_invalid_parent_note">Schrijf nog even een korte, positieve notitie.</string>
+    <string name="error_session_missing">Je sessie is verlopen. Koppel dit toestel opnieuw.</string>
+    <string name="error_parent_session_missing">Log even in met je ouderaccount om goed te keuren of te beheren.</string>
+    <string name="error_parent_reauth_required">Bevestig opnieuw met Apple om het account te verwijderen.</string>
+    <string name="error_not_implemented">Deze actie is nog niet beschikbaar op dit toestel.</string>
+    <string name="error_transport_invalid_url">De verbinding kon niet worden opgezet.</string>
+    <string name="error_transport_offline">We kunnen even geen verbinding maken — je afgevinkte taken zijn veilig.</string>
+    <string name="error_transport_generic">Er ging iets mis. Probeer het gerust opnieuw.</string>
+    <string name="error_transport_decoding">Het antwoord was onverwacht. Probeer het zo nog een keer.</string>
+    <string name="error_photo_processing_failed">Foto lukte niet — je mag het nog een keer proberen.</string>
+    <string name="error_photo_processing_timeout">Foto wordt nagekeken… kom zo nog even terug.</string>
+    <string name="error_biometrics_unavailable">De vingerafdruk is nu niet beschikbaar. Gebruik je pincode.</string>
+    <string name="error_biometrics_cancelled">Geen probleem — je kunt je pincode gebruiken.</string>
+    <string name="error_apple_sign_in_failed">Inloggen met Apple lukte niet. Probeer het opnieuw.</string>
+
+    <!-- Home screen widget -->
+    <string name="widget_display_name">Nog N taken</string>
+    <string name="widget_description">Toont hoeveel open taken er vandaag nog staan.</string>
+    <string name="widget_all_done">Alles af voor nu</string>
+    <string name="widget_open_tasks">Nog %d taken</string>
+    <string name="widget_open_hint">Open de app voor details</string>
+</resources>

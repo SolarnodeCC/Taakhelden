@@ -1,0 +1,52 @@
+name: Android
+
+on:
+  pull_request:
+    paths:
+      - "apps/android/**"
+      - "packages/shared/**"
+      - "docs/openapi/**"
+      - ".github/workflows/android.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  contract-and-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      # Fails when the generated Swift or Kotlin contract models drift from the shared
+      # Zod schemas — the same gate the iOS lane runs.
+      - run: npm run openapi:check
+
+      - uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00 # v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
+      - uses: gradle/actions/setup-gradle@06832c7b30a0129d7fb559bcc6e43d26f6374244 # v4
+
+      # `:core` is a plain Kotlin/JVM module and holds the ported app logic, so this is
+      # the real regression lane. It runs even if the Android SDK were unavailable.
+      - name: Core unit tests
+        working-directory: apps/android
+        run: gradle :core:test --no-daemon
+
+      - name: Build and test the app module
+        working-directory: apps/android
+        run: gradle :app:assembleDebug :app:testDebugUnitTest --no-daemon
+
+      # MissingTranslation is an error here: half-Dutch child copy ships worse than no
+      # feature at all.
+      - name: Lint
+        working-directory: apps/android
+        run: gradle :app:lintDebug --no-daemon

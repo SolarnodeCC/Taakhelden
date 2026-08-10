@@ -1,14 +1,19 @@
 /**
- * APNs-push + de catalogus van positieve notificatieteksten.
- * Regels: max 2/dag per kind, nooit binnen quiet hours, nooit schuldgevoel-taal
- * (stijlgids: docs/taakhelden-productvoorstel.md §3.7). Zonder APNS-secrets
- * (lokaal/test) is verzenden een stille no-op. Log nooit namen of tokens.
+ * Push (APNs voor iOS, FCM voor Android) + de catalogus van positieve
+ * notificatieteksten. Regels: max 2/dag per kind, nooit binnen quiet hours, nooit
+ * schuldgevoel-taal (stijlgids: docs/taakhelden-productvoorstel.md §3.7). Zonder
+ * gateway-secrets (lokaal/test) is verzenden een stille no-op. Log nooit namen of
+ * tokens.
  */
 import { SignJWT, importPKCS8 } from "jose";
 import { PushPayload } from "@taakhelden/shared";
 import type { Env } from "../types";
 import { getFamily, getMembers, getMember } from "../repo/families";
-import { listDeviceTokensForUsers, deleteDeadDeviceToken } from "../repo/devices";
+import {
+  listDeviceTokensForUsers,
+  deleteDeadDeviceToken,
+  type DeviceToken,
+} from "../repo/devices";
 import { getSetting } from "../repo/notifications";
 import { localDate, localTime } from "./time";
 
@@ -47,6 +52,8 @@ const APNS_HOSTS = {
   production: "https://api.push.apple.com",
   sandbox: "https://api.sandbox.push.apple.com",
 } as const;
+const FCM_TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token";
+const FCM_SCOPE = "https://www.googleapis.com/auth/firebase.messaging";
 
 /** Valt HH:MM binnen [start, end)? Werkt ook over middernacht heen (19:30→07:00). */
 export function isQuietTime(quietStart: string, quietEnd: string, hhmm: string): boolean {
@@ -119,6 +126,115 @@ async function apnsSend(
   return sent;
 }
 
+// FCM OAuth2-token (RS256 service account) is 1 u geldig; ververs iets eerder.
+let cachedFcmToken: { token: string; expiresAt: number } | null = null;
+
+async function fcmAccessToken(
+  env: Env & { FCM_CLIENT_EMAIL: string; FCM_PRIVATE_KEY: string },
+): Promise<string | null> {
+  if (cachedFcmToken && cachedFcmToken.expiresAt > Date.now()) return cachedFcmToken.token;
+  const key = await importPKCS8(env.FCM_PRIVATE_KEY, "RS256");
+  const assertion = await new SignJWT({ scope: FCM_SCOPE })
+    .setProtectedHeader({ alg: "RS256" })
+    .setIssuer(env.FCM_CLIENT_EMAIL)
+    .setSubject(env.FCM_CLIENT_EMAIL)
+    .setAudience(FCM_TOKEN_ENDPOINT)
+    .setIssuedAt()
+    .setExpirationTime("1h")
+    .sign(key);
+
+  const res = await fetch(FCM_TOKEN_ENDPOINT, {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion,
+    }),
+  });
+  if (!res.ok) return null;
+  const json = (await res.json()) as { access_token?: string; expires_in?: number };
+  if (!json.access_token) return null;
+  cachedFcmToken = {
+    token: json.access_token,
+    expiresAt: Date.now() + ((json.expires_in ?? 3600) - 300) * 1000,
+  };
+  return cachedFcmToken.token;
+}
+
+/**
+ * FCM HTTP v1 — de Android-tegenhanger van `apnsSend`.
+ *
+ * Zelfde contract: best-effort, nooit een mutatie laten falen, en zonder secrets een
+ * stille no-op. De lockscreen-tekst blijft generiek (geen taaknamen of foto's), net als
+ * bij APNs. Data-only velden gaan mee onder `th`, zodat de client dezelfde payload ziet.
+ */
+async function fcmSend(
+  env: Env,
+  tokens: string[],
+  message: { title: string; body: string },
+  payload: PushPayload,
+): Promise<number> {
+  if (
+    !env.FCM_PROJECT_ID ||
+    !env.FCM_CLIENT_EMAIL ||
+    !env.FCM_PRIVATE_KEY ||
+    tokens.length === 0
+  ) {
+    return 0; // geen secrets (dev/test) of geen apparaten: stille no-op
+  }
+  const fcmEnv = env as Env & { FCM_CLIENT_EMAIL: string; FCM_PRIVATE_KEY: string };
+  const accessToken = await fcmAccessToken(fcmEnv);
+  if (!accessToken) return 0;
+
+  const endpoint = `https://fcm.googleapis.com/v1/projects/${env.FCM_PROJECT_ID}/messages:send`;
+  let sent = 0;
+  for (const token of tokens) {
+    try {
+      const parsedPayload = PushPayload.parse(payload);
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {
+          authorization: `Bearer ${accessToken}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          message: {
+            token,
+            // A silent refresh must not draw a notification; a normal push must.
+            ...(parsedPayload.contentAvailable ? {} : { notification: message }),
+            android: {
+              priority: parsedPayload.contentAvailable ? "NORMAL" : "HIGH",
+            },
+            data: { th: JSON.stringify(parsedPayload) },
+          },
+        }),
+      });
+      if (res.ok) sent++;
+      // 404 UNREGISTERED / 403 SENDER_ID_MISMATCH: token is dood → opruimen.
+      else if (res.status === 404) await deleteDeadDeviceToken(env.DB, token);
+    } catch {
+      // netwerk-hik: push is best-effort, nooit een mutatie laten falen
+    }
+  }
+  return sent;
+}
+
+/** Verstuurt naar beide gateways en telt het totaal aantal geslaagde pushes. */
+async function pushToDevices(
+  env: Env,
+  devices: DeviceToken[],
+  message: { title: string; body: string },
+  payload: PushPayload,
+): Promise<number> {
+  const apnsTokens = devices.filter((d) => d.platform !== "android").map((d) => d.token);
+  const fcmTokens = devices.filter((d) => d.platform === "android").map((d) => d.token);
+  const [apns, fcm] = await Promise.all([
+    apnsSend(env, apnsTokens, message, payload),
+    fcmSend(env, fcmTokens, message, payload),
+  ]);
+  return apns + fcm;
+}
+
 /** Push naar een kind: respecteert quiet hours en max 2 pushes per dag. */
 export async function notifyChild(
   env: Env,
@@ -143,8 +259,8 @@ export async function notifyChild(
   const used = Number((await env.KV.get(countKey)) ?? "0");
   if (used >= DAILY_CHILD_PUSH_LIMIT) return;
 
-  const tokens = await listDeviceTokensForUsers(env.DB, familyId, [childId]);
-  const sent = await apnsSend(env, tokens, { title: "Wispel", body }, payload);
+  const devices = await listDeviceTokensForUsers(env.DB, familyId, [childId]);
+  const sent = await pushToDevices(env, devices, { title: "Wispel", body }, payload);
   if (sent > 0) {
     await env.KV.put(countKey, String(used + 1), { expirationTtl: 60 * 60 * 24 });
   }
@@ -159,8 +275,8 @@ export async function notifyParents(
 ): Promise<void> {
   const { results } = await getMembers(env.DB, familyId);
   const parentIds = results.filter((m) => m.role === "parent").map((m) => m.id as string);
-  const tokens = await listDeviceTokensForUsers(env.DB, familyId, parentIds);
-  await apnsSend(env, tokens, { title: "Wispel", body }, payload);
+  const devices = await listDeviceTokensForUsers(env.DB, familyId, parentIds);
+  await pushToDevices(env, devices, { title: "Wispel", body }, payload);
 }
 
 /** Roepnaam voor in pushtekst (nooit loggen — privacyregel 5). */
