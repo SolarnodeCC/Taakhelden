@@ -221,6 +221,86 @@ describe("GET /tasks/proposals", () => {
 });
 
 // ============================================================
+// WS-AI-GUARD (ADR-0006) — deterministische review_flag
+//
+// De vlag is een signaal voor de ouder, nooit een filter: een gemarkeerde
+// taakvraag wordt hoe dan ook aangemaakt (201, status 'pending'). De vlag mag
+// het kindtoken nooit bereiken — niet in de create-response, niet in de lijst.
+// ============================================================
+
+describe("WS-AI-GUARD — review_flag", () => {
+  it("markeert een taakvraag met zorgwekkende tekst, maar blokkeert 'm niet", async () => {
+    const fam = await seedFamily("prp_flag_create");
+    await makeTeen(fam.familyId, fam.childA);
+
+    const res = await api("/tasks/proposals", {
+      token: await childToken(fam.childA, fam.familyId),
+      body: { ...CREATE_BODY, note: "Werkstuk maken over drugs voor school" },
+      idempotencyKey: "prp-flag-1",
+    });
+
+    expect(res.status).toBe(201);
+    const body = (await res.json()) as { status: string; reviewFlag?: string | null };
+    expect(body.status).toBe("pending");
+    // Het kind is de indiener: nooit zijn eigen vlag terugzien, ook niet als null.
+    expect("reviewFlag" in body).toBe(false);
+
+    const row = await env.DB.prepare("SELECT review_flag FROM task_proposals WHERE family_id = ?")
+      .bind(fam.familyId)
+      .first<{ review_flag: string | null }>();
+    expect(row?.review_flag).toBe("language");
+  });
+
+  it("laat schone tekst ongemarkeerd", async () => {
+    const fam = await seedFamily("prp_flag_clean");
+    await makeTeen(fam.familyId, fam.childA);
+
+    await api("/tasks/proposals", {
+      token: await childToken(fam.childA, fam.familyId),
+      body: CREATE_BODY,
+      idempotencyKey: "prp-flag-clean-1",
+    });
+
+    const row = await env.DB.prepare("SELECT review_flag FROM task_proposals WHERE family_id = ?")
+      .bind(fam.familyId)
+      .first<{ review_flag: string | null }>();
+    expect(row?.review_flag).toBeNull();
+  });
+
+  it("ouder ziet de vlag in de lijst; kind nooit — ook niet als null", async () => {
+    const fam = await seedFamily("prp_flag_list");
+    const flaggedId = `prp_test${Math.random().toString(36).slice(2)}`;
+    await env.DB.prepare(
+      `INSERT INTO task_proposals (id, family_id, child_id, title, category, icon, suggested_points, note, review_flag)
+       VALUES (?, ?, ?, 'Werkstuk over drugs', 'household', 'star', 20, 'schoolopdracht', 'language')`,
+    )
+      .bind(flaggedId, fam.familyId, fam.childA)
+      .run();
+    await seedProposal(fam.familyId, fam.childA, "Auto wassen");
+
+    const parentRes = await api("/tasks/proposals", {
+      token: await parentToken(fam.parentId, fam.familyId),
+    });
+    const parentBody = (await parentRes.json()) as {
+      proposals: Array<{ id: string; reviewFlag: string | null }>;
+    };
+    const flaggedRow = parentBody.proposals.find((p) => p.id === flaggedId);
+    expect(flaggedRow?.reviewFlag).toBe("language");
+    const cleanRow = parentBody.proposals.find((p) => p.id !== flaggedId);
+    expect(cleanRow?.reviewFlag).toBeNull();
+
+    const childRes = await api("/tasks/proposals", {
+      token: await childToken(fam.childA, fam.familyId),
+    });
+    const childBody = (await childRes.json()) as { proposals: Array<Record<string, unknown>> };
+    expect(childBody.proposals.length).toBeGreaterThan(0);
+    for (const proposal of childBody.proposals) {
+      expect("reviewFlag" in proposal).toBe(false);
+    }
+  });
+});
+
+// ============================================================
 // POST /tasks/proposals/:id/approve
 // ============================================================
 

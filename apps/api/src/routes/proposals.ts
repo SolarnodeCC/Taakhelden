@@ -38,12 +38,19 @@ import { getFamily, getMember, listChildren } from "../repo/families";
 import { generateInstancesForFamily } from "../services/taskEngine";
 import { childCopy, notifyChild } from "../services/notifier";
 import { localDate } from "../services/time";
+import { screenProposalText } from "../services/proposalScreen";
 
 const proposals = new Hono<AppBindings>();
 
 const TEEN_MIN_AGE = 13;
 
-function proposalView(row: ProposalRow): TaskProposal {
+/**
+ * `includeReviewFlag` is de enige plek die bepaalt of `review_flag` het
+ * netwerk op gaat. Een kind mag NOOIT zien dat zijn eigen taakvraag gemarkeerd
+ * is (WS-AI-GUARD AC2) — dus elke call-site hieronder geeft dit expliciet mee,
+ * er is geen "veilige default".
+ */
+function proposalView(row: ProposalRow, includeReviewFlag: boolean): TaskProposal {
   return TaskProposal.parse({
     id: row.id,
     childId: row.child_id,
@@ -57,6 +64,7 @@ function proposalView(row: ProposalRow): TaskProposal {
     decidedAt: row.decided_at ?? null,
     createdTaskId: row.created_task_id ?? null,
     createdAt: row.created_at,
+    ...(includeReviewFlag ? { reviewFlag: row.review_flag ?? null } : {}),
   });
 }
 
@@ -86,15 +94,20 @@ proposals.post("/", requireIdempotencyKey, validate("json", CreateProposalBody),
     );
   }
 
+  const body = c.req.valid("json");
+  const reviewFlag = screenProposalText(body.title, body.note);
+
   const id = await createProposal(c.env.DB, auth.familyId, {
-    ...c.req.valid("json"),
+    ...body,
     childId: auth.userId,
+    reviewFlag,
   });
   const row = await getProposal(c.env.DB, auth.familyId, id);
   if (!row) {
     throw new ApiException(404, ErrorCodes.NOT_FOUND, "Taakvraag niet gevonden.");
   }
-  return c.json(proposalView(row), 201);
+  // Het kind is de indiener van deze taakvraag: nooit zijn eigen vlag terugzien.
+  return c.json(proposalView(row, false), 201);
 });
 
 /** GET /tasks/proposals?status=pending — ouder ziet alle vragen, kind alleen zijn eigen. */
@@ -110,7 +123,12 @@ proposals.get("/", async (c) => {
     status: parsedStatus?.success ? parsedStatus.data : undefined,
     childId: auth.role === "child" ? auth.userId : undefined,
   });
-  return c.json(TaskProposalListResponse.parse({ proposals: rows.map(proposalView) }));
+  const includeReviewFlag = auth.role === "parent";
+  return c.json(
+    TaskProposalListResponse.parse({
+      proposals: rows.map((row) => proposalView(row, includeReviewFlag)),
+    }),
+  );
 });
 
 /**
@@ -194,7 +212,7 @@ proposals.post(
     }
 
     const updated = await getProposal(c.env.DB, familyId, proposalId);
-    return c.json({ proposal: proposalView(updated as ProposalRow), taskId });
+    return c.json({ proposal: proposalView(updated as ProposalRow, true), taskId });
   },
 );
 
@@ -222,7 +240,7 @@ proposals.post(
     }
 
     const updated = await getProposal(c.env.DB, familyId, proposalId);
-    return c.json(proposalView(updated as ProposalRow));
+    return c.json(proposalView(updated as ProposalRow, true));
   },
 );
 

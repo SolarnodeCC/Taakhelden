@@ -160,7 +160,9 @@
       "actionError": "Er ging iets mis. Probeer het nog eens.",
       "loadError": "Kon de taakvragen niet laden.",
       "declineNoteRequired": "Vul een reactie in — kinderen waarderen een berichtje.",
-      "approveValidationError": "Punten moeten groter dan nul zijn."
+      "approveValidationError": "Punten moeten groter dan nul zijn.",
+      "reviewFlagBadge": "Even zelf lezen",
+      "reviewFlagHint": "De tekst van deze taakvraag bevat een woord dat aandacht kan verdienen — lees 'm rustig door voordat je beslist."
     }
   },
   "taken": {

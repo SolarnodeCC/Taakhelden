@@ -52,6 +52,13 @@ export const TaskProposal = z.object({
   decidedAt: z.string().nullable(),
   createdTaskId: z.string().nullable(),
   createdAt: z.string(),
+  /**
+   * WS-AI-GUARD (ADR-0006): deterministische veiligheidsvlag, alleen gezet
+   * door de server. Optional, niet alleen nullable — een kindtoken krijgt dit
+   * veld nooit terug (het kind ziet nooit dat zijn tekst gemarkeerd is), dus
+   * het veld moet legitiem kunnen ontbreken i.p.v. altijd `null` te zijn.
+   */
+  reviewFlag: z.string().nullable().optional(),
 });
 export type TaskProposal = z.infer<typeof TaskProposal>;
 
