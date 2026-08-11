@@ -82,7 +82,15 @@ Do **not** hand-edit `agent/baselines/main.repo-score.json` — always regenerat
 | Date | Score | Why refreshed |
 |------|-------|---------------|
 | 2026-07 | 53 | after merge with main + iOS Phase 1 |
-| 2026-08 | 48 | after the Android port (`apps/android/`) |
+| 2026-08 | 48 | after the Android port (`apps/android/`) + WS-AI-GUARD merge |
+
+> **Regenerate against the tree CI actually scans.** For a `pull_request` run, that is
+> the **merge commit** (branch + base), not the branch tip. A baseline taken on the
+> branch alone will report a different `caps`/`findings` count than CI and fail ratchet
+> on `new_caps` even when the score is unchanged — that is exactly what happened here
+> (branch tip: `caps=16 findings=56`; CI's merged tree: `caps=17 findings=57`). Merge the
+> base branch in first, then regenerate. Delete the gitignored `.jankurai/` smart-scan
+> state beforehand too, so the run matches a cold CI runner.
 
 ### 2026-08 — Android port (53 → 48)
 

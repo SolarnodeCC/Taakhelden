@@ -1,6 +1,6 @@
 {
-  "report_fingerprint": "sha256:fe087ad4725b34746d60ffc6d25b41ce3ab8934c5ab6daaf7e7eb5122db74fd1",
-  "input_fingerprint": "sha256:2c91b6b28ee5f3f60c455802b0be76cfe58bea3ae625929604d6e99437a3a109",
+  "report_fingerprint": "sha256:60cc68e6e9cdb0069c9ff6cba4bb4acc4460c22bfa6942e8cdf65ad53fae8949",
+  "input_fingerprint": "sha256:0b2e4c801f78f698763986b3fae3af2da6cc5904402428c8af096c782e8052c5",
   "policy_fingerprint": "sha256:20e69f63f26de0c53e8f6a8df3b7234d5d27169372d8ae045880cfb1929a5a8c",
   "manifest_fingerprints": {
     "owner_map": "sha256:eab3d9897d5ec572c3f90f2b477cda75596304fde67d38de6ce157be0a0e8617",
@@ -8,7 +8,7 @@
     "generated_zones": "sha256:8e884fbb53897f8e3197fc9ea998412b5a235c56b065800f1771c4097b4698e7"
   },
   "dirty_worktree": false,
-  "generated_at": "1786427937",
+  "generated_at": "1786428710",
   "schema_url": "schemas/repo-score.schema.json",
   "standard": "jankurai",
   "standard_version": "0.9.0",
@@ -38,6 +38,7 @@
     "HLT-042-CI-LOCAL-PARITY on .github/workflows/ios.yml",
     "HLT-034-CI-BAD-BEHAVIOR on .github/workflows/jankurai.yml",
     "HLT-042-CI-LOCAL-PARITY on .github/workflows/jankurai.yml",
+    "HLT-010-SECRET-SPRAWL on agent/baselines/README.md",
     "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
     "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
     "HLT-004-UNMAPPED-PROOF on agent/test-map.json",
@@ -64,9 +65,9 @@
     "HLT-025-RELEASE-READINESS-GAP on docs/release.md"
   ],
   "repo": ".",
-  "run_id": "1786427937",
-  "started_at": "1786427937",
-  "elapsed_ms": 4099,
+  "run_id": "1786428710",
+  "started_at": "1786428710",
+  "elapsed_ms": 4374,
   "scope": {
     "mode": "full",
     "paths": []
@@ -78,7 +79,7 @@
     "minimum_score": 40,
     "passed": true,
     "hard_findings": 0,
-    "soft_findings": 56,
+    "soft_findings": 57,
     "ratchet": {
       "baseline_score": 48,
       "allowed_drop": 0,
@@ -93,7 +94,7 @@
     }
   },
   "git": {
-    "head": "6c01b73",
+    "head": "130a5d0",
     "base": null,
     "changed_files": 0,
     "mode": "full",
@@ -124,6 +125,7 @@
     "future-hostile-dead-language-in-product-code",
     "direct-db-access-from-wrong-layer",
     "missing-rendered-ux-qa-lane",
+    "secret-like-content-detected",
     "input-boundary-gap",
     "agent-tool-supply-chain-gap",
     "release-readiness-gap",
@@ -1082,7 +1084,7 @@
   "copy_code": {
     "schema_version": "1.1.0",
     "generated_by": "jankurai copy-code",
-    "generated_at": "2026-08-11T05:58:53.702339436+00:00",
+    "generated_at": "2026-08-11T06:11:45.784782929+00:00",
     "repo": ".",
     "auditor_version": "1.6.10",
     "status": "review",
@@ -1120,9 +1122,9 @@
       ]
     },
     "summary": {
-      "files_scanned": 521,
-      "files_considered": 206,
-      "active_files": 206,
+      "files_scanned": 524,
+      "files_considered": 207,
+      "active_files": 207,
       "exact_file_classes": 0,
       "hard_classes": 0,
       "warning_classes": 4,
@@ -1997,7 +1999,7 @@
       "evidence": [
         "detector=ci.local-parity.workflow-not-thin",
         "path=.github/workflows/jankurai.yml",
-        "line=38",
+        "line=44",
         "proof_window=None",
         "snippet=jobs:"
       ],
@@ -2006,13 +2008,13 @@
       "confidence": 0.95,
       "evidence_kind": "repository-scan",
       "rerun_command": "just fast",
-      "fingerprint": "sha256:93eee7c14c6150c2a9611c637503227be8b68727ad88a2288094559e8a21565a",
+      "fingerprint": "sha256:8f7d149a6df5830be19616e06f6861f001549252260268bc64a3a2adeea3834e",
       "rule_id": "HLT-042-CI-LOCAL-PARITY",
       "tlr": "Verification",
       "lane": "fast",
       "docs_url": "docs/ci-local.md",
       "owner": "ops",
-      "line": 38,
+      "line": 44,
       "matched_term": "ci.local-parity.workflow-not-thin",
       "reason": "without a single source of truth, local runs drift from CI and breakage is only visible after push"
     },
@@ -2063,6 +2065,28 @@
       "lane": "fast",
       "docs_url": "docs/testing.md",
       "owner": "workspace"
+    },
+    {
+      "severity": "critical",
+      "category": "security",
+      "path": "agent/baselines/README.md",
+      "problem": "secret-like value or credential material appears in repository text",
+      "agent_fix": "remove and rotate the credential, add local and CI secret scanning, and scan transcripts/artifacts/MCP config for related exposure",
+      "evidence": [
+        "- `HLT-010-SECRET-SPRAWL` (critical) — a test passed `accessToken = \"child-token\"`,"
+      ],
+      "check_id": "HLT-010-SECRET-SPRAWL:security",
+      "hardness": "hard",
+      "confidence": 0.95,
+      "evidence_kind": "repository-scan",
+      "rerun_command": "just security",
+      "fingerprint": "sha256:a172f5c17b91b6543798ac806a64bb69bed6e685568385040e206f97aef40551",
+      "rule_id": "HLT-010-SECRET-SPRAWL",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "docs_url": "docs/audit-rubric.md#top-level-risk-mapping",
+      "owner": "agent",
+      "line": 93
     },
     {
       "severity": "medium",
@@ -3133,6 +3157,16 @@
       "owner": "agent",
       "task": "add `ops/AGENTS.md` with owns / forbidden / proof lane guidance",
       "why": "reference-profile cell `ops` lacks local AGENTS.md guidance"
+    },
+    {
+      "path": "agent/baselines/README.md",
+      "priority": "critical",
+      "rule_id": "HLT-010-SECRET-SPRAWL",
+      "tlr": "Security, secrets, agency",
+      "lane": "security",
+      "owner": "agent",
+      "task": "remove and rotate the credential, add local and CI secret scanning, and scan transcripts/artifacts/MCP config for related exposure",
+      "why": "secret-like value or credential material appears in repository text"
     },
     {
       "path": ".github/workflows",
