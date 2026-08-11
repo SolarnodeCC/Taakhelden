@@ -7,7 +7,7 @@ name: Jankurai (regression gate)
 # directory".
 #
 # `mode: ratchet` tegen de baseline in agent/baselines/main.repo-score.json
-# (score 52, ververst na merge met main + iOS Phase 1 — zie dat bestand en
+# (score 48, ververst na de Android-port — zie dat bestand en
 # agent/baselines/README.md). Deze job faalt nu ECHT bij een regressie t.o.v.
 # die baseline; ci.yml blijft daarnaast de bron van waarheid voor de
 # typecheck/test/migratie-gate (zie claude.yml). Of een faalde `audit`-job de
@@ -22,6 +22,12 @@ name: Jankurai (regression gate)
 #     "raw command SQL" / injection-risico.
 #   - `JSON.parse(...) as T` na een D1-read wordt als ongevalideerde any-cast
 #     geflagged, ook waar een handmatige guard er meteen achteraan staat.
+#   - Compose's `placeholder = { ... }`-parameter op `OutlinedTextField` telt als
+#     "future-hostile/dead-language term" — het is een API-naam, geen dode code.
+#   - `ops/ci/lib.sh`/doctor/runner "missing" op elke workflow: bewuste keuze,
+#     deze monorepo gebruikt npm-scripts (zie .claude/rules/ops/ci-and-agent.md).
+#   - Kotlin telt als "taal buiten de optimale stack" van het referentieprofiel
+#     (Rust + TypeScript); inherent aan het hebben van een Android-app.
 # Een regressiemelding op exact deze patronen is vermoedelijk ruis, niet een
 # echte achteruitgang — controleer de repair-queue voordat je een PR blokkeert.
 on:
