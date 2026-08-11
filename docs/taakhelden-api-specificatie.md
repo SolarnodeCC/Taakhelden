@@ -131,13 +131,20 @@ Een tiener stelt een taak voor; een ouder maakt er een echte taak van of wijst h
 | Methode & pad | Rol | Beschrijving |
 |---|---|---|
 | `POST /tasks/proposals` | child (tienerregister) | Taakvraag indienen: `{title, category?, icon?, suggestedPoints, note?}`. **`Idempotency-Key` verplicht.** Levert geen punten en geen taak op. 403 als het kind niet in het tienerregister zit. |
-| `GET /tasks/proposals?status=` | beide | Ouder ziet alle taakvragen van het gezin, kind alleen zijn eigen. Optioneel filter `status=pending\|approved\|declined`. Response: `{ proposals: TaskProposal[] }`. |
+| `GET /tasks/proposals?status=` | beide | Ouder ziet alle taakvragen van het gezin, kind alleen zijn eigen. Optioneel filter `status=pending\|approved\|declined`. Response: `{ proposals: TaskProposal[] }`. `reviewFlag` (zie hieronder) staat er alleen in voor `role=parent`. |
 | `POST /tasks/proposals/{id}/approve` | parent (`full`) | `{points, approvalRequired?, assignees?}` → maakt een echte taak via de gewone `createTask`-route en koppelt `createdTaskId`. De ouder bepaalt de punten; die mogen afwijken van `suggestedPoints`. Lege `assignees` = alleen de indiener. **`Idempotency-Key` verplicht.** **Geen ledger-boeking.** Response: `{ proposal, taskId }`. |
 | `POST /tasks/proposals/{id}/decline` | parent (`full`) | `{note}`: verplichte, vriendelijke toelichting; status wordt `declined`. **`Idempotency-Key` verplicht.** Geen puntenaftrek — nooit een negatieve mechaniek. |
 
 **Leeftijdsgrens (serverside).** Indienen mag alleen vanuit het tienerregister: `users.age_mode = 'teen'` **of** een `birth_year` waaruit leeftijd ≥ 13 volgt. Die tweede voorwaarde vangt op dat `age_mode` bij het aanmaken van het profiel wordt afgeleid en daarna niet meebeweegt met de leeftijd. iOS toont de affordance al alleen in teen mode; de servercheck is de tweede grendel.
 
 **Idempotentie.** De KV-middleware dedupt op (user, `Idempotency-Key`) en geeft de eerdere response terug. Daarnaast is de beslissing zelf een atomaire claim (`UPDATE … WHERE status = 'pending'`): een tweede goedkeuring met een *nieuwe* key krijgt `409 INVALID_STATUS` en er ontstaat nooit een tweede taak.
+
+**Veiligheidsvlag (WS-AI-GUARD, ADR-0006).** Bij het aanmaken screent de server `title` + `note`
+deterministisch (`services/proposalScreen.ts`, geen model-call) op mogelijke veiligheidszorgen.
+Een match blokkeert de taakvraag **niet** — hij wordt altijd aangemaakt — maar zet `review_flag`
+in D1. Dat veld komt als `reviewFlag` alleen terug op ouder-facing responses
+(`GET /tasks/proposals` met `role=parent`, en de `approve`/`decline`-responses); het **ontbreekt
+volledig** — niet `null` — op elke kind-facing response, inclusief de `201` van de eigen indiener.
 
 **Taakvraag-schema (`TaskProposal`):**
 ```json
@@ -153,7 +160,8 @@ Een tiener stelt een taak voor; een ouder maakt er een echte taak van of wijst h
   "decisionNote": null,               // vriendelijke toelichting van de ouder bij afwijzen
   "decidedAt": null,
   "createdTaskId": null,              // gevuld na goedkeuren
-  "createdAt": "2026-08-01T09:12:33.412Z"
+  "createdAt": "2026-08-01T09:12:33.412Z",
+  "reviewFlag": null                  // ouder-only; ontbreekt (niet null) op kind-facing responses
 }
 ```
 
