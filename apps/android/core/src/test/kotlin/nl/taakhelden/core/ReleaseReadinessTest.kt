@@ -31,7 +31,7 @@ class ReleaseReadinessTest {
     }
 
     @Test
-    fun `build config override wins over the production fallback`() {
+    fun `build config override wins over the production default`() {
         assertEquals(
             "https://staging.example/v1",
             AppConfiguration.apiBaseUrl(
@@ -60,7 +60,7 @@ class ReleaseReadinessTest {
     }
 
     @Test
-    fun `an unexpanded gradle placeholder does not win over the fallback`() {
+    fun `an unexpanded gradle build value does not win over the production default`() {
         val url = AppConfiguration.apiBaseUrl(
             buildConfigValue = "\$TAAKHELDEN_API_BASE_URL",
             environment = emptyMap(),

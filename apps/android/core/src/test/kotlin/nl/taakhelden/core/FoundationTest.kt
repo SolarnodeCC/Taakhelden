@@ -128,9 +128,9 @@ class FoundationTest {
     }
 
     @Test
-    fun `legacy plaintext PIN blob is rejected`() {
-        val legacyBlob = "1234".toByteArray(Charsets.UTF_8)
-        assertFalse(PinHasher.verify("1234", legacyBlob))
+    fun `plaintext PIN blob from before hashing is rejected`() {
+        val plaintextBlob = "1234".toByteArray(Charsets.UTF_8)
+        assertFalse(PinHasher.verify("1234", plaintextBlob))
     }
 
     @Test
@@ -158,9 +158,9 @@ class FoundationTest {
     }
 
     @Test
-    fun `auth store clears a legacy plaintext PIN on verify`() {
+    fun `auth store clears a pre-hash plaintext PIN on verify`() {
         val secureStore = InMemorySecureStore()
-        // Plant a legacy plaintext PIN directly in secure storage.
+        // Plant a pre-hash plaintext PIN directly in secure storage.
         secureStore.saveValue("4242".toByteArray(Charsets.UTF_8), SecureStoreKey.CHILD_PIN)
 
         val store = AuthStore(secureStore)
