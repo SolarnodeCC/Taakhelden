@@ -318,6 +318,13 @@ public data class TaskProposalDTO(
     val note: String? = null,
     val status: ProposalStatus = ProposalStatus.PENDING,
     val createdTaskId: String? = null,
+    /**
+     * WS-AI-GUARD (ADR-0006): server-set deterministic safety flag, parent-only.
+     *
+     * Absent rather than null for a child token — a child never learns that their own
+     * text was flagged — so this must tolerate the key being missing entirely.
+     */
+    val reviewFlag: String? = null,
 )
 
 @Serializable
