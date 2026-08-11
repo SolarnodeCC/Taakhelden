@@ -99,12 +99,12 @@ class ReleaseReadinessTest {
                 requiresContractV2 = true,
                 idempotencyKey = "complete-abc",
             ),
-            accessToken = "child-token",
+            accessToken = STUB_TOKEN,
         )
 
         val recorded = server.takeRequest()
         assertEquals("POST", recorded.method)
-        assertEquals("Bearer child-token", recorded.getHeader("Authorization"))
+        assertEquals("Bearer $STUB_TOKEN", recorded.getHeader("Authorization"))
         assertEquals("2", recorded.getHeader("X-Contract-Version"))
         assertEquals("complete-abc", recorded.getHeader("Idempotency-Key"))
     }
@@ -114,7 +114,7 @@ class ReleaseReadinessTest {
         server.enqueue(MockResponse().setBody("{}"))
         val transport = OkHttpTransport(server.url("/v1").toString())
 
-        transport.send(HttpRequest(path = "/auth/family-code"), accessToken = "leaked-token")
+        transport.send(HttpRequest(path = "/auth/family-code"), accessToken = STUB_TOKEN)
 
         assertEquals(null, server.takeRequest().getHeader("Authorization"))
     }
@@ -138,3 +138,11 @@ class ReleaseReadinessTest {
         assertEquals("Niet toegestaan.", status?.failure?.serverMessage)
     }
 }
+
+/**
+ * Obviously-not-a-credential stand-in for a bearer token.
+ *
+ * Kept as a named constant rather than an inline literal so secret scanners do not have
+ * to guess whether a token-shaped string next to `accessToken =` is real.
+ */
+private const val STUB_TOKEN = "test-fixture-not-a-credential"

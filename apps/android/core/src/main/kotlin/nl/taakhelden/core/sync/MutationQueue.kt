@@ -103,9 +103,9 @@ public class FileMutationQueueStore(private val file: java.io.File) : MutationQu
             file.parentFile?.mkdirs()
             // Write-then-rename so a crash mid-write cannot truncate the queue and lose a
             // child's checked-off task.
-            val temporary = java.io.File(file.parentFile, "${file.name}.tmp")
-            temporary.writeText(apiJson.encodeToString(serializer, mutations))
-            temporary.renameTo(file)
+            val scratchFile = java.io.File(file.parentFile, "${file.name}.tmp")
+            scratchFile.writeText(apiJson.encodeToString(serializer, mutations))
+            scratchFile.renameTo(file)
         }
     }
 }

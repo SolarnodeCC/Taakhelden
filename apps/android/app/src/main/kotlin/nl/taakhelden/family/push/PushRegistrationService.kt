@@ -21,18 +21,31 @@ class PushRegistrationService(
 
     val currentToken: String? get() = registeredToken
 
-    suspend fun registerIfNeeded() {
-        if (!BuildConfig.FIREBASE_CONFIGURED) return
-        val token = fetchToken() ?: return
-        register(token)
+    /** Outcome of a registration attempt, so a caller can retry rather than guess. */
+    enum class Result { REGISTERED, ALREADY_REGISTERED, UNAVAILABLE, FAILED }
+
+    suspend fun registerIfNeeded(): Result {
+        if (!BuildConfig.FIREBASE_CONFIGURED) return Result.UNAVAILABLE
+        val token = fetchToken() ?: return Result.UNAVAILABLE
+        return register(token)
     }
 
-    suspend fun register(token: String) {
-        if (token == registeredToken) return
-        runCatching { apiClient.registerDevice(token) }
-            .onSuccess { registeredToken = token }
-        // A failure is intentionally swallowed: a family whose push registration fails
-        // must still be able to check off tasks.
+    /**
+     * Registration is best-effort by design: push is an optional extra, and a family
+     * whose token cannot be stored must still be able to check off tasks. The failure is
+     * reported back rather than thrown, so the caller decides whether to retry — it is
+     * never allowed to break the screen the user is on.
+     */
+    suspend fun register(token: String): Result {
+        if (token == registeredToken) return Result.ALREADY_REGISTERED
+        return runCatching { apiClient.registerDevice(token) }
+            .fold(
+                onSuccess = {
+                    registeredToken = token
+                    Result.REGISTERED
+                },
+                onFailure = { Result.FAILED },
+            )
     }
 
     /**

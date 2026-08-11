@@ -1,5 +1,6 @@
 package nl.taakhelden.core.realtime
 
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -8,13 +9,13 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import nl.taakhelden.core.api.TaakHeldenApiClient
+import nl.taakhelden.core.api.mintFamilyRoomToken
 import okhttp3.HttpUrl.Companion.toHttpUrlOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.Response
 import okhttp3.WebSocket
 import okhttp3.WebSocketListener
-import java.util.concurrent.TimeUnit
 
 public sealed interface FamilyRoomConnectionState {
     public data object Disconnected : FamilyRoomConnectionState
