@@ -28,6 +28,9 @@ class MainActivity : FragmentActivity() {
 
     private lateinit var appState: AppState
 
+    /** Set in `onStop` so `onStart` can tell a rotation from a real return to the app. */
+    private var wasChangingConfigurations = false
+
     private val environment: AppEnvironment
         get() = (application as WispelApplication).environment
 
@@ -59,19 +62,24 @@ class MainActivity : FragmentActivity() {
 
     override fun onStart() {
         super.onStart()
-        appState.handleAppForegrounded()
+        // A rotation also runs onStop/onStart. Treating that as "returned to the app"
+        // would fire a sync and a push registration on every orientation change.
+        if (!wasChangingConfigurations) {
+            appState.handleAppForegrounded()
+        }
+        wasChangingConfigurations = false
     }
 
     override fun onStop() {
+        // Leaving the app re-locks the child home — a phone handed to a sibling must land
+        // on the unlock screen, not in someone else's day. A configuration change is not
+        // leaving the app, though: locking there would kick a child out for rotating
+        // their tablet.
+        wasChangingConfigurations = isChangingConfigurations
+        if (!wasChangingConfigurations) {
+            appState.handleAppBackgrounded()
+        }
         super.onStop()
-        // Leaving the app always re-locks the child home — a phone handed to a sibling
-        // must land on the unlock screen, not in someone else's day.
-        appState.handleAppBackgrounded()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        if (isFinishing) environment.speechBus.shutdown()
     }
 
     private fun handleIntent(intent: Intent?) {

@@ -108,13 +108,24 @@ class AppState(val environment: AppEnvironment) : ViewModel() {
     }
 
     /**
+     * Plain back-navigation to the welcome hub.
+     *
+     * Deliberately does **not** touch sessions: a parent who signs in with Apple, reaches
+     * the child step and taps "Terug" must not silently lose the account they just
+     * created. Signing out is [signOut] and only happens where the user asked for it.
+     */
+    fun navigateToWelcome() {
+        _route.value = AppRoute.WELCOME
+    }
+
+    /**
      * Signs the current user out.
      *
      * The push token is detached *before* the session is cleared — afterwards there is no
      * token to authenticate the de-registration with, and the departing user would keep
      * receiving this family's notifications.
      */
-    fun returnToWelcome() {
+    fun signOut() {
         viewModelScope.launch {
             if (authStore.childSession != null || authStore.parentSession != null) {
                 environment.pushService.deregisterCurrentUser()
@@ -124,7 +135,12 @@ class AppState(val environment: AppEnvironment) : ViewModel() {
         }
     }
 
-    /** Called when the app is backgrounded: the child home always re-locks. */
+    /**
+     * The app genuinely went to the background: re-lock the child home.
+     *
+     * Only called for a real background transition, never for a configuration change —
+     * a child rotating their tablet must not be thrown back to the unlock screen.
+     */
     fun handleAppBackgrounded() {
         authStore.lockChildSession()
         if (_route.value == AppRoute.CHILD_HOME) {

@@ -62,7 +62,11 @@ private fun WidgetContent(context: Context, openCount: Int) {
             text = if (openCount == 0) {
                 context.getString(R.string.widget_all_done)
             } else {
-                context.getString(R.string.widget_open_tasks, openCount)
+                context.resources.getQuantityString(
+                    R.plurals.widget_open_tasks,
+                    openCount,
+                    openCount,
+                )
             },
             style = TextStyle(
                 color = ColorProvider(Color(WPalettes.kid.text.argb)),

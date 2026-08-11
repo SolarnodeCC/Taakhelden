@@ -76,11 +76,14 @@ fun ChildShell(appState: AppState) {
         ActivityResultContracts.RequestPermission(),
     ) { /* Push is optional: a decline changes nothing else in the app. */ }
 
+    val preferences = appState.environment.preferences
+
     LaunchedEffect(Unit) {
         viewModel.loadAll()
-        // Guideline: explain before the system dialog. Below API 33 there is no runtime
-        // notification permission, so there is nothing to prime.
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        // Explain before the system dialog, and ask **once**. Re-prompting someone who
+        // already declined is nagging, and below API 33 there is no runtime notification
+        // permission to prime at all.
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && !preferences.pushPrimerShown) {
             val granted = androidx.core.content.ContextCompat.checkSelfPermission(
                 context,
                 Manifest.permission.POST_NOTIFICATIONS,
@@ -170,11 +173,15 @@ fun ChildShell(appState: AppState) {
         PushOptInPrimer(
             onAccept = {
                 showPushPrimer = false
+                preferences.pushPrimerShown = true
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     notificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
                 }
             },
-            onDecline = { showPushPrimer = false },
+            onDecline = {
+                showPushPrimer = false
+                preferences.pushPrimerShown = true
+            },
         )
     }
 }

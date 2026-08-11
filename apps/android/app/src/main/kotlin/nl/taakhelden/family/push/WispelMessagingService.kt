@@ -34,12 +34,19 @@ class WispelMessagingService : FirebaseMessagingService() {
     }
 
     companion object {
+        /**
+         * No replay on purpose.
+         *
+         * With `replay = 1` the last push was re-delivered to every new collector, so
+         * `repeatOnLifecycle` would re-fire it on each foreground and pop the parental
+         * gate open again long after the notification was handled. A missed silent
+         * refresh is harmless — `onStart` syncs anyway.
+         */
         private val _events = MutableSharedFlow<PushEvent>(
-            replay = 1,
-            extraBufferCapacity = 4,
+            replay = 0,
+            extraBufferCapacity = 8,
         )
 
-        /** Hot stream of push events; replays the last one for a cold-started activity. */
         val events: SharedFlow<PushEvent> = _events
 
         /**

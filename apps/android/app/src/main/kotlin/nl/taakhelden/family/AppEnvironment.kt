@@ -4,7 +4,10 @@ import android.content.Context
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.plus
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
+import nl.taakhelden.family.widget.OpenTasksWidget
+import androidx.glance.appwidget.updateAll
 import nl.taakhelden.core.api.OkHttpTransport
 import nl.taakhelden.core.api.TaakHeldenApiClient
 import nl.taakhelden.core.auth.AuthStore
@@ -42,7 +45,15 @@ class AppEnvironment(context: Context) {
     /** Survives configuration changes; cancelled only when the process dies. */
     val applicationScope: CoroutineScope = CoroutineScope(SupervisorJob()) + Dispatchers.Main.immediate
 
-    val preferences: AppPreferences = AppPreferences(applicationContext)
+    val preferences: AppPreferences = AppPreferences(applicationContext).apply {
+        onOpenTaskCountChanged = {
+            // Glance updates are suspend work; the count has already been persisted, so
+            // this only has to redraw whatever widgets are on the home screen.
+            applicationScope.launch {
+                runCatching { OpenTasksWidget().updateAll(applicationContext) }
+            }
+        }
+    }
 
     val authStore: AuthStore = AuthStore(EncryptedSecureStore(applicationContext))
 

@@ -14,6 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import nl.taakhelden.core.parent.ParentDashboardSnapshot
@@ -80,8 +81,9 @@ fun ParentTodayTab(
                             color = palette.text.color,
                         )
                         Text(
-                            text = stringResource(
-                                R.string.parent_today_balance,
+                            text = pluralStringResource(
+                                R.plurals.parent_today_balance,
+                                child.balancePoints,
                                 child.balancePoints,
                             ),
                             color = palette.mutedText.color,

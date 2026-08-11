@@ -21,6 +21,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
@@ -104,7 +105,11 @@ fun WinkelTab(
                             }
                         }
                         Text(
-                            text = stringResource(R.string.child_shop_balance, rewards.balance),
+                            text = pluralStringResource(
+                                R.plurals.child_shop_balance,
+                                rewards.balance,
+                                rewards.balance,
+                            ),
                             color = palette.mutedText.color,
                         )
                     }
@@ -150,8 +155,9 @@ fun WinkelTab(
                                     )
                                 }
                                 WBadge(
-                                    text = stringResource(
-                                        R.string.child_points_badge,
+                                    text = pluralStringResource(
+                                        R.plurals.child_points_badge,
+                                        redemption.price,
                                         redemption.price,
                                     ),
                                 )
@@ -305,7 +311,11 @@ private fun RewardCard(
                 )
             }
 
-            WBadge(text = stringResource(R.string.child_points_badge, reward.price))
+            WBadge(text = pluralStringResource(
+                R.plurals.child_points_badge,
+                reward.price,
+                reward.price,
+            ))
         }
 
         Row(

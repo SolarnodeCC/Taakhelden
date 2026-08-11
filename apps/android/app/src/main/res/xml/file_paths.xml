@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Only the one cache subdirectory the camera writes a pending task photo into. Nothing
+  else in the app's storage is reachable through the provider, and the file is deleted as
+  soon as it has been compressed for upload.
+-->
+<paths>
+    <cache-path
+        name="task_photos"
+        path="task-photos/" />
+</paths>

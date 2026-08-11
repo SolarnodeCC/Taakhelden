@@ -84,9 +84,6 @@
     <string name="child_day_title">Vandaag</string>
     <string name="child_day_progress">%1$d van %2$d klaar</string>
     <string name="child_day_speak">Je hebt %1$d van %2$d missies klaar</string>
-    <string name="child_points_badge">%d punten</string>
-    <string name="child_streak">🔥 %d dagen streak</string>
-    <string name="child_streak_teen">%d dagen streak</string>
     <string name="child_all_done">Alles gedaan - je bent een ster vandaag!</string>
     <string name="child_all_done_teen">Alles gedaan — nette dag.</string>
     <string name="child_all_done_detail">Morgen staan er weer nieuwe missies klaar.</string>
@@ -95,7 +92,6 @@
     <string name="child_connection_safe">We kunnen even geen verbinding maken — je afgevinkte taken zijn veilig.</string>
     <string name="child_offline_safe">Wordt bewaard - sturen we zo.</string>
     <string name="child_retry">Opnieuw proberen</string>
-    <string name="child_task_points">+%d punten</string>
     <string name="child_task_done">Afgevinkt</string>
     <string name="child_task_done_button">Klaar!</string>
     <string name="child_task_undo_button">Oeps, toch niet</string>
@@ -114,7 +110,6 @@
     <!-- Child shop -->
     <string name="child_shop_loading">Winkel laden…</string>
     <string name="child_shop_title">Winkel</string>
-    <string name="child_shop_balance">Je hebt %d punten</string>
     <string name="child_shop_balance_speak">Je hebt %d punten in de winkel</string>
     <string name="child_shop_empty">Straks staan hier beloningen klaar — pap of mam vult de winkel.</string>
     <string name="child_shop_affordable">Je kunt deze kiezen!</string>
@@ -265,7 +260,6 @@
     <string name="parent_today_empty">Nog geen kinderen zichtbaar</string>
     <string name="parent_today_empty_detail">Zodra er een profiel gekoppeld is, zie je hier per kind de dag in drie rustige kolommen.</string>
     <string name="parent_today_child_quiet">Vandaag is het rustig voor %s.</string>
-    <string name="parent_today_balance">%d punten</string>
     <string name="parent_today_points_short">%d pt</string>
     <string name="parent_bucket_open">Te doen</string>
     <string name="parent_bucket_awaiting">Wacht op goedkeuring</string>
@@ -288,18 +282,15 @@
     <string name="parent_approvals_photo_processing">Foto wordt nagekeken…</string>
     <string name="parent_approvals_photo_ready">Foto klaar om te bekijken</string>
     <string name="parent_approvals_toggle_bulk">Kies mee voor bulk goedkeuren</string>
-    <string name="parent_approvals_points">%d punten</string>
     <string name="parent_photo_accessibility_label">Taakfoto</string>
 
     <!-- Bulk approve -->
     <string name="parent_bulk_title">Bulk goedkeuren</string>
-    <string name="parent_bulk_button">Keur %d kaartjes goed</string>
     <string name="parent_bulk_allowed">Je selectie hoort bij hetzelfde kind en kan veilig samen door.</string>
     <string name="parent_bulk_empty">Kies eerst een paar kaartjes van hetzelfde kind.</string>
     <string name="parent_bulk_mixed">Bulk goedkeuren werkt alleen voor kaartjes van hetzelfde kind.</string>
     <string name="parent_bulk_photo_ack">Voor geselecteerde foto\'s vragen we eerst een bewuste bevestiging.</string>
     <string name="parent_bulk_photo_toggle">Ik heb de geselecteerde foto\'s bewust bekeken.</string>
-    <string name="parent_bulk_failures">%d goedkeuringen lukten niet — probeer die rustig opnieuw.</string>
 
     <!-- Redo sheet -->
     <string name="parent_redo_title">Nog even kijken</string>
@@ -338,7 +329,6 @@
     <string name="parent_rewards_create_placeholder">Bijvoorbeeld: filmavond</string>
     <string name="parent_rewards_create_price">%d punten</string>
     <string name="parent_rewards_create_button">Beloning toevoegen</string>
-    <string name="parent_rewards_meta">%d punten</string>
     <string name="parent_rewards_archive">Archiveren</string>
     <string name="parent_rewards_empty">Nog geen beloningen in de winkel.</string>
     <string name="parent_stepper_increase">Meer</string>
@@ -382,6 +372,51 @@
     <string name="widget_display_name">Nog N taken</string>
     <string name="widget_description">Toont hoeveel open taken er vandaag nog staan.</string>
     <string name="widget_all_done">Alles af voor nu</string>
-    <string name="widget_open_tasks">Nog %d taken</string>
     <string name="widget_open_hint">Open de app voor details</string>
+
+    <!-- Counts: "1 punten" / "1 dagen" is wrong Dutch. -->
+    <plurals name="child_points_badge">
+        <item quantity="one">%d punt</item>
+        <item quantity="other">%d punten</item>
+    </plurals>
+    <plurals name="child_streak">
+        <item quantity="one">🔥 %d dag streak</item>
+        <item quantity="other">🔥 %d dagen streak</item>
+    </plurals>
+    <plurals name="child_streak_teen">
+        <item quantity="one">%d dag streak</item>
+        <item quantity="other">%d dagen streak</item>
+    </plurals>
+    <plurals name="child_task_points">
+        <item quantity="one">+%d punt</item>
+        <item quantity="other">+%d punten</item>
+    </plurals>
+    <plurals name="child_shop_balance">
+        <item quantity="one">Je hebt %d punt</item>
+        <item quantity="other">Je hebt %d punten</item>
+    </plurals>
+    <plurals name="parent_today_balance">
+        <item quantity="one">%d punt</item>
+        <item quantity="other">%d punten</item>
+    </plurals>
+    <plurals name="parent_approvals_points">
+        <item quantity="one">%d punt</item>
+        <item quantity="other">%d punten</item>
+    </plurals>
+    <plurals name="parent_bulk_button">
+        <item quantity="one">Keur %d kaartje goed</item>
+        <item quantity="other">Keur %d kaartjes goed</item>
+    </plurals>
+    <plurals name="parent_bulk_failures">
+        <item quantity="one">%d goedkeuring lukte niet — probeer die rustig opnieuw.</item>
+        <item quantity="other">%d goedkeuringen lukten niet — probeer die rustig opnieuw.</item>
+    </plurals>
+    <plurals name="parent_rewards_meta">
+        <item quantity="one">%d punt</item>
+        <item quantity="other">%d punten</item>
+    </plurals>
+    <plurals name="widget_open_tasks">
+        <item quantity="one">Nog %d taak</item>
+        <item quantity="other">Nog %d taken</item>
+    </plurals>
 </resources>

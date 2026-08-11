@@ -34,6 +34,14 @@ class SpeechBus(context: Context) {
         engine.speak(text, TextToSpeech.QUEUE_FLUSH, null, UTTERANCE_ID)
     }
 
+    /**
+     * Releases the engine.
+     *
+     * Owned by `AppEnvironment` and therefore process-scoped: an Activity must **not**
+     * call this on destroy, or a rotation would leave the next Activity holding a dead
+     * engine and young mode would go silent. Kept for tests and for a future
+     * process-level teardown.
+     */
     fun shutdown() {
         engine?.stop()
         engine?.shutdown()

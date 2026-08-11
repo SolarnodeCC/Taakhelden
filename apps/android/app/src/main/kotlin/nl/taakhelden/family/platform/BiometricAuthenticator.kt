@@ -1,5 +1,6 @@
 package nl.taakhelden.family.platform
 
+import android.os.Build
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
@@ -27,10 +28,10 @@ class BiometricAuthenticator(private val activity: FragmentActivity) {
         manager.canAuthenticate(BIOMETRIC_ONLY) == BiometricManager.BIOMETRIC_SUCCESS
 
     fun canEvaluateDeviceOwner(): Boolean =
-        manager.canAuthenticate(DEVICE_OWNER) == BiometricManager.BIOMETRIC_SUCCESS
+        manager.canAuthenticate(deviceOwnerAuthenticators()) == BiometricManager.BIOMETRIC_SUCCESS
 
     suspend fun evaluateDeviceOwner(title: String, subtitle: String): Boolean =
-        authenticate(title, subtitle, DEVICE_OWNER, negativeButtonText = null)
+        authenticate(title, subtitle, deviceOwnerAuthenticators(), negativeButtonText = null)
 
     suspend fun evaluateBiometrics(
         title: String,
@@ -38,13 +39,28 @@ class BiometricAuthenticator(private val activity: FragmentActivity) {
         negativeButtonText: String,
     ): Boolean = authenticate(title, subtitle, BIOMETRIC_ONLY, negativeButtonText)
 
+    /**
+     * Combining a biometric class with `DEVICE_CREDENTIAL` in `setAllowedAuthenticators`
+     * is only supported from API 30; on 28–29 `PromptInfo.build()` rejects it outright.
+     * Below 30 we therefore ask for biometrics and let the deprecated
+     * `setDeviceCredentialAllowed` add the PIN/pattern fallback — otherwise the parental
+     * gate would be unreachable on Android 8–10 for a parent with no fingerprint enrolled.
+     */
+    private fun deviceOwnerAuthenticators(): Int =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) DEVICE_OWNER else BIOMETRIC_ONLY
+
     private suspend fun authenticate(
         title: String,
         subtitle: String,
         authenticators: Int,
         negativeButtonText: String?,
     ): Boolean {
-        if (manager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_SUCCESS) {
+        val legacyDeviceCredential =
+            negativeButtonText == null && Build.VERSION.SDK_INT < Build.VERSION_CODES.R
+
+        if (!legacyDeviceCredential &&
+            manager.canAuthenticate(authenticators) != BiometricManager.BIOMETRIC_SUCCESS
+        ) {
             throw BiometricException(UserMessage.BIOMETRICS_UNAVAILABLE)
         }
 
@@ -76,11 +92,18 @@ class BiometricAuthenticator(private val activity: FragmentActivity) {
                 .setTitle(title)
                 .setSubtitle(subtitle)
                 .apply {
-                    if (negativeButtonText != null) {
-                        setAllowedAuthenticators(BIOMETRIC_ONLY)
-                        setNegativeButtonText(negativeButtonText)
-                    } else {
-                        setAllowedAuthenticators(DEVICE_OWNER)
+                    when {
+                        negativeButtonText != null -> {
+                            setAllowedAuthenticators(BIOMETRIC_ONLY)
+                            setNegativeButtonText(negativeButtonText)
+                        }
+
+                        legacyDeviceCredential -> {
+                            @Suppress("DEPRECATION")
+                            setDeviceCredentialAllowed(true)
+                        }
+
+                        else -> setAllowedAuthenticators(DEVICE_OWNER)
                     }
                 }
                 .build()

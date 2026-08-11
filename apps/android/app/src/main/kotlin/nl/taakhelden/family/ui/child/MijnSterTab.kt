@@ -34,7 +34,6 @@ import nl.taakhelden.family.ui.components.YoungSpeakButton
 import nl.taakhelden.family.ui.theme.WDimens
 import nl.taakhelden.family.ui.theme.WispelTheme
 import nl.taakhelden.family.ui.theme.color
-import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * "Mijn Ster": the child's own profile, level and avatar shop.
@@ -67,7 +66,7 @@ fun MijnSterTab(
     }
 
     // Not observable state on purpose: counting taps must not recompose the tab.
-    val tapCount = remember { AtomicInteger(0) }
+    val tapTracker = remember { FiveTapTracker() }
 
     Column(
         modifier = Modifier
@@ -76,9 +75,8 @@ fun MijnSterTab(
             .padding(WDimens.spacingXl)
             .combinedClickable(
                 onClick = {
-                    // Five taps in a row is the second hidden entry point (ADR-0003).
-                    if (tapCount.incrementAndGet() >= FIVE_TAP_THRESHOLD) {
-                        tapCount.set(0)
+                    // Five *rapid* taps is the second hidden entry point (ADR-0003).
+                    if (tapTracker.registerTap()) {
                         appState.openParentGate(ParentGateEntryPoint.BUILD_NUMBER_FIVE_TAP)
                     }
                 },
@@ -152,6 +150,37 @@ fun MijnSterTab(
             color = palette.mutedText.color,
             modifier = Modifier.fillMaxWidth(),
         )
+    }
+}
+
+/**
+ * Counts the five-tap gesture that opens the parental gate.
+ *
+ * The window matters: without it a child tapping around this tab over a whole session
+ * eventually accumulates five taps and the gate pops open on its own. Taps must land in
+ * quick succession, the way iOS's `onTapGesture(count: 5)` requires.
+ */
+private class FiveTapTracker(
+    private val now: () -> Long = System::currentTimeMillis,
+) {
+    private var count = 0
+    private var lastTapAt = 0L
+
+    /** Returns true when this tap completed the gesture. */
+    fun registerTap(): Boolean {
+        val timestamp = now()
+        count = if (timestamp - lastTapAt > MAX_GAP_MS) 1 else count + 1
+        lastTapAt = timestamp
+
+        if (count >= FIVE_TAP_THRESHOLD) {
+            count = 0
+            return true
+        }
+        return false
+    }
+
+    private companion object {
+        const val MAX_GAP_MS = 700L
     }
 }
 

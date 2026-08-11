@@ -20,9 +20,26 @@ class AppPreferences(context: Context) : ParentPreferences, OpenTaskCountSink {
         get() = preferences.getBoolean(KEY_CHILD_SOUNDS, true)
         set(value) = preferences.edit().putBoolean(KEY_CHILD_SOUNDS, value).apply()
 
+    /**
+     * Whether the notification primer has already been shown.
+     *
+     * Without this the primer reappeared on every visit to the child home for anyone who
+     * declined — nagging a child for a permission they already said no to.
+     */
+    var pushPrimerShown: Boolean
+        get() = preferences.getBoolean(KEY_PUSH_PRIMER_SHOWN, false)
+        set(value) = preferences.edit().putBoolean(KEY_PUSH_PRIMER_SHOWN, value).apply()
+
     override fun update(count: Int) {
+        if (preferences.getInt(KEY_OPEN_TASK_COUNT, -1) == count) return
         preferences.edit().putInt(KEY_OPEN_TASK_COUNT, count).apply()
+        // Writing the preference is not enough: without an explicit update the widget
+        // keeps showing a stale count until its 15-minute refresh window.
+        onOpenTaskCountChanged?.invoke(count)
     }
+
+    /** Set by [nl.taakhelden.family.AppEnvironment] to push the new count to the widget. */
+    var onOpenTaskCountChanged: ((Int) -> Unit)? = null
 
     val openTaskCount: Int get() = preferences.getInt(KEY_OPEN_TASK_COUNT, 0)
 
@@ -30,6 +47,7 @@ class AppPreferences(context: Context) : ParentPreferences, OpenTaskCountSink {
         const val FILE_NAME = "wispel_prefs"
         const val KEY_CHILD_SOUNDS = "childSoundsEnabled"
         const val KEY_OPEN_TASK_COUNT = "openTaskCount"
+        const val KEY_PUSH_PRIMER_SHOWN = "pushPrimerShown"
 
         /** Read-only accessor for the widget, which has no `AppEnvironment`. */
         fun openTaskCount(context: Context): Int =

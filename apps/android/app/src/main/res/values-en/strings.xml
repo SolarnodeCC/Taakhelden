@@ -72,9 +72,6 @@
     <string name="child_day_title">Today</string>
     <string name="child_day_progress">%1$d of %2$d done</string>
     <string name="child_day_speak">You finished %1$d of %2$d missions</string>
-    <string name="child_points_badge">%d points</string>
-    <string name="child_streak">🔥 %d day streak</string>
-    <string name="child_streak_teen">%d day streak</string>
     <string name="child_all_done">All done - you\'re a star today!</string>
     <string name="child_all_done_teen">All done — solid day.</string>
     <string name="child_all_done_detail">New missions will be ready tomorrow.</string>
@@ -83,7 +80,6 @@
     <string name="child_connection_safe">We can\'t connect right now — your checked-off tasks are safe.</string>
     <string name="child_offline_safe">Saved — we\'ll send it soon.</string>
     <string name="child_retry">Try again</string>
-    <string name="child_task_points">+%d points</string>
     <string name="child_task_done">Checked off</string>
     <string name="child_task_done_button">Done!</string>
     <string name="child_task_undo_button">Oops, undo</string>
@@ -102,7 +98,6 @@
     <!-- Child shop -->
     <string name="child_shop_loading">Loading shop…</string>
     <string name="child_shop_title">Shop</string>
-    <string name="child_shop_balance">You have %d points</string>
     <string name="child_shop_balance_speak">You have %d points in the shop</string>
     <string name="child_shop_empty">Rewards will show up here soon — a parent fills the shop.</string>
     <string name="child_shop_affordable">You can pick this!</string>
@@ -253,7 +248,6 @@
     <string name="parent_today_empty">No children visible yet</string>
     <string name="parent_today_empty_detail">Once a profile is paired, you\'ll see each child\'s day in three columns here.</string>
     <string name="parent_today_child_quiet">It\'s quiet today for %s.</string>
-    <string name="parent_today_balance">%d points</string>
     <string name="parent_today_points_short">%d pts</string>
     <string name="parent_bucket_open">To do</string>
     <string name="parent_bucket_awaiting">Awaiting approval</string>
@@ -276,18 +270,15 @@
     <string name="parent_approvals_photo_processing">Photo is being checked…</string>
     <string name="parent_approvals_photo_ready">Photo ready to view</string>
     <string name="parent_approvals_toggle_bulk">Include in bulk approval</string>
-    <string name="parent_approvals_points">%d points</string>
     <string name="parent_photo_accessibility_label">Task photo</string>
 
     <!-- Bulk approve -->
     <string name="parent_bulk_title">Bulk approve</string>
-    <string name="parent_bulk_button">Approve %d cards</string>
     <string name="parent_bulk_allowed">Your selection belongs to the same child and can be approved together.</string>
     <string name="parent_bulk_empty">Pick a few cards from the same child first.</string>
     <string name="parent_bulk_mixed">Bulk approve only works for cards from the same child.</string>
     <string name="parent_bulk_photo_ack">For selected photos we ask for a conscious acknowledgement first.</string>
     <string name="parent_bulk_photo_toggle">I have consciously reviewed the selected photos.</string>
-    <string name="parent_bulk_failures">%d approvals failed — try those again calmly.</string>
 
     <!-- Redo sheet -->
     <string name="parent_redo_title">Needs another look</string>
@@ -326,7 +317,6 @@
     <string name="parent_rewards_create_placeholder">For example: movie night</string>
     <string name="parent_rewards_create_price">%d points</string>
     <string name="parent_rewards_create_button">Add reward</string>
-    <string name="parent_rewards_meta">%d points</string>
     <string name="parent_rewards_archive">Archive</string>
     <string name="parent_rewards_empty">No rewards in the shop yet.</string>
     <string name="parent_stepper_increase">More</string>
@@ -370,6 +360,51 @@
     <string name="widget_display_name">N tasks left</string>
     <string name="widget_description">Shows how many open tasks are left today.</string>
     <string name="widget_all_done">All done for now</string>
-    <string name="widget_open_tasks">%d tasks left</string>
     <string name="widget_open_hint">Open the app for details</string>
+
+    <!-- Counts: "1 punten" / "1 dagen" is wrong Dutch. -->
+    <plurals name="child_points_badge">
+        <item quantity="one">%d point</item>
+        <item quantity="other">%d points</item>
+    </plurals>
+    <plurals name="child_streak">
+        <item quantity="one">🔥 %d day streak</item>
+        <item quantity="other">🔥 %d day streak</item>
+    </plurals>
+    <plurals name="child_streak_teen">
+        <item quantity="one">%d day streak</item>
+        <item quantity="other">%d day streak</item>
+    </plurals>
+    <plurals name="child_task_points">
+        <item quantity="one">+%d point</item>
+        <item quantity="other">+%d points</item>
+    </plurals>
+    <plurals name="child_shop_balance">
+        <item quantity="one">You have %d point</item>
+        <item quantity="other">You have %d points</item>
+    </plurals>
+    <plurals name="parent_today_balance">
+        <item quantity="one">%d point</item>
+        <item quantity="other">%d points</item>
+    </plurals>
+    <plurals name="parent_approvals_points">
+        <item quantity="one">%d point</item>
+        <item quantity="other">%d points</item>
+    </plurals>
+    <plurals name="parent_bulk_button">
+        <item quantity="one">Approve %d card</item>
+        <item quantity="other">Approve %d cards</item>
+    </plurals>
+    <plurals name="parent_bulk_failures">
+        <item quantity="one">%d approval failed — try it again calmly.</item>
+        <item quantity="other">%d approvals failed — try those again calmly.</item>
+    </plurals>
+    <plurals name="parent_rewards_meta">
+        <item quantity="one">%d point</item>
+        <item quantity="other">%d points</item>
+    </plurals>
+    <plurals name="widget_open_tasks">
+        <item quantity="one">%d task left</item>
+        <item quantity="other">%d tasks left</item>
+    </plurals>
 </resources>

@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import nl.taakhelden.core.parent.ParentModeState
@@ -188,8 +189,9 @@ fun ParentRewardsTab(
                                 color = palette.text.color,
                             )
                             Text(
-                                text = stringResource(
-                                    R.string.parent_rewards_meta,
+                                text = pluralStringResource(
+                                    R.plurals.parent_rewards_meta,
+                                    reward.price,
                                     reward.price,
                                 ),
                                 color = palette.mutedText.color,

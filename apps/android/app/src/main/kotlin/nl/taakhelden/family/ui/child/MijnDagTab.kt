@@ -25,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
@@ -287,10 +288,17 @@ private fun DayHeader(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(WDimens.spacingSm),
             ) {
-                WBadge(text = stringResource(R.string.child_points_badge, balance.balance))
                 WBadge(
-                    text = stringResource(
-                        if (isTeen) R.string.child_streak_teen else R.string.child_streak,
+                    text = pluralStringResource(
+                        R.plurals.child_points_badge,
+                        balance.balance,
+                        balance.balance,
+                    ),
+                )
+                WBadge(
+                    text = pluralStringResource(
+                        if (isTeen) R.plurals.child_streak_teen else R.plurals.child_streak,
+                        balance.streakDays,
                         balance.streakDays,
                     ),
                 )
@@ -360,7 +368,11 @@ private fun TaskCard(
                     )
                 }
                 Text(
-                    text = stringResource(R.string.child_task_points, instance.points),
+                    text = pluralStringResource(
+                        R.plurals.child_task_points,
+                        instance.points,
+                        instance.points,
+                    ),
                     color = palette.mutedText.color,
                 )
 

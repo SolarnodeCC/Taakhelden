@@ -30,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -79,8 +80,9 @@ fun ParentApprovalsTab(
         ) {
             if (state.bulkFailureCount > 0) {
                 Text(
-                    text = stringResource(
-                        R.string.parent_bulk_failures,
+                    text = pluralStringResource(
+                        R.plurals.parent_bulk_failures,
+                        state.bulkFailureCount,
                         state.bulkFailureCount,
                     ),
                     style = MaterialTheme.typography.bodyMedium,
@@ -178,7 +180,11 @@ private fun ApprovalCard(
                 )
             }
             Text(
-                text = stringResource(R.string.parent_approvals_points, item.points),
+                text = pluralStringResource(
+                    R.plurals.parent_approvals_points,
+                    item.points,
+                    item.points,
+                ),
                 style = MaterialTheme.typography.labelMedium,
                 color = palette.mutedText.color,
             )
@@ -301,7 +307,11 @@ private fun BulkApprovalBar(
         }
 
         WPrimaryButton(
-            text = stringResource(R.string.parent_bulk_button, selectionCount),
+            text = pluralStringResource(
+                R.plurals.parent_bulk_button,
+                selectionCount,
+                selectionCount,
+            ),
             onClick = onApprove,
             modifier = Modifier.fillMaxWidth(),
             enabled = validation == BulkApprovalValidation.ALLOWED && !isBusy,

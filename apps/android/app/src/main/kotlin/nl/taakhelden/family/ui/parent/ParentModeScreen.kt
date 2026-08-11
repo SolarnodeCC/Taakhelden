@@ -191,7 +191,8 @@ fun ParentModeScreen(appState: AppState) {
                     showAppleReauth = false
                     if (deleted) {
                         appState.closeParentMode()
-                        appState.returnToWelcome()
+                        // The family is gone server-side; clear the local sessions too.
+                        appState.signOut()
                     }
                 }
             },

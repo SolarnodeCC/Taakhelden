@@ -1,8 +1,11 @@
 package nl.taakhelden.family.ui
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.fragment.app.FragmentActivity
 import nl.taakhelden.core.auth.ChildAgeBand
 import nl.taakhelden.family.ui.child.ChildShell
@@ -35,55 +38,60 @@ fun AppRoot(appState: AppState, activity: FragmentActivity) {
     }
     val isYoung = childSession?.ageBand == ChildAgeBand.YOUNG
 
-    when (route) {
-        AppRoute.WELCOME -> WispelTheme(WRegister.PARENT) {
-            WelcomeScreen(
-                onParent = appState::openParentOnboarding,
-                onChild = appState::openChildPairing,
-            )
+    // An explicit Box rather than bare siblings: parent mode is an opaque full-screen
+    // layer over whatever route is underneath, and that stacking should not depend on
+    // the implicit behaviour of the composition root.
+    Box(modifier = Modifier.fillMaxSize()) {
+        when (route) {
+            AppRoute.WELCOME -> WispelTheme(WRegister.PARENT) {
+                WelcomeScreen(
+                    onParent = appState::openParentOnboarding,
+                    onChild = appState::openChildPairing,
+                )
+            }
+
+            AppRoute.PARENT_ONBOARDING -> WispelTheme(WRegister.PARENT) {
+                ParentOnboardingScreen(
+                    appState = appState,
+                    onBack = appState::navigateToWelcome,
+                    onGoToPairing = appState::openChildPairing,
+                )
+            }
+
+            AppRoute.CHILD_PAIRING -> WispelTheme(WRegister.KID) {
+                ChildPairingScreen(
+                    appState = appState,
+                    onBack = appState::navigateToWelcome,
+                    onPaired = appState::finishChildPairing,
+                )
+            }
+
+            AppRoute.CHILD_UNLOCK -> WispelTheme(childRegister, isYoung = isYoung) {
+                ChildUnlockScreen(
+                    appState = appState,
+                    activity = activity,
+                    onUnlocked = appState::unlockChildHome,
+                )
+            }
+
+            AppRoute.CHILD_HOME -> WispelTheme(childRegister, isYoung = isYoung) {
+                ChildShell(appState = appState)
+            }
         }
 
-        AppRoute.PARENT_ONBOARDING -> WispelTheme(WRegister.PARENT) {
-            ParentOnboardingScreen(
-                appState = appState,
-                onBack = appState::returnToWelcome,
-                onGoToPairing = appState::openChildPairing,
-            )
+        // The gate and parent mode always render in the parent register, even when opened
+        // from a child screen — crossing into parent mode should feel like a different
+        // place, not a differently coloured version of the same one.
+        if (isChallengePresented) {
+            WispelTheme(WRegister.PARENT) {
+                ParentGateSheet(appState = appState, activity = activity)
+            }
         }
 
-        AppRoute.CHILD_PAIRING -> WispelTheme(WRegister.KID) {
-            ChildPairingScreen(
-                appState = appState,
-                onBack = appState::returnToWelcome,
-                onPaired = appState::finishChildPairing,
-            )
-        }
-
-        AppRoute.CHILD_UNLOCK -> WispelTheme(childRegister, isYoung = isYoung) {
-            ChildUnlockScreen(
-                appState = appState,
-                activity = activity,
-                onUnlocked = appState::unlockChildHome,
-            )
-        }
-
-        AppRoute.CHILD_HOME -> WispelTheme(childRegister, isYoung = isYoung) {
-            ChildShell(appState = appState)
-        }
-    }
-
-    // The gate and parent mode always render in the parent register, even when they are
-    // opened from a child screen — crossing into parent mode should feel like a different
-    // place, not a differently coloured version of the same one.
-    if (isChallengePresented) {
-        WispelTheme(WRegister.PARENT) {
-            ParentGateSheet(appState = appState, activity = activity)
-        }
-    }
-
-    if (isParentModePresented) {
-        WispelTheme(WRegister.PARENT) {
-            ParentModeScreen(appState = appState)
+        if (isParentModePresented) {
+            WispelTheme(WRegister.PARENT) {
+                ParentModeScreen(appState = appState)
+            }
         }
     }
 }

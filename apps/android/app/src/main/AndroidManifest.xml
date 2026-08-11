@@ -23,6 +23,7 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
+        android:enableOnBackInvokedCallback="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.Wispel"
         tools:targetApi="35">
@@ -47,6 +48,18 @@
                 <data android:scheme="@string/apple_redirect_scheme" />
             </intent-filter>
         </activity>
+
+        <!-- Hands the camera a write target for a full-resolution task photo without
+             granting it, or us, any broader storage access. -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
 
         <service
             android:name=".push.WispelMessagingService"
