@@ -21,6 +21,38 @@ export interface AppleClaims {
   emailVerified: boolean;
 }
 
+/**
+ * Wat te doen met een geverifieerd Apple-identiteitstoken waarvoor nog geen
+ * `apple_sub`-koppeling bestaat.
+ *
+ *  - `link`   — koppel aan het bestaande account met dit adres.
+ *  - `refuse` — het adres hoort bij een bestaand account, maar Apple staat er
+ *               niet voor in. Koppelen zou account-overname zijn; stilzwijgend
+ *               een tweede gezin aanmaken laat de ouder z'n kinderen kwijtraken
+ *               zonder uitleg. Dus: vragen om de bekende inlog.
+ *  - `create` — nieuw gezin. Een onbevestigd adres leggen we niet vast: Apple
+ *               staat er niet voor in, en het zou de UNIQUE-index bezetten voor
+ *               wie het adres wél kan bewijzen.
+ *
+ * Losse functie omdat dit de hele beveiligingsbeslissing van de Apple-flow is:
+ * zo is hij uitputtend te testen zonder Apples JWKS.
+ */
+export type AppleAccountAction =
+  | { kind: "link" }
+  | { kind: "refuse" }
+  | { kind: "create"; email: string | null };
+
+export function decideAppleAccount(
+  claims: Pick<AppleClaims, "email" | "emailVerified">,
+  hasAccountWithEmail: boolean,
+): AppleAccountAction {
+  if (!claims.email) return { kind: "create", email: null };
+  if (hasAccountWithEmail) {
+    return claims.emailVerified ? { kind: "link" } : { kind: "refuse" };
+  }
+  return { kind: "create", email: claims.emailVerified ? claims.email : null };
+}
+
 export async function verifyAppleIdentityToken(
   identityToken: string,
   clientId: string,

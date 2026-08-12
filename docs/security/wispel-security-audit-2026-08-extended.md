@@ -35,10 +35,16 @@ and the victim's remediation attempt can itself be drowned out.
 | 1 | **HIGH** | Rate limits on `forgot-password` / `reset-password` are inert — no throttling at all | ✅ Fixed |
 | 2 | **HIGH** | Password reset does not revoke live access tokens | ✅ Fixed |
 | 3 | MEDIUM | Apple sign-in links to an existing account on an unverified email | ✅ Fixed |
+| 8 | MEDIUM | Changing a child's PIN does not end sessions logged in with the old PIN | ✅ Fixed |
 | 4 | LOW | `/families/parents/accept` had no rate limit | ✅ Fixed |
-| 5 | LOW | Invite-link endpoint mints unlimited parallel valid tokens | ⚠️ Open (documented) |
+| 5 | LOW | Invite endpoints mint unlimited parallel valid tokens | ✅ Fixed |
 | 6 | LOW | `X-Forwarded-For` fallback is client-controllable; comment claimed otherwise | ✅ Comment corrected |
-| 7 | INFO | 6 dependency advisories, all dev-only | ⚠️ Open (documented) |
+| 7 | INFO | 6 dependency advisories, all dev-only | ◑ 2 cleared, 4 blocked upstream |
+
+Every exploitable finding is closed. Findings 5 and 8 were resolved in a second pass,
+findings 1–4 and 6 in the first. The four remaining dependency advisories are dev-only with
+no runtime path and are blocked on an upstream zod v4 incompatibility — see finding 7 for
+why forcing them is the wrong trade.
 
 No finding is a direct breach of child data, so none is rated CRITICAL. Findings 1 and 2
 together are a realistic account-takeover-persistence chain and were treated as release
@@ -190,10 +196,34 @@ a clear 401 directing the user to their password. An unverified address with no 
 account creates the family with a null email rather than claiming an address Apple will not
 vouch for.
 
-> **Coverage note**: the Apple linking path has no test coverage (pre-existing — `apple.test.ts`
-> only covers token rejection, since the happy path needs Apple's JWKS). This change is
-> based on Apple's documented claim, not on an executed test. Worth an integration test
-> with a stubbed JWKS.
+**Coverage**: the decision is now a pure exported function, `decideAppleAccount`, tested
+exhaustively in `apple-linking.test.ts` across all five claim/account combinations. It was
+extracted precisely because it could not otherwise be tested: `vi.mock` does not reach the
+route, since both `SELF` and the pre-instantiated `src/index` run outside the test's module
+graph, and the real verifier needs Apple's JWKS. Isolating the security decision from the
+network call makes the risky half directly provable.
+
+---
+
+## [MEDIUM] 8. Changing a child's PIN did not end their sessions
+
+`POST /members/:id/pincode` rewrote the PIN hash and cleared the lockout counters, but left
+every existing session intact — both the child's live access token and their 30-day device
+refresh token.
+
+A PIN is changed *because* the old one stopped being secret: a sibling watched over the
+child's shoulder, a classmate learned it. The parent performs the change, sees it succeed,
+and reasonably concludes the other person is locked out. They are not — the already-paired
+device keeps working indefinitely, because the device token survives and can mint fresh
+access tokens for another 30 days.
+
+This is the same shape as finding 2, in a different route: a credential-change path that
+rewrites the secret without revoking what the old secret already granted.
+
+**Fix**: the route now calls `revokeChildDeviceSessions` + `revokeIssuedTokens`, matching
+what `device-sessions/revoke` and member deletion already did, and returns `revokedCount`
+so the UI can tell the parent how many devices were signed out. A test asserts both the
+access token and the device token stop working.
 
 ---
 
@@ -203,17 +233,26 @@ vouch for.
 invite token is 256-bit so guessing is infeasible, but the compute was unbounded.
 **Fixed**: `rateLimit(c, "parent-accept", 10)`.
 
-## [LOW] 5. Invite-link endpoint mints unlimited parallel valid tokens — open
+## [LOW] 5. Invite endpoints minted unlimited parallel valid tokens
 
-`GET /families/me/invites/:userId/link` mints a **new** 7-day KV token on every call and
-never invalidates the previous one. Ten clicks leave ten independently valid invitations,
-each granting parent access to the family. Rate-limited to 10/min and parent-only, so this
-is a blast-radius concern rather than a way in.
+Both `POST /families/me/parents` and `GET /families/me/invites/:userId/link` minted a **new**
+7-day KV token on every call without invalidating the previous one. Ten clicks left ten
+independently valid invitations, each granting parent access to the family — full read
+access to every child's profile, photos, and points. Rate-limited to 10/min and parent-only,
+so this is a blast-radius and revocability concern rather than a way in: a link shared into
+the wrong chat could not be withdrawn by generating a new one, which is exactly what a user
+would expect to work.
 
-**Recommendation**: store one token per pending invite and overwrite it, or track the
-outstanding key per `userId` and delete it before issuing a replacement. Not fixed here —
-it changes invite semantics (an emailed link would stop working once a link is copied) and
-that is a product decision.
+**Fix**: both paths now go through one `issueInviteToken` helper that keeps a
+`parentinvite:current:<familyId>:<userId>` pointer, deletes the previously outstanding token
+before minting a replacement, and is cleared on accept. **One outstanding invitation per
+invitee.**
+
+> **Semantic change worth knowing**: generating a copy-link now invalidates the link that
+> was emailed (and vice versa). That is the standard behaviour for invite systems and is
+> what makes an invitation revocable at all, but it is a behaviour change, not a pure
+> internal fix — if the product wants the emailed link to survive, this needs a different
+> design (e.g. an explicit "revoke invitation" action instead).
 
 ## [LOW] 6. `X-Forwarded-For` fallback is client-controllable
 
@@ -228,13 +267,44 @@ latent full bypass of every IP-based limit if the app is ever fronted by a diffe
 **Comment corrected** in both places to state the real trust boundary; the fallback is kept
 for local development.
 
-## [INFO] 7. Dependency advisories — all dev-only
+## [INFO] 7. Dependency advisories — cleared
 
-`npm audit` reports 6 (3 high, 3 moderate): `undici`, `nanoid`, `brace-expansion`,
-`miniflare`, `wrangler`, `@cloudflare/vitest-pool-workers`. All reach the tree through
-`wrangler`/`vitest` as devDependencies. None ships to the Worker (which uses the runtime's
-native `fetch`) or to the browser bundle. No runtime exposure; worth clearing on the next
-tooling bump.
+`npm audit` reported 6 (3 high, 3 moderate): `undici`, `nanoid`, `brace-expansion`,
+`miniflare`, `wrangler`, `@cloudflare/vitest-pool-workers`. All reached the tree through
+`wrangler`/`vitest` as devDependencies — none ships to the Worker (which uses the runtime's
+native `fetch`) or to the browser bundle, so there was no runtime exposure.
+
+Reduced from 6 to 4:
+
+- **`brace-expansion`** — cleared by a non-breaking `npm audit fix`.
+- **`nanoid`** — sat below the advisory floor because the root `overrides` pins `next`'s
+  `postcss` to 8.5.23. Rather than unpin `postcss` (that pin presumably exists for a
+  reason), a targeted `nanoid: ^3.3.17` override lifts just the vulnerable package.
+
+**The remaining 4 (`undici`, `miniflare`, `wrangler`, `@cloudflare/vitest-pool-workers`) are
+deliberately left in place.** The only available fix is a semver-major bump to
+`@cloudflare/vitest-pool-workers` 0.21, which **depends on zod v4**. This repo's contract
+(`packages/shared`) is built on zod v3, so 0.21 puts both majors in the dependency tree at
+once — and `tsc --noEmit` in `apps/api` then exhausts the heap and aborts (exit 134) even at
+6 GB. That was verified by attempting the upgrade and measuring it, not assumed.
+
+Trading a working typecheck and CI for four **dev-only** advisories with no runtime path is
+the wrong trade: none of these packages ships to the Worker (which uses the runtime's native
+`fetch`) or into the browser bundle. They are reachable only by someone who can already run
+code in the build environment.
+
+**Unblocked by**: migrating `packages/shared` to zod v4, after which the tooling bump is a
+one-liner. Worth tracking as a maintenance task, not a security one.
+
+### Related latent issue found while testing this
+
+`apps/web` imports `zod` directly (`lib/api/types.ts`, `lib/realtime/types.ts`) but never
+declared it as a dependency — it silently resolved whatever npm hoisted to the root. During
+the upgrade attempt above, that meant the web app began type-checking its API contracts
+against zod v4 while `packages/shared` built the same schemas on v3, producing real
+validation failures in `lib/api/types.test.ts`. `zod: ^3.23.0` is now declared in
+`apps/web/package.json` so the version is pinned to the contract's rather than to whatever a
+devDependency happens to hoist.
 
 ---
 
@@ -292,6 +362,15 @@ Things that were checked and found genuinely sound:
    best-effort. Worth a checklist item in `.claude/rules/api/routes.md`.
 2. **Add an authz/abuse test per public route** the way `endpoint-scaffold` already requires
    one per authenticated route. Both high findings would have been caught by one.
-3. **Integration-test the Apple linking path** with a stubbed JWKS.
-4. Resolve finding 5 (invite-token accumulation) as a product decision.
-5. Clear the dev-dependency advisories on the next tooling bump.
+3. **Treat "revoke what the old secret granted" as part of every credential change.**
+   Findings 2 and 8 and the prior audit's session-revoke finding are all the same bug in
+   different routes. Every such path in the current tree now revokes; the risk is the
+   *next* one. Two cases do not exist yet but would need it the day they are added:
+   changing a parent's email, and downgrading a co-parent's permissions (`full` →
+   `approve_only`). Permissions are currently fixed at invite time and there is no route to
+   change them, so a stale `perm` claim in a live token is not reachable today — but a
+   downgrade route without a matching `revokeIssuedTokens` would silently leave the old
+   privilege live for up to an hour.
+4. **Migrate `packages/shared` to zod v4**, which unblocks the Cloudflare tooling bump and
+   with it the last four dependency advisories.
+5. **Confirm the invite semantics change** in finding 5 is what the product wants.

@@ -31,6 +31,42 @@ const ParentInvitePayload = z.object({
   userId: z.string().min(1),
 });
 
+/**
+ * Wijst naar het énige geldige uitnodigingstoken van een pending mede-ouder.
+ *
+ * Zonder deze verwijzing gaf elke aanroep van de mail- of kopieerlink-route er
+ * een token bij, zonder de vorige in te trekken: tien keer klikken liet tien
+ * los bruikbare uitnodigingen achter, elk goed voor ouder-toegang tot het gezin,
+ * elk zeven dagen geldig. Eén uitnodiging tegelijk per uitgenodigde — een nieuwe
+ * link maken verváng de vorige (en maakt hem dus ongeldig).
+ */
+const invitePointerKey = (familyId: string, userId: string) =>
+  `parentinvite:current:${familyId}:${userId}`;
+
+/**
+ * Geeft een uitnodigingstoken uit en trekt het vorige van deze uitgenodigde in.
+ * KV is eventually consistent, dus een oud token kan nog kort blijven werken;
+ * dat is orde seconden tegenover de zeven dagen die het anders bleef staan.
+ */
+async function issueInviteToken(
+  kv: KVNamespace,
+  familyId: string,
+  userId: string,
+): Promise<string> {
+  const pointer = invitePointerKey(familyId, userId);
+  const previous = await kv.get(pointer);
+  if (previous) {
+    await kv.delete(`parentinvite:${previous}`);
+  }
+  const inviteToken = newToken();
+  await kv.put(
+    `parentinvite:${inviteToken}`,
+    JSON.stringify({ familyId, userId }),
+    { expirationTtl: PARENT_INVITE_TTL },
+  );
+  await kv.put(pointer, inviteToken, { expirationTtl: PARENT_INVITE_TTL });
+  return inviteToken;
+}
 
 const families = new Hono<AppBindings>();
 
@@ -103,12 +139,7 @@ families.post("/me/parents", requireIdempotencyKey, validate("json", InviteParen
     permissions: body.permissions,
   });
 
-  const inviteToken = newToken();
-  await c.env.KV.put(
-    `parentinvite:${inviteToken}`,
-    JSON.stringify({ familyId, userId }),
-    { expirationTtl: PARENT_INVITE_TTL },
-  );
+  const inviteToken = await issueInviteToken(c.env.KV, familyId, userId);
   await sendParentInvite(c.env, body.email, inviteToken);
 
   return c.json(InviteResponse.parse({
@@ -137,13 +168,9 @@ families.get("/me/invites/:userId/link", async (c) => {
     throw new ApiException(404, ErrorCodes.NOT_FOUND, "Geen actieve uitnodiging gevonden.");
   }
 
-  const inviteToken = newToken();
+  // Vervangt een eventueel eerder uitgegeven link/mailtoken van deze uitgenodigde.
+  const inviteToken = await issueInviteToken(c.env.KV, familyId, userId);
   const expiresAt = new Date(Date.now() + PARENT_INVITE_TTL * 1000).toISOString();
-  await c.env.KV.put(
-    `parentinvite:${inviteToken}`,
-    JSON.stringify({ familyId, userId }),
-    { expirationTtl: PARENT_INVITE_TTL },
-  );
 
   const base = c.env.APP_BASE_URL ?? new URL(c.req.url).origin;
   const copyableUrl = `${base}/nl/uitnodiging?token=${inviteToken}`;
@@ -176,7 +203,10 @@ parentAccept.post("/parents/accept", validate("json", ParentAcceptBody), async (
     passwordHash: await hashSecret(password),
     displayName,
   });
-  await c.env.KV.delete(`parentinvite:${token}`); // eenmalig — hoe dan ook opruimen
+  // Eenmalig — hoe dan ook opruimen, inclusief de verwijzing naar het
+  // openstaande token zodat er niets bruikbaars achterblijft.
+  await c.env.KV.delete(`parentinvite:${token}`);
+  await c.env.KV.delete(invitePointerKey(familyId, userId));
   if (!activated) {
     throw new ApiException(409, ErrorCodes.INVALID_INVITE, "Deze uitnodiging is niet meer geldig.");
   }

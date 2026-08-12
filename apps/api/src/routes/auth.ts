@@ -21,7 +21,7 @@ import { newId, newFamilyCode, newToken } from "../services/ids";
 import { issueChildTokens, issueParentTokens } from "../services/session";
 import { hashSecret, needsRehash, verifySecret, sha256Hex } from "../services/passwords";
 import { verifyTurnstile } from "../services/turnstile";
-import { verifyAppleIdentityToken } from "../services/apple";
+import { verifyAppleIdentityToken, decideAppleAccount } from "../services/apple";
 import { notifyParents, parentCopy } from "../services/notifier";
 import { revokeIssuedTokens } from "../services/revocation";
 import { sendPasswordResetEmail } from "../services/email";
@@ -120,30 +120,25 @@ auth.post("/apple", validate("json", AppleAuthBody), async (c) => {
     );
   }
 
-  // Alleen een door Apple geverifieerd adres mag een bestaand account
-  // identificeren: op een onbevestigd adres zou het aanmaken van een Apple ID
-  // met andermans e-mailadres genoeg zijn om dat account over te nemen zonder
-  // ooit het wachtwoord te kennen.
-  const trustedEmail = claims.emailVerified ? claims.email : null;
-
   let user = await repo.getParentByAppleSub(c.env.DB, claims.sub);
-  if (!user && claims.email) {
-    // Zelfde e-mailadres als een bestaand wachtwoord-account → koppelen.
-    const byEmail = await repo.getParentByEmail(c.env.DB, claims.email);
-    if (byEmail && !trustedEmail) {
-      // Het adres hoort bij een bestaand account, maar Apple staat er niet voor
-      // in. Niet koppelen (overname) en ook niet stilzwijgend een tweede gezin
-      // aanmaken (dan is de ouder z'n kinderen kwijt zonder uitleg) — vragen om
-      // de bekende inlog.
+  // Alleen een door Apple geverifieerd adres mag een bestaand account
+  // identificeren — zie `decideAppleAccount` voor de afweging.
+  let newAccountEmail: string | null = null;
+  if (!user) {
+    const byEmail = claims.email ? await repo.getParentByEmail(c.env.DB, claims.email) : null;
+    const action = decideAppleAccount(claims, Boolean(byEmail));
+    if (action.kind === "refuse") {
       throw new ApiException(
         401,
         ErrorCodes.INVALID_CREDENTIALS,
         "Dit e-mailadres hoort al bij een account. Log in met je wachtwoord.",
       );
     }
-    if (byEmail) {
+    if (action.kind === "link" && byEmail) {
       await repo.linkAppleSub(c.env.DB, byEmail.id as string, claims.sub);
       user = byEmail;
+    } else if (action.kind === "create") {
+      newAccountEmail = action.email;
     }
   }
   let isNew = false;
@@ -155,7 +150,7 @@ auth.post("/apple", validate("json", AppleAuthBody), async (c) => {
       inviteCode: newFamilyCode(),
       familyName: body.familyName ?? "Ons gezin",
       parentId,
-      email: trustedEmail,
+      email: newAccountEmail,
       passwordHash: null,
       appleSub: claims.sub,
       displayName: body.displayName ?? "Ouder",
