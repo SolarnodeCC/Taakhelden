@@ -18,6 +18,13 @@ import type { AppBindings } from "../types";
  * Zonder identificeerbare aanroeper valt de teller NOOIT terug op een gedeelde
  * sleutel. Dat deed hij eerder wel ("local"), waardoor élke limiet in feite een
  * globale limiet werd en één client iedereen kon buitensluiten.
+ *
+ * LET OP: de keerzijde is dat een niet-identificeerbare aanroeper daarmee ook
+ * geen IP-limiet meer voelt (elke request krijgt een eigen sleutel). Een route
+ * die alleen op `rateLimit` leunt, is dus onbegrensd zodra het IP wegvalt —
+ * bijvoorbeeld doordat een BFF-handler vergeet `X-Forwarded-For` door te geven.
+ * Elke publieke route hoort daarom óók een `rateLimitSubject` te hebben op iets
+ * wat de aanvaller niet kan variëren (e-mailadres, account, gezinscode).
  */
 export function callerIp(c: Context<AppBindings>): string | null {
   const direct = c.req.header("CF-Connecting-IP");

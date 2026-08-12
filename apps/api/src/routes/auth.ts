@@ -120,10 +120,27 @@ auth.post("/apple", validate("json", AppleAuthBody), async (c) => {
     );
   }
 
+  // Alleen een door Apple geverifieerd adres mag een bestaand account
+  // identificeren: op een onbevestigd adres zou het aanmaken van een Apple ID
+  // met andermans e-mailadres genoeg zijn om dat account over te nemen zonder
+  // ooit het wachtwoord te kennen.
+  const trustedEmail = claims.emailVerified ? claims.email : null;
+
   let user = await repo.getParentByAppleSub(c.env.DB, claims.sub);
   if (!user && claims.email) {
     // Zelfde e-mailadres als een bestaand wachtwoord-account → koppelen.
     const byEmail = await repo.getParentByEmail(c.env.DB, claims.email);
+    if (byEmail && !trustedEmail) {
+      // Het adres hoort bij een bestaand account, maar Apple staat er niet voor
+      // in. Niet koppelen (overname) en ook niet stilzwijgend een tweede gezin
+      // aanmaken (dan is de ouder z'n kinderen kwijt zonder uitleg) — vragen om
+      // de bekende inlog.
+      throw new ApiException(
+        401,
+        ErrorCodes.INVALID_CREDENTIALS,
+        "Dit e-mailadres hoort al bij een account. Log in met je wachtwoord.",
+      );
+    }
     if (byEmail) {
       await repo.linkAppleSub(c.env.DB, byEmail.id as string, claims.sub);
       user = byEmail;
@@ -138,7 +155,7 @@ auth.post("/apple", validate("json", AppleAuthBody), async (c) => {
       inviteCode: newFamilyCode(),
       familyName: body.familyName ?? "Ons gezin",
       parentId,
-      email: claims.email,
+      email: trustedEmail,
       passwordHash: null,
       appleSub: claims.sub,
       displayName: body.displayName ?? "Ouder",
@@ -301,6 +318,12 @@ const RESET_TTL_SECONDS = 3600; // 1 uur
 auth.post("/forgot-password", validate("json", ForgotPasswordBody), async (c) => {
   await rateLimit(c, "forgot-password", 5);
   const { email } = c.req.valid("json");
+  // Ook per e-mailadres begrensd, net als /register. De IP-limiet hierboven valt
+  // weg zodra de aanroeper niet te identificeren is (`rateLimit` geeft zo'n
+  // request een eigen sleutel), en dan was dit een ongelimiteerde mailbom naar
+  // een willekeurig adres. Vóór de user-lookup, zodat een 429 niet verraadt of
+  // het adres bestaat.
+  await rateLimitSubject(c, "forgot-password-email", email, 3, 3600);
 
   const user = await repo.getParentByEmail(c.env.DB, email);
   if (user) {
@@ -337,6 +360,11 @@ auth.post("/reset-password", validate("json", ResetPasswordBody), async (c) => {
     );
   }
 
+  // Ook per account begrensd: de IP-limiet hierboven valt weg zodra de aanroeper
+  // niet te identificeren is, en daaronder hangt een PBKDF2-afleiding van 600k
+  // iteraties per request.
+  await rateLimitSubject(c, "reset-password-user", userId, 5, 3600);
+
   // Atomair verwijderen vóór het updaten van het wachtwoord — voorkomt hergebruik
   // bij gelijktijdige requests.
   await c.env.KV.delete(kvKey);
@@ -362,6 +390,11 @@ auth.post("/reset-password", validate("json", ResetPasswordBody), async (c) => {
   }
   // Revoke all active refresh tokens so any compromised session can no longer be used.
   await repo.revokeAllRefreshTokensForUser(c.env.DB, userId);
+  // ... en het lopende access-token. Dat is stateless, dus zonder deze markering
+  // bleef een gestolen token na de reset gewoon werken tot het verliep — precies
+  // de sessie waar de reset vanaf moest. Logout, sessie-intrekking en
+  // account-verwijdering doen dit al; deze route was de uitzondering.
+  await revokeIssuedTokens(c.env, userId);
   return c.json({ ok: true });
 });
 

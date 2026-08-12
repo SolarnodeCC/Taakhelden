@@ -11,6 +11,14 @@ let jwks: ReturnType<typeof createRemoteJWKSet> | null = null;
 export interface AppleClaims {
   sub: string; // stabiel Apple-subject — onze koppelsleutel (users.apple_sub)
   email: string | null; // kan een private-relay-adres zijn; bij herlogin soms afwezig
+  /**
+   * Heeft Apple dit adres geverifieerd? Apple stuurt de claim als boolean óf als
+   * string. Alleen een geverifieerd adres mag een Apple-account aan een bestaand
+   * wachtwoord-account koppelen: op een onbevestigd adres zou het aanmaken van
+   * een Apple ID met andermans e-mailadres genoeg zijn om dat account over te
+   * nemen zonder ooit het wachtwoord te kennen.
+   */
+  emailVerified: boolean;
 }
 
 export async function verifyAppleIdentityToken(
@@ -27,6 +35,7 @@ export async function verifyAppleIdentityToken(
     return {
       sub: payload.sub,
       email: typeof payload.email === "string" ? payload.email.toLowerCase() : null,
+      emailVerified: payload.email_verified === true || payload.email_verified === "true",
     };
   } catch {
     return null; // ongeldig/verlopen token of JWKS onbereikbaar → gewoon 401

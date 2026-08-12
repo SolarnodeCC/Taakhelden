@@ -161,6 +161,7 @@ export default families;
 export const parentAccept = new Hono<AppBindings>();
 
 parentAccept.post("/parents/accept", validate("json", ParentAcceptBody), async (c) => {
+  await rateLimit(c, "parent-accept", 10);
   const { token, password, displayName } = c.req.valid("json");
 
   const raw = await c.env.KV.get(`parentinvite:${token}`);

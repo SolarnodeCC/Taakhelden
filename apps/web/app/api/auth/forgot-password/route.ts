@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { ForgotPasswordBody, ErrorCodes } from "@taakhelden/shared";
-import { apiFetch } from "../../../../lib/api/config";
+import { apiFetch, forwardHeaders } from "../../../../lib/api/config";
 
 export async function POST(req: Request) {
   const parsed = ForgotPasswordBody.safeParse(await req.json().catch(() => null));
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
   try {
     res = await apiFetch("/auth/forgot-password", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: forwardHeaders(req, { "Content-Type": "application/json" }),
       body: JSON.stringify(parsed.data),
       cache: "no-store",
     });
