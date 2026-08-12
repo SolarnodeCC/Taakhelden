@@ -33,6 +33,35 @@ describe("device-registratie", () => {
     expect(rows?.n).toBe(2);
   });
 
+  it("android-toestel registreert met platform 'android'", async () => {
+    const fam = await seedFamily("dev-android");
+    const childTok = await childToken(fam.childA, fam.familyId);
+    const token = "e".repeat(64);
+
+    const res = await api("/devices", {
+      token: childTok,
+      body: { apnsToken: token, platform: "android" },
+    });
+    expect(res.status).toBe(201);
+
+    // Het platform moet bewaard blijven: notifier.ts kiest hierop de gateway
+    // (APNs voor ios, FCM voor android).
+    const row = await env.DB
+      .prepare("SELECT platform FROM devices WHERE apns_token = ?")
+      .bind(token)
+      .first<{ platform: string }>();
+    expect(row?.platform).toBe("android");
+  });
+
+  it("onbekend platform wordt geweigerd", async () => {
+    const fam = await seedFamily("dev-bad-platform");
+    const res = await api("/devices", {
+      token: await childToken(fam.childA, fam.familyId),
+      body: { apnsToken: "f".repeat(64), platform: "windows" },
+    });
+    expect(res.status).toBe(400);
+  });
+
   it("kind kan token niet aan een ander profiel hangen (403)", async () => {
     const fam = await seedFamily("dev2");
     const res = await api("/devices", {

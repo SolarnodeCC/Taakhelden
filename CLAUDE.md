@@ -18,6 +18,7 @@ Codebase-paden en Worker-namen kunnen nog `taakhelden` heten tot WS-STRINGS / WS
 - `docs/taakhelden-cloudflare-github-architectuur.md` — infrastructuur en CI/CD
 - `docs/taakhelden-api-specificatie.md` — het API-contract (leidend voor alle endpoints)
 - `docs/taakhelden-ios-bouwvoorstel.md` — iOS-bouwvoorstel (SwiftUI ↔ API/web/DS)
+- `apps/android/README.md` — Android-port: modulegrens, verschillen met iOS, open punten
 
 ## Stack
 - **API**: Cloudflare Worker, Hono, TypeScript — `apps/api`
@@ -26,6 +27,8 @@ Codebase-paden en Worker-namen kunnen nog `taakhelden` heten tot WS-STRINGS / WS
 - **Realtime**: Durable Object `FamilyRoom` (1 per gezin) — WebSocket + serialisatie van ledger-writes
 - **Web**: Next.js ouder-dashboard — `apps/web` (marketinglanding volgt WS-WEB-MKT)
 - **iOS**: SwiftUI (apart Xcode-project in `apps/ios`)
+- **Android**: Jetpack Compose (Gradle-project in `apps/android`; `:core` is Kotlin/JVM en
+  bevat de gedeelde app-logica, `:app` de Compose-UI)
 - **Gedeeld contract**: Zod-schemas + foutcodes in `packages/shared`
 
 ## Harde architectuurregels
@@ -76,6 +79,9 @@ Codebase-paden en Worker-namen kunnen nog `taakhelden` heten tot WS-STRINGS / WS
 - `npm run dev:web` — Next.js dev server
 - `npm test` — Vitest in Workers-runtime (`@cloudflare/vitest-pool-workers`)
 - `npm run typecheck` — alle workspaces
+- `npm run openapi:check` — bewaakt het gedeelde contract én de gegenereerde
+  Swift/Kotlin-modellen
+- `gradle -p apps/android :core:test` — Android-logica (geen Android SDK nodig)
 - Migratie lokaal: `npx wrangler d1 migrations apply taakhelden-db --local` (vanuit `apps/api`)
 
 ## Workflow

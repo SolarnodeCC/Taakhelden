@@ -1,0 +1,410 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- English mirror of values/strings.xml (Dutch is the default locale). -->
+<resources>
+    <!-- Common -->
+    <string name="common_back">Back</string>
+    <string name="common_cancel">Cancel</string>
+    <string name="common_close">Close</string>
+    <string name="common_delete_digit">Delete</string>
+    <string name="sign_in_with_apple">Sign in with Apple</string>
+
+    <!-- Welcome hub -->
+    <string name="welcome_pitch">Keep track of chores and homework together — for the whole family.</string>
+    <string name="welcome_detail">Start a family as a parent, or pair a child device with a family code.</string>
+    <string name="welcome_parent">I\'m a parent</string>
+    <string name="welcome_child">I already have a family code</string>
+
+    <!-- Child pairing -->
+    <string name="pairing_title">Pair a child device</string>
+    <string name="pairing_step_code">1. Family code</string>
+    <string name="pairing_code_placeholder">123456</string>
+    <string name="pairing_load_profiles">Load profiles</string>
+    <string name="pairing_step_profile">2. Pick your profile at %s</string>
+    <string name="pairing_mode_teen">Teen mode</string>
+    <string name="pairing_mode_kid">Child mode</string>
+    <string name="pairing_step_pin">3. Use a PIN</string>
+    <string name="pairing_pin_placeholder">4 digits</string>
+    <string name="pairing_biometrics_toggle">Fingerprint may help later</string>
+    <string name="pairing_pin_note">For children under 13, \'Use PIN\' always stays visible next to the fingerprint.</string>
+    <string name="pairing_submit">Pair and continue</string>
+
+    <!-- Parent onboarding -->
+    <string name="onboarding_title">Start a family</string>
+    <string name="onboarding_signin_detail">Sign in with Apple to start your family.</string>
+    <string name="onboarding_family_name">Family name (optional)</string>
+    <string name="onboarding_child_title">First child</string>
+    <string name="onboarding_child_name">First name</string>
+    <string name="onboarding_child_birth_year">Birth year</string>
+    <string name="onboarding_child_avatar">Pick an avatar</string>
+    <string name="onboarding_child_pin">Child PIN</string>
+    <string name="onboarding_child_submit">Add child</string>
+    <string name="onboarding_code_title">Your family code</string>
+    <string name="onboarding_code_accessibility">Family code %s</string>
+    <string name="onboarding_code_detail">Keep this code with the child device. %s can now pair with the PIN you just chose.</string>
+    <string name="onboarding_code_child_fallback">Your child</string>
+    <string name="onboarding_code_next">Go to child pairing</string>
+    <string name="onboarding_validation_error">Fill in every field and pick a 4-digit PIN.</string>
+    <string name="onboarding_default_family_name">Our family</string>
+    <string name="onboarding_default_parent_name">Parent</string>
+
+    <!-- Child unlock -->
+    <string name="child_unlock_hi">Hi %s!</string>
+    <string name="child_unlock_hi_young">Hi!</string>
+    <string name="child_unlock_title">Unlock your hero space</string>
+    <string name="child_unlock_biometrics">Use your fingerprint</string>
+    <string name="child_unlock_biometrics_reason">Unlock Wispel to continue.</string>
+    <string name="child_unlock_pin_retry">That PIN isn\'t right yet — try again calmly.</string>
+    <string name="child_unlock_pin_alternative">Or use your PIN</string>
+    <string name="child_unlock_pin_alternative_hint">PIN is always available next to the fingerprint</string>
+    <string name="child_unlock_speak_intro">Hi %s. Unlock your hero space.</string>
+    <string name="child_young_unlock_title">Open your space</string>
+    <string name="child_young_pin_retry">That code isn\'t right yet — try again calmly.</string>
+    <string name="child_young_speak">Read aloud</string>
+
+    <!-- Child chrome -->
+    <string name="child_tab_day">My Day</string>
+    <string name="child_tab_day_young">Day</string>
+    <string name="child_tab_shop">Shop</string>
+    <string name="child_tab_shop_young">Shop</string>
+    <string name="child_tab_hero">My Star</string>
+    <string name="child_tab_hero_young">Star</string>
+    <string name="child_day_loading">Loading your hero day…</string>
+    <string name="child_day_title">Today</string>
+    <string name="child_day_progress">%1$d of %2$d done</string>
+    <string name="child_day_speak">You finished %1$d of %2$d missions</string>
+    <string name="child_all_done">All done - you\'re a star today!</string>
+    <string name="child_all_done_teen">All done — solid day.</string>
+    <string name="child_all_done_detail">New missions will be ready tomorrow.</string>
+    <string name="child_no_missions">No missions yet</string>
+    <string name="child_no_missions_detail">Ask a parent to set one up for you.</string>
+    <string name="child_connection_safe">We can\'t connect right now — your checked-off tasks are safe.</string>
+    <string name="child_offline_safe">Saved — we\'ll send it soon.</string>
+    <string name="child_retry">Try again</string>
+    <string name="child_task_done">Checked off</string>
+    <string name="child_task_done_button">Done!</string>
+    <string name="child_task_undo_button">Oops, undo</string>
+    <string name="child_task_undo_expired">Just a bit too late — but you did great!</string>
+    <string name="child_photo_ready">Photo is ready — bonus comes after approval!</string>
+    <string name="child_photo_processing">Photo is being checked…</string>
+    <string name="child_photo_bonus_hint">+%d bonus points with a photo</string>
+    <string name="child_photo_upload_error">Photo didn\'t work — you can try again.</string>
+    <string name="child_photo_take">Take a photo</string>
+    <string name="child_photo_pick">Pick a photo</string>
+
+    <!-- WS-PAUSE — child rest state -->
+    <string name="child_pause_title">You have a rest day</string>
+    <string name="child_pause_detail">No tasks today — enjoy your free time!</string>
+
+    <!-- Child shop -->
+    <string name="child_shop_loading">Loading shop…</string>
+    <string name="child_shop_title">Shop</string>
+    <string name="child_shop_balance_speak">You have %d points in the shop</string>
+    <string name="child_shop_empty">Rewards will show up here soon — a parent fills the shop.</string>
+    <string name="child_shop_affordable">You can pick this!</string>
+    <string name="child_shop_affordable_teen">Fits your balance</string>
+    <string name="child_shop_need_more">%1$d more points until %2$s</string>
+    <string name="child_shop_load_error">We couldn\'t load the shop — try again soon.</string>
+    <string name="child_shop_redeem">Redeem!</string>
+    <string name="child_shop_redeem_young">Buy</string>
+    <string name="child_shop_pin">Save for this</string>
+    <string name="child_shop_pinned">Your savings goal</string>
+    <string name="child_shop_goal_progress">%1$d more points until %2$s — you\'ve got this!</string>
+    <string name="child_shop_goal_progress_teen">%1$d more points until %2$s</string>
+    <string name="child_shop_redeem_success">Nice! A parent will check this soon.</string>
+    <string name="child_shop_insufficient">Almost! Keep earning — you can do it.</string>
+    <string name="child_shop_pending">Waiting on a parent…</string>
+    <string name="child_shop_pin_error">Couldn\'t set your savings goal — try again soon.</string>
+
+    <!-- My Star / avatar -->
+    <string name="held_fallback_name">Star</string>
+    <string name="held_level_format">Level %d</string>
+    <string name="held_level_speak">You are on level %d</string>
+    <string name="held_lifetime_format">Lifetime: %1$d points · streak %2$d</string>
+    <string name="held_level_explain">Your level grows with every point you\'ve ever earned — not your current balance.</string>
+    <string name="held_parent_gate_hint">Press and hold to open the parent gate</string>
+    <string name="held_parent_gate_action">Open parent gate</string>
+    <string name="held_avatar_title">Avatar shop</string>
+    <string name="held_avatar_preview">Avatar</string>
+    <string name="held_avatar_slot">Slot</string>
+    <string name="held_avatar_slot_hat">Hat</string>
+    <string name="held_avatar_slot_background">Background</string>
+    <string name="held_avatar_slot_accessory">Extra</string>
+    <string name="held_avatar_loading">Loading shop…</string>
+    <string name="held_avatar_load_error">We couldn\'t load the shop — try again soon.</string>
+    <string name="held_avatar_equip_error">That didn\'t work yet — try again soon.</string>
+    <string name="held_avatar_unlocked">Unlocked — pick it!</string>
+    <string name="held_avatar_equip">Wear</string>
+    <string name="held_avatar_equipped">On</string>
+    <string name="held_avatar_unlock_level">Reach level %d — you\'ve got this!</string>
+    <string name="held_avatar_unlock_points">Earn %d lifetime points — almost there!</string>
+    <string name="held_avatar_unlock_badge">Earn the matching badge first — you can do it!</string>
+    <string name="held_avatar_unlock_soon">Coming soon — keep doing missions!</string>
+
+    <!-- Family goal -->
+    <string name="goal_card_title">Family goal</string>
+    <string name="goal_card_progress">You\'re at %1$d of %2$d points together — stronger as a team!</string>
+    <string name="goal_card_progress_teen">%1$d / %2$d points together</string>
+    <string name="goal_card_speak">Together you have %1$d of %2$d points</string>
+    <string name="goal_parent_title">Family goal</string>
+    <string name="goal_parent_detail">Set one cooperative goal. No sibling ranking — only progress together.</string>
+    <string name="goal_parent_name">Title</string>
+    <string name="goal_parent_icon">Icon</string>
+    <string name="goal_parent_target">Target: %d</string>
+    <string name="goal_parent_create">Start family goal</string>
+    <string name="goal_parent_created">Family goal is ready — children see progress on My Day.</string>
+    <string name="goal_parent_error">That didn\'t work. Maybe a goal is already active.</string>
+    <string name="goal_parent_default_title">Pizza night together</string>
+
+    <!-- Push opt-in primer -->
+    <string name="child_push_primer_title">May Wispel send you a nudge?</string>
+    <string name="child_push_primer_body">Only short, friendly reminders — no task names or photos on your lock screen. You can turn this off later.</string>
+    <string name="child_push_primer_accept">Yes, please</string>
+    <string name="child_push_primer_decline">Not now</string>
+    <string name="push_channel_name">Friendly reminders</string>
+    <string name="push_channel_description">Short nudges from Wispel. Never with task names or photos on your lock screen.</string>
+
+    <!-- WS-PROPOSAL — teen task proposal -->
+    <string name="proposal_title">Request a task</string>
+    <string name="proposal_button">Request a task</string>
+    <string name="proposal_form_title">New proposal</string>
+    <string name="proposal_form_detail">Got an idea for a task? Send it through — a parent decides and sets the points.</string>
+    <string name="proposal_field_title">Task name</string>
+    <string name="proposal_field_title_placeholder">E.g. wash the windows</string>
+    <string name="proposal_field_category">Type</string>
+    <string name="proposal_category_homework">Homework</string>
+    <string name="proposal_category_household">Household</string>
+    <string name="proposal_category_selfcare">Self-care</string>
+    <string name="proposal_category_custom">Other</string>
+    <string name="proposal_field_points_label">You suggest: %d points</string>
+    <string name="proposal_field_points_stepper">%d points</string>
+    <string name="proposal_field_note">Note (optional)</string>
+    <string name="proposal_field_note_placeholder">Explain why this task is useful</string>
+    <string name="proposal_submit">Send proposal</string>
+    <string name="proposal_submit_success">Proposal sent — a parent will take a look!</string>
+    <string name="proposal_submit_error">That didn\'t work — try again soon.</string>
+    <string name="proposal_list_title">Your requests</string>
+    <string name="proposal_list_loading">Loading requests…</string>
+    <string name="proposal_list_empty">No requests yet — feel free to send one!</string>
+    <string name="proposal_load_error">Couldn\'t load requests — try again soon.</string>
+    <string name="proposal_suggested_points">You suggested %d points</string>
+    <string name="proposal_status_pending">Waiting on a parent</string>
+    <string name="proposal_status_approved">Approved!</string>
+    <string name="proposal_status_declined">Let\'s try something else</string>
+
+    <!-- WS-FOCUS — focus timer -->
+    <string name="focus_title">Focus time</string>
+    <string name="focus_ready">Ready to start</string>
+    <string name="focus_running">Going…</string>
+    <string name="focus_paused">On a break</string>
+    <string name="focus_done">Nice work!</string>
+    <string name="focus_start">Start!</string>
+    <string name="focus_pause">Pause</string>
+    <string name="focus_resume">Resume</string>
+    <string name="focus_stop">Stop</string>
+    <string name="focus_duration_format">%d min</string>
+    <string name="focus_duration_pick">How long do you want to focus?</string>
+    <string name="focus_button_inline">Start focus</string>
+    <string name="focus_button_inline_a11y">Start focus timer for this task</string>
+    <string name="focus_complete_offer_title">Mark task done too?</string>
+    <string name="focus_complete_offer_detail">You worked hard — want to check the task off as well?</string>
+    <string name="focus_complete_offer_yes">Yes, done!</string>
+    <string name="focus_complete_offer_later">Maybe later</string>
+    <string name="focus_a11y_idle">Focus timer, not started</string>
+    <string name="focus_a11y_running">Focus timer running, %s remaining</string>
+    <string name="focus_a11y_paused">Focus timer paused, %s remaining</string>
+    <string name="focus_a11y_done">Focus timer done — nice work!</string>
+
+    <!-- Parent gate -->
+    <string name="parent_gate_title">Parent gate</string>
+    <string name="parent_gate_description">Parent mode stays hidden from children and opens only via device authentication or a parent account.</string>
+    <string name="parent_gate_behind">What\'s behind the gate</string>
+    <string name="parent_gate_behind_detail">Today per child, approvals with safe photo review, quiet settings and privacy actions like export or delete.</string>
+    <string name="parent_gate_child_pin_blocked">Child PIN cannot open this</string>
+    <string name="parent_gate_la_button">Unlock with your fingerprint or screen lock</string>
+    <string name="parent_gate_la_title">Open the parent gate</string>
+    <string name="parent_gate_la_reason">Unlock Wispel parent mode</string>
+    <string name="parent_gate_la_failed">Authentication failed. Try again or use your parent account.</string>
+    <string name="parent_gate_account_button">Use parent account</string>
+    <string name="parent_gate_cancel">Go back</string>
+    <string name="parent_gate_push_note">Push links to approvals also land here first, with generic lock screen copy.</string>
+    <string name="parent_gate_account_title">Sign in as parent</string>
+    <string name="parent_gate_account_detail">Approvals, management and privacy actions need a parent account session on this device.</string>
+
+    <!-- Parent mode -->
+    <string name="parent_mode_title">Parent mode</string>
+    <string name="parent_mode_subtitle">See what\'s happening per child today, safely approve photos and manage settings.</string>
+    <string name="parent_mode_pending">%d to review</string>
+    <string name="parent_mode_back">Back to child mode</string>
+    <string name="parent_mode_refresh">Refresh</string>
+    <string name="parent_surface_vandaag">Today</string>
+    <string name="parent_surface_goedkeuren">Approvals</string>
+    <string name="parent_surface_taken">Tasks</string>
+    <string name="parent_surface_beloningen">Rewards</string>
+    <string name="parent_surface_instellingen">Settings</string>
+
+    <!-- Parent today -->
+    <string name="parent_today_loading">Loading today…</string>
+    <string name="parent_today_loading_detail">Fetching the latest overview per child.</string>
+    <string name="parent_today_empty">No children visible yet</string>
+    <string name="parent_today_empty_detail">Once a profile is paired, you\'ll see each child\'s day in three columns here.</string>
+    <string name="parent_today_child_quiet">It\'s quiet today for %s.</string>
+    <string name="parent_today_points_short">%d pts</string>
+    <string name="parent_bucket_open">To do</string>
+    <string name="parent_bucket_awaiting">Awaiting approval</string>
+    <string name="parent_bucket_done">Done</string>
+    <string name="parent_bucket_empty">—</string>
+    <string name="parent_task_status_open">Ready to start</string>
+    <string name="parent_task_status_submitted">Awaiting approval</string>
+    <string name="parent_task_status_approved">Approved</string>
+    <string name="parent_task_status_completed">Completed</string>
+    <string name="parent_task_status_redo">Needs another look</string>
+
+    <!-- Parent approvals -->
+    <string name="parent_approvals_empty">Nothing to review — nice and quiet.</string>
+    <string name="parent_approvals_empty_detail">New photos and approvals will appear here automatically behind the parent gate.</string>
+    <string name="parent_approvals_submitted_by">Submitted by %s</string>
+    <string name="parent_approvals_approve">Approve</string>
+    <string name="parent_approvals_redo">Needs another look</string>
+    <string name="parent_approvals_no_photo">No photo</string>
+    <string name="parent_approvals_photo_safe">View fullscreen without showing location or camera metadata.</string>
+    <string name="parent_approvals_photo_processing">Photo is being checked…</string>
+    <string name="parent_approvals_photo_ready">Photo ready to view</string>
+    <string name="parent_approvals_toggle_bulk">Include in bulk approval</string>
+    <string name="parent_photo_accessibility_label">Task photo</string>
+
+    <!-- Bulk approve -->
+    <string name="parent_bulk_title">Bulk approve</string>
+    <string name="parent_bulk_allowed">Your selection belongs to the same child and can be approved together.</string>
+    <string name="parent_bulk_empty">Pick a few cards from the same child first.</string>
+    <string name="parent_bulk_mixed">Bulk approve only works for cards from the same child.</string>
+    <string name="parent_bulk_photo_ack">For selected photos we ask for a conscious acknowledgement first.</string>
+    <string name="parent_bulk_photo_toggle">I have consciously reviewed the selected photos.</string>
+
+    <!-- Redo sheet -->
+    <string name="parent_redo_title">Needs another look</string>
+    <string name="parent_redo_note_prompt">Send a short, positive note for %s.</string>
+    <string name="parent_redo_note_placeholder">Almost! Take another look at the corners and you\'re done.</string>
+    <string name="parent_redo_submit">Send note</string>
+
+    <!-- Parent settings -->
+    <string name="parent_settings_sound_title">Sounds</string>
+    <string name="parent_settings_sound_detail">Parents can toggle the reward sound here without it being visible in child mode.</string>
+    <string name="parent_settings_sound_toggle">Sounds on</string>
+    <string name="parent_settings_privacy_title">Privacy and data</string>
+    <string name="parent_settings_privacy_detail">You can request your family data or delete your account. This is only accessible behind the parent gate.</string>
+    <string name="parent_settings_export">Request data export</string>
+    <string name="parent_settings_export_ready">Your export is ready: %s</string>
+    <string name="parent_settings_export_pending">We\'re preparing your export. Come back shortly behind the parent gate.</string>
+    <string name="parent_settings_export_failed">The export failed. Please try again soon.</string>
+    <string name="parent_settings_delete">Delete account and family</string>
+    <string name="parent_settings_delete_confirm_title">Are you sure?</string>
+    <string name="parent_settings_delete_confirm_message">This will request deletion of your account and family data. This stays behind the parent gate.</string>
+    <string name="parent_settings_delete_confirm_button">Delete account</string>
+    <string name="parent_settings_delete_success">Your account deletion request has been processed. You will be safely returned.</string>
+    <string name="parent_settings_delete_siwa_title">Confirm with Apple</string>
+    <string name="parent_settings_delete_siwa_detail">For safety we ask for Apple Sign In again before deleting the family.</string>
+
+    <!-- Parent task and reward management -->
+    <string name="parent_tasks_create_title">New task</string>
+    <string name="parent_tasks_create_placeholder">For example: put shoes away</string>
+    <string name="parent_tasks_create_points">%d points</string>
+    <string name="parent_tasks_create_button">Add task</string>
+    <string name="parent_tasks_meta">%1$d pts · %2$d child(ren)</string>
+    <string name="parent_tasks_archive">Archive</string>
+    <string name="parent_tasks_empty">No tasks yet — add one when you\'re ready.</string>
+    <string name="parent_tasks_need_child">Pair a child profile before adding a task.</string>
+    <string name="parent_rewards_create_title">New reward</string>
+    <string name="parent_rewards_create_placeholder">For example: movie night</string>
+    <string name="parent_rewards_create_price">%d points</string>
+    <string name="parent_rewards_create_button">Add reward</string>
+    <string name="parent_rewards_archive">Archive</string>
+    <string name="parent_rewards_empty">No rewards in the shop yet.</string>
+    <string name="parent_stepper_increase">More</string>
+    <string name="parent_stepper_decrease">Less</string>
+
+    <!-- Photo viewer -->
+    <string name="parent_photo_safe_title">Safe photo viewer</string>
+    <string name="parent_photo_safe_detail">Wispel intentionally hides EXIF, location and camera data here. Only the photo itself matters for review.</string>
+
+    <!-- Sync status -->
+    <string name="parent_sync_live">Live</string>
+    <string name="parent_sync_sync">Sync</string>
+    <string name="parent_sync_disconnected">Disconnected</string>
+    <string name="parent_sync_connecting">Connecting…</string>
+    <string name="parent_sync_connected">Connected</string>
+    <string name="parent_sync_reconnect">Retrying in %ds</string>
+    <string name="parent_sync_idle">Not started yet</string>
+    <string name="parent_sync_busy">Syncing</string>
+    <string name="parent_sync_updated">Updated at %s</string>
+    <string name="parent_sync_retry">Try again</string>
+
+    <!-- Core error messages -->
+    <string name="error_invalid_family_code">That family code doesn\'t look complete yet.</string>
+    <string name="error_invalid_pin">That PIN is still missing a few digits.</string>
+    <string name="error_invalid_parent_note">Write a short, positive note first.</string>
+    <string name="error_session_missing">Your session expired. Pair this device again.</string>
+    <string name="error_parent_session_missing">Sign in with your parent account to approve or manage.</string>
+    <string name="error_parent_reauth_required">Confirm with Apple again to delete the account.</string>
+    <string name="error_not_implemented">This action isn\'t available on this device yet.</string>
+    <string name="error_transport_invalid_url">The connection could not be set up.</string>
+    <string name="error_transport_offline">We can\'t connect right now — your checked-off tasks are safe.</string>
+    <string name="error_transport_generic">Something went wrong. Feel free to try again.</string>
+    <string name="error_transport_decoding">That answer was unexpected. Try again in a moment.</string>
+    <string name="error_photo_processing_failed">Photo didn\'t work — you can try again.</string>
+    <string name="error_photo_processing_timeout">Photo is being checked… come back in a moment.</string>
+    <string name="error_biometrics_unavailable">Fingerprint isn\'t available right now. Use your PIN.</string>
+    <string name="error_biometrics_cancelled">No problem — you can use your PIN.</string>
+    <string name="error_apple_sign_in_failed">Signing in with Apple didn\'t work. Please try again.</string>
+
+    <!-- Home screen widget -->
+    <string name="widget_display_name">N tasks left</string>
+    <string name="widget_description">Shows how many open tasks are left today.</string>
+    <string name="widget_all_done">All done for now</string>
+    <string name="widget_open_hint">Open the app for details</string>
+
+    <!-- Counts: "1 punten" / "1 dagen" is wrong Dutch. -->
+    <plurals name="child_points_badge">
+        <item quantity="one">%d point</item>
+        <item quantity="other">%d points</item>
+    </plurals>
+    <plurals name="child_streak">
+        <item quantity="one">🔥 %d day streak</item>
+        <item quantity="other">🔥 %d day streak</item>
+    </plurals>
+    <plurals name="child_streak_teen">
+        <item quantity="one">%d day streak</item>
+        <item quantity="other">%d day streak</item>
+    </plurals>
+    <plurals name="child_task_points">
+        <item quantity="one">+%d point</item>
+        <item quantity="other">+%d points</item>
+    </plurals>
+    <plurals name="child_shop_balance">
+        <item quantity="one">You have %d point</item>
+        <item quantity="other">You have %d points</item>
+    </plurals>
+    <plurals name="parent_today_balance">
+        <item quantity="one">%d point</item>
+        <item quantity="other">%d points</item>
+    </plurals>
+    <plurals name="parent_approvals_points">
+        <item quantity="one">%d point</item>
+        <item quantity="other">%d points</item>
+    </plurals>
+    <plurals name="parent_bulk_button">
+        <item quantity="one">Approve %d card</item>
+        <item quantity="other">Approve %d cards</item>
+    </plurals>
+    <plurals name="parent_bulk_failures">
+        <item quantity="one">%d approval failed — try it again calmly.</item>
+        <item quantity="other">%d approvals failed — try those again calmly.</item>
+    </plurals>
+    <plurals name="parent_rewards_meta">
+        <item quantity="one">%d point</item>
+        <item quantity="other">%d points</item>
+    </plurals>
+    <plurals name="widget_open_tasks">
+        <item quantity="one">%d task left</item>
+        <item quantity="other">%d tasks left</item>
+    </plurals>
+</resources>

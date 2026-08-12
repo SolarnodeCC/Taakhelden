@@ -15,6 +15,7 @@
     "apps/api/src/routes/auth.ts": "api",
     "apps/web/": "web",
     "apps/ios/": "ios",
+    "apps/android/": "android",
     "packages/shared/": "shared",
     "Design System/": "design-system",
     "docs/": "docs",

@@ -9,6 +9,10 @@
       "command": "npx wrangler d1 migrations apply taakhelden-db --local",
       "purpose": "dry-run new D1 migrations locally before they reach CI"
     },
+    "apps/android/": {
+      "command": "gradle -p apps/android :core:test :app:testDebugUnitTest :app:lintDebug",
+      "purpose": "JUnit suite for the ported core logic plus the app module's build and translation lint; :core alone runs without an Android SDK"
+    },
     "apps/web/": {
       "command": "npm run typecheck --workspaces --if-present",
       "purpose": "no Vitest/Playwright suite exists yet for the Next.js dashboard; typecheck is the current gate"

@@ -18,6 +18,7 @@ the `paths` glob (lazy: `alwaysApply: false`). Global workflow rules live in
 | Web BFF | `web/bff.md` | `app/api/**`, `lib/api/**`, `lib/auth/**` |
 | Web i18n | `web/i18n.md` | `messages/**`, `i18n/**` |
 | iOS | `ios/swift.md` | `apps/ios/**/*.swift`, `**/*.strings` |
+| Android | `android/kotlin.md` | `apps/android/**/*.kt`, `**/*.kts`, `**/*.xml` |
 | CI & agent | `ops/ci-and-agent.md` | `.github/workflows/**`, `.claude/**`, `agent/**` |
 | Generated zones | `ops/generated-zones.md` | `target/jankurai/**`, baseline JSON |
 | Docs | `docs/markdown.md` | `docs/**`, `AGENTS.md`, `CLAUDE.md` |

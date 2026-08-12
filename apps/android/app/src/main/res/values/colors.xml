@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Only the handful of tokens the Android framework needs before Compose starts
+  (window background, launcher icon). The full palette lives in the shared design
+  tokens (nl.taakhelden.core.designsystem.WPalettes) — never add ad-hoc colours here.
+-->
+<resources>
+    <color name="wispel_parent_background">#FFFFFFFF</color>
+    <color name="wispel_kid_cream">#FFFFF8EC</color>
+    <color name="wispel_kid_coral">#FFFF6F59</color>
+    <color name="wispel_parent_accent">#FF0E9F8E</color>
+</resources>

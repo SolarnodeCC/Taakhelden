@@ -35,20 +35,26 @@ export async function deleteDeviceToken(db: D1Database, familyId: string, apnsTo
     .run();
 }
 
+/** Een pushtoken met de gateway waarlangs het verstuurd moet worden. */
+export type DeviceToken = { token: string; platform: string };
+
 export async function listDeviceTokensForUsers(
   db: D1Database,
   familyId: string,
   userIds: string[],
-): Promise<string[]> {
+): Promise<DeviceToken[]> {
   if (userIds.length === 0) return [];
   const placeholders = userIds.map(() => "?").join(",");
   const { results } = await db
     .prepare(
-      `SELECT DISTINCT d.apns_token FROM devices d
+      `SELECT DISTINCT d.apns_token, d.platform FROM devices d
        JOIN users u ON u.id = d.user_id AND u.family_id = ? AND u.deleted_at IS NULL
        WHERE d.user_id IN (${placeholders})`,
     )
     .bind(familyId, ...userIds)
     .all();
-  return results.map((r) => r.apns_token as string);
+  return results.map((r) => ({
+    token: r.apns_token as string,
+    platform: (r.platform as string) ?? "ios",
+  }));
 }
