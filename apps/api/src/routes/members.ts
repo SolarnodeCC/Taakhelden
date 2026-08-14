@@ -160,7 +160,14 @@ members.post("/:id/pincode", validate("json", PincodeBody), async (c) => {
     throw new ApiException(404, ErrorCodes.NOT_FOUND, "Kindprofiel niet gevonden.");
   }
   await repo.setMemberPincode(c.env.DB, familyId, memberId, await hashSecret(c.req.valid("json").pincode));
-  return c.json({ ok: true });
+  // Een pincode wordt gewijzigd omdát de oude niet meer geheim is (broertje kijkt
+  // mee, klasgenoot weet 'm). Dan moeten de toestellen die nog met de óude code
+  // zijn ingelogd er ook uit: het 30-daagse device-token en het lopende
+  // access-token overleefden de wijziging anders gewoon, terwijl de ouder ziet
+  // dat de code is aangepast.
+  const revokedCount = await revokeChildDeviceSessions(c.env.DB, familyId, memberId);
+  await revokeIssuedTokens(c.env, memberId);
+  return c.json({ ok: true, revokedCount });
 });
 
 members.post("/:id/device-sessions/revoke", async (c) => {

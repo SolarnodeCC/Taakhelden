@@ -47,8 +47,12 @@ export function getApiBaseUrl(): string {
  * Worker cannot identify the caller and every rate limit degrades into a single
  * shared counter, letting one client lock everyone out.
  *
- * Read only from headers Cloudflare sets on the inbound edge request — never
- * from a client-supplied value that we would then present as trusted.
+ * `CF-Connecting-IP` is set by Cloudflare's edge and overwrites anything the
+ * client sent, so it is trustworthy. `X-Forwarded-For` is NOT: Cloudflare
+ * appends to it rather than replacing it, so its first element is whatever the
+ * client put there. It stays as a fallback only for local `next dev`, where no
+ * edge header exists; behind Cloudflare the first branch always wins. Never
+ * promote this value to anything but a rate-limit key.
  */
 export function forwardedClientIp(req: Request): string | null {
   const direct = req.headers.get("CF-Connecting-IP");
