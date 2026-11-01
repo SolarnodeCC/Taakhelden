@@ -10,7 +10,7 @@
     "openapi:check": "npm run openapi:generate && git diff --exit-code -- ../../docs/openapi/taakhelden-core-v1.json ../../apps/ios/TaakHelden/Core/API/Generated/ContractModels.swift ../../apps/android/core/src/main/kotlin/nl/taakhelden/core/api/ContractModels.kt"
   },
   "dependencies": {
-    "zod": "^3.23.0"
+    "zod": "^4.6.6"
   },
   "devDependencies": {
     "tsx": "^4.23.1",
